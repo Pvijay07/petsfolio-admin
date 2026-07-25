@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Controllers;
+
+class Home extends BaseController
+{
+    public function index(): string
+    {
+        return redirect('https://www.petsfolio.com/in/');
+    }
+    public function chat()
+    {
+        return view('chat');
+    }
+}

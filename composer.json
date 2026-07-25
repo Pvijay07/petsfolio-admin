@@ -1,0 +1,7 @@
+{
+    "require": {
+        "minishlink/web-push": "^10.1",
+        "dompdf/dompdf": "*",
+        "mongodb/mongodb": "^1.19"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "require": {
+        "google/apiclient": "2.15",
+        "google/apiclient-services": "0.370",
+        "google/auth": "1.28",
+        "firebase/php-jwt": "6.0"
+    }
+}

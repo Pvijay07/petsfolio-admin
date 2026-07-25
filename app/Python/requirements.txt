@@ -1,0 +1,4 @@
+faster-whisper>=1.0.0
+pyannote.audio>=3.1.0
+ollama>=0.2.0
+pydantic>=2.0.0
