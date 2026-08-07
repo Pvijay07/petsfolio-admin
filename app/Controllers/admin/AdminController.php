@@ -1670,12 +1670,12 @@ class AdminController extends BaseController
 
             // SMTP Configuration from environment
             $config = [
-                'protocol'   => getenv('email.protocol') ?: 'smtp',
-                'SMTPHost'   => getenv('email.SMTPHost') ?: 'smtp.hostinger.com',
-                'SMTPPort'   => getenv('email.SMTPPort') ?: 465,
-                'SMTPUser'   => getenv('email.SMTPUser') ?: 'support@petsfolio.in',
-                'SMTPPass'   => getenv('email.SMTPPass') ?: '>z8RFpxBBm',
-                'SMTPCrypto' => getenv('email.SMTPCrypto') ?: 'ssl',
+                'protocol'   => getenv('email.protocol'),
+                'SMTPHost'   => getenv('email.SMTPHost'),
+                'SMTPPort'   => getenv('email.SMTPPort'),
+                'SMTPUser'   => getenv('email.SMTPUser'),
+                'SMTPPass'   => getenv('email.SMTPPass'),
+                'SMTPCrypto' => getenv('email.SMTPCrypto'),
                 'mailType'   => 'html',
                 'charset'    => 'utf-8',
                 'newline'    => "\r\n",
