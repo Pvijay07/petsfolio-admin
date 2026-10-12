@@ -6,9 +6,11 @@ use CodeIgniter\Model;
 
 class Booking extends Model
 {
+    protected $table = 'walking_service_bookings';
     protected $db;
     public function __construct()
     {
+        parent::__construct();
         $this->db = \Config\Database::connect();
     }
     public function getWalkingBookings()
@@ -54,6 +56,7 @@ class Booking extends Model
         $this->attachPets($results);
         return $results;
     }
+
     public function getSittingBookings($booking_status)
     {
         $results = $this->db->table('sitting_service_bookings')
@@ -88,6 +91,7 @@ class Booking extends Model
         $this->attachPets($results);
         return $results;
     }
+
     public function getSittingTracking($booking_id)
     {
         return $this->db->table('sitting_service_bookings')
@@ -108,6 +112,7 @@ class Booking extends Model
             ->get()
             ->getResult();
     }
+
     public function getSittingWalletDetails($booking_id)
     {
         $booking = $this->db->table('sitting_service_bookings')
@@ -164,6 +169,7 @@ class Booking extends Model
             'sp_histories' => $spHistories,
         ];
     }
+
     public function getGroomingBookings($booking_status)
     {
         $grooming = $this->db->table('grooming_service_bookings')
@@ -216,15 +222,19 @@ class Booking extends Model
         $this->attachPets($grooming);
         return $grooming;
     }
+
     public function getBookingAddons($id, $service_id)
     {
         return $this->db->table('booking_addons')
-            ->select('booking_addons.addon')
+            ->select('booking_addons.addon, booking_addons.addon as name, COALESCE(NULLIF(booking_addons.price, 0), MAX(addons.price), 0) as price, MAX(addons.price) as addon_table_price, COALESCE(NULLIF(booking_addons.price, 0), MAX(addons.price), 0) as addon_price')
+            ->join('addons', 'TRIM(addons.name) = TRIM(booking_addons.addon) AND (addons.service_id = booking_addons.service_id OR addons.service_id = ' . (int) $service_id . ')', 'left')
             ->where('booking_addons.booking_id', $id)
             ->where('booking_addons.service_id', $service_id)
+            ->groupBy('booking_addons.id')
             ->get()
             ->getResult();
     }
+
     public function getTotalQuotes($booking_id, $service_id)
     {
         return $this->db->table('quotations')
@@ -232,6 +242,7 @@ class Booking extends Model
             ->where('quotations.service_id', $service_id)
             ->countAllResults();
     }
+
     public function getTotalNewQuotes($booking_id, $service_id)
     {
         return $this->db->table('quotations')
@@ -241,6 +252,7 @@ class Booking extends Model
 
             ->countAllResults();
     }
+
     public function getOtherQuotes($booking_id, $provider_id, $service_id)
     {
         return $this->db->table('quotations')
@@ -445,6 +457,7 @@ class Booking extends Model
         $this->attachPets($results);
         return $results;
     }
+
     public function getCancelledBookingsCount($status)
     {
         $walkingCount = $this->db->table('walking_service_bookings')
@@ -471,6 +484,7 @@ class Booking extends Model
             'training' => $trainingCount
         ];
     }
+
     public function getNoBidsBookingsCount($status = 'New')
     {
         $walking = $this->db->table('walking_service_bookings')
@@ -1077,6 +1091,14 @@ class Booking extends Model
 
             ->countAllResults();
     }
+    public function getCompletedSittings()
+    {
+        return $this->db->table('sitting_service_bookings')
+            ->join('quotations', 'quotations.booking_id = sitting_service_bookings.id', 'left')
+            ->where('sitting_service_bookings.status', 'Completed')
+            ->whereIn('quotations.status', ['Accepted', 'Completed'])
+            ->countAllResults();
+    }
     public function getPendingWalkings()
     {
         return $this->db->table('walking_service_bookings')
@@ -1115,6 +1137,14 @@ class Booking extends Model
             ->where('training_service_bookings.status', 'Confirmed')
             ->where('quotations.status', 'Accepted')
 
+            ->countAllResults();
+    }
+    public function getPendingSittings()
+    {
+        return $this->db->table('sitting_service_bookings')
+            ->join('quotations', 'quotations.booking_id = sitting_service_bookings.id', 'left')
+            ->where('sitting_service_bookings.status', 'Confirmed')
+            ->where('quotations.status', 'Accepted')
             ->countAllResults();
     }
     public function getRevenue()
@@ -1719,6 +1749,7 @@ class Booking extends Model
             ->select('service_providers.id as provider_id, service_providers.name as provider_name, service_providers.phone as provider_phone, service_providers.service_latitude, service_providers.service_longitude, service_providers.device_token')
             ->join('sp_services', 'sp_services.provider_id = service_providers.id', 'left')
             ->where('sp_services.service_id', $service_id)
+            ->where('(service_providers.is_on_hold = 0 OR service_providers.is_on_hold IS NULL)')
             ->get()
             ->getResult();
     }
@@ -1834,19 +1865,56 @@ class Booking extends Model
     {
         return $this->db->table($table)
             ->where('id', $booking_id)
-            ->update(['service_start_date' => $start_date, 'service_end_date' => $end_date, 'status' => 'New']);
+            ->update([
+                'service_start_date' => $start_date,
+                'service_end_date'   => $end_date,
+                'status'             => 'New',
+                'repost'             => 1,
+                'pricing_version'    => 2
+            ]);
     }
     public function repostGroomingBooking($table, $booking_id, $start_date)
     {
         return $this->db->table($table)
             ->where('id', $booking_id)
-            ->update(['service_start_date' => $start_date, 'status' => 'New']);
+            ->update([
+                'service_start_date' => $start_date,
+                'status'             => 'New',
+                'repost'             => 1,
+                'pricing_version'    => 2
+            ]);
     }
     public function repostTrainingBooking($table, $booking_id, $start_date)
     {
         return $this->db->table($table)
             ->where('id', $booking_id)
-            ->update(['service_start_date' => $start_date, 'status' => 'New']);
+            ->update([
+                'service_start_date' => $start_date,
+                'status'             => 'New',
+                'repost'             => 1,
+                'pricing_version'    => 2
+            ]);
+    }
+    public function repostSittingBooking($table, $booking_id, $start_date)
+    {
+        return $this->db->table($table)
+            ->where('id', $booking_id)
+            ->update([
+                'service_start_date' => $start_date,
+                'status'             => 'New',
+                'repost'             => 1,
+                'pricing_version'    => 2
+            ]);
+    }
+    public function repostBoardingBooking($table, $booking_id, $start_date)
+    {
+        return $this->db->table($table)
+            ->where('id', $booking_id)
+            ->update([
+                'service_start_date' => $start_date,
+                'status'             => 'New',
+                'pricing_version'    => 2
+            ]);
     }
     public function getMostRequests()
     {
@@ -2250,7 +2318,7 @@ class Booking extends Model
             ->select('service_providers.phone as provider_phone')
 
             ->join('users', 'transactions.user_id = users.id and transactions.transaction_type = "booking"', 'left')
-            ->join('service_providers', 'transactions.provider_id = service_providers.id and transactions.transaction_type IN ("Service_registration","Grooming_registration","Training_registration","Walking_registration") ', 'left')
+            ->join('service_providers', 'transactions.provider_id = service_providers.id and transactions.transaction_type IN ("Service_registration","Grooming_registration","Training_registration","Walking_registration","Sitting_registration") ', 'left')
 
             ->where('transactions.transaction_type', $type)
             ->orderBy('transactions.id', 'DESC')
@@ -2280,6 +2348,28 @@ class Booking extends Model
                     $transaction->service_name = $service->name;
                 }
             }
+
+            // Financial breakdown:
+            // Base Amount (1000) -> Platform Fee 10% (100) -> Subtotal (1100) -> GST 18% (198) -> Paid Amount (1298)
+            $paid = (float)($transaction->amount ?? 0);
+            if ($paid > 0) {
+                $base = round($paid / 1.298, 2);
+                $platform = round($base * 0.10, 2);
+                $subtotal = round($base + $platform, 2);
+                $gst = round($paid - $subtotal, 2);
+
+                $transaction->base_amount = $base;
+                $transaction->paid_amount = $paid;
+                $transaction->platform = $platform;
+                $transaction->platform_charges = $platform;
+                $transaction->gst = $gst;
+            } else {
+                $transaction->base_amount = 0.00;
+                $transaction->paid_amount = 0.00;
+                $transaction->platform = 0.00;
+                $transaction->platform_charges = 0.00;
+                $transaction->gst = 0.00;
+            }
         }
 
         return $transactions;
@@ -2292,8 +2382,8 @@ class Booking extends Model
             ->select('service_providers.name as provider_name')
             ->select('service_providers.email as provider_email')
             ->select('service_providers.phone as provider_phone')
-            ->join('service_providers', 'transactions.provider_id = service_providers.id and transactions.transaction_type IN ("Service_registration","Grooming_registration","Training_registration","Walking_registration") ', 'left')
-            ->whereIn('transactions.transaction_type', ["Service_registration", "Grooming_registration", "Training_registration", "Walking_registration"])
+            ->join('service_providers', 'transactions.provider_id = service_providers.id and transactions.transaction_type IN ("Service_registration","Grooming_registration","Training_registration","Walking_registration","Sitting_registration") ', 'left')
+            ->whereIn('transactions.transaction_type', ["Service_registration", "Grooming_registration", "Training_registration", "Walking_registration", "Sitting_registration"])
             ->orderBy('transactions.id', 'DESC')
             ->get()
             ->getResult();
@@ -2806,7 +2896,7 @@ class Booking extends Model
             ->select('COALESCE(u.phone, sp.phone) as phone')
             ->select('COALESCE(u.profile, sp.profile) as profile')
             ->select('tc.name as category')
-            ->select('SUM(CASE WHEN m.is_read = 0 AND m.sender_type = "client" THEN 1 ELSE 0 END) as unread_count')
+            ->select('SUM(CASE WHEN m.is_read = 0 AND m.sender_type != "support" THEN 1 ELSE 0 END) as unread_count')
             ->select('employees.name as support_name')
 
             ->join('users u', 'u.id = t.user_id AND (t.user_type = "client" OR t.user_type = "user")', 'left')
@@ -3377,55 +3467,103 @@ class Booking extends Model
 
     public function getBookingById($bookingId)
     {
-        // Try to find booking in all services
-        $walking = $this->db->table('walking_service_bookings')
-            ->select('walking_service_bookings.service_id')
-            ->select('user_addresses.city,user_addresses.state, user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
-            ->join('user_addresses', 'user_addresses.id = walking_service_bookings.address_id', 'left')
+        $hasFcm = $this->db->fieldExists('fcm_token', 'users');
+        $userTokenSelect = $hasFcm
+            ? 'COALESCE(NULLIF(users.device_token, ""), users.fcm_token) as user_device_token'
+            : 'users.device_token as user_device_token';
 
-            ->where('walking_service_bookings.id', $bookingId)->get()->getRow();
+        // Try to find booking in all services
+        $walking = $this->db->table('walking_service_bookings wb')
+            ->select('wb.id, wb.user_id, wb.service_id, wb.status')
+            ->select('users.name as user_name, users.phone as user_phone, ' . $userTokenSelect)
+            ->select('user_addresses.city, user_addresses.state, user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude, user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname')
+            ->join('users', 'users.id = wb.user_id', 'left')
+            ->join('user_addresses', 'user_addresses.id = wb.address_id', 'left')
+            ->where('wb.id', $bookingId)->get()->getRow();
         if ($walking) {
             $walking->service_type = 'walking';
-            return $walking;
+            return $this->enrichBookingCoordinates($walking);
         }
 
-        $grooming = $this->db->table('grooming_service_bookings')
-            ->select('grooming_service_bookings.service_id')
-
-            ->select('user_addresses.city,user_addresses.state, user_addresses.address,user_addresses.latitude as booking_latitude,user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
-            ->join('user_addresses', 'user_addresses.id = grooming_service_bookings.address_id', 'left')
-
-
-            ->where('grooming_service_bookings.id', $bookingId)->get()->getRow();
+        $grooming = $this->db->table('grooming_service_bookings gb')
+            ->select('gb.id, gb.user_id, gb.service_id, gb.status')
+            ->select('users.name as user_name, users.phone as user_phone, ' . $userTokenSelect)
+            ->select('user_addresses.city, user_addresses.state, user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude, user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname')
+            ->join('users', 'users.id = gb.user_id', 'left')
+            ->join('user_addresses', 'user_addresses.id = gb.address_id', 'left')
+            ->where('gb.id', $bookingId)->get()->getRow();
         if ($grooming) {
             $grooming->service_type = 'grooming';
-            return $grooming;
+            return $this->enrichBookingCoordinates($grooming);
         }
 
-        $training = $this->db->table('training_service_bookings')
-            ->select('training_service_bookings.service_id')
-
-            ->select('user_addresses.city,user_addresses.state, user_addresses.address,user_addresses.latitude as booking_latitude,user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
-            ->join('user_addresses', 'user_addresses.id = training_service_bookings.address_id', 'left')
-
-            ->where('training_service_bookings.id', $bookingId)->get()->getRow();
+        $training = $this->db->table('training_service_bookings tb')
+            ->select('tb.id, tb.user_id, tb.service_id, tb.status')
+            ->select('users.name as user_name, users.phone as user_phone, ' . $userTokenSelect)
+            ->select('user_addresses.city, user_addresses.state, user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude, user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname')
+            ->join('users', 'users.id = tb.user_id', 'left')
+            ->join('user_addresses', 'user_addresses.id = tb.address_id', 'left')
+            ->where('tb.id', $bookingId)->get()->getRow();
         if ($training) {
             $training->service_type = 'training';
-            return $training;
+            return $this->enrichBookingCoordinates($training);
         }
-        $sitting = $this->db->table('sitting_service_bookings')
-            ->select('sitting_service_bookings.service_id')
 
-            ->select('user_addresses.city,user_addresses.state, user_addresses.address,user_addresses.latitude as booking_latitude,user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
-            ->join('user_addresses', 'user_addresses.id = sitting_service_bookings.address_id', 'left')
-
-            ->where('sitting_service_bookings.id', $bookingId)->get()->getRow();
+        $sitting = $this->db->table('sitting_service_bookings sb')
+            ->select('sb.id, sb.user_id, sb.service_id, sb.status')
+            ->select('users.name as user_name, users.phone as user_phone, ' . $userTokenSelect)
+            ->select('user_addresses.city, user_addresses.state, user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude, user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname')
+            ->join('users', 'users.id = sb.user_id', 'left')
+            ->join('user_addresses', 'user_addresses.id = sb.address_id', 'left')
+            ->where('sb.id', $bookingId)->get()->getRow();
         if ($sitting) {
             $sitting->service_type = 'sitting';
-            return $sitting;
+            return $this->enrichBookingCoordinates($sitting);
         }
+
         return null;
     }
+
+    /**
+     * Ensures booking object has coordinates; if address_id was missing or deleted,
+     * falls back to the user's latest recorded address with coordinates.
+     */
+    protected function enrichBookingCoordinates($booking)
+    {
+        if (!$booking) {
+            return null;
+        }
+
+        $hasCoords = !empty($booking->booking_latitude) &&
+                     !empty($booking->booking_longitude) &&
+                     is_numeric($booking->booking_latitude) &&
+                     is_numeric($booking->booking_longitude) &&
+                     !((float)$booking->booking_latitude == 0.0 && (float)$booking->booking_longitude == 0.0);
+
+        if (!$hasCoords && !empty($booking->user_id)) {
+            $fallback = $this->db->table('user_addresses')
+                ->where('user_id', $booking->user_id)
+                ->where('latitude IS NOT NULL', null, false)
+                ->where('longitude IS NOT NULL', null, false)
+                ->where('latitude !=', '')
+                ->where('longitude !=', '')
+                ->where('latitude !=', 0)
+                ->orderBy('id', 'DESC')
+                ->get()
+                ->getRow();
+
+            if ($fallback && !empty($fallback->latitude) && !empty($fallback->longitude)) {
+                $booking->booking_latitude  = $fallback->latitude;
+                $booking->booking_longitude = $fallback->longitude;
+                if (empty($booking->city)) $booking->city = $fallback->city ?? null;
+                if (empty($booking->state)) $booking->state = $fallback->state ?? null;
+                if (empty($booking->address)) $booking->address = $fallback->address ?? null;
+            }
+        }
+
+        return $booking;
+    }
+
     public function getBookingStatus($booking_id)
     {
         // Walking
@@ -3467,7 +3605,7 @@ class Booking extends Model
         (
             COALESCE(SUM(CASE WHEN category = 'refund_amount' AND transaction_type = 'credit' THEN amount END), 0)
             -
-            COALESCE(SUM(CASE WHEN category = 'refund_amount_used' AND transaction_type = 'debit' THEN amount END), 0)
+            COALESCE(SUM(CASE WHEN category IN ('refund_amount_used', 'refund_amount', 'refund_reversal', 'refund_adjustment') AND transaction_type = 'debit' THEN amount END), 0)
         ) AS net_refund_balance
     ");
         $builder->where('user_id', $userId);
@@ -3484,6 +3622,7 @@ class Booking extends Model
         // Convert to float with 2 decimals
         return number_format((float) $grandTotal, 2, '.', '');
     }
+
     public function getSPBalanceFromHistory($provider_id)
     {
         $builder = $this->db->table('sp_wallet_histories');
@@ -3499,8 +3638,9 @@ class Booking extends Model
         $withdrawBuilder = $this->db->table('wallet_withdrawals');
         $withdrawBuilder->select("COALESCE(SUM(amount), 0) AS total_withdrawals");
         $withdrawBuilder->where('user_id', $provider_id);
+        $withdrawBuilder->where('status !=', 'rejected');
         $withdrawRows = $withdrawBuilder->get()->getResultArray();
-        $totalWithdrawals = array_sum(array_column($withdrawRows, 'total_earnings'));
+        $totalWithdrawals = array_sum(array_column($withdrawRows, 'total_withdrawals'));
 
         $finalBalance = $totalEarnings - $totalWithdrawals;
         return number_format($finalBalance, 2, '.', '');
@@ -3546,6 +3686,7 @@ class Booking extends Model
                 ->select("
                 '$service' as service_type,
                 b.id as booking_id,
+                b.created_at as created_at,
                 u.name as client_name,
                 sp.name as walker_name,
                 q.bid_amount as booking_amt,
@@ -3560,8 +3701,10 @@ class Booking extends Model
          AND COALESCE(uwh.total_refunds, 0) = 0 
     THEN 'Pending'
 
-    WHEN ROUND(COALESCE(swh.total_approved, 0), 2) = 
-         ROUND((q.bid_amount - COALESCE(uwh.total_refunds, 0)) * 0.90, 2)
+    WHEN q.bid_amount IS NULL THEN 'Pending'
+
+    WHEN ABS(ROUND(COALESCE(swh.total_approved, 0), 2) - 
+         ROUND((q.bid_amount - COALESCE(uwh.total_refunds, 0)) * 0.90, 2)) <= 1.00
     THEN 'Balanced'
 
     ELSE 'Mismatch'
@@ -3570,7 +3713,7 @@ END AS status
             ")
 
                 ->join('users as u', 'u.id = b.user_id')
-                ->join('quotations as q', 'q.booking_id = b.id', 'left')
+                ->join('quotations as q', "q.booking_id = b.id AND q.status IN ('Accepted', 'Completed')", 'left')
                 ->join('service_providers as sp', 'sp.id = q.provider_id', 'left')
                 ->join('(' . $uwh_subquery->getCompiledSelect() . ') as uwh', 'uwh.booking_id = b.id', 'left')
                 ->join('(' . $swh_subquery->getCompiledSelect() . ') as swh', 'swh.booking_id = b.id', 'left')
@@ -3579,7 +3722,26 @@ END AS status
         }
 
         $unionQuery = implode(' UNION ALL ', $queries);
-        return $this->db->query($unionQuery)->getResultArray();
+        $results = $this->db->query($unionQuery)->getResultArray();
+
+        foreach ($results as &$row) {
+            $rawCreatedAt = $row['created_at'] ?? null;
+            if (!empty($rawCreatedAt)) {
+                try {
+                    $dt = new \DateTime($rawCreatedAt, new \DateTimeZone('UTC'));
+                    $dt->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+                    $row['date'] = $dt->format('Y-m-d');
+                    $row['created_at'] = $dt->format('Y-m-d H:i:s');
+                    $row['created_at_utc'] = $rawCreatedAt;
+                } catch (\Throwable $e) {
+                    $row['date'] = date('Y-m-d', strtotime($rawCreatedAt));
+                }
+            } else {
+                $row['date'] = date('Y-m-d');
+            }
+        }
+
+        return $results;
     }
 
 
@@ -3722,10 +3884,26 @@ END AS status
             }
 
             // Append to summary
+            $rawCreatedAt = $row['created_at'] ?? null;
+            $istCreatedAt = $rawCreatedAt;
+            $istDate = !empty($rawCreatedAt) ? date('Y-m-d', strtotime($rawCreatedAt)) : null;
+
+            if (!empty($rawCreatedAt)) {
+                try {
+                    $dt = new \DateTime($rawCreatedAt, new \DateTimeZone('UTC'));
+                    $dt->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+                    $istCreatedAt = $dt->format('Y-m-d H:i:s');
+                    $istDate = $dt->format('Y-m-d');
+                } catch (\Throwable $e) {
+                }
+            }
+
             $summary[] = [
                 'txn_id' => 'TXN-' . str_pad($row['txn_id'], 3, '0', STR_PAD_LEFT),
                 'service_id' => $row['booking_id'],
-                'date' => date('Y-m-d', strtotime($row['created_at'])),
+                'created_at' => $istCreatedAt,
+                'created_at_utc' => $rawCreatedAt,
+                'date' => $istDate,
                 'action' => $row['description'],
                 'debit' => ($row['transaction_type'] === 'debit') ? number_format($amount, 2) : '0.00',
                 'credit' => ($row['transaction_type'] === 'credit') ? number_format($amount, 2) : '0.00',
@@ -3835,12 +4013,26 @@ END AS status
 
         foreach ($rows as $row) {
             // $txnId = 'TXN-' . str_pad($row['txn_id'], 3, '0', STR_PAD_LEFT);
+            $rawCreatedAt = $row['created_at'] ?? null;
+            $istCreatedAt = $rawCreatedAt;
+            $istDate = !empty($rawCreatedAt) ? date('Y-m-d', strtotime($rawCreatedAt)) : null;
+
+            if (!empty($rawCreatedAt)) {
+                try {
+                    $dt = new \DateTime($rawCreatedAt, new \DateTimeZone('UTC'));
+                    $dt->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+                    $istCreatedAt = $dt->format('Y-m-d H:i:s');
+                    $istDate = $dt->format('Y-m-d');
+                } catch (\Throwable $e) {
+                }
+            }
 
             $summary[] = [
                 'txn_id' => $row['txn_id'],
                 'service_id' => $row['booking_id'],
-                'created_at' => $row['created_at'],
-                'date' => date('Y-m-d', strtotime($row['created_at'])),
+                'created_at' => $istCreatedAt,
+                'created_at_utc' => $rawCreatedAt,
+                'date' => $istDate,
                 'action' => $row['description'],
 
                 'debit' => ($row['transaction_type'] === 'debit') ? number_format($row['amount'], 2) : '0.00',
@@ -3984,7 +4176,7 @@ END AS status
         (
             COALESCE(SUM(CASE WHEN category = 'booking_amount' AND transaction_type = 'credit' THEN amount END), 0)
             -
-            COALESCE(SUM(CASE WHEN category = 'approved_amount' AND transaction_type = 'debit' THEN amount END), 0)
+            COALESCE(SUM(CASE WHEN category IN ('approved_amount', 'penalty_amount', 'cancelled_amount', 'cancelled_aamount', 'rejected_amount', 'replacement_deduction', 'booking_refund', 'booking_cancelled') THEN amount END), 0)
         ) AS expected_service_balance
     ");
         $builder->where('provider_id', $userId);
@@ -4039,18 +4231,44 @@ END AS status
         $lat,
         $lon,
         $radius_km = 20,
-        $limit = 50,
+        $limit = 100,
         $offset = 0
     ) {
+        // Validate coordinates: prevent MySQL syntax error in RADIANS()
+        if (
+            empty($service_id) ||
+            $lat === null || $lon === null ||
+            $lat === '' || $lon === '' ||
+            !is_numeric($lat) || !is_numeric($lon)
+        ) {
+            return [];
+        }
+
+        $lat = (float) $lat;
+        $lon = (float) $lon;
+
+        // Coordinates at (0,0) or outside valid range (-90..90, -180..180)
+        if (($lat == 0.0 && $lon == 0.0) || $lat < -90.0 || $lat > 90.0 || $lon < -180.0 || $lon > 180.0) {
+            return [];
+        }
+
+        $radius_km = (float) ($radius_km > 0 ? $radius_km : 20);
+        $limit     = (int) ($limit > 0 ? $limit : 100);
+        $offset    = (int) ($offset >= 0 ? $offset : 0);
+
+        $latStr = sprintf('%.7f', $lat);
+        $lonStr = sprintf('%.7f', $lon);
         $earthRadius = 6371;
 
         $distanceSql = "(
         $earthRadius * ACOS(
-            COS(RADIANS($lat))
-            * COS(RADIANS(service_providers.service_latitude))
-            * COS(RADIANS(service_providers.service_longitude) - RADIANS($lon))
-            + SIN(RADIANS($lat))
-            * SIN(RADIANS(service_providers.service_latitude))
+            LEAST(1.0, GREATEST(-1.0,
+                COS(RADIANS($latStr))
+                * COS(RADIANS(service_providers.service_latitude))
+                * COS(RADIANS(service_providers.service_longitude) - RADIANS($lonStr))
+                + SIN(RADIANS($latStr))
+                * SIN(RADIANS(service_providers.service_latitude))
+            ))
         )
     )";
 
@@ -4068,8 +4286,11 @@ END AS status
             ->join('sp_services', 'sp_services.provider_id = service_providers.id')
             ->where('sp_services.service_id', $service_id)
             ->where('service_providers.status', 'active')
+            ->where('(service_providers.is_on_hold = 0 OR service_providers.is_on_hold IS NULL)')
             ->where('service_providers.service_latitude IS NOT NULL', null, false)
             ->where('service_providers.service_longitude IS NOT NULL', null, false)
+            ->where('service_providers.service_latitude !=', 0)
+            ->where('service_providers.service_longitude !=', 0)
             ->where('sp_services.status', 'approved')
             ->having('distance <=', $radius_km)
             ->orderBy('distance', 'ASC')
@@ -4219,26 +4440,39 @@ END AS status
 
         if (!empty($quotationIds) && !empty($providerIds)) {
             $quotationAddons = $db->table('quotation_addons qa')
-                ->select('q.booking_id, qa.addon')
+                ->select('q.booking_id, qa.addon, qa.price, qa.price as addon_price')
                 ->join('quotations q', 'q.id = qa.quotation_id')
                 ->whereIn('q.id', $quotationIds)
                 ->get()
                 ->getResult();
 
             foreach ($quotationAddons as $addon) {
-                $addons[$addon->booking_id][] = ['addon' => $addon->addon];
+                $addons[$addon->booking_id][] = [
+                    'addon' => $addon->addon,
+                    'name' => $addon->addon,
+                    'price' => $addon->price,
+                    'addon_price' => $addon->price
+                ];
             }
         }
 
         if (!empty($bookingIds)) {
             $bookingAddons = $db->table('booking_addons ba')
-                ->select('ba.booking_id, ba.addon')
+                ->select('ba.booking_id, ba.addon, ba.addon as name, COALESCE(NULLIF(ba.price, 0), MAX(a.price), 0) as price, MAX(a.price) as addon_table_price, COALESCE(NULLIF(ba.price, 0), MAX(a.price), 0) as addon_price')
+                ->join('addons a', 'TRIM(a.name) = TRIM(ba.addon) AND a.service_id = ba.service_id', 'left')
                 ->whereIn('ba.booking_id', $bookingIds)
+                ->groupBy('ba.id')
                 ->get()
                 ->getResult();
 
             foreach ($bookingAddons as $addon) {
-                $addons[$addon->booking_id][] = ['addon' => $addon->addon];
+                $addons[$addon->booking_id][] = [
+                    'addon' => $addon->addon,
+                    'name' => $addon->addon,
+                    'price' => $addon->price,
+                    'addon_price' => $addon->addon_price,
+                    'addon_table_price' => $addon->addon_table_price
+                ];
             }
         }
 
@@ -5310,7 +5544,7 @@ END AS status
             ->select("
                 wb.id, wb.user_id, wb.service_id, wb.package_id, wb.status, wb.created_at, wb.service_start_date, wb.service_end_date, wb.total_price, wb.comment,wb.type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 'walking' as service_type,
@@ -5322,7 +5556,13 @@ END AS status
                 wb.walk_duration,
                 wb.service_days,
                 quotations.sp_timings as preferable_time,
-                quotations.extra_sessions
+                quotations.extra_sessions,
+                COALESCE(
+                    MAX(CASE WHEN LOWER(transactions.status) IN ('success', 'completed', 'paid', 'successful') THEN COALESCE(transactions.transaction_date, transactions.created_at) END),
+                    DATE_ADD(NULLIF(MIN(sp_bookings.created_at), '0000-00-00 00:00:00'), INTERVAL 330 MINUTE),
+                    quotations.updated_at,
+                    wb.updated_at
+                ) as confirmed_at
             ", false)
             ->join('users', 'users.id = wb.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = wb.id AND booking_pets.service_id = wb.service_id', 'left')
@@ -5331,6 +5571,8 @@ END AS status
             ->join('services', 'services.id = wb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = wb.id AND quotations.service_id = wb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
             ->join('service_providers', 'service_providers.id = quotations.provider_id', 'left')
+            ->join('sp_bookings', 'sp_bookings.booking_id = wb.id', 'left')
+            ->join('transactions', 'transactions.booking_id = wb.id', 'left')
             ->groupBy('wb.id');
 
         if ($showDeleted) {
@@ -5365,7 +5607,7 @@ END AS status
             ->select("
                 gb.id, gb.user_id, gb.service_id, gb.package_id, gb.status, gb.created_at, gb.service_start_date as service_start_date, (NULL) as service_end_date, gb.total_price, gb.comment,(NULL) as type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 'grooming' as service_type,
@@ -5378,7 +5620,13 @@ END AS status
                 (NULL) as walk_duration,
                 (NULL) as service_days,
                 quotations.sp_timings as preferable_time,
-                quotations.extra_sessions
+                quotations.extra_sessions,
+                COALESCE(
+                    MAX(CASE WHEN LOWER(transactions.status) IN ('success', 'completed', 'paid', 'successful') THEN COALESCE(transactions.transaction_date, transactions.created_at) END),
+                    DATE_ADD(NULLIF(MIN(sp_bookings.created_at), '0000-00-00 00:00:00'), INTERVAL 330 MINUTE),
+                    quotations.updated_at,
+                    gb.updated_at
+                ) as confirmed_at
 
             ", false)
             ->join('users', 'users.id = gb.user_id', 'left')
@@ -5388,6 +5636,8 @@ END AS status
             ->join('services', 'services.id = gb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = gb.id AND quotations.service_id = gb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
             ->join('service_providers', 'service_providers.id = quotations.provider_id', 'left')
+            ->join('sp_bookings', 'sp_bookings.booking_id = gb.id', 'left')
+            ->join('transactions', 'transactions.booking_id = gb.id', 'left')
             ->groupBy('gb.id');
 
         if ($showDeleted) {
@@ -5409,7 +5659,7 @@ END AS status
             ->select("
                 tb.id, tb.user_id, tb.service_id, tb.package_id, tb.status, tb.created_at, tb.service_start_date, (NULL) as service_end_date, tb.total_price, tb.comment,(NULL) as type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 'training' as service_type,
@@ -5422,7 +5672,13 @@ END AS status
                 (NULL) as walk_duration,
                 (NULL) as service_days,
                 quotations.sp_timings as preferable_time,
-                quotations.extra_sessions
+                quotations.extra_sessions,
+                COALESCE(
+                    MAX(CASE WHEN LOWER(transactions.status) IN ('success', 'completed', 'paid', 'successful') THEN COALESCE(transactions.transaction_date, transactions.created_at) END),
+                    DATE_ADD(NULLIF(MIN(sp_bookings.created_at), '0000-00-00 00:00:00'), INTERVAL 330 MINUTE),
+                    quotations.updated_at,
+                    tb.updated_at
+                ) as confirmed_at
 
             ", false)
             ->join('users', 'users.id = tb.user_id', 'left')
@@ -5432,6 +5688,8 @@ END AS status
             ->join('services', 'services.id = tb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = tb.id AND quotations.service_id = tb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
             ->join('service_providers', 'service_providers.id = quotations.provider_id', 'left')
+            ->join('sp_bookings', 'sp_bookings.booking_id = tb.id', 'left')
+            ->join('transactions', 'transactions.booking_id = tb.id', 'left')
             ->groupBy('tb.id');
 
         if ($showDeleted) {
@@ -5453,7 +5711,7 @@ END AS status
             ->select("
                 sb.id, sb.user_id, sb.service_id, (NULL) as package_id, sb.status, sb.created_at, sb.service_start_date, (NULL) as service_end_date, sb.total_price, sb.comment,(NULL) as type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 'sitting' as service_type,
@@ -5466,7 +5724,13 @@ END AS status
                 (NULL) as walk_duration,
                 (NULL) as service_days,
                 quotations.sp_timings as preferable_time,
-                quotations.extra_sessions
+                quotations.extra_sessions,
+                COALESCE(
+                    MAX(CASE WHEN LOWER(transactions.status) IN ('success', 'completed', 'paid', 'successful') THEN COALESCE(transactions.transaction_date, transactions.created_at) END),
+                    DATE_ADD(NULLIF(MIN(sp_bookings.created_at), '0000-00-00 00:00:00'), INTERVAL 330 MINUTE),
+                    quotations.updated_at,
+                    sb.updated_at
+                ) as confirmed_at
 
 
             ", false)
@@ -5477,6 +5741,8 @@ END AS status
             ->join('services', 'services.id = sb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = sb.id AND quotations.service_id = sb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
             ->join('service_providers', 'service_providers.id = quotations.provider_id', 'left')
+            ->join('sp_bookings', 'sp_bookings.booking_id = sb.id', 'left')
+            ->join('transactions', 'transactions.booking_id = sb.id', 'left')
             ->groupBy('sb.id');
 
         if ($showDeleted) {

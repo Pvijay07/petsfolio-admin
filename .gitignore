@@ -125,6 +125,14 @@ nb-configuration.xml
 /results/
 /phpunit*.xml
 *.json
+.env*
 public/service_account/
-.env
 app/ThirdParty/*
+public/uploads/call_recordings/
+public/uploads/providers/call_records/
+scratch/
+*.docx
+*.sql
+*.wav
+*.mp3
+*.mp4
