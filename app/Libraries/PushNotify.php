@@ -141,25 +141,28 @@ class PushNotify
                     "notification" => [
                         "title" => $title,
                         "body"  => $message,
-                        "image" => "https://beta.petsfolio.in/public/uploads/icons/ic_launcher.png"
+                        "image" => "https://staging-api.petsfolio.in/public/uploads/icons/ic_launcher.png"
                     ],
                     "android"      => [
                         "priority" => "HIGH",
                         "notification" => [
-                            "sound"     => "default",
-                            "icon"      => "ic_launcher",
-                            "color"     => "#FF6F00",
-                            "channelId" => "custom_sound_channel",
+                            "sound"      => "default",
+                            "icon"       => "ic_launcher",
+                            "color"      => "#FF6F00",
+                            "channel_id" => "custom_sound_channel",
                         ],
-                        "data" => [
-                            "route_name" => $routeName
-                        ]
                     ],
                     "apns"         => [
                         "headers" => ["apns-priority" => "10"],
                         "payload" => ["aps" => ["sound" => "notification_sound"]]
                     ]
                 ];
+
+                if (!empty($routeName)) {
+                    $messagePayload["android"]["data"] = [
+                        "route_name" => (string) $routeName
+                    ];
+                }
 
                 if (!empty($data)) {
                     $messagePayload["data"] = array_map('strval', $data);
@@ -189,10 +192,23 @@ class PushNotify
                         'body'   => json_decode((string) $response['value']->getBody(), true)
                     ];
                 } else {
+                    $reason = $response['reason'];
+                    $errorDetails = $reason->getMessage();
+
+                    if ($reason instanceof \GuzzleHttp\Exception\RequestException && $reason->hasResponse()) {
+                        $resBody = (string) $reason->getResponse()->getBody();
+                        $decoded = json_decode($resBody, true);
+                        if (!empty($decoded['error']['message'])) {
+                            $code   = $decoded['error']['code'] ?? $reason->getResponse()->getStatusCode();
+                            $fcmErr = $decoded['error']['details'][0]['errorCode'] ?? '';
+                            $errorDetails = "FCM [{$code}" . ($fcmErr ? " / {$fcmErr}" : "") . "]: " . $decoded['error']['message'];
+                        }
+                    }
+
                     $results[] = [
                         'token'  => $token,
                         'status' => 'failed',
-                        'error'  => $response['reason']->getMessage(),
+                        'error'  => $errorDetails,
                     ];
                 }
             }

@@ -1,4 +1,5 @@
 <?php
+
 if (!function_exists('ageCalculator')) {
   function ageCalculator($dob)
   {
@@ -20,6 +21,7 @@ if (!function_exists('ageCalculator')) {
     return $age;
   }
 }
+
 if (!function_exists('distanceCalculator')) {
   /**
    * Calculate distance between two points in kilometers using the Haversine formula.
@@ -70,16 +72,300 @@ if (!function_exists('deg2rad')) {
   }
 }
 
-if (!function_exists('hasPermission')) {
-  function hasPermission($permissionName)
+if (!function_exists('getUserRoleSlug')) {
+  /**
+   * Get the role slug for the specified user or currently logged-in user.
+   */
+  function getUserRoleSlug($user = null): ?string
   {
-    $db       = \Config\Database::connect();
-    $userRole = session()->get('user')->role_id;
-    return $db->table('role_permissions')
-      ->join('permissions', 'permissions.id = role_permissions.permission_id')
-      ->where('role_permissions.role_id', $userRole)
-      ->where('permissions.id', $permissionName)
-      ->countAllResults() > 0;
+    if (!$user) {
+      $user = session()->get('user');
+    }
+    if (!$user) {
+      return null;
+    }
+
+    $roleSlug = is_object($user) ? ($user->role_slug ?? null) : ($user['role_slug'] ?? null);
+    if (!empty($roleSlug)) {
+      return $roleSlug;
+    }
+
+    $roleId = (int)(is_object($user) ? ($user->role_id ?? 0) : ($user['role_id'] ?? 0));
+    if ($roleId > 0) {
+      $db = \Config\Database::connect();
+      $role = $db->table('roles')->select('slug')->where('id', $roleId)->get()->getRowArray();
+      $slug = $role['slug'] ?? null;
+      if (is_object($user)) {
+        $user->role_slug = $slug;
+      }
+      return $slug;
+    }
+
+    return null;
+  }
+}
+
+if (!function_exists('isSuperAdmin')) {
+  /**
+   * Determine if the user is a Super Admin.
+   */
+  function isSuperAdmin($user = null): bool
+  {
+    if (!$user) {
+      $user = session()->get('user');
+    }
+    if (!$user) {
+      return false;
+    }
+
+    $roleId = (int)(is_object($user) ? ($user->role_id ?? 0) : ($user['role_id'] ?? 0));
+    if ($roleId === 1) {
+      return true;
+    }
+
+    $roleSlug = getUserRoleSlug($user);
+    return $roleSlug === 'super_admin';
+  }
+}
+
+if (!function_exists('hasRole')) {
+  /**
+   * Check if a user has a specific role by slug, array of slugs, or ID.
+   *
+   * @param string|int|array $slugOrId
+   * @param object|array|null $user
+   * @return bool
+   */
+  function hasRole($slugOrId, $user = null): bool
+  {
+    if (!$user) {
+      $user = session()->get('user');
+    }
+    if (!$user) {
+      return false;
+    }
+
+    $userRoleId = (int)(is_object($user) ? ($user->role_id ?? 0) : ($user['role_id'] ?? 0));
+    $userRoleSlug = getUserRoleSlug($user);
+
+    if (is_array($slugOrId)) {
+      foreach ($slugOrId as $target) {
+        if (is_numeric($target) && (int)$target === $userRoleId) {
+          return true;
+        }
+        if (is_string($target) && $userRoleSlug !== null && strtolower($target) === strtolower($userRoleSlug)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (is_numeric($slugOrId)) {
+      return (int)$slugOrId === $userRoleId;
+    }
+
+    if (is_string($slugOrId)) {
+      return $userRoleSlug !== null && strtolower($slugOrId) === strtolower($userRoleSlug);
+    }
+
+    return false;
+  }
+}
+
+if (!function_exists('hasPermission')) {
+  function hasPermission($slugOrId)
+  {
+    $session = session();
+    $user    = $session->get('user');
+    if (!$user) {
+      return false;
+    }
+
+    // Super Admin always gets full access
+    if (isSuperAdmin($user)) {
+      return true;
+    }
+
+    $userRole = (int)(is_object($user) ? ($user->role_id ?? 0) : ($user['role_id'] ?? 0));
+
+    // Load cached permissions for performance (1 DB query per login session instead of 30+ per page load)
+    $cachedPerms = $session->get('_user_permissions');
+    if ($cachedPerms === null || !is_array($cachedPerms)) {
+      $userId = (int)(is_object($user) ? ($user->id ?? 0) : ($user['id'] ?? 0));
+      $cachedPerms = _loadUserPermissions($userId, $userRole);
+      $session->set('_user_permissions', $cachedPerms);
+    }
+
+    if (is_numeric($slugOrId)) {
+      return in_array((int)$slugOrId, $cachedPerms['ids'] ?? []);
+    }
+
+    // Direct slug match
+    return in_array($slugOrId, $cachedPerms['slugs'] ?? []);
+  }
+}
+
+if (!function_exists('hasAnyProviderPermission')) {
+  function hasAnyProviderPermission()
+  {
+    $session = session();
+    $user    = $session->get('user');
+    if (!$user) {
+      return false;
+    }
+
+    if (isSuperAdmin($user)) {
+      return true;
+    }
+
+    $userRole = (int)(is_object($user) ? ($user->role_id ?? 0) : ($user['role_id'] ?? 0));
+
+    $cachedPerms = $session->get('_user_permissions');
+    if ($cachedPerms === null || !is_array($cachedPerms)) {
+      $userId = (int)(is_object($user) ? ($user->id ?? 0) : ($user['id'] ?? 0));
+      $cachedPerms = _loadUserPermissions($userId, $userRole);
+      $session->set('_user_permissions', $cachedPerms);
+    }
+
+    $providerSubSlugs = [
+      'fee_pending.view',
+      'wait_for_call.view',
+      'wait_for_call_24.view',
+      'manager_approval.view',
+      'kyc_pending.view',
+      'verified.view',
+      'old_non_verified.view',
+      'old_verified.view',
+      'suspended.view',
+      'service_providers.view',
+      'providers.view',
+      'providers.manage',
+      'providers.verify',
+      'service_providers.edit',
+      'service_providers.delete'
+    ];
+    foreach ($providerSubSlugs as $subSlug) {
+      if (in_array($subSlug, $cachedPerms['slugs'] ?? [])) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+if (!function_exists('_loadUserPermissions')) {
+  function _loadUserPermissions(int $userId, int $roleId): array
+  {
+    $db = \Config\Database::connect();
+
+    // Fetch role permissions
+    $rolePerms = $db->table('role_permissions rp')
+      ->select('p.id, p.slug')
+      ->join('permissions p', 'p.id = rp.permission_id')
+      ->where('rp.role_id', $roleId)
+      ->get()
+      ->getResultArray();
+
+    // Fetch direct user permission overrides
+    $userPerms = [];
+    if ($db->tableExists('user_permissions')) {
+      $userPerms = $db->table('user_permissions up')
+        ->select('p.id, p.slug')
+        ->join('permissions p', 'p.id = up.permission_id')
+        ->where('up.user_id', $userId)
+        ->get()
+        ->getResultArray();
+    }
+
+    $merged = array_merge($rolePerms, $userPerms);
+    $ids    = array_unique(array_column($merged, 'id'));
+    $slugs  = array_unique(array_filter(array_column($merged, 'slug')));
+
+    return [
+      'ids'   => array_values(array_map('intval', $ids)),
+      'slugs' => array_values($slugs)
+    ];
+  }
+}
+
+if (!function_exists('clearPermissionCache')) {
+  function clearPermissionCache()
+  {
+    session()->remove('_user_permissions');
+  }
+}
+
+if (!function_exists('getDefaultPermittedRoute')) {
+  function getDefaultPermittedRoute($user = null)
+  {
+    if (!$user) {
+      $user = session()->get('user');
+    }
+    if (!$user) {
+      return base_url('login');
+    }
+
+    // Super Admin or user with dashboard.view
+    if (isSuperAdmin($user) || hasPermission('dashboard.view')) {
+      return base_url('dashboard');
+    }
+
+    // Priority route mapping based on assigned permission slugs
+    $priorityRoutes = [
+      'fee_pending.view'         => 'providers?status=pending_registration',
+      'wait_for_call.view'       => 'providers?status=pending_verification',
+      'wait_for_call_24.view'    => 'providers?status=pending_verification&overdue=1',
+      'manager_approval.view'    => 'providers?status=approval',
+      'kyc_pending.view'         => 'providers?status=pending_kyc',
+      'verified.view'            => 'providers?status=active',
+      'old_non_verified.view'    => 'providers?status=non_verified',
+      'old_verified.view'        => 'providers?status=non_verified',
+      'suspended.view'           => 'providers?status=inactive',
+      'providers.view'           => 'providers?status=pending_registration',
+      'service_providers.view'   => 'providers?status=pending_registration',
+      'insurance.view'           => 'enquiries',
+      'new_enquiries.view'       => 'enquiries',
+      'active_insurance.view'    => 'active',
+      'insurance_claims.view'    => 'claims',
+      'expiring_policies.view'   => 'expiring',
+      'clients.view'             => 'clients?status=active',
+      'bookings.view_requests'   => 'bookingRequests',
+      'bookings.walking'         => 'bookings/in_progress',
+      'bookings.grooming'        => 'bookings/grooming',
+      'bookings.training'        => 'bookings/training',
+      'bookings.boarding'        => 'bookings/boarding',
+      'bookings.sitting'         => 'bookings/sitting',
+      'bookings.premium'         => 'bookings/premium_requests',
+      'bookings.missed_walks'    => 'bookings/missed_walks',
+      'bookings.all'             => 'bookings',
+      'support.client'           => 'support',
+      'support.provider'         => 'sp-support',
+      'employees.view'           => 'employees',
+      'finance.sp_earnings'      => 'sp-earnings',
+      'finance.client_spendings' => 'client-spendings',
+      'finance.sp_payments'      => 'sp-payments',
+      'finance.company_earnings' => 'company-earnings',
+      'call_analysis.view'       => 'call-analysis',
+      'community.view'           => 'community-channels',
+      'loyalty.view'             => 'loyalty-programs',
+      'notifications.view'       => 'notifications',
+      'notifications.campaigns'  => 'notification-manager',
+      'permissions.view'         => 'permissions',
+      'walker.leaderboard'       => 'walker-leaderboard',
+      'walker.sp_management'     => 'sp-management',
+    ];
+
+    foreach ($priorityRoutes as $permSlug => $routePath) {
+      if (hasPermission($permSlug)) {
+        return base_url($routePath);
+      }
+    }
+
+    if (hasRole(['verification_executive', 10], $user)) {
+      return base_url('providers?status=pending_registration');
+    }
+
+    return base_url('unauthorized');
   }
 }
 
@@ -128,6 +414,7 @@ if (!function_exists('phonepeResponseDescription')) {
     return $map[$code] ?? 'Unknown payment status';
   }
 }
+
 if (!function_exists('getGoogleDistance')) {
 
   function getGoogleDistance($lat1, $lon1, $lat2, $lon2, $mode = "driving")
@@ -184,5 +471,29 @@ if (!function_exists('getGoogleDirections')) {
     }
 
     return null;
+  }
+}
+
+if (!function_exists('utcToIst')) {
+  /**
+   * Convert UTC datetime string to IST (Asia/Kolkata) formatted string.
+   *
+   * @param string|null $time UTC datetime string (e.g. '2026-10-06 08:56:54')
+   * @param string $format Target format (default 'd M Y, h:i A')
+   * @return string
+   */
+  function utcToIst($time, string $format = 'd M Y, h:i A'): string
+  {
+    if (empty($time) || $time === '0000-00-00 00:00:00' || $time === '--') {
+      return '--';
+    }
+
+    try {
+      $dt = new \DateTime($time, new \DateTimeZone('UTC'));
+      $dt->setTimezone(new \DateTimeZone('Asia/Kolkata'));
+      return $dt->format($format);
+    } catch (\Throwable $e) {
+      return !empty($time) ? date($format, strtotime($time)) : '--';
+    }
   }
 }

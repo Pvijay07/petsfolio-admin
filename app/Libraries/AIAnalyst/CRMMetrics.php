@@ -1,0 +1,534 @@
+<?php
+
+namespace App\Libraries\AIAnalyst;
+
+/**
+ * CRMMetrics
+ * 
+ * Live, dynamic analytics for CRM Leads, Sales Funnel, Sources, and Agent Performance
+ * directly queried from MongoDB Atlas (`petsfolio-crm-live`).
+ */
+class CRMMetrics
+{
+    private MongoDBClient $mongo;
+
+    public function __construct()
+    {
+        $this->mongo = new MongoDBClient();
+    }
+
+    /**
+     * Calculate live lead conversion rate from MongoDB `leads` collection.
+     */
+    public function conversion_rate(string $date_range = '30_days', ?string $source = null, ?string $channel = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+    {
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
+
+        if (!empty($source) && strtolower($source) !== 'all') {
+            if (class_exists('MongoDB\BSON\Regex')) {
+                $match['source'] = new \MongoDB\BSON\Regex(trim($source), 'i');
+            } else {
+                $match['source'] = trim($source);
+            }
+        }
+
+        $pipeline = [];
+        if (!empty($match)) {
+            $pipeline[] = ['$match' => (object) $match];
+        }
+
+        $pipeline[] = [
+            '$group' => [
+                '_id'         => null,
+                'total_leads' => ['$sum' => 1],
+                'converted'   => [
+                    '$sum' => [
+                        '$cond' => [
+                            ['$in' => ['$status', ['Joined', 'joined', 'converted', 'won', 'closed_won', 'Active', 'Job Assigned', 'Job Posted']]],
+                            1,
+                            0
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $results   = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+        $data      = $results[0] ?? ['total_leads' => 0, 'converted' => 0];
+
+        $total     = (int) ($data['total_leads'] ?? 0);
+        $converted = (int) ($data['converted'] ?? 0);
+        $rate      = $total > 0 ? round(($converted / $total) * 100, 2) : 0.0;
+        $dbName    = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'          => 'lead_conversion_rate',
+            'crm_type'        => $crm_type,
+            'database'        => $dbName,
+            'date_range'      => $date_range,
+            'source_filter'   => $source ?: 'all',
+            'total_leads'     => $total,
+            'converted_leads' => $converted,
+            'conversion_rate' => "{$rate}%",
+            'raw_rate'        => $rate,
+        ];
+    }
+
+    /**
+     * Analyze live CRM sales funnel drop-off by stage from MongoDB `leads` collection.
+     */
+    public function funnel_dropoff(string $date_range = '30_days', ?string $stage = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+    {
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
+
+        $pipeline = [];
+        if (!empty($match)) {
+            $pipeline[] = ['$match' => (object) $match];
+        }
+
+        $pipeline[] = [
+            '$group' => [
+                '_id'   => '$status',
+                'count' => ['$sum' => 1]
+            ]
+        ];
+        $pipeline[] = ['$sort' => ['count' => -1]];
+
+        $stages = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+
+        if (empty($stages)) {
+            $fallbackPipeline = [
+                ['$group' => ['_id' => '$status', 'count' => ['$sum' => 1]]],
+                ['$sort' => ['count' => -1]]
+            ];
+            $stages = $this->mongo->aggregate('leads', $fallbackPipeline, $crm_type);
+        }
+
+        $totalLeads = 0;
+        foreach ($stages as $s) {
+            $totalLeads += (int) ($s['count'] ?? 0);
+        }
+
+        $formatted = [];
+        $previous  = 0;
+        foreach ($stages as $index => $item) {
+            $current   = (int) ($item['count'] ?? 0);
+            $stageName = $item['_id'] ?: 'Unspecified';
+
+            $dropoffPct = 0;
+            if ($index > 0 && $previous > 0) {
+                $dropoffPct = round((($previous - $current) / $previous) * 100, 1);
+            }
+
+            $formatted[] = [
+                'stage'       => $stageName,
+                'lead_count'  => $current,
+                'percentage'  => $totalLeads > 0 ? round(($current / $totalLeads) * 100, 1) . '%' : '0%',
+                'dropoff_pct' => $dropoffPct > 0 ? "{$dropoffPct}% drop from previous" : '0%'
+            ];
+            $previous = $current;
+        }
+
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'      => 'funnel_dropoff',
+            'crm_type'    => $crm_type,
+            'database'    => $dbName,
+            'date_range'  => $date_range,
+            'total_leads' => $totalLeads,
+            'funnel'      => $formatted
+        ];
+    }
+
+    /**
+     * Compare live lead source performance from MongoDB `leads` collection.
+     */
+    public function lead_source_performance(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+    {
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
+
+        $pipeline = [];
+        if (!empty($match)) {
+            $pipeline[] = ['$match' => (object) $match];
+        }
+
+        $pipeline[] = [
+            '$group' => [
+                '_id'       => '$source',
+                'total'     => ['$sum' => 1],
+                'converted' => [
+                    '$sum' => [
+                        '$cond' => [
+                            ['$in' => ['$status', ['Joined', 'joined', 'converted', 'won', 'closed_won', 'Active', 'Job Assigned', 'Job Posted']]],
+                            1,
+                            0
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $pipeline[] = ['$sort' => ['total' => -1]];
+
+        $results = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+
+        $sources       = [];
+        $totalAllLeads = 0;
+
+        foreach ($results as $res) {
+            $total     = (int) ($res['total'] ?? 0);
+            $converted = (int) ($res['converted'] ?? 0);
+            $rate      = $total > 0 ? round(($converted / $total) * 100, 1) : 0.0;
+            $totalAllLeads += $total;
+
+            $sources[] = [
+                'source'          => $res['_id'] ?: 'WhatsApp',
+                'total_leads'     => $total,
+                'converted'       => $converted,
+                'conversion_rate' => "{$rate}%",
+                'raw_rate'        => $rate
+            ];
+        }
+
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'          => 'lead_source_performance',
+            'crm_type'        => $crm_type,
+            'database'        => $dbName,
+            'date_range'      => $date_range,
+            'total_crm_leads' => $totalAllLeads,
+            'sources'         => $sources
+        ];
+    }
+
+    /**
+     * Evaluate live sales agent performance from MongoDB `leads` collection.
+     */
+    public function agent_performance(string $date_range = '30_days', ?string $agent_id = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+    {
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
+
+        if (!empty($agent_id) && strtolower($agent_id) !== 'all') {
+            if (class_exists('MongoDB\BSON\Regex')) {
+                $match['assignedTo'] = new \MongoDB\BSON\Regex(trim($agent_id), 'i');
+            } else {
+                $match['assignedTo'] = trim($agent_id);
+            }
+        }
+
+        $pipeline = [];
+        if (!empty($match)) {
+            $pipeline[] = ['$match' => (object) $match];
+        }
+
+        $pipeline[] = [
+            '$group' => [
+                '_id'       => '$assignedTo',
+                'total'     => ['$sum' => 1],
+                'converted' => [
+                    '$sum' => [
+                        '$cond' => [
+                            ['$in' => ['$status', ['Joined', 'joined', 'converted', 'won', 'closed_won', 'Active', 'Job Assigned', 'Job Posted']]],
+                            1,
+                            0
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $pipeline[] = ['$sort' => ['total' => -1]];
+
+        $results = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+
+        $agents = [];
+        foreach ($results as $res) {
+            $conv = (int) ($res['total'] ?? 0);
+            $succ = (int) ($res['converted'] ?? 0);
+            $rate = $conv > 0 ? round(($succ / $conv) * 100, 1) : 0.0;
+
+            $agents[] = [
+                'agent_name'            => $res['_id'] ?: 'Unassigned',
+                'total_assigned_leads'  => $conv,
+                'successful_conversions'=> $succ,
+                'success_rate'          => "{$rate}%"
+            ];
+        }
+
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'      => 'agent_performance',
+            'crm_type'    => $crm_type,
+            'database'    => $dbName,
+            'date_range'  => $date_range,
+            'agent_stats' => $agents
+        ];
+    }
+
+    /**
+     * Average support ticket resolution time from MySQL `tickets` & `ticket_categories` tables.
+     */
+    public function avg_resolution_time(string $date_range = '30_days', ?string $issue_type = null, ?string $start_date = null, ?string $end_date = null): array
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('tickets t')
+            ->select("
+                COALESCE(tc.name, 'General Support') AS issue_type,
+                COUNT(t.id) AS total_tickets,
+                SUM(CASE WHEN t.status IN ('resolved', 'closed') THEN 1 ELSE 0 END) AS resolved_tickets,
+                AVG(CASE WHEN t.status IN ('resolved', 'closed') AND t.updated_at IS NOT NULL AND t.updated_at >= t.created_at THEN TIMESTAMPDIFF(MINUTE, t.created_at, t.updated_at) / 60.0 ELSE NULL END) AS avg_hours
+            ", false)
+            ->join('ticket_categories tc', 'tc.id = t.category', 'left');
+
+        if ($startStr) {
+            $builder->where('t.created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $builder->where('t.created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        if (!empty($issue_type) && strtolower($issue_type) !== 'all') {
+            $cleanIssue = trim($issue_type);
+            $builder->groupStart()
+                ->like('tc.name', $cleanIssue)
+                ->orLike('t.subject', $cleanIssue)
+                ->orLike('t.description', $cleanIssue)
+            ->groupEnd();
+        }
+
+        $results = $builder->groupBy("COALESCE(tc.name, 'General Support')")
+            ->orderBy('total_tickets', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $totalSupportActivity = 0;
+        $totalResolved = 0;
+        $sumHours = 0.0;
+        $byIssueType = [];
+
+        foreach ($results as $row) {
+            $tot  = (int) ($row['total_tickets'] ?? 0);
+            $res  = (int) ($row['resolved_tickets'] ?? 0);
+            $avgH = round((float) ($row['avg_hours'] ?? 0), 1);
+
+            $totalSupportActivity += $tot;
+            $totalResolved += $res;
+            if ($res > 0) {
+                $sumHours += ($avgH * $res);
+            }
+
+            $byIssueType[] = [
+                'issue_type'           => $row['issue_type'],
+                'total_tickets'        => $tot,
+                'resolved_tickets'     => $res,
+                'avg_resolution_hours' => $avgH,
+                'formatted_avg_time'   => "{$avgH} hours"
+            ];
+        }
+
+        $overallAvg = $totalResolved > 0 ? round($sumHours / $totalResolved, 1) : 0.0;
+
+        return [
+            'metric'                 => 'avg_resolution_time',
+            'date_range'             => $date_range,
+            'total_support_activity' => $totalSupportActivity,
+            'total_tickets_resolved' => $totalResolved,
+            'overall_avg_resolution' => "{$overallAvg} hours",
+            'by_issue_type'          => $byIssueType
+        ];
+    }
+
+    /**
+     * Cross-sell acceptance rate from MySQL `booking_addons` & `v_bookings_overview` tables.
+     */
+    public function cross_sell_acceptance_rate(string $date_range = '30_days', ?string $product = null, ?string $start_date = null, ?string $end_date = null): array
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        $db = \Config\Database::connect();
+
+        // 1. Fetch total overall bookings in period
+        $bookingsBuilder = $db->table('v_bookings_overview')
+            ->select('COUNT(*) as total_bookings');
+
+        if ($startStr) {
+            $bookingsBuilder->where('created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $bookingsBuilder->where('created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        $totalBookingsRow = $bookingsBuilder->get()->getRowArray();
+        $totalBookings = (int) ($totalBookingsRow['total_bookings'] ?? 0);
+
+        // 2. Fetch add-ons purchased
+        $addonsBuilder = $db->table('booking_addons ba')
+            ->select("
+                ba.addon AS product_name,
+                COUNT(ba.id) AS total_purchased,
+                COALESCE(SUM(ba.price), 0) AS total_addon_revenue
+            ", false);
+
+        if ($startStr) {
+            $addonsBuilder->where('ba.created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $addonsBuilder->where('ba.created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        if (!empty($product) && strtolower($product) !== 'all') {
+            $addonsBuilder->like('ba.addon', trim($product));
+        }
+
+        $addonResults = $addonsBuilder->groupBy('ba.addon')
+            ->orderBy('total_purchased', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $totalAddonsPurchased = 0;
+        $totalAddonRevenue = 0.0;
+        $productsBreakdown = [];
+
+        foreach ($addonResults as $row) {
+            $purchased = (int) ($row['total_purchased'] ?? 0);
+            $rev       = (float) ($row['total_addon_revenue'] ?? 0);
+            $totalAddonsPurchased += $purchased;
+            $totalAddonRevenue += $rev;
+
+            $attachRate = $totalBookings > 0 ? round(($purchased / $totalBookings) * 100, 1) : 0.0;
+
+            $productsBreakdown[] = [
+                'product_name'        => $row['product_name'] ?: 'General Add-on',
+                'units_purchased'     => $purchased,
+                'total_addon_revenue' => "₹" . number_format($rev, 2),
+                'attachment_rate'     => "{$attachRate}%"
+            ];
+        }
+
+        $overallAcceptancePct = $totalBookings > 0 ? round(($totalAddonsPurchased / $totalBookings) * 100, 1) : 0.0;
+
+        return [
+            'metric'                   => 'cross_sell_acceptance_rate',
+            'date_range'               => $date_range,
+            'total_bookings_in_period' => $totalBookings,
+            'total_addons_purchased'    => $totalAddonsPurchased,
+            'total_addon_revenue'      => "₹" . number_format($totalAddonRevenue, 2),
+            'overall_acceptance'       => "{$overallAcceptancePct}%",
+            'products_breakdown'       => $productsBreakdown
+        ];
+    }
+
+    /**
+     * Categorize and analyze live incoming WhatsApp client message topics from MongoDB `messages` collection.
+     */
+    public function whatsapp_inquiry_topics(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+    {
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
+        $match['direction'] = 'incoming';
+
+        $messages = $this->mongo->find('messages', $match, ['text' => 1, 'createdAt' => 1], 1000, $crm_type);
+
+        $total = count($messages);
+        $categories = [
+            'Service Details & Inclusions'      => 0,
+            'Service & City Availability'       => 0,
+            'Pricing, Packages & Offers'        => 0,
+            'Pet Insurance & Policy Claims'     => 0,
+            'Booking & Cancellation Process'    => 0,
+            'Pet Details & Client Onboarding'   => 0,
+            'Greetings & General Conversations' => 0
+        ];
+
+        foreach ($messages as $m) {
+            $text = strtolower(trim($m['text'] ?? ''));
+            if (empty($text)) {
+                $categories['Greetings & General Conversations']++;
+                continue;
+            }
+
+            if (preg_match('/insurance|policy|claim|medical|coverage|health/i', $text)) {
+                $categories['Pet Insurance & Policy Claims']++;
+            } elseif (preg_match('/grooming|walk|train|bath|haircut|nail|tick|session|how long|duration|behaviour|biting|command|issue|service/i', $text)) {
+                $categories['Service Details & Inclusions']++;
+            } elseif (preg_match('/price|cost|charge|rate|fee|how much|discount|offer|amount|₹|rs|pkg|package|pay/i', $text)) {
+                $categories['Pricing, Packages & Offers']++;
+            } elseif (preg_match('/availab|city|cities|covering|location|where|slot|when|today|tomorrow|open|timing|schedule|time|address/i', $text)) {
+                $categories['Service & City Availability']++;
+            } elseif (preg_match('/book|booking|cancel|refund|reschedule|confirm|status/i', $text)) {
+                $categories['Booking & Cancellation Process']++;
+            } elseif (preg_match('/dog|cat|puppy|breed|labrador|german|pomeranian|persian|years|year|old|age|pet|male|female/i', $text)) {
+                $categories['Pet Details & Client Onboarding']++;
+            } else {
+                $categories['Greetings & General Conversations']++;
+            }
+        }
+
+        $breakdown = [];
+        foreach ($categories as $cat => $count) {
+            $pct = $total > 0 ? round(($count / $total) * 100, 1) : 0;
+            $breakdown[] = [
+                'topic'             => $cat,
+                'inquiry_count'     => $count,
+                'percentage_share'  => "{$pct}%"
+            ];
+        }
+
+        usort($breakdown, fn($a, $b) => $b['inquiry_count'] <=> $a['inquiry_count']);
+
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'                => 'whatsapp_inquiry_topics',
+            'crm_type'              => $crm_type,
+            'database'              => $dbName,
+            'date_range'            => $date_range,
+            'total_inquiries_found' => $total,
+            'topic_breakdown'       => $breakdown
+        ];
+    }
+
+    /**
+     * Helper to build date range match filter for MongoDB pipeline.
+     */
+    private function buildDateMatch(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+
+        if ($startStr === null && $endStr === null) {
+            return [];
+        }
+
+        $startIso = date('c', strtotime($startStr));
+        $endIso   = date('c', strtotime($endStr));
+
+        $startDateOnly = date('Y-m-d', strtotime($startStr));
+        $endDateOnly   = date('Y-m-d', strtotime($endStr));
+
+        $orConditions = [
+            ['createdAt' => ['$gte' => $startIso, '$lte' => $endIso]],
+            ['created_at' => ['$gte' => $startIso, '$lte' => $endIso]],
+            ['created_at' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]],
+            ['createdAt' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]]
+        ];
+
+        if (class_exists('MongoDB\BSON\UTCDateTime')) {
+            $startMs = $startStr ? strtotime($startStr) * 1000 : 0;
+            $endMs   = $endStr ? strtotime($endStr) * 1000 : strtotime('2099-12-31') * 1000;
+
+            $startUtc = new \MongoDB\BSON\UTCDateTime($startMs);
+            $endUtc   = new \MongoDB\BSON\UTCDateTime($endMs);
+
+            array_unshift(
+                $orConditions,
+                ['createdAt' => ['$gte' => $startUtc, '$lte' => $endUtc]],
+                ['created_at' => ['$gte' => $startUtc, '$lte' => $endUtc]]
+            );
+        }
+
+        return [
+            '$or' => $orConditions
+        ];
+    }
+}

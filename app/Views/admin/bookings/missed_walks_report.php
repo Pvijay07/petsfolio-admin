@@ -11,13 +11,28 @@
     <div class="conatiner-fluid content-inner pb-0" id="page_layout">
         <!-- Modern Header Section -->
         <div class="container-fluid p-0 mb-4">
-            <div class="bg-gradient-primary text-white p-5 rounded-3 shadow position-relative overflow-hidden">
-                <div class="position-relative z-1">
-                    <h1 class="h2 fw-bold mb-2 text-white">Missed / Not Done Dog Walks Report</h1>
-                    <p class="text-white-75 mb-0">Track and manage missed walking services with reason codes</p>
+            <div class="p-4 p-md-5 rounded-4 shadow-lg position-relative overflow-hidden text-white"
+                style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);">
+                
+                <!-- Subtle glass background circles -->
+                <div class="position-absolute" style="top: -60px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+                <div class="position-absolute" style="bottom: -50px; left: 30%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+                
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2.5">
+                            <span class="badge rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-2"
+                                style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: #fecdd3; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem;">
+                                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                                Walk Exception Tracking
+                            </span>
+                        </div>
+                        <h1 class="h2 fw-bold text-white mb-2 tracking-tight">Missed / Incomplete Walks</h1>
+                        <p class="text-white-50 mb-0 fs-6">
+                            Monitor, categorize, and log root-cause reason codes for incomplete or skipped dog walks.
+                        </p>
+                    </div>
                 </div>
-                <i class="bi bi-watch position-absolute end-0 bottom-0 opacity-10"
-                    style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
             </div>
         </div>
 
@@ -63,17 +78,17 @@
         <!-- Table Card -->
         <div class="card border-0 shadow-sm overflow-hidden rounded-3">
             <div class="table-responsive">
-                <table class="table table-hover mb-0" id="walksTable">
-                    <thead class="" style="background: #c6d2ff !important;">
+                <table class="table table-hover align-middle mb-0" id="walksTable">
+                    <thead style="background: #f8fafc !important; border-bottom: 2px solid #e2e8f0;">
                         <tr>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="date">S.No.</th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="date">Date <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="times">Times</th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="status">Status <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="client">Client <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="pet">Pet <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="provider">Provider <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important; width: 250px;">Reason</th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="date">#</th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="date">Date <i class="bi bi-arrow-down-up ms-1"></i></th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="times">Times</th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="status">Status <i class="bi bi-arrow-down-up ms-1"></i></th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="client">Client <i class="bi bi-arrow-down-up ms-1"></i></th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="pet">Pet <i class="bi bi-arrow-down-up ms-1"></i></th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="provider">Provider <i class="bi bi-arrow-down-up ms-1"></i></th>
+                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; width: 250px;">Reason</th>
                         </tr>
                     </thead>
                     <tbody class="border-top-0" id="tableBody">
@@ -97,14 +112,20 @@
     </div>
 
     <!-- Reason Modal -->
-    <div id="reasonModal" class="modal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
+    <div id="reasonModal" class="modal fade" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow p-0">
-                <div class="modal-header p-3" style="background: #c6d2ff !important; border-bottom: 2px solid #a3b4ff;">
-                    <h5 class="modal-title text-dark fw-bold fs-5 mb-0" id="reasonModalLabel">
-                        <i class="bi bi-pencil-square me-2"></i>Add/Edit Reason
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeReasonModal()"></button>
+            <div class="modal-content border-0 shadow-2xl rounded-4 overflow-hidden p-0">
+                <div class="modal-header px-4 py-3 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;">
+                    <div class="d-flex align-items-center gap-2.5">
+                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.15);">
+                            <i class="bi bi-pencil-square text-warning fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="modal-title text-white fw-bold fs-6 mb-0" id="reasonModalLabel">Log Exception Reason</h5>
+                            <span class="text-white-50 tiny">Provide root cause for missed or uncompleted walk</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close" onclick="closeReasonModal()"></button>
                 </div>
                 <div class="modal-body p-4">
                     <input type="hidden" id="modalTrackId">
@@ -146,7 +167,7 @@
 <style>
     /* Modern Color Variables - Matching bookings management */
     :root {
-        --primary-light: #c6d2ff;
+        --primary-light: #e0e7ff;
         --primary-main: #3f30e3;
         --primary-dark: #2b1fb3;
         --primary-gradient: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%);

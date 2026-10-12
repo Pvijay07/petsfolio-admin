@@ -6,6 +6,8 @@ use CodeIgniter\Model;
 
 class User extends Model
 {
+  protected $table      = 'users';
+  protected $primaryKey = 'id';
   protected $db;
   protected $admin;
 
@@ -24,8 +26,9 @@ class User extends Model
   public function getUserByUsername($email)
   {
     return $this->db->table($this->admin)
-      ->select('id, name, email, password,role_id')
-      ->where('email', $email)
+      ->select('employees.id, employees.name, employees.email, employees.password, employees.role_id, roles.name as role_name, roles.slug as role_slug')
+      ->join('roles', 'roles.id = employees.role_id', 'left')
+      ->where('employees.email', $email)
       ->get()
       ->getRow();
   }
@@ -49,23 +52,49 @@ class User extends Model
   public function getUser($id)
   {
     return $this->db->table($this->admin)
-      ->select('*')
-      ->where('id', $id)
+      ->select('employees.*, roles.name as role_name, roles.slug as role_slug')
+      ->join('roles', 'roles.id = employees.role_id', 'left')
+      ->where('employees.id', $id)
       ->get()
       ->getRow();
   }
-  public function getAll($status)
+  public function getAll($status = 'active')
   {
-    $users = $this->db->table('users')
+    $builder = $this->db->table('users')
       ->select('users.*')
       ->select('user_withdrawal_wallet.amount as wallet_amount')
-      ->join('user_withdrawal_wallet', 'users.id = user_withdrawal_wallet.user_id', 'left')
+      ->join('user_withdrawal_wallet', 'users.id = user_withdrawal_wallet.user_id', 'left');
 
-      ->where('users.status', $status)
-      ->where('users.name!=', '')
-      ->where('users.email!=', '')
-      ->where('users.gender!=', '')
+    if ($status === 'incomplete') {
+      $builder->groupStart()
+        ->where('users.name', '')
+        ->orWhere('users.name IS NULL', null, false)
+        ->orWhere('users.email', '')
+        ->orWhere('users.email IS NULL', null, false)
+        ->orWhere('users.gender', '')
+        ->orWhere('users.gender IS NULL', null, false)
+        ->groupEnd();
+    } elseif ($status === 'all') {
+      // Return all users
+    } elseif (!empty($status)) {
+      $builder->where('users.status', $status)
+        ->where('users.name!=', '')
+        ->where('users.name IS NOT NULL', null, false)
+        ->where('users.email!=', '')
+        ->where('users.email IS NOT NULL', null, false)
+        ->where('users.gender!=', '')
+        ->where('users.gender IS NOT NULL', null, false);
+    } else {
+      $builder->where('users.status', 'active')
+        ->where('users.name!=', '')
+        ->where('users.name IS NOT NULL', null, false)
+        ->where('users.email!=', '')
+        ->where('users.email IS NOT NULL', null, false)
+        ->where('users.gender!=', '')
+        ->where('users.gender IS NOT NULL', null, false);
+    }
 
+    $users = $builder
       ->orderBy('users.id', 'DESC')
       ->get()
       ->getResult();
@@ -80,9 +109,61 @@ class User extends Model
         ->where('user_id', $user->id)
         ->get()
         ->getResult();
+      $user->devices   = $this->db->table('user_devices')
+        ->where('user_id', $user->id)
+        ->where('user_type', 'client')
+        ->orderBy('last_active_at', 'DESC')
+        ->get()
+        ->getResult();
+      $user->latest_device = !empty($user->devices) ? $user->devices[0] : null;
     }
     return $users;
   }
+
+  public function getClientCounts()
+  {
+    $total = $this->db->table('users')
+      ->countAllResults();
+
+    $active = $this->db->table('users')
+      ->where('status', 'active')
+      ->where('name!=', '')
+      ->where('name IS NOT NULL', null, false)
+      ->where('email!=', '')
+      ->where('email IS NOT NULL', null, false)
+      ->where('gender!=', '')
+      ->where('gender IS NOT NULL', null, false)
+      ->countAllResults();
+
+    $inactive = $this->db->table('users')
+      ->where('status', 'inactive')
+      ->where('name!=', '')
+      ->where('name IS NOT NULL', null, false)
+      ->where('email!=', '')
+      ->where('email IS NOT NULL', null, false)
+      ->where('gender!=', '')
+      ->where('gender IS NOT NULL', null, false)
+      ->countAllResults();
+
+    $incomplete = $this->db->table('users')
+      ->groupStart()
+        ->where('name', '')
+        ->orWhere('name IS NULL', null, false)
+        ->orWhere('email', '')
+        ->orWhere('email IS NULL', null, false)
+        ->orWhere('gender', '')
+        ->orWhere('gender IS NULL', null, false)
+      ->groupEnd()
+      ->countAllResults();
+
+    return [
+      'total'      => $total,
+      'active'     => $active,
+      'inactive'   => $inactive,
+      'incomplete' => $incomplete,
+    ];
+  }
+
   public function addTax($data)
   {
     return $this->db->table('taxes')->insert($data);
@@ -106,15 +187,13 @@ class User extends Model
   }
   public function getRoles()
   {
-    return $this->db->table('roles')->get()->getResult();
+    return $this->db->table('roles')->orderBy('id', 'ASC')->get()->getResult();
   }
   public function getUsers()
   {
     return $this->db->table('employees')
-      ->select('employees.id, employees.name,employees.email,employees. password, employees.role_id,employees.status')
-      ->select('roles.name as role_name,')
-
-      ->join('roles', 'roles.id=employees.role_id', 'left')
+      ->select('employees.id, employees.name, employees.email, employees.password, employees.role_id, employees.status, roles.name as role_name, roles.slug as role_slug')
+      ->join('roles', 'roles.id = employees.role_id', 'left')
       ->orderBy('employees.id', 'DESC')
       ->where('employees.role_id!=', 1)->get()->getResult();
   }

@@ -136,3 +136,8 @@ scratch/
 *.wav
 *.mp3
 *.mp4
+
+
+# Python virtual environments
+app/Python/venv/
+app/Python/.venv/

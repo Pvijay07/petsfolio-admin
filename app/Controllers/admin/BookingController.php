@@ -39,6 +39,7 @@ class BookingController extends BaseController
         $data['bookings'] = $this->bookingModel->getWalkingBookings('Confirmed', 'Accepted');
         return $this->loadView('admin/bookings/walkingbookings', $data);
     }
+    
     public function premiumRequests()
     {
         $data['title'] = 'Premium Service Requests';
@@ -76,9 +77,12 @@ class BookingController extends BaseController
         }
 
         $data['requests'] = $requests;
+        $data['normalCount'] = count($this->getBookingRequests());
+        $data['premiumCount'] = count($requests);
 
         return $this->loadView('admin/bookings/premium_requests', $data);
     }
+
     public function getQuotations($bookingId)
     {
         $db = \Config\Database::connect();
@@ -321,6 +325,38 @@ class BookingController extends BaseController
         $data['page'] = 'walkingquotes';
         $data['booking_id'] = $booking_id;
         $data['quotations'] = $this->bookingModel->getWalkingQuotes($booking_id);
+
+        // Fetch chat counts for each quotation strictly scoped to this booking
+        $chatCounts = [];
+        if (!empty($data['quotations'])) {
+            $conversations = $this->db->table('booking_conversations')
+                ->where('booking_id', $booking_id)
+                ->get()
+                ->getResult();
+
+            if (!empty($conversations)) {
+                $convIds = array_column($conversations, 'id');
+                if (!empty($convIds)) {
+                    $msgCounts = $this->db->table('booking_messages')
+                        ->select('conversation_id, COUNT(id) as msg_count')
+                        ->whereIn('conversation_id', $convIds)
+                        ->groupBy('conversation_id')
+                        ->get()
+                        ->getResult();
+
+                    $msgCountMap = [];
+                    foreach ($msgCounts as $mc) {
+                        $msgCountMap[$mc->conversation_id] = (int)$mc->msg_count;
+                    }
+
+                    foreach ($conversations as $conv) {
+                        $cId = (int)$conv->service_provider_id;
+                        $chatCounts[$cId] = ($chatCounts[$cId] ?? 0) + ($msgCountMap[$conv->id] ?? 0);
+                    }
+                }
+            }
+        }
+
         foreach ($data['quotations'] as &$quotation) {
 
             $distance = distanceCalculator(
@@ -331,8 +367,9 @@ class BookingController extends BaseController
             );
 
             $quotation->distance = isset($distance) ? $distance : null;
+            $quotation->chat_count = (int)($chatCounts[(int)$quotation->provider_id] ?? 0);
         }
-
+        unset($quotation);
 
         return $this->loadView('admin/bookings/walking-quotes', $data);
     }
@@ -346,6 +383,7 @@ class BookingController extends BaseController
 
         return $this->loadView('admin/bookings/booking-requests', $data);
     }
+
     public function getBookingRequests()
     {
         // Get bookings (assuming 'New' status)
@@ -362,10 +400,21 @@ class BookingController extends BaseController
             $sittingBookings ?? []
         );
 
+        // Convert created_at to IST and preserve UTC
+        foreach ($allBookings as $booking) {
+            if (!empty($booking->created_at) && $booking->created_at !== '0000-00-00 00:00:00') {
+                $booking->created_at_utc = $booking->created_at;
+                $booking->created_at = utcToIst($booking->created_at, 'Y-m-d H:i:s');
+            }
+            if (!empty($booking->updated_at) && $booking->updated_at !== '0000-00-00 00:00:00') {
+                $booking->updated_at_utc = $booking->updated_at;
+            }
+        }
+
         // Sort by created_at in descending order
         usort($allBookings, function ($a, $b) {
-            $dateA = strtotime($a->updated_at ?? $a->created_at);
-            $dateB = strtotime($b->updated_at ?? $b->created_at);
+            $dateA = strtotime($a->created_at ?? $a->updated_at ?? 0);
+            $dateB = strtotime($b->created_at ?? $b->updated_at ?? 0);
             return $dateB - $dateA; // For descending order
         });
 
@@ -475,6 +524,18 @@ class BookingController extends BaseController
 
         // Post-process only the paginated results (25 rows max)
         foreach ($data['bookings'] as $booking) {
+            // Convert created_at from UTC to IST
+            if (!empty($booking->created_at) && $booking->created_at !== '0000-00-00 00:00:00') {
+                $booking->created_at_utc = $booking->created_at;
+                $booking->created_at = utcToIst($booking->created_at, 'Y-m-d H:i:s');
+            }
+            if (!empty($booking->updated_at) && $booking->updated_at !== '0000-00-00 00:00:00') {
+                $booking->updated_at_utc = $booking->updated_at;
+            }
+            if (!empty($booking->confirmed_at) && $booking->confirmed_at !== '0000-00-00 00:00:00') {
+                $booking->confirmed_at = date('Y-m-d H:i:s', strtotime($booking->confirmed_at));
+            }
+
             $booking->totalQuotes = $this->bookingModel->getOtherQuotes($booking->id, $booking->provider_id ?? 0, $booking->service_id);
 
             $addressParts = array_filter([
@@ -771,12 +832,29 @@ class BookingController extends BaseController
         $start_date = $this->request->getPost('start_date');
         $service_id = $this->request->getPost('service_id');
 
+        if (empty($service_id) && !empty($booking_id)) {
+            if (str_ends_with($booking_id, 'WLK') || str_contains($booking_id, 'WLK')) {
+                $service_id = '4';
+            } elseif (str_ends_with($booking_id, 'GRM') || str_contains($booking_id, 'GRM')) {
+                $service_id = '2';
+            } elseif (str_ends_with($booking_id, 'TRN') || str_contains($booking_id, 'TRN')) {
+                $service_id = '3';
+            } elseif (str_ends_with($booking_id, 'SIT') || str_contains($booking_id, 'SIT')) {
+                $service_id = '6';
+            } elseif (str_ends_with($booking_id, 'BRD') || str_contains($booking_id, 'BRD')) {
+                $service_id = '1';
+            }
+        }
+
         $notificationTitle = '';
         $booking = null;
         $reposted = false;
 
         if ($service_id == '1') {
-            // Handle service 1 if needed
+            $notificationTitle = 'New job alert - Boarding';
+            $booking = $this->bookingModel->getBooking('boarding_service_bookings', $booking_id);
+            $providers = $this->bookingModel->getServiceProviders($service_id);
+            $reposted = $this->bookingModel->repostBoardingBooking('boarding_service_bookings', $booking_id, $start_date);
         } elseif ($service_id == '2') {
             $booking = $this->bookingModel->getBooking('grooming_service_bookings', $booking_id);
             $providers = $this->bookingModel->getServiceProviders($service_id);
@@ -791,9 +869,20 @@ class BookingController extends BaseController
             $notificationTitle = 'New job alert - Walking';
             $booking = $this->bookingModel->getBooking('walking_service_bookings', $booking_id);
             $providers = $this->bookingModel->getServiceProviders($service_id);
-            $totalDays = $this->bookingModel->getPackageDetails($booking->package_id)->duration_days;
+            $pkg = $this->bookingModel->getPackageDetails($booking->package_id);
+            $totalDays = $pkg->duration_days ?? $pkg->totalDays ?? 30;
             $end_date = calculateEndDate($start_date, $totalDays, $booking->service_days);
             $reposted = $this->bookingModel->repostWalkingBooking('walking_service_bookings', $booking_id, $start_date, $end_date);
+        } elseif ($service_id == '6') {
+            $notificationTitle = 'New job alert - Sitting';
+            $booking = $this->bookingModel->getBooking('sitting_service_bookings', $booking_id);
+            $providers = $this->bookingModel->getServiceProviders($service_id);
+            $reposted = $this->bookingModel->repostSittingBooking('sitting_service_bookings', $booking_id, $start_date);
+        }
+
+        if ($reposted) {
+            $db = \Config\Database::connect();
+            $db->table('quotations')->where('booking_id', $booking_id)->delete();
         }
 
         if ($reposted && !empty($notificationTitle) && $booking && isset($providers)) {
@@ -813,16 +902,43 @@ class BookingController extends BaseController
                     $provider->distance = round($d, 2);
 
                     // Notify providers within 30km (adjust threshold as needed)
+                    $PushNotify = new PushNotify();
+                    $logModel = new \App\Models\NotificationLogModel();
+
                     if ($d <= 30) {
-                        $PushNotify = new PushNotify();
-                        $PushNotify->notify($provider->device_token, $notificationTitle, 'Don\'t miss out—submit your quote now!');
+                        $pushRes = $PushNotify->notify($provider->device_token, $notificationTitle, 'Don\'t miss out—submit your quote now!');
                         $notifiedProviders[] = $provider->provider_id;
+                        $logModel->createLog([
+                            'provider_id'   => $provider->provider_id,
+                            'user_type'     => 'provider',
+                            'channel'       => 'push',
+                            'title'         => $notificationTitle,
+                            'body'          => 'Don\'t miss out—submit your quote now!',
+                            'status'        => ($pushRes['status_code'] ?? 0) === 200 ? 'sent' : 'failed',
+                            'error_message' => ($pushRes['status_code'] ?? 0) === 200 ? null : ($pushRes['message'] ?? 'Push failed'),
+                            'device_token'  => $provider->device_token,
+                            'sent_at'       => date('Y-m-d H:i:s'),
+                            'created_at'    => date('Y-m-d H:i:s'),
+                        ]);
                     }
                 } else {
                     // If location isn't relevant, notify all providers
                     $PushNotify = new PushNotify();
-                    $PushNotify->notify($provider->device_token, $notificationTitle, 'Don\'t miss out—submit your quote now!');
+                    $logModel = new \App\Models\NotificationLogModel();
+                    $pushRes = $PushNotify->notify($provider->device_token, $notificationTitle, 'Don\'t miss out—submit your quote now!');
                     $notifiedProviders[] = $provider->provider_id;
+                    $logModel->createLog([
+                        'provider_id'   => $provider->provider_id,
+                        'user_type'     => 'provider',
+                        'channel'       => 'push',
+                        'title'         => $notificationTitle,
+                        'body'          => 'Don\'t miss out—submit your quote now!',
+                        'status'        => ($pushRes['status_code'] ?? 0) === 200 ? 'sent' : 'failed',
+                        'error_message' => ($pushRes['status_code'] ?? 0) === 200 ? null : ($pushRes['message'] ?? 'Push failed'),
+                        'device_token'  => $provider->device_token,
+                        'sent_at'       => date('Y-m-d H:i:s'),
+                        'created_at'    => date('Y-m-d H:i:s'),
+                    ]);
                 }
             }
 
@@ -830,6 +946,9 @@ class BookingController extends BaseController
             if (isset($booking->user_device_token)) {
                 $serviceName = '';
                 switch ($service_id) {
+                    case '1':
+                        $serviceName = 'boarding';
+                        break;
                     case '2':
                         $serviceName = 'grooming';
                         break;
@@ -839,14 +958,30 @@ class BookingController extends BaseController
                     case '4':
                         $serviceName = 'walking';
                         break;
+                    case '6':
+                        $serviceName = 'sitting';
+                        break;
                 }
 
                 $PushNotify = new PushNotify();
-                $PushNotify->notify(
+                $userPushRes = $PushNotify->notify(
                     $booking->user_device_token,
                     "Your {$serviceName} request has been reposted",
                     'Please check the app for new quotes.'
                 );
+                $logModel = new \App\Models\NotificationLogModel();
+                $logModel->createLog([
+                    'user_id'       => $booking->user_id ?? null,
+                    'user_type'     => 'user',
+                    'channel'       => 'push',
+                    'title'         => "Your {$serviceName} request has been reposted",
+                    'body'          => 'Please check the app for new quotes.',
+                    'status'        => ($userPushRes['status_code'] ?? 0) === 200 ? 'sent' : 'failed',
+                    'error_message' => ($userPushRes['status_code'] ?? 0) === 200 ? null : ($userPushRes['message'] ?? 'Push failed'),
+                    'device_token'  => $booking->user_device_token,
+                    'sent_at'       => date('Y-m-d H:i:s'),
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
             }
         }
 
@@ -1121,6 +1256,7 @@ class BookingController extends BaseController
                 return 0;
         }
     }
+
     public function clientStatistics()
     {
         $data['title'] = '';
@@ -1195,6 +1331,7 @@ class BookingController extends BaseController
 
         return $combined;
     }
+
     public function providerStatistics()
     {
         $data['title'] = '';
@@ -1394,6 +1531,7 @@ class BookingController extends BaseController
         $data['walks'] = $this->bookingModel->getUntrackedWalks();
         return $this->loadView('admin/bookings/missed_walks_report', $data);
     }
+
     public function updateReason()
     {
         $trackId = $this->request->getPost('track_id');
@@ -1479,14 +1617,19 @@ class BookingController extends BaseController
                 'provider_phone' => $booking->provider_phone ?? '--',
                 'service_start_date' => $booking->service_start_date ?? '--',
                 'service_end_date' => $booking->service_end_date ?? '--',
+                'service_date' => $booking->service_start_date ?? '--',
                 'totalQuotes' => $booking->totalQuotes ?? 0,
                 'comment' => $booking->comment ?? '',
                 'cancel_reason' => $booking->cancel_reason ?? '',
                 'user_withdrawal_amount' => $booking->user_withdrawal_amount ?? '--',
-                'created_at' => $booking->created_at ?? '--',
+                'created_at' => (!empty($booking->created_at) && $booking->created_at !== '0000-00-00 00:00:00') ? utcToIst($booking->created_at, 'Y-m-d H:i:s') : ($booking->created_at ?? '--'),
+                'created_date' => (!empty($booking->created_at) && $booking->created_at !== '0000-00-00 00:00:00') ? utcToIst($booking->created_at, 'd M Y') : '--',
+                'confirmed_at' => (!empty($booking->confirmed_at) && $booking->confirmed_at !== '0000-00-00 00:00:00') ? date('Y-m-d H:i:s', strtotime($booking->confirmed_at)) : '--',
+                'confirmed_date' => (!empty($booking->confirmed_at) && $booking->confirmed_at !== '0000-00-00 00:00:00') ? date('d M Y', strtotime($booking->confirmed_at)) : '--',
                 'deleted_at' => $booking->deleted_at ?? '--',
                 'deleted_by' => $booking->deleted_by ?? 'User',
                 'service_type' => $booking->service_type ?? 'walking',
+                'service_name' => $booking->service_name ?? ucfirst($booking->service_type ?? 'walking'),
                 'service_frequency' => $booking->service_frequency ?? '',
                 'walk_duration' => $booking->walk_duration ?? '',
                 'service_days' => $booking->service_days ?? '',
@@ -1696,12 +1839,23 @@ class BookingController extends BaseController
             return $this->response->setJSON(['error' => 'Booking not found']);
         }
 
+        $lat = $booking->booking_latitude ?? null;
+        $lon = $booking->booking_longitude ?? null;
+
+        if (empty($lat) || empty($lon) || !is_numeric($lat) || !is_numeric($lon) || ((float)$lat == 0.0 && (float)$lon == 0.0)) {
+            return $this->response->setJSON([
+                'providers' => [],
+                'booking'   => $booking,
+                'message'   => 'Booking address does not have valid coordinates to locate nearby providers.'
+            ]);
+        }
+
         // Batch fetch all provider data at once
         $nearbyProviders = $this->bookingModel->getNearbyProvidersByService(
             $booking->service_id,
-            $booking->booking_latitude,
-            $booking->booking_longitude,
-            10
+            $lat,
+            $lon,
+            50
         );
 
         if (empty($nearbyProviders)) {
@@ -1760,5 +1914,439 @@ class BookingController extends BaseController
             'providers' => $nearbyProviders,
             'booking' => $booking
         ]);
+    }
+
+    /**
+     * Notify nearby providers about a booking request
+     */
+    public function notifyNearbyProviders()
+    {
+        $bookingId   = $this->request->getPost('booking_id');
+        $providerIds = $this->request->getPost('provider_ids');
+        $queueOnly   = $this->request->getPost('queue_only');
+
+        if (empty($bookingId) || empty($providerIds)) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Booking ID and at least one provider must be selected.',
+            ]);
+        }
+
+        if (is_string($providerIds)) {
+            $decoded = json_decode($providerIds, true);
+            $providerIds = (json_last_error() === JSON_ERROR_NONE && is_array($decoded))
+                ? $decoded
+                : explode(',', $providerIds);
+        }
+        $providerIds = array_values(array_filter(array_map('trim', (array) $providerIds)));
+
+        if (empty($providerIds)) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'No valid provider IDs specified.',
+            ]);
+        }
+
+        $booking = $this->bookingModel->getBookingById($bookingId);
+        $serviceName = 'Service';
+        if ($booking && isset($booking->service_id)) {
+            switch ((string) $booking->service_id) {
+                case '1':
+                    $serviceName = 'Boarding';
+                    break;
+                case '2':
+                    $serviceName = 'Grooming';
+                    break;
+                case '3':
+                    $serviceName = 'Training';
+                    break;
+                case '4':
+                    $serviceName = 'Walking';
+                    break;
+                case '6':
+                    $serviceName = 'Sitting';
+                    break;
+            }
+        }
+
+        $db = \Config\Database::connect();
+        $providers = $db->table('service_providers')
+            ->select('id, name, phone, device_token')
+            ->whereIn('id', $providerIds)
+            ->get()->getResult();
+
+        if (empty($providers)) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Selected providers were not found in the database.',
+            ]);
+        }
+
+        $isQueue = ($queueOnly === '1' || $queueOnly === 1 || $queueOnly === true || $queueOnly === 'true' || $queueOnly === 'on');
+        $title = "New job alert - {$serviceName}";
+        $body = "A new {$serviceName} request is available near you. Submit your quote now!";
+
+        $logModel = new \App\Models\NotificationLogModel();
+        $pushNotify = new PushNotify();
+
+        $sentCount = 0;
+        $failCount = 0;
+        $tokens = [];
+        $providerByToken = [];
+
+        $hasQueueProviderId = $db->fieldExists('provider_id', 'notification_queue');
+        $hasQueueBookingId  = $db->fieldExists('booking_id', 'notification_queue');
+
+        foreach ($providers as $provider) {
+            $token = trim($provider->device_token ?? '');
+            $hasToken = !empty($token) && $token !== 'default_token';
+
+            if ($isQueue) {
+                if ($hasToken) {
+                    $queueData = [
+                        'tokens'       => json_encode([$token]),
+                        'title'        => $title,
+                        'message'      => $body,
+                        'priority'     => 'high',
+                        'status'       => 'pending',
+                        'scheduled_at' => date('Y-m-d H:i:s'),
+                        'attempts'     => 0,
+                        'created_at'   => date('Y-m-d H:i:s'),
+                        'updated_at'   => date('Y-m-d H:i:s'),
+                    ];
+
+                    if ($hasQueueProviderId) {
+                        $queueData['provider_id'] = $provider->id;
+                    }
+                    if ($hasQueueBookingId) {
+                        $queueData['booking_id'] = $bookingId;
+                    }
+
+                    $db->table('notification_queue')->insert($queueData);
+                }
+
+                $logModel->createLog([
+                    'provider_id'   => $provider->id,
+                    'user_type'     => 'provider',
+                    'channel'       => 'push',
+                    'title'         => $title,
+                    'body'          => $body,
+                    'status'        => $hasToken ? 'queued' : 'failed',
+                    'error_message' => $hasToken ? null : 'Missing device push token',
+                    'device_token'  => $hasToken ? $token : null,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
+
+                if ($hasToken) {
+                    $sentCount++;
+                } else {
+                    $failCount++;
+                }
+            } else {
+                if (!$hasToken) {
+                    $failCount++;
+                    $logModel->createLog([
+                        'provider_id'   => $provider->id,
+                        'user_type'     => 'provider',
+                        'channel'       => 'push',
+                        'title'         => $title,
+                        'body'          => $body,
+                        'status'        => 'failed',
+                        'error_message' => 'Missing device push token',
+                        'device_token'  => null,
+                        'created_at'    => date('Y-m-d H:i:s'),
+                    ]);
+                    continue;
+                }
+
+                $tokens[] = $token;
+                $providerByToken[$token] = $provider;
+            }
+        }
+
+        if (!$isQueue && !empty($tokens)) {
+            $results = $pushNotify->notifyMultipleParallel($tokens, $title, $body);
+
+            foreach ($results as $res) {
+                $tok = $res['token'] ?? '';
+                $p = $providerByToken[$tok] ?? null;
+                $isSuccess = ($res['status'] === 'sent');
+
+                if ($isSuccess) {
+                    $sentCount++;
+                } else {
+                    $failCount++;
+                }
+
+                $logModel->createLog([
+                    'provider_id'   => $p ? $p->id : null,
+                    'user_type'     => 'provider',
+                    'channel'       => 'push',
+                    'title'         => $title,
+                    'body'          => $body,
+                    'status'        => $isSuccess ? 'sent' : 'failed',
+                    'error_message' => $isSuccess ? null : ($res['error'] ?? 'FCM dispatch failed'),
+                    'device_token'  => $tok,
+                    'sent_at'       => $isSuccess ? date('Y-m-d H:i:s') : null,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
+        return $this->response->setJSON([
+            'status'     => true,
+            'is_queue'   => $isQueue,
+            'message'    => $isQueue
+                ? "{$sentCount} notification(s) queued for booking #{$bookingId}."
+                : "{$sentCount} notification(s) sent successfully" . ($failCount > 0 ? " ({$failCount} failed)" : "") . ".",
+            'sent_count' => $sentCount,
+            'fail_count' => $failCount,
+        ]);
+    }
+
+    /**
+     * Send bulk notifications to providers and/or clients for selected halted bookings
+     */
+    public function sendBulkNotifications()
+    {
+        $bookingIds  = $this->request->getPost('booking_ids');
+        $targetAudience = $this->request->getPost('target_audience') ?: 'clients'; // 'clients', 'providers', 'both'
+        $customTitle = trim($this->request->getPost('title') ?? '');
+        $customMessage = trim($this->request->getPost('message') ?? '');
+        $radiusKm = (int) ($this->request->getPost('radius_km') ?? 25);
+        if ($radiusKm <= 0) $radiusKm = 25;
+
+        if (empty($bookingIds)) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Please select at least one halted booking.'
+            ]);
+        }
+
+        if (is_string($bookingIds)) {
+            $decoded = json_decode($bookingIds, true);
+            $bookingIds = (json_last_error() === JSON_ERROR_NONE && is_array($decoded))
+                ? $decoded
+                : explode(',', $bookingIds);
+        }
+        $bookingIds = array_values(array_unique(array_filter(array_map('trim', (array) $bookingIds))));
+
+        if (empty($bookingIds)) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'No valid bookings selected.'
+            ]);
+        }
+
+        $pushNotify = new PushNotify();
+        $logModel = new \App\Models\NotificationLogModel();
+        $db = \Config\Database::connect();
+
+        $providerTokensMap = []; // token => ['provider_id' => ..., 'title' => ..., 'body' => ...]
+        $clientTokensMap   = []; // token => ['user_id' => ..., 'title' => ..., 'body' => ...]
+
+        $processedBookingsCount = 0;
+        $noTokenCount = 0;
+
+        foreach ($bookingIds as $bookingId) {
+            $booking = $this->bookingModel->getBookingById($bookingId);
+            if (!$booking) continue;
+
+            $processedBookingsCount++;
+            $serviceName = 'Service';
+            if (isset($booking->service_id)) {
+                switch ((string) $booking->service_id) {
+                    case '1':
+                        $serviceName = 'Boarding';
+                        break;
+                    case '2':
+                        $serviceName = 'Grooming';
+                        break;
+                    case '3':
+                        $serviceName = 'Training';
+                        break;
+                    case '4':
+                        $serviceName = 'Walking';
+                        break;
+                    case '6':
+                        $serviceName = 'Sitting';
+                        break;
+                }
+            }
+
+            // 1. Notify Nearby Service Providers
+            if ($targetAudience === 'providers' || $targetAudience === 'both') {
+                $nearbyProviders = [];
+                if (!empty($booking->booking_latitude) && !empty($booking->booking_longitude)) {
+                    $nearbyProviders = $this->bookingModel->getNearbyProvidersByService(
+                        $booking->service_id,
+                        $booking->booking_latitude,
+                        $booking->booking_longitude,
+                        $radiusKm
+                    );
+                }
+
+                $pTitle = !empty($customTitle) ? $customTitle : "Reactivate Booking - {$serviceName}";
+                $pBody  = !empty($customMessage) ? $customMessage : "A service request in your area is currently awaiting confirmation. Open the Petsfolio app to reactivate your booking and take action now.";
+
+                if (!empty($nearbyProviders)) {
+                    foreach ($nearbyProviders as $provider) {
+                        $tok = trim($provider->device_token ?? '');
+                        if (!empty($tok) && $tok !== 'default_token') {
+                            if (!isset($providerTokensMap[$tok])) {
+                                $providerTokensMap[$tok] = [
+                                    'provider_id' => $provider->provider_id,
+                                    'title'       => $pTitle,
+                                    'body'        => $pBody,
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Notify Clients / Pet Parents
+            if ($targetAudience === 'clients' || $targetAudience === 'both') {
+                $clientToken = trim($booking->user_device_token ?? '');
+                if (!empty($clientToken) && $clientToken !== 'default_token') {
+                    $cTitle = !empty($customTitle) ? $customTitle : "Reactivate Booking - Petsfolio";
+                    $cBody  = !empty($customMessage) ? $customMessage : "A service request in your area is currently awaiting confirmation. Open the Petsfolio app to reactivate your booking and take action now.";
+
+                    if (!isset($clientTokensMap[$clientToken])) {
+                        $clientTokensMap[$clientToken] = [
+                            'user_id' => $booking->user_id ?? null,
+                            'title'   => $cTitle,
+                            'body'    => $cBody,
+                        ];
+                    }
+                } else {
+                    $noTokenCount++;
+                }
+            }
+        }
+
+        $totalProvidersSent = 0;
+        $totalClientsSent   = 0;
+        $totalFailed        = 0;
+
+        // Dispatch provider notifications in parallel
+        if (!empty($providerTokensMap)) {
+            $tokens = array_keys($providerTokensMap);
+            // Use first provider message or default
+            $firstProv = reset($providerTokensMap);
+            $results = $pushNotify->notifyMultipleParallel($tokens, $firstProv['title'], $firstProv['body']);
+
+            foreach ($results as $res) {
+                $tok = $res['token'] ?? '';
+                $info = $providerTokensMap[$tok] ?? null;
+                $isSuccess = ($res['status'] === 'sent');
+
+                if ($isSuccess) {
+                    $totalProvidersSent++;
+                } else {
+                    $totalFailed++;
+                }
+
+                $logModel->createLog([
+                    'provider_id'   => $info ? $info['provider_id'] : null,
+                    'user_type'     => 'provider',
+                    'channel'       => 'push',
+                    'title'         => $info['title'] ?? 'Job Notification',
+                    'body'          => $info['body'] ?? 'Job Notification Body',
+                    'status'        => $isSuccess ? 'sent' : 'failed',
+                    'error_message' => $isSuccess ? null : ($res['error'] ?? 'FCM dispatch failed'),
+                    'device_token'  => $tok,
+                    'sent_at'       => $isSuccess ? date('Y-m-d H:i:s') : null,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
+        // Dispatch client notifications in parallel
+        if (!empty($clientTokensMap)) {
+            $cTokens = array_keys($clientTokensMap);
+            $firstCli = reset($clientTokensMap);
+            $cResults = $pushNotify->notifyMultipleParallel($cTokens, $firstCli['title'], $firstCli['body']);
+
+            foreach ($cResults as $res) {
+                $tok = $res['token'] ?? '';
+                $info = $clientTokensMap[$tok] ?? null;
+                $isSuccess = ($res['status'] === 'sent');
+
+                if ($isSuccess) {
+                    $totalClientsSent++;
+                } else {
+                    $totalFailed++;
+                }
+
+                $logModel->createLog([
+                    'user_id'       => $info ? $info['user_id'] : null,
+                    'user_type'     => 'user',
+                    'channel'       => 'push',
+                    'title'         => $info['title'] ?? 'Booking Update',
+                    'body'          => $info['body'] ?? 'Booking Update Body',
+                    'status'        => $isSuccess ? 'sent' : 'failed',
+                    'error_message' => $isSuccess ? null : ($res['error'] ?? 'FCM dispatch failed'),
+                    'device_token'  => $tok,
+                    'sent_at'       => $isSuccess ? date('Y-m-d H:i:s') : null,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
+        $totalSent = $totalProvidersSent + $totalClientsSent;
+
+        if ($totalSent === 0 && $totalFailed === 0) {
+            $msg = ($targetAudience === 'clients')
+                ? "No active device push tokens found for the clients of the selected {$processedBookingsCount} booking(s). The pet parents might not have active push notifications registered in the mobile app."
+                : "No active device push tokens found for the selected bookings or nearby providers within {$radiusKm}km.";
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => $msg,
+            ]);
+        }
+
+        $parts = [];
+        if ($totalProvidersSent > 0) $parts[] = "{$totalProvidersSent} provider(s)";
+        if ($totalClientsSent > 0)   $parts[] = "{$totalClientsSent} client(s)";
+        $sentStr = implode(' and ', $parts);
+
+        $skippedNote = ($noTokenCount > 0 && $targetAudience === 'clients')
+            ? " ({$noTokenCount} booking(s) skipped due to missing device push token)"
+            : "";
+
+        return $this->response->setJSON([
+            'status'         => true,
+            'message'        => "Bulk notifications successfully sent to {$sentStr} across {$processedBookingsCount} halted booking(s){$skippedNote}" . ($totalFailed > 0 ? " ({$totalFailed} failed)" : "") . ".",
+            'providers_sent' => $totalProvidersSent,
+            'clients_sent'   => $totalClientsSent,
+            'failed'         => $totalFailed,
+            'bookings_count' => $processedBookingsCount,
+        ]);
+    }
+
+    public function deleteQuotation($quotation_id = null)
+    {
+        if (empty($quotation_id)) {
+            $quotation_id = $this->request->getPost('id');
+        }
+
+        if (empty($quotation_id)) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Quotation ID is required.']);
+        }
+
+        $quotation = $this->quotationModel->getQuotation($quotation_id);
+
+        if (!$quotation) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Quotation not found.']);
+        }
+
+        $deleted = $this->quotationModel->deleteQuotation($quotation->provider_id, $quotation_id);
+
+        if ($deleted) {
+            return $this->response->setJSON(['status' => true, 'message' => 'Quotation deleted successfully.']);
+        }
+
+        return $this->response->setJSON(['status' => false, 'message' => 'Failed to delete quotation.']);
     }
 }

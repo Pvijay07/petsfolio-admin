@@ -11,15 +11,24 @@ function ratingOptions($weight, $isSimple = false, $optionsStr = '') {
     $weight = (float)$weight;
     $parsedOptions = [];
     if (!empty($optionsStr)) {
-        $parts = explode(',', $optionsStr);
-        foreach ($parts as $part) {
-            $subparts = explode(':', $part, 2);
-            if (count($subparts) === 2) {
-                $key = trim($subparts[0]);
-                $val = trim($subparts[1]);
-                $key = str_replace(["\r", "\n", "\\r", "\\n"], "", $key);
+        if (preg_match_all('/(?:^|,\s*)(Bad|Poor|Average|Good|Excellent)\s*:\s*(.*?)(?=(?:,\s*(?:Bad|Poor|Average|Good|Excellent)\s*:|$))/s', $optionsStr, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $m) {
+                $key = trim($m[1]);
+                $val = trim($m[2]);
                 $val = str_replace(["\r", "\n", "\\r", "\\n"], "", $val);
                 $parsedOptions[$key] = $val;
+            }
+        } else {
+            $parts = explode(',', $optionsStr);
+            foreach ($parts as $part) {
+                $subparts = explode(':', $part, 2);
+                if (count($subparts) === 2) {
+                    $key = trim($subparts[0]);
+                    $val = trim($subparts[1]);
+                    $key = str_replace(["\r", "\n", "\\r", "\\n"], "", $key);
+                    $val = str_replace(["\r", "\n", "\\r", "\\n"], "", $val);
+                    $parsedOptions[$key] = $val;
+                }
             }
         }
     }
@@ -267,15 +276,15 @@ function ratingOptions($weight, $isSimple = false, $optionsStr = '') {
                                         </div>
                                     <?php endforeach; ?>
 
-                                    <!-- Mandatory Instruction Section -->
-                                    <!-- <div class="alert alert-warning border-0 rounded-4 p-4 mt-4 shadow-sm">
-                                        <h6 class="fw-bold d-flex align-items-center mb-3">
-                                            <i class="fas fa-bullhorn me-2"></i> Instruction to be read by Verification Executive
+                                    <!-- Mandatory Statement by Verification Executive -->
+                                    <div class="alert alert-warning border-0 rounded-4 p-4 mt-4 shadow-sm" style="background: rgba(255, 193, 7, 0.12); border-left: 4px solid #ffc107 !important;">
+                                        <h6 class="fw-bold d-flex align-items-center mb-2 text-dark">
+                                            <span class="me-2" style="font-size: 1.25rem;">🗣️</span> Statement by Verification Executive
                                         </h6>
-                                        <p class="mb-0 small fw-bold text-dark italic">
-                                            “Taking clients outside the Petsfolio platform is strictly not allowed. If you take clients offline, your account will be blocked, you will have to pay a penalty, and you will not receive any more leads from Petsfolio. All services must be accepted only through proper bookings in the app.”
+                                        <p class="mb-0 small fw-bold text-dark" style="font-style: italic; line-height: 1.6;">
+                                            “Taking clients outside the Petsfolio platform is strictly not allowed. If you take clients offline, your account will be blocked, you must pay a penalty, and you will not receive further leads.”
                                         </p>
-                                    </div> -->
+                                    </div>
                                 </div>
                             </div>
                         </div>

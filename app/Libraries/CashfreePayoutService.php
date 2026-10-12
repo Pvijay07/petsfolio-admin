@@ -148,10 +148,13 @@ class CashfreePayoutService
   {
     $cache = Services::cache();
     $cacheKey = 'cf_payout_access_token';
-    $token = $cache->get($cacheKey);
-
-    if ($token) {
-      return $token;
+    try {
+      $token = $cache->get($cacheKey);
+      if ($token) {
+        return $token;
+      }
+    } catch (\Throwable $e) {
+      \log_message('warning', 'Cashfree token cache read failed: ' . $e->getMessage());
     }
 
     $client = Services::curlrequest();
@@ -170,7 +173,11 @@ class CashfreePayoutService
         $token = $body['data']['token'];
         // Cache for 24 hours (usually tokens last 24h, but check docs if possible)
         // Cashfree usually gives 24h, we'll cache for 23h to be safe
-        $cache->save($cacheKey, $token, 23 * 3600);
+        try {
+          $cache->save($cacheKey, $token, 23 * 3600);
+        } catch (\Throwable $e) {
+          \log_message('warning', 'Cashfree token cache save failed: ' . $e->getMessage());
+        }
         return $token;
       }
 
@@ -339,22 +346,24 @@ class CashfreePayoutService
       ];
     }
 
+    $cleanAccountHolder = trim($bankDetails['account_holder_name'] ?? '');
+    $cleanAccountNumber = trim(preg_replace('/\s+/', '', (string)($bankDetails['account_number'] ?? '')));
+    $cleanIfsc          = strtoupper(trim(preg_replace('/\s+/', '', (string)($bankDetails['ifsc_code'] ?? ''))));
+
     // V2 API format
     $payload = [
       "beneficiary_id"                 => $beneficiaryId,
-      "beneficiary_name"               => $bankDetails['account_holder_name'],
-      "beneficiary_instrument_details" => [],
+      "beneficiary_name"               => $cleanAccountHolder,
+      "beneficiary_instrument_details" => [
+        "bank_account_number" => $cleanAccountNumber,
+        "bank_ifsc"           => $cleanIfsc,
+      ],
       "beneficiary_contact_details"    => [
-        "beneficiary_email"        => $userInfo['email'] ?? 'noreply@example.com',
-        "beneficiary_phone"        => $userInfo['phone'] ?? '',
+        "beneficiary_email"        => !empty($userInfo['email']) ? trim($userInfo['email']) : 'noreply@example.com',
+        "beneficiary_phone"        => !empty($userInfo['phone']) ? trim($userInfo['phone']) : '',
         "beneficiary_country_code" => "+91",
       ]
     ];
-
-
-    $payload['beneficiary_instrument_details']['bank_account_number'] = $bankDetails['account_number'];
-    $payload['beneficiary_instrument_details']['bank_ifsc']           = $bankDetails['ifsc_code'];
-
 
     // Add optional address details if available
     if (!empty($userInfo['address'])) {
@@ -591,6 +600,293 @@ class CashfreePayoutService
 
     return $transferResult;
   }
+
+  /**
+   * Resolve an existing beneficiary or register a new one in Cashfree
+   */
+  public function resolveOrRegisterBeneficiary(
+    string $candidateId,
+    string $accountHolder,
+    string $accountNumber,
+    string $ifsc,
+    ?string $email = null,
+    ?string $phone = null,
+    ?string $upiId = null
+  ): array {
+    $cleanAccountNumber = trim(preg_replace('/\s+/', '', (string)$accountNumber));
+    $cleanIfsc          = strtoupper(trim(preg_replace('/\s+/', '', (string)$ifsc)));
+    $cleanHolder        = trim($accountHolder);
+
+    if (empty($cleanAccountNumber) || empty($cleanIfsc)) {
+      return [
+        'success' => false,
+        'error'   => 'Account number and IFSC code are required.'
+      ];
+    }
+
+    // 1. Check if beneficiary already exists in Cashfree by querying bank details
+    $searchResult = $this->get('/beneficiary', [
+      'bank_account_number' => $cleanAccountNumber,
+      'bank_ifsc'           => $cleanIfsc,
+    ]);
+
+    if ($searchResult['success'] && !empty($searchResult['data'])) {
+      $candidate = null;
+      if (isset($searchResult['data']['beneficiary_id']) && !empty($searchResult['data']['beneficiary_id'])) {
+        $candidate = $searchResult['data'];
+      } elseif (is_array($searchResult['data'])) {
+        foreach ($searchResult['data'] as $item) {
+          if (isset($item['beneficiary_id']) && !empty($item['beneficiary_id'])) {
+            $candidate = $item;
+            break;
+          }
+        }
+      }
+      if ($candidate && !empty($candidate['beneficiary_id'])) {
+        return [
+          'success'        => true,
+          'beneficiary_id' => $candidate['beneficiary_id'],
+          'data'           => $candidate,
+          'resolved_from'  => 'bank_search'
+        ];
+      }
+    }
+
+    // 2. Also check if the candidate ID itself exists in Cashfree
+    if (!empty($candidateId)) {
+      $idCheck = $this->getBeneficiaryDetails($candidateId);
+      if ($idCheck['success'] && !empty($idCheck['data']['beneficiary_id'])) {
+        return [
+          'success'        => true,
+          'beneficiary_id' => $idCheck['data']['beneficiary_id'],
+          'data'           => $idCheck['data'],
+          'resolved_from'  => 'id_lookup'
+        ];
+      }
+    }
+
+    // 3. Not found, attempt to register new beneficiary in Cashfree
+    $payload = [
+      'beneficiary_id'                 => $candidateId,
+      'beneficiary_name'               => $cleanHolder,
+      'beneficiary_instrument_details' => [
+        'bank_account_number' => $cleanAccountNumber,
+        'bank_ifsc'           => $cleanIfsc,
+      ],
+      'beneficiary_contact_details'    => [
+        'beneficiary_email'        => !empty($email) ? trim($email) : 'noreply@example.com',
+        'beneficiary_phone'        => !empty($phone) ? trim($phone) : '',
+        'beneficiary_country_code' => '+91',
+      ]
+    ];
+
+    if (!empty($upiId)) {
+      $payload['beneficiary_instrument_details']['vpa'] = trim($upiId);
+    }
+
+    $postResult = $this->post('/beneficiary', $payload);
+
+    if ($postResult['success']) {
+      $createdId = $postResult['data']['beneficiary_id'] ?? $candidateId;
+      return [
+        'success'        => true,
+        'beneficiary_id' => $createdId,
+        'data'           => $postResult['data'],
+        'resolved_from'  => 'created'
+      ];
+    }
+
+    // 4. Handle 409 Conflict / "already exists" response from Cashfree
+    $postError = strtolower($postResult['error'] ?? '');
+    $subCode   = strtolower($postResult['details']['subCode'] ?? '');
+    $isAlreadyExists = (
+      $postResult['status'] === 409 ||
+      strpos($postError, 'already exists') !== false ||
+      strpos($subCode, 'already_exists') !== false ||
+      strpos($subCode, 'beneficiary_already_exists') !== false ||
+      strpos($postError, 'beneficiary with same instrument') !== false
+    );
+
+    if ($isAlreadyExists) {
+      $existingId = null;
+
+      // Try regex on error message
+      if (preg_match('/beneficiary_id\s*[:=]\s*([a-zA-Z0-9_\-]+)/i', $postResult['error'] ?? '', $m)) {
+        $existingId = $m[1];
+      } elseif (preg_match('/id\s*[:=]\s*([a-zA-Z0-9_\-]+)/i', $postResult['error'] ?? '', $m)) {
+        $existingId = $m[1];
+      } elseif (preg_match('/beneficiary\s+with\s+id\s+([a-zA-Z0-9_\-]+)/i', $postResult['error'] ?? '', $m)) {
+        $existingId = $m[1];
+      }
+
+      // Query Cashfree by bank details again
+      if (!$existingId) {
+        $retrySearch = $this->get('/beneficiary', [
+          'bank_account_number' => $cleanAccountNumber,
+          'bank_ifsc'           => $cleanIfsc,
+        ]);
+        if ($retrySearch['success'] && !empty($retrySearch['data'])) {
+          if (isset($retrySearch['data']['beneficiary_id']) && !empty($retrySearch['data']['beneficiary_id'])) {
+            $existingId = $retrySearch['data']['beneficiary_id'];
+          } elseif (is_array($retrySearch['data'])) {
+            foreach ($retrySearch['data'] as $item) {
+              if (isset($item['beneficiary_id']) && !empty($item['beneficiary_id'])) {
+                $existingId = $item['beneficiary_id'];
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Fallback: check candidate ID
+      if (!$existingId && !empty($candidateId)) {
+        $idCheck = $this->getBeneficiaryDetails($candidateId);
+        if ($idCheck['success'] && !empty($idCheck['data']['beneficiary_id'])) {
+          $existingId = $idCheck['data']['beneficiary_id'];
+        }
+      }
+
+      if ($existingId) {
+        return [
+          'success'        => true,
+          'beneficiary_id' => $existingId,
+          'data'           => ['beneficiary_id' => $existingId],
+          'resolved_from'  => 'conflict_resolution'
+        ];
+      }
+
+      return [
+        'success' => false,
+        'error'   => 'Beneficiary already exists in Cashfree, but could not resolve its ID: ' . ($postResult['error'] ?? 'Unknown error'),
+        'details' => $postResult
+      ];
+    }
+
+    return [
+      'success' => false,
+      'error'   => 'Cashfree Beneficiary Registration Failed: ' . ($postResult['error'] ?? ($postResult['details']['message'] ?? 'Unknown error')),
+      'details' => $postResult
+    ];
+  }
+
+  /**
+   * Process Executive Call Verification Payout via Cashfree - NEW
+   */
+  public function processExecutivePayout(int $execId, array $bankDetails, float $amount, string $execName, string $remarks = ''): array
+  {
+    if (empty($bankDetails['account_number']) || empty($bankDetails['ifsc_code'])) {
+      return [
+        'success' => false,
+        'error'   => 'Incomplete bank account details for executive.'
+      ];
+    }
+
+    $amount = round(floatval($amount), 2);
+    if ($amount <= 0) {
+      return [
+        'success' => false,
+        'error'   => 'Payout amount must be greater than zero.'
+      ];
+    }
+
+    $accountHolder      = !empty($bankDetails['account_holder_name']) ? trim($bankDetails['account_holder_name']) : trim($execName);
+    $cleanAccountNumber = trim(preg_replace('/\s+/', '', (string)($bankDetails['account_number'] ?? '')));
+    $cleanIfsc          = strtoupper(trim(preg_replace('/\s+/', '', (string)($bankDetails['ifsc_code'] ?? ''))));
+    $candidateBeneId    = 'EXEC_BEN_' . $execId . '_' . substr(md5($cleanAccountNumber), 0, 6);
+
+    // Fetch employee contact info if not provided in bankDetails
+    $execEmail = !empty($bankDetails['email']) ? trim($bankDetails['email']) : null;
+    $execPhone = !empty($bankDetails['phone']) ? trim($bankDetails['phone']) : null;
+
+    if (empty($execEmail) || empty($execPhone)) {
+      if ($this->db->tableExists('employees')) {
+        $emp = $this->db->table('employees')->where('id', $execId)->get()->getRowArray();
+        if ($emp) {
+          $execEmail = $execEmail ?: (!empty($emp['email']) ? trim($emp['email']) : null);
+          $execPhone = $execPhone ?: (!empty($emp['phone']) ? trim($emp['phone']) : (!empty($emp['mobile']) ? trim($emp['mobile']) : null));
+        }
+      }
+    }
+
+    $execEmail = $execEmail ?: "executive{$execId}@petsfolio.com";
+    $execPhone = $execPhone ?: "9876543210";
+    $upiId     = !empty($bankDetails['upi_id']) ? trim($bankDetails['upi_id']) : null;
+
+    // 1. Check if cf_beneficiary_id was previously stored on bank details and still valid
+    $beneficiaryId = null;
+    if (!empty($bankDetails['cf_beneficiary_id'])) {
+      $storedBeneId = trim($bankDetails['cf_beneficiary_id']);
+      $beneCheck = $this->getBeneficiaryDetails($storedBeneId);
+      if ($beneCheck['success'] && !empty($beneCheck['data']['beneficiary_id'])) {
+        $beneficiaryId = $storedBeneId;
+      }
+    }
+
+    // 2. Resolve or Register Beneficiary via helper if not already verified
+    if (!$beneficiaryId) {
+      $beneResult = $this->resolveOrRegisterBeneficiary(
+        $candidateBeneId,
+        $accountHolder,
+        $cleanAccountNumber,
+        $cleanIfsc,
+        $execEmail,
+        $execPhone,
+        $upiId
+      );
+
+      if (!$beneResult['success']) {
+        return [
+          'success' => false,
+          'error'   => $beneResult['error'] ?? 'Failed to register/resolve Cashfree beneficiary',
+          'details' => $beneResult
+        ];
+      }
+
+      $beneficiaryId = $beneResult['beneficiary_id'];
+    }
+
+    // 3. Cache the resolved beneficiary_id in executive_bank_details table
+    try {
+      if ($this->db->tableExists('executive_bank_details')) {
+        if (!$this->db->fieldExists('cf_beneficiary_id', 'executive_bank_details')) {
+          $this->db->query("ALTER TABLE `executive_bank_details` ADD COLUMN `cf_beneficiary_id` VARCHAR(100) DEFAULT NULL AFTER `upi_id`");
+        }
+        $this->db->table('executive_bank_details')
+          ->where('executive_id', $execId)
+          ->update(['cf_beneficiary_id' => $beneficiaryId, 'updated_at' => date('Y-m-d H:i:s')]);
+      }
+    } catch (\Throwable $e) {
+      log_message('warning', 'Could not update cf_beneficiary_id in executive_bank_details: ' . $e->getMessage());
+    }
+
+    // 4. Create Transfer
+    $transferId      = 'EXEC_TRF_' . $execId . '_' . time();
+    $transferRemarks = !empty($remarks) ? $remarks : "Executive Verification Payout #{$execId}";
+
+    $transferResult = $this->createTransfer($beneficiaryId, $amount, $transferId, $transferRemarks);
+
+    if ($transferResult['success']) {
+      $responseData = $transferResult['data'] ?? [];
+      $utr = $responseData['utr'] ?? ($responseData['reference_id'] ?? ($responseData['cf_transfer_id'] ?? $transferId));
+      return [
+        'success'        => true,
+        'message'        => 'Cashfree payout transfer initiated successfully',
+        'transfer_id'    => $transferId,
+        'utr'            => $utr,
+        'beneficiary_id' => $beneficiaryId,
+        'data'           => $responseData
+      ];
+    }
+
+    $transferError = $transferResult['error'] ?? ($transferResult['details']['message'] ?? ($transferResult['details']['subCode'] ?? 'Transfer initiation failed'));
+    return [
+      'success' => false,
+      'error'   => 'Cashfree Transfer Failed: ' . $transferError,
+      'details' => $transferResult
+    ];
+  }
+
   /**
    * Process User Refund Payout - NEW
    */
@@ -696,13 +992,17 @@ class CashfreePayoutService
     $userId = $refund['user_id'];
     $beneficiaryId = 'BEN_REF_' . $userId . '_' . $refund['id'];
 
+    $cleanAccountHolder = trim($refund['account_holder_name'] ?? '');
+    $cleanAccountNumber = trim(preg_replace('/\s+/', '', (string)($refund['account_number'] ?? '')));
+    $cleanIfsc          = strtoupper(trim(preg_replace('/\s+/', '', (string)($refund['ifsc_code'] ?? ''))));
+
     // V2 API format
     $payload = [
       "beneficiary_id"                 => $beneficiaryId,
-      "beneficiary_name"               => $refund['account_holder_name'],
+      "beneficiary_name"               => $cleanAccountHolder,
       "beneficiary_instrument_details" => [
-        "bank_account_number" => $refund['account_number'],
-        "bank_ifsc"           => $refund['ifsc_code']
+        "bank_account_number" => $cleanAccountNumber,
+        "bank_ifsc"           => $cleanIfsc
       ],
       "beneficiary_contact_details"    => [
         "beneficiary_email"        => 'noreply@example.com', // Default if not available
@@ -714,8 +1014,8 @@ class CashfreePayoutService
     // Try to get more info from users table
     $clientInfo = $this->db->table('users')->select('email, phone')->where('id', $userId)->get()->getRowArray();
     if ($clientInfo) {
-      if (!empty($clientInfo['email'])) $payload['beneficiary_contact_details']['beneficiary_email'] = $clientInfo['email'];
-      if (!empty($clientInfo['phone'])) $payload['beneficiary_contact_details']['beneficiary_phone'] = $clientInfo['phone'];
+      if (!empty($clientInfo['email'])) $payload['beneficiary_contact_details']['beneficiary_email'] = trim($clientInfo['email']);
+      if (!empty($clientInfo['phone'])) $payload['beneficiary_contact_details']['beneficiary_phone'] = trim($clientInfo['phone']);
     }
 
     $result = $this->post('/beneficiary', $payload);
@@ -1220,11 +1520,11 @@ class CashfreePayoutService
     ];
 
     $result = $withdrawalBuilder->where('id', $transaction['withdrawal_id'])->update($updateData);
-    if ($cashfreeStatus == 'SUCCESS' && $userId) {
+    if (($cashfreeStatus == 'SUCCESS' || $cashfreeStatus == 'PAID') && $userId) {
 
       $booking        = new Booking();
       $netAmount      = $transaction['amount'];
-      $booking->debitProviderWallet($userId, $netAmount);
+      // $booking->debitProviderWallet($userId, $netAmount);
       $spBalanceAfter = $booking->getProviderServiceWalletSum($userId)['service_amount'];
       $spEarnAmount   = $booking->getProviderWithdrawalWalletSum($userId);
       $idempotencyKey = 'wid_debit_' . $transaction['withdrawal_id'] . '_' . $transferId;
@@ -1238,11 +1538,14 @@ class CashfreePayoutService
         $spBalanceAfter,
         $spEarnAmount,
         'withdrawal_amount',
-        'Withdrawal amount debited from wallet',
+        'Withdrawal request processed successfully',
         'sp_wallet_histories',
         $idempotencyKey,
         $transferId
       );
+
+      // Send push notification & log notification to provider
+      $this->sendProviderPayoutNotification($userId, $netAmount, $payoutData['transfer_utr'] ?? $transferId);
     }
     return $result;
   }
@@ -1704,5 +2007,59 @@ class CashfreePayoutService
         break;
     }
     return $builder->select($select)->get()->getRowArray() ?? [];
+  }
+
+  /**
+   * Send Push Notification & Database Record to Provider after successful payout release
+   */
+  public function sendProviderPayoutNotification($providerId, $amount, $utrOrRef)
+  {
+    try {
+      $title = "💰 Payout Released Successfully!";
+      $formattedAmount = "₹" . number_format((float)$amount, 2);
+      $msg = "Your withdrawal payout of {$formattedAmount} has been processed and transferred to your bank account! UTR/Ref: {$utrOrRef}";
+
+      // 1. Insert into database notifications table if table exists
+      if ($this->db->tableExists('notifications')) {
+        $this->db->table('notifications')->insert([
+          'user_id'    => $providerId,
+          // 'title'      => $title,
+          'message'    => $msg,
+          'type'       => 'payout_released',
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+      }
+
+      // 2. Fetch service provider device token
+      $sp = $this->db->table('service_providers')->where('id', $providerId)->get()->getRowArray();
+      $deviceToken = $sp['device_token'] ?? ($sp['fcm_token'] ?? null);
+
+      if (empty($deviceToken)) {
+        $user = $this->db->table('users')->where('id', $providerId)->get()->getRowArray();
+        $deviceToken = $user['device_token'] ?? ($user['fcm_token'] ?? null);
+      }
+
+      // 3. Send Push Notification via PushNotify FCM
+      if (!empty($deviceToken)) {
+        $pushNotify = new \App\Libraries\PushNotify();
+        $pushRes    = $pushNotify->notify($deviceToken, $title, $msg);
+
+        $isSent = ($pushRes['status_code'] ?? 0) === 200;
+        $this->db->table('notification_logs')->insert([
+          'provider_id'   => $providerId,
+          'user_type'     => !empty($sp) ? 'provider' : 'user',
+          'channel'       => 'push',
+          'title'         => $title,
+          'body'          => $msg,
+          'status'        => $isSent ? 'sent' : 'failed',
+          'error_message' => $isSent ? null : ($pushRes['message'] ?? 'Push failed'),
+          'device_token'  => $deviceToken,
+          'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+          'created_at'    => date('Y-m-d H:i:s'),
+        ]);
+      }
+    } catch (\Throwable $e) {
+      log_message('error', 'Failed to send provider payout notification: ' . $e->getMessage());
+    }
   }
 }

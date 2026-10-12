@@ -17,29 +17,31 @@ class InsuranceManagement extends BaseController
   public function index()
   {
     $data['enquiries'] = $this->model->getEnquiries();
+    $data['tabCounts'] = $this->model->getTabCounts();
     return $this->loadView('admin/insurance/enquiries', $data);
   }
   public function quotations()
   {
     $data['quotations'] = $this->model->getQuotations();
+    $data['tabCounts'] = $this->model->getTabCounts();
     return $this->loadView('admin/insurance/quotations', $data);
   }
   public function active()
   {
     $data['insurances'] = $this->model->getActiveInsurances();
-
+    $data['tabCounts'] = $this->model->getTabCounts();
     return $this->loadView('admin/insurance/active', $data);
   }
   public function expiring()
   {
     $data['insurances'] = $this->model->getExpiringInsurances();
-
+    $data['tabCounts'] = $this->model->getTabCounts();
     return $this->loadView('admin/insurance/expiring', $data);
   }
   public function claims()
   {
     $data['claims'] = $this->model->getClaims();
-
+    $data['tabCounts'] = $this->model->getTabCounts();
     return $this->loadView('admin/insurance/claims', $data);
   }
 
@@ -106,9 +108,11 @@ class InsuranceManagement extends BaseController
     $subject = $this->request->getPost('subject');
     $message = $this->request->getPost('message');
 
-    $emailSender = new SmsEmailLibrary();
-
-    $emailSender->sendEmail($email, $subject, $message);
+    $emailSender = \Config\Services::email();
+    $emailSender->setTo($email);
+    $emailSender->setSubject($subject);
+    $emailSender->setMessage($message);
+    @$emailSender->send();
 
     return $this->response->setJSON(['status' => true, 'message' => 'Mail Sent Successfully']);
   }
@@ -527,6 +531,93 @@ class InsuranceManagement extends BaseController
     return $this->response->setJSON([
       'status' => false,
       'message' => 'Failed to update status'
+    ]);
+  }
+
+  public function deleteEnquiry()
+  {
+    if (!$this->request->isAJAX()) {
+      return $this->response->setStatusCode(405)->setJSON([
+        'status'  => false,
+        'message' => 'Method not allowed'
+      ]);
+    }
+
+    $id = $this->request->getPost('id') ?? ($this->request->getJSON()->id ?? null);
+    $reason = $this->request->getPost('reason') ?? ($this->request->getJSON()->reason ?? 'Deleted via admin panel');
+
+    if (!$id) {
+      return $this->response->setJSON([
+        'status'  => false,
+        'message' => 'Invalid enquiry ID provided'
+      ]);
+    }
+
+    $enquiry = $this->model->getEnquiryById($id);
+
+    if (!$enquiry) {
+      return $this->response->setJSON([
+        'status'  => false,
+        'message' => 'Insurance enquiry not found or already deleted'
+      ]);
+    }
+
+    $policyNumber = $enquiry->policy_number ?? "ID-{$id}";
+    $clientName   = $enquiry->client_name ?? 'Unknown Client';
+    $petName      = $enquiry->pet_name ?? 'Unknown Pet';
+
+    $deleted = $this->model->deleteEnquiry($id);
+
+    if ($deleted) {
+      // Clean up orphaned quotations if any existed for this policy number
+      if (!empty($enquiry->policy_number)) {
+        \Config\Database::connect()->table('insurance_policies_quotations')
+          ->where('policy_id', $enquiry->policy_number)
+          ->delete();
+      }
+
+      // Log action in audit logs with full snapshot
+      \App\Libraries\ActivityLogger::log(
+        'delete',
+        "Deleted Insurance Enquiry #{$id} (Policy Ref: {$policyNumber}, Client: {$clientName}, Pet: {$petName})",
+        'insurance_enquiry',
+        $id,
+        [
+          'id'             => $enquiry->id,
+          'policy_number'  => $enquiry->policy_number,
+          'client_name'    => $clientName,
+          'client_phone'   => $enquiry->client_phone ?? '',
+          'client_email'   => $enquiry->client_email ?? '',
+          'pet_name'       => $petName,
+          'pet_breed'      => $enquiry->pet_breed ?? '',
+          'gender'         => $enquiry->gender ?? '',
+          'dob'            => $enquiry->dob ?? '',
+          'coverage_type'  => $enquiry->coverage_type ?? '',
+          'duration_years' => $enquiry->duration_years ?? 1,
+          'status'         => $enquiry->status ?? 'Pending',
+          'remarks'        => $enquiry->remarks ?? '',
+          'created_at'     => $enquiry->created_at ?? '',
+        ],
+        null,
+        [
+          'enquiry_id'     => $id,
+          'policy_number'  => $policyNumber,
+          'deletion_reason'=> $reason,
+          'deleted_at'     => date('Y-m-d H:i:s')
+        ]
+      );
+
+      log_message('info', "Insurance Enquiry #{$id} (Policy: {$policyNumber}, Client: {$clientName}) was deleted by admin. Reason: {$reason}");
+
+      return $this->response->setJSON([
+        'status'  => true,
+        'message' => "Enquiry #{$policyNumber} deleted successfully"
+      ]);
+    }
+
+    return $this->response->setJSON([
+      'status'  => false,
+      'message' => 'Failed to delete insurance enquiry. Please try again.'
     ]);
   }
 }

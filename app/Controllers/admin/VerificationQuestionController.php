@@ -58,6 +58,8 @@ class VerificationQuestionController extends BaseController
             'sort_order'      => $this->request->getPost('sort_order') ?? 0,
             'status'          => $this->request->getPost('status') ?? 'active',
             'field_name'      => $this->request->getPost('field_name'),
+            'training_type'   => $this->request->getPost('training_type'),
+            'group_key'       => $this->request->getPost('group_key'),
         ];
 
         if ($id) {

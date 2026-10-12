@@ -164,7 +164,7 @@ class ChatPushNotifications {
   async registerServiceWorker() {
     try {
       const registration = await navigator.serviceWorker.register(
-        "https://petsfolio.in/admin/sw.js?v=" + Date.now(),
+        "https://admin.petsfolio.in/sw.js?v=" + Date.now(),
       );
       this.log("Service Worker registered");
 
@@ -231,7 +231,7 @@ class ChatPushNotifications {
   async sendSubscriptionToServer(subscription) {
     try {
       const response = await fetch(
-        "https://petsfolio.in/admin/notifications/subscribe",
+        "https://admin.petsfolio.in/notifications/subscribe",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -272,7 +272,7 @@ class ChatPushNotifications {
 
     try {
       const response = await fetch(
-        "https://petsfolio.in/admin/notifications/send-chat-notification",
+        "https://admin.petsfolio.in/notifications/send-chat-notification",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

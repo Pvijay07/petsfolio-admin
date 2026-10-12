@@ -10,13 +10,28 @@
   <div class="conatiner-fluid content-inner pb-0" id="page_layout">
     <!-- Modern Header Section -->
     <div class="container-fluid p-0 mb-4">
-      <div class="bg-gradient-primary text-white p-5 rounded-3 shadow position-relative overflow-hidden">
-        <div class="position-relative z-1">
-          <h1 class="h2 fw-bold mb-2 text-white">Dispute Management</h1>
-          <p class="text-white-75 mb-0">Review and resolve customer disputes, manage addons and packages</p>
+      <div class="p-4 p-md-5 rounded-4 shadow-lg position-relative overflow-hidden text-white"
+        style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);">
+        
+        <!-- Subtle glass background circles -->
+        <div class="position-absolute" style="top: -60px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        <div class="position-absolute" style="bottom: -50px; left: 30%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2.5">
+              <span class="badge rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-2"
+                style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: #fecdd3; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem;">
+                <i class="bi bi-shield-exclamation text-danger"></i>
+                Dispute Resolution Desk
+              </span>
+            </div>
+            <h1 class="h2 fw-bold text-white mb-2 tracking-tight">Dispute Management</h1>
+            <p class="text-white-50 mb-0 fs-6">
+              Review, mediate, and resolve customer disputes, addon adjustments, and package claims.
+            </p>
+          </div>
         </div>
-        <i class="bi bi-exclamation-triangle position-absolute end-0 bottom-0 opacity-10"
-          style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
       </div>
     </div>
 
@@ -355,17 +370,17 @@
   }
 
   .modal-header {
-    background: #c6d2ff !important;
+    background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;
     padding: 1.25rem 1.5rem;
-    border-bottom: 2px solid #a3b4ff;
+    border-bottom: none;
     flex-shrink: 0;
   }
 
   .modal-header h3 {
     margin: 0;
     font-size: 1.25rem;
-    font-weight: 600;
-    color: #000;
+    font-weight: 700;
+    color: #ffffff !important;
   }
 
   .modal-body {
@@ -373,7 +388,7 @@
     overflow-y: auto;
     padding: 1.5rem;
     scrollbar-width: thin;
-    scrollbar-color: #c6d2ff #f1f1f1;
+    scrollbar-color: #cbd5e1 #f1f1f1;
   }
 
   .modal-body::-webkit-scrollbar {
@@ -386,12 +401,12 @@
   }
 
   .modal-body::-webkit-scrollbar-thumb {
-    background: #c6d2ff;
+    background: #cbd5e1;
     border-radius: 4px;
   }
 
   .modal-body::-webkit-scrollbar-thumb:hover {
-    background: #a3b4ff;
+    background: #94a3b8;
   }
 
   .modal-footer {
@@ -456,7 +471,7 @@
 
   .custom-checkbox:hover {
     background: #e9ecef;
-    border-color: #c6d2ff;
+    border-color: #cbd5e1;
   }
 
   .custom-checkbox span {
@@ -477,36 +492,37 @@
     color: #2d3436;
     margin: 0 0 1rem 0;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #c6d2ff;
+    border-bottom: 2px solid #e0e7ff;
   }
 
   /* Action button styling */
   .action-btn {
-    background: #c6d2ff;
-    color: #000;
-    border: none;
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px solid #c7d2fe;
     padding: 0.4rem 1rem;
-    border-radius: 6px;
+    border-radius: 50px;
     font-size: 0.85rem;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.2s;
   }
 
   .action-btn:hover {
-    background: #a3b4ff;
+    background: #4f46e5;
+    color: #ffffff;
     transform: translateY(-1px);
   }
 
   /* Table improvements */
   .table th {
-    background: #c6d2ff !important;
-    color: #000 !important;
-    font-weight: 600;
-    font-size: 0.85rem;
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 1rem !important;
-    border-bottom: 2px solid #a3b4ff !important;
+    padding: 0.85rem 1rem !important;
+    border-bottom: 2px solid #e2e8f0 !important;
   }
 
   .table td {
@@ -516,7 +532,7 @@
   }
 
   .table tbody tr:hover {
-    background-color: rgba(198, 210, 255, 0.1) !important;
+    background-color: rgba(99, 102, 241, 0.04) !important;
   }
 
   /* Avatar styles */
@@ -524,13 +540,14 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #c6d2ff;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    color: #000;
+    font-weight: 700;
+    color: #ffffff !important;
     margin-right: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   }
 
   /* Responsive */

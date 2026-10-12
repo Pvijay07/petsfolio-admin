@@ -59,7 +59,7 @@
               <table class="table table-hover align-middle mb-0">
                 <thead style="background: #c6d2ff !important;">
                   <tr>
-                    <!-- <th style="background: #c6d2ff !important;" class="py-3 text-black fw-semibold border-bottom">Ticket ID</th> -->
+                    <th style="background: #c6d2ff !important;" class="py-3 text-black fw-semibold border-bottom">Ticket ID</th>
                     <th style="background: #c6d2ff !important;"
                       class="py-3 fs-6   text-black fw-semibold border-bottom">User
                       Details</th>
@@ -77,22 +77,22 @@
                 </thead>
                 <tbody>
                   <?php foreach ($supports as $support):
-                  if ($support->status != 'resolved'){
+                    if ($support->status != 'resolved') {
                       $path = ($support->user_type == 'user' || $support->user_type == 'client') ? 'users' : 'providers';
                       $message = htmlspecialchars($support->message);
                       $isReactivateRequest = $support->message == 'Please reactivate my account';
-                      ?>
+                  ?>
                       <tr>
                         <!-- Ticket ID -->
-                        <!-- <td class="fw-bold text-dark">#<?= $support->id ?></td> -->
+                        <td class="fw-bold text-dark">#<?= $support->ticket_number ?></td>
 
                         <!-- User Details (merged Profile + Name + Phone + User Type badge) -->
                         <td class="p-2 px-3">
                           <div class="d-flex align-items-center gap-3">
-                            <div class="rounded-circle overflow-hidden" style="width: 45px; height: 45px;">
-                              <img class="w-100 h-100 object-fit-cover"
-                                src="<?= $support->profile ? 'https://beta.petsfolio.in/public/uploads/' . $path . '/' . $support->profile : 'https://fitinex.com/public/img/avatar/avatar.png'; ?>"
-                                alt="Profile">
+                            <div
+                              class="rounded-circle bg-primary bg-opacity-10 text-black d-flex align-items-center justify-content-center fw-bold"
+                              style="width: 44px; height: 44px; border: 2px solid #e5dbff; font-size: 1.2rem; color: #fff !important;">
+                              <?= strtoupper(substr($support->name ?? '?', 0, 1)) ?>
                             </div>
                             <div>
                               <div class="fw-medium text-dark mb-1">
@@ -176,15 +176,18 @@
                                 <i class="bi bi-check-circle me-1"></i>Mark as Solved
                               </button>
                               <a href="<?= base_url('sp-supportticket/' . $support->id) ?>"
-                                class="btn btn-outline-primary btn-sm px-3 py-2 rounded-5"
+                                class="btn btn-outline-primary btn-sm px-3 py-2 rounded-5 d-inline-flex align-items-center gap-1"
                                 style="background: #c6d2ff !important; border-color: #a3b4ff !important; color: #1a1a1a !important;">
-                                <i class="bi bi-chat-left-text me-1"></i>Chat
+                                <i class="bi bi-chat-left-text"></i> Chat
                               </a>
+                              <!-- <span class="badge rounded-pill px-2 py-1" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.25); font-size: 0.72rem;" title="AI Mode & Human Mode Active">
+                                <i class="bi bi-robot text-warning"></i> AI
+                              </span> -->
                             <?php } ?>
                           </div>
                         </td>
                       </tr>
-                    <?php }
+                  <?php }
                   endforeach; ?>
                 </tbody>
               </table>
@@ -226,7 +229,7 @@
                     if ($support->status == 'completed' || $support->status == 'resolved') {
                       $path = ($support->user_type == 'user' || $support->user_type == 'client') ? 'users' : 'providers';
                       $message = htmlspecialchars($support->message);
-                      ?>
+                  ?>
                       <tr>
                         <!-- Ticket ID -->
                         <td class="fw-bold text-dark p-2 px-3">#<?= $support->id ?></td>
@@ -282,7 +285,7 @@
                           </span>
                         </td>
                       </tr>
-                    <?php }
+                  <?php }
                   endforeach; ?>
                 </tbody>
               </table>
@@ -391,7 +394,7 @@
 
 <script>
   // ✅ Handle Active/Inactive Status Toggle
-  $(document).on('click', '.status', function (e) {
+  $(document).on('click', '.status', function(e) {
     e.preventDefault();
 
     const id = $(this).data('id');
@@ -424,7 +427,7 @@
             user_type: userType,
             queryId: queryId
           },
-          success: function (data) {
+          success: function(data) {
             if (data.status === true) {
               // ✅ Update button appearance dynamically
               button.attr('value', newStatus)
@@ -449,7 +452,7 @@
               });
             }
           },
-          error: function () {
+          error: function() {
             Swal.fire({
               icon: 'error',
               title: 'Error',
@@ -462,7 +465,7 @@
   });
 
   // ✅ Handle Query Status Update
-  $(document).on('click', '.query_status', function (e) {
+  $(document).on('click', '.query_status', function(e) {
     e.preventDefault();
 
     const queryId = $(this).data('queryid');
@@ -507,7 +510,7 @@
     $.ajax({
       type: 'POST',
       url: url + '/' + queryId,
-      success: function (data) {
+      success: function(data) {
         if (data.status === true) {
           Swal.fire({
             icon: 'success',
@@ -526,7 +529,7 @@
           });
         }
       },
-      error: function () {
+      error: function() {
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -537,9 +540,10 @@
   }
 
   // Initialize tooltips
-  $(function () {
+  $(function() {
     $('[data-toggle="tooltip"]').tooltip();
   });
+
   function confirmMarkAsSolved(chatId) {
     Swal.fire({
       title: 'Mark as Solved',
@@ -558,7 +562,7 @@
   }
 
   function updateTicketStatus(chatId, status) {
-    fetch("https://petsfolio.in/api/supportticket/updateStatus", {
+    fetch('<?= base_url("supportticket/updateStatus") ?>', {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -594,7 +598,6 @@
         });
       });
   }
-
 </script>
 
 <?php echo $this->endSection() ?>

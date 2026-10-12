@@ -24,11 +24,44 @@ class ProviderController extends BaseController
     $type   = $this->request->getGet('type');
 
     if (empty($status) && empty($type)) {
-      $status = 'active';
+      if (hasPermission('providers.view') || hasPermission('verified.view')) {
+        $status = 'active';
+      } elseif (hasPermission('fee_pending.view')) {
+        $status = 'pending_registration';
+      } elseif (hasPermission('wait_for_call.view') || hasPermission('wait_for_call_24.view')) {
+        $status = 'pending_verification';
+      } elseif (hasPermission('manager_approval.view')) {
+        $status = 'approval';
+      } elseif (hasPermission('kyc_pending.view')) {
+        $status = 'pending_kyc';
+      } elseif (hasPermission('old_non_verified.view')) {
+        $status = 'non_verified';
+      } elseif (hasPermission('suspended.view')) {
+        $status = 'inactive';
+      } else {
+        $status = 'active';
+      }
     }
 
     if (empty($status) && !empty($type) && !in_array($type, ['walkers', 'groomers', 'trainers', 'boarders', 'sitters'])) {
       $status = $type;
+    }
+
+    // Verify permission for the requested status
+    if ($status === 'pending_registration' && !hasPermission('providers.view') && !hasPermission('fee_pending.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Fee Pending providers.');
+    } elseif ($status === 'pending_verification' && !hasPermission('providers.view') && !hasPermission('wait_for_call.view') && !hasPermission('wait_for_call_24.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Waiting for Call providers.');
+    } elseif ($status === 'approval' && !hasPermission('providers.view') && !hasPermission('manager_approval.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Manager Approval providers.');
+    } elseif ($status === 'pending_kyc' && !hasPermission('providers.view') && !hasPermission('kyc_pending.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view KYC Pending providers.');
+    } elseif ($status === 'active' && !hasPermission('providers.view') && !hasPermission('verified.view') && !hasPermission('old_verified.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Verified providers.');
+    } elseif ($status === 'non_verified' && !hasPermission('providers.view') && !hasPermission('old_non_verified.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Old SP-Non Verified providers.');
+    } elseif ($status === 'inactive' && !hasPermission('providers.view') && !hasPermission('suspended.view')) {
+      return redirect()->to(getDefaultPermittedRoute())->with('error', 'You do not have permission to view Suspended providers.');
     }
 
     $perServiceStatuses = ['pending_registration', 'pending_verification', 'approval', 'active', 'non_verified', 'pending_kyc'];
@@ -38,6 +71,7 @@ class ProviderController extends BaseController
     $city              = $this->request->getGet('city');
     $area              = $this->request->getGet('area');
     $search            = $this->request->getGet('search');
+    $reg_type          = $this->request->getGet('reg_type');
 
     $perPage = (int) ($this->request->getGet('limit') ?? 50);
     if (!in_array($perPage, [10, 25, 50, 100, 250, 500, 10000])) {
@@ -52,11 +86,11 @@ class ProviderController extends BaseController
     if ($status) {
       if (in_array($status, $perServiceStatuses)) {
         $overdue           = $this->request->getGet('overdue') === '1';
-        $total             = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue, null, 0, true, $search);
-        $data['providers'] = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue, $perPage, $offset, false, $search);
+        $total             = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue, null, 0, true, $search, $reg_type);
+        $data['providers'] = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue, $perPage, $offset, false, $search, $reg_type);
       } else {
-        $total             = $this->model->getAll($status, $filter_service_id, $city, $area, null, 0, true, $search);
-        $data['providers'] = $this->model->getAll($status, $filter_service_id, $city, $area, $perPage, $offset, false, $search);
+        $total             = $this->model->getAll($status, $filter_service_id, $city, $area, null, 0, true, $search, $reg_type);
+        $data['providers'] = $this->model->getAll($status, $filter_service_id, $city, $area, $perPage, $offset, false, $search, $reg_type);
       }
     } else {
       // Determine service_id based on type
@@ -74,17 +108,22 @@ class ProviderController extends BaseController
           $service_id = 1; // Default to vets or general
       }
 
-      // getByService doesn't have pagination implemented yet, but we can stick with standard for now or update it too if needed
-      // For now, let's just use getAll if no status but type is provided, or implement getByService pagination
       $total             = $this->model->getByService($service_id, null, 0, true, $search);
       $data['providers'] = $this->model->getByService($service_id, $perPage, $offset, false, $search);
     }
 
-    $data['pager']        = service('pager');
-    $data['pager_links']  = $data['pager']->makeLinks($page, $perPage, $total, 'default_full');
+    $pager = service('pager');
+    $allowedParams = ['status', 'type', 'experience', 'service_id', 'city', 'area', 'search', 'limit', 'overdue', 'flow', 'reg_type'];
+    $allGetKeys    = array_keys($this->request->getGet());
+    $pagerParams   = array_diff(array_unique(array_merge($allowedParams, $allGetKeys)), ['page']);
+    $pager->only($pagerParams);
+
+    $data['pager']        = $pager;
+    $data['pager_links']  = $pager->makeLinks($page, $perPage, $total, 'default_full');
     $data['total_items']  = $total;
     $data['per_page']     = $perPage;
     $data['current_page'] = $page;
+    $data['reg_type']     = $reg_type;
 
     $data['title']             = '';
     $data['type']              = $status ?? $type ?? 'active';
@@ -94,75 +133,94 @@ class ProviderController extends BaseController
     $data['area']              = $area;
     $data['search']            = $search;
     $data['all_services']      = $this->model->getAllServices();
-    $data['all_cities']        = $this->model->getAllCities();
-    $data['all_areas']         = $this->model->getAllAreas();
+    $currentStatus = $status ?? $type ?? 'active';
+    $isServiceWise = in_array($currentStatus, $perServiceStatuses);
+    $data['all_cities']        = $this->model->getCitiesByStatus($currentStatus, $isServiceWise, $filter_service_id);
+    $data['all_areas']         = !empty($city)
+      ? $this->model->getAreasByCityAndStatus($city, $currentStatus, $isServiceWise, $filter_service_id)
+      : $this->model->getAreasByStatus($currentStatus, $isServiceWise, $filter_service_id);
     $data['page']              = 'provider';
-    foreach ($data['providers'] as $provider) {
-      $provider->age     = ageCalculator($provider->dob);
-      $verifications     = $this->model->getAllVerfications($provider->id);
-      $verificationArray = (array) $verifications;
 
-      $verificationFields = [
-        'email_verified',
-        'mobile_verified',
-        'identity_proof_verified',
-        'police_verification_verified',
-        'walking_verified',
-        'profile_picture_verified',
-        'call_verification',
-        'training_verified',
-        'grooming_verified'
-      ];
-
-      // Total verification fields
-      $totalVerifications     = count($verificationFields);
-      $completedVerifications = 0;
-
-      foreach ($verificationFields as $field) {
-        if (!empty($verificationArray[$field])) {
-          $completedVerifications++;
-        }
+    $providerIds = [];
+    if (!empty($data['providers'])) {
+      foreach ($data['providers'] as $p) {
+        $providerIds[] = is_object($p) ? $p->id : $p['id'];
       }
+    }
 
-      // Completion percentage
-      $provider->completionPercentage = ($totalVerifications > 0)
-        ? round(($completedVerifications / $totalVerifications) * 100, 1)
-        : 0;
+    if (!empty($providerIds)) {
+      $allVerifications  = $this->model->batchGetVerifications($providerIds);
+      $allServiceDetails = $this->model->batchGetServiceDetails($providerIds);
+      $allDevices        = $this->model->batchGetDevices($providerIds);
+      $allCallAttempts   = $this->model->batchGetCallAttempts($providerIds);
 
-      $provider->verifications = $verifications;
+      foreach ($data['providers'] as $provider) {
+        $pid = is_object($provider) ? $provider->id : $provider['id'];
+        $callAttemptData = $allCallAttempts[$pid] ?? null;
+        $serviceId = is_object($provider) ? ($provider->service_id ?? null) : ($provider['service_id'] ?? null);
 
-      if (!isset($provider->serviceDetails) || empty($provider->serviceDetails)) {
-        $provider->serviceDetails = [];
-        if (!empty($provider->services)) {
-          foreach ($provider->services as $service) {
-            if ($service->service_id == '4') {
-              $provider->serviceDetails['walking'] = $this->model->getWalkingDetails($provider->id);
-            } elseif ($service->service_id == '3') {
-              $provider->serviceDetails['training'] = $this->model->getTrainingDetails($provider->id);
-            } elseif ($service->service_id == '2') {
-              $provider->serviceDetails['grooming'] = $this->model->getGroomingDetails($provider->id);
-            } elseif ($service->service_id == '1') {
-              $provider->serviceDetails['boarding'] = $this->model->getBoardingDetails($provider->id);
-            } elseif ($service->service_id == '6') {
-              $provider->serviceDetails['sitting'] = $this->model->getSittingDetails($provider->id);
-            }
+        $attemptCount = 0;
+        if ($callAttemptData) {
+          if ($serviceId && isset($callAttemptData['by_service'][$serviceId])) {
+            $attemptCount = $callAttemptData['by_service'][$serviceId];
+          } else {
+            $attemptCount = $callAttemptData['total_attempts'] ?? 0;
           }
         }
-      }
+        $provider->call_attempts_count  = $attemptCount;
+        $provider->total_call_attempts  = $callAttemptData['total_attempts'] ?? 0;
+        $provider->last_call_attempt_at = $callAttemptData['last_call_at'] ?? null;
 
-      // If this is a service-wise view, pull current service details to main object
-      if (isset($provider->service_id)) {
-        $details = null;
-        if ($provider->service_id == '4') $details = $provider->serviceDetails['walking'] ?? $this->model->getWalkingDetails($provider->id);
-        elseif ($provider->service_id == '3') $details = $provider->serviceDetails['training'] ?? $this->model->getTrainingDetails($provider->id);
-        elseif ($provider->service_id == '2') $details = $provider->serviceDetails['grooming'] ?? $this->model->getGroomingDetails($provider->id);
-        elseif ($provider->service_id == '1') $details = $provider->serviceDetails['boarding'] ?? $this->model->getBoardingDetails($provider->id);
-        elseif ($provider->service_id == '6') $details = $provider->serviceDetails['sitting'] ?? $this->model->getSittingDetails($provider->id);
+        $provider->age     = ageCalculator($provider->dob);
+        $verifications     = $allVerifications[$pid] ?? null;
+        $verificationArray = (array) $verifications;
 
-        if ($details) {
-          $provider->experience     = $details->experience ?? '';
-          $provider->available_time = $details->available_time ?? '';
-          $provider->confidence     = $details->confidence ?? '';
+        $verificationFields = [
+          'email_verified',
+          'mobile_verified',
+          'identity_proof_verified',
+          'police_verification_verified',
+          'walking_verified',
+          'profile_picture_verified',
+          'call_verification',
+          'training_verified',
+          'grooming_verified'
+        ];
+
+        $totalVerifications     = count($verificationFields);
+        $completedVerifications = 0;
+
+        foreach ($verificationFields as $field) {
+          if (!empty($verificationArray[$field])) {
+            $completedVerifications++;
+          }
+        }
+
+        $provider->completionPercentage = ($totalVerifications > 0)
+          ? round(($completedVerifications / $totalVerifications) * 100, 1)
+          : 0;
+
+        $provider->verifications = $verifications;
+        if (!isset($provider->serviceDetails) || empty($provider->serviceDetails)) {
+          $provider->serviceDetails = $allServiceDetails[$pid] ?? [];
+        }
+        if (!isset($provider->latest_device) || empty($provider->latest_device)) {
+          $provider->latest_device = $allDevices[$pid] ?? null;
+        }
+
+        if (isset($provider->service_id)) {
+          $details = null;
+          if ($provider->service_id == '4') $details = $provider->serviceDetails['walking'] ?? null;
+          elseif ($provider->service_id == '3') $details = $provider->serviceDetails['training'] ?? null;
+          elseif ($provider->service_id == '2') $details = $provider->serviceDetails['grooming'] ?? null;
+          elseif ($provider->service_id == '1') $details = $provider->serviceDetails['boarding'] ?? null;
+          elseif ($provider->service_id == '6') $details = $provider->serviceDetails['sitting'] ?? null;
+
+          if ($details) {
+            $provider->experience     = $details['experience'] ?? ($details->experience ?? '');
+            $provider->available_time = $details['available_time'] ?? ($details->available_time ?? '');
+            $provider->confidence     = $details['confidence'] ?? ($details->confidence ?? '');
+          }
         }
       }
     }
@@ -184,7 +242,7 @@ class ProviderController extends BaseController
       }
     }
 
-    if ($roleId == 10 || $roleId == 7 || $roleId == 1) {
+    if (hasRole(['verification_executive', 'super_admin', 'manager'], $user) || in_array($roleId, [1, 7, 10])) {
       $walks = $this->db->table('sp_walking_details')->where('verifier_id', $adminId)->countAllResults();
       $trains = $this->db->table('sp_training_details')->where('verifier_id', $adminId)->countAllResults();
       $grooms = $this->db->table('sp_grooming_details')->where('verifier_id', $adminId)->countAllResults();
@@ -376,15 +434,34 @@ class ProviderController extends BaseController
         $selected_types = $this->getSelectedGroomingTypes($provider_id, $details);
       }
 
-      // Filter organized questions
+      // Filter organized questions with deduplication across types
+      $seenGroups = [];
+      $seenNormalized = [];
       $filtered_organized = [];
       foreach ($organized as $cat) {
         $filtered_questions = [];
         foreach ($cat['questions'] as $q) {
           $q_type = $q['training_type'] ?? '';
-          if (empty($q_type) || in_array($q_type, $selected_types)) {
-            $filtered_questions[] = $q;
+          if (!empty($q_type) && !in_array($q_type, $selected_types)) {
+            continue;
           }
+
+          $groupKey = !empty($q['group_key']) ? trim($q['group_key']) : '';
+          $normText = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $q['question_text'] ?? '')));
+
+          if ($groupKey !== '') {
+            if (isset($seenGroups[$groupKey])) {
+              continue;
+            }
+            $seenGroups[$groupKey] = true;
+          } elseif ($normText !== '') {
+            if (isset($seenNormalized[$normText])) {
+              continue;
+            }
+            $seenNormalized[$normText] = true;
+          }
+
+          $filtered_questions[] = $q;
         }
         if (!empty($filtered_questions)) {
           $cat['questions'] = $filtered_questions;
@@ -397,13 +474,32 @@ class ProviderController extends BaseController
       }
       $organized = $filtered_organized;
 
-      // Filter flat questions
+      // Filter flat questions with deduplication across types
+      $seenGroupsFlat = [];
+      $seenNormalizedFlat = [];
       $filtered_flat = [];
       foreach ($questions as $q) {
         $q_type = $q['training_type'] ?? '';
-        if (empty($q_type) || in_array($q_type, $selected_types)) {
-          $filtered_flat[] = $q;
+        if (!empty($q_type) && !in_array($q_type, $selected_types)) {
+          continue;
         }
+
+        $groupKey = !empty($q['group_key']) ? trim($q['group_key']) : '';
+        $normText = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $q['question_text'] ?? '')));
+
+        if ($groupKey !== '') {
+          if (isset($seenGroupsFlat[$groupKey])) {
+            continue;
+          }
+          $seenGroupsFlat[$groupKey] = true;
+        } elseif ($normText !== '') {
+          if (isset($seenNormalizedFlat[$normText])) {
+            continue;
+          }
+          $seenNormalizedFlat[$normText] = true;
+        }
+
+        $filtered_flat[] = $q;
       }
       $questions = $filtered_flat;
       $data['selected_types'] = $selected_types;
@@ -462,12 +558,31 @@ class ProviderController extends BaseController
       } else {
         $selected_types = $this->getSelectedGroomingTypes($provider_id);
       }
+      $seenGroupsFlat = [];
+      $seenNormalizedFlat = [];
       $filtered_flat = [];
       foreach ($questions as $q) {
         $q_type = $q['training_type'] ?? '';
-        if (empty($q_type) || in_array($q_type, $selected_types)) {
-          $filtered_flat[] = $q;
+        if (!empty($q_type) && !in_array($q_type, $selected_types)) {
+          continue;
         }
+
+        $groupKey = !empty($q['group_key']) ? trim($q['group_key']) : '';
+        $normText = strtolower(trim(preg_replace('/[^a-zA-Z0-9]/', '', $q['question_text'] ?? '')));
+
+        if ($groupKey !== '') {
+          if (isset($seenGroupsFlat[$groupKey])) {
+            continue;
+          }
+          $seenGroupsFlat[$groupKey] = true;
+        } elseif ($normText !== '') {
+          if (isset($seenNormalizedFlat[$normText])) {
+            continue;
+          }
+          $seenNormalizedFlat[$normText] = true;
+        }
+
+        $filtered_flat[] = $q;
       }
       $questions = $filtered_flat;
     }
@@ -619,6 +734,40 @@ class ProviderController extends BaseController
 
     if ($callRecordPath) {
       $reviewData['call_record'] = $callRecordPath;
+
+      // Automatically queue audio recording into AI Call Intelligence pipeline
+      // try {
+      //   $adminUserId = session()->get('user')->id ?? 1;
+      //   $empRole = $db->table('employees')->select('role_id')->where('id', $adminUserId)->get()->getRowArray();
+      //   $isRegRole = (!empty($empRole['role_id']) && (int)$empRole['role_id'] === 13);
+      //   $callType = $isRegRole ? 'registration' : 'verification';
+
+      //   $recUrl = 'public/uploads/providers/call_records/' . $callRecordPath;
+      //   $recModel = new \App\Models\CallRecordingModel();
+      //   $jobModel = new \App\Models\CallJobModel();
+
+      //   $recId = $recModel->insert([
+      //     'provider_id'   => (int)$provider_id,
+      //     'customer_id'   => null,
+      //     'verifier_id'   => (int)$adminUserId,
+      //     'call_type'     => $callType,
+      //     'recording_url' => $recUrl,
+      //     'duration'      => 0,
+      //     'status'        => 'queued',
+      //     'created_at'    => date('Y-m-d H:i:s'),
+      //     'updated_at'    => date('Y-m-d H:i:s')
+      //   ], true);
+
+      //   if ($recId) {
+      //     $jobModel->insert([
+      //       'recording_id' => $recId,
+      //       'status'       => 'queued',
+      //       'retry_count'  => 0,
+      //     ]);
+      //   }
+      // } catch (\Throwable $e) {
+      //   log_message('error', 'Failed to queue call recording from submitServiceVerification: ' . $e->getMessage());
+      // }
     }
 
     // Check if review already exists for this admin/service
@@ -672,6 +821,44 @@ class ProviderController extends BaseController
         $serviceDetails['created_at']  = date('Y-m-d H:i:s');
         $db->table($detailTable)->insert($serviceDetails);
       }
+
+      // Log completed call verification record for executive payout calculation
+      if ($currentUser > 0) {
+        $empExists = $db->table('employees')->where('id', $currentUser)->countAllResults();
+        if ($empExists > 0) {
+          $detailRow = $db->table($detailTable)->where('provider_id', $provider_id)->get()->getRow();
+          if ($detailRow) {
+            $sourceId = $detailRow->id;
+            $callDate = date('Y-m-d');
+            $existingCallRecord = $db->table('executive_call_records')
+              ->where([
+                'source_table' => $detailTable,
+                'source_id'    => $sourceId,
+                'provider_id'  => $provider_id,
+                'service_id'   => $service_id,
+              ])->get()->getRow();
+
+            if (!$existingCallRecord) {
+              try {
+                $db->table('executive_call_records')->insert([
+                  'executive_id'  => $currentUser,
+                  'provider_id'   => $provider_id,
+                  'service_id'    => $service_id,
+                  'source_table'  => $detailTable,
+                  'source_id'     => $sourceId,
+                  'call_date'      => $callDate,
+                  'payout_status' => 'pending',
+                  'rate'          => 0.00,
+                  'created_at'    => date('Y-m-d H:i:s'),
+                  'updated_at'    => date('Y-m-d H:i:s'),
+                ]);
+              } catch (\Throwable $e) {
+                log_message('error', 'ProviderController call record logging error: ' . $e->getMessage());
+              }
+            }
+          }
+        }
+      }
     }
 
     // 4. Special handling for Global Account Status if needed
@@ -705,7 +892,10 @@ class ProviderController extends BaseController
     $db->transComplete();
 
     if ($status === 'approved' && $db->transStatus() !== false) {
-      $this->sendPartnerAgreementEmail($provider_id, $service_id);
+      // $this->sendPartnerAgreementEmail($provider_id, $service_id);
+      $this->sendProviderNotification($provider_id, '🎉 Manager Approval Granted!', 'Congratulations! Your provider profile has received manager approval and is now live on Petsfolio.', 'manager_approved');
+    } elseif ($db->transStatus() !== false && (!empty($updateData['call_verified']) || isset($serviceDetails['call_verified_at']))) {
+      $this->sendProviderNotification($provider_id, '📞 Call Verification Approved!', 'Your call verification has been completed and approved by our team.', 'call_verified');
     }
 
     if ($db->transStatus() === false) {
@@ -754,6 +944,17 @@ class ProviderController extends BaseController
           ->update(['payment_paid' => 1]);
       }
       $result = $this->model->db->table('service_providers')->where('id', $id)->update($updateData);
+
+      if ($result) {
+        if ($status === 'suspended') {
+          $this->sendProviderNotification($id, '⚠️ Account Suspended', 'Your provider account has been suspended by management. Please contact support if you have questions.', 'account_suspended');
+        } elseif ($status === 'approved' || $status === 'active') {
+          $this->sendProviderNotification($id, '🎉 Manager Approval Granted!', 'Congratulations! Your provider account is now fully approved and active on Petsfolio.', 'manager_approved');
+        } elseif ($status === 'pending_verification' || $status === 'call_verified') {
+          $this->sendProviderNotification($id, '📞 Call Verification Approved!', 'Your provider account call verification has been updated and approved.', 'call_verified');
+        }
+      }
+
       return $this->response->setJSON(['status' => $result ? true : false]);
     }
 
@@ -762,7 +963,66 @@ class ProviderController extends BaseController
       $this->model->debitProviderWallet($provider_id, $netAmount);
     }
     $this->model->updateStatus($id, $provider_id, $status);
+
+    if ($status === 'suspended') {
+      $this->sendProviderNotification($provider_id, '⚠️ Account Suspended', 'Your provider account has been suspended by management.', 'account_suspended');
+    }
+
     return $this->response->setJSON(['status' => true]);
+  }
+
+  /**
+   * Helper method to send FCM push notification and in-app DB notification to provider
+   */
+  private function sendProviderNotification($providerId, $title, $message, $type = 'account_update')
+  {
+    try {
+      $db = \Config\Database::connect();
+      $hasFcm = $db->fieldExists('fcm_token', 'service_providers');
+      $tokenSelect = $hasFcm ? 'COALESCE(NULLIF(device_token, ""), fcm_token) as device_token' : 'device_token';
+
+      $provider = $db->table('service_providers')
+        ->select("id, name, phone, email, {$tokenSelect}")
+        ->where('id', $providerId)
+        ->get()->getRowArray();
+
+      if (!$provider) return;
+
+      // 1. Insert DB notification if table exists
+      if ($db->tableExists('notifications')) {
+        $db->table('notifications')->insert([
+          'user_id'    => $providerId,
+          'user_type'  => 'provider',
+          // 'title'      => $title,
+          'message'    => $message,
+          'type'       => $type,
+          'created_at' => date('Y-m-d H:i:s')
+        ]);
+      }
+
+      // 2. Dispatch FCM push notification
+      $deviceToken = $provider['device_token'] ?? null;
+      if ($deviceToken && $deviceToken !== 'default_token') {
+        $pushNotify = new \App\Libraries\PushNotify();
+        $pushRes    = $pushNotify->notify($deviceToken, $title, $message);
+
+        $isSent = ($pushRes['status_code'] ?? 0) === 200;
+        $db->table('notification_logs')->insert([
+          'provider_id'   => $providerId,
+          'user_type'     => 'provider',
+          'channel'       => 'push',
+          'title'         => $title,
+          'body'          => $message,
+          'status'        => $isSent ? 'sent' : 'failed',
+          'error_message' => $isSent ? null : ($pushRes['message'] ?? 'Push failed'),
+          'device_token'  => $deviceToken,
+          'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+          'created_at'    => date('Y-m-d H:i:s'),
+        ]);
+      }
+    } catch (\Throwable $e) {
+      log_message('error', 'Provider Notification Error: ' . $e->getMessage());
+    }
   }
   public function uploadReceipt()
   {
@@ -942,8 +1202,11 @@ class ProviderController extends BaseController
       ->orderBy('name', 'ASC')
       ->get()->getResult();
 
+    $hasProviderId = $db->fieldExists('provider_id', 'notification_queue');
+    $providerCol   = $hasProviderId ? 'COALESCE(n.provider_id, sp.id) as provider_id' : 'sp.id as provider_id';
+
     $builder = $db->table('notification_queue n')
-      ->select('n.*, sp.name as provider_name, sp.phone as provider_phone, COALESCE(n.provider_id, sp.id) as provider_id')
+      ->select("n.*, sp.name as provider_name, sp.phone as provider_phone, {$providerCol}")
       ->join('service_providers sp', 'n.tokens LIKE CONCAT("%", sp.device_token, "%")', 'left');
 
     if ($provider_id) {
@@ -972,7 +1235,7 @@ class ProviderController extends BaseController
     }
 
     // Create a new entry in the queue with the same details
-    $newId = $db->table('notification_queue')->insert([
+    $queueData = [
       'tokens'       => $notification->tokens,
       'title'        => $notification->title,
       'message'      => $notification->message,
@@ -980,12 +1243,19 @@ class ProviderController extends BaseController
       'status'       => 'pending',
       'scheduled_at' => date('Y-m-d H:i:s'),
       'attempts'     => 0,
-      'route_name'   => $notification->route_name,
-      'provider_id'  => $notification->provider_id,
-      'booking_id'   => $notification->booking_id,
+      'route_name'   => $notification->route_name ?? null,
       'created_at'   => date('Y-m-d H:i:s'),
       'updated_at'   => date('Y-m-d H:i:s')
-    ]);
+    ];
+
+    if ($db->fieldExists('provider_id', 'notification_queue') && isset($notification->provider_id)) {
+      $queueData['provider_id'] = $notification->provider_id;
+    }
+    if ($db->fieldExists('booking_id', 'notification_queue') && isset($notification->booking_id)) {
+      $queueData['booking_id'] = $notification->booking_id;
+    }
+
+    $newId = $db->table('notification_queue')->insert($queueData);
 
     if ($newId) {
       return $this->response->setJSON(['status' => true, 'message' => 'Notification queued for resending']);
@@ -996,43 +1266,154 @@ class ProviderController extends BaseController
 
   public function downloadProviders()
   {
-    $status            = $this->request->getGet('status');
-    $experience        = $this->request->getGet('experience');
-    $filter_service_id = $this->request->getGet('service_id');
-    $city              = $this->request->getGet('city');
-    $area              = $this->request->getGet('area');
+    $status            = $this->request->getVar('status');
+    $type              = $this->request->getVar('type');
+    $experience        = $this->request->getVar('experience');
+    $filter_service_id = $this->request->getVar('service_id');
+    $city              = $this->request->getVar('city');
+    $area              = $this->request->getVar('area');
+    $search            = $this->request->getVar('search');
+    $reg_type          = $this->request->getVar('reg_type');
+    $overdue           = $this->request->getVar('overdue') === '1' || $this->request->getVar('overdue') === 1;
+    $idsRaw            = $this->request->getVar('ids');
 
-    $perServiceStatuses = ['pending_registration', 'pending_verification', 'approval', 'active', 'non_verified', 'pending_kyc'];
-
-    if ($status && in_array($status, $perServiceStatuses)) {
-      $overdue   = $this->request->getGet('overdue') === '1';
-      $providers = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue);
-    } elseif ($status) {
-      $providers = $this->model->getAll($status, $filter_service_id, $city, $area);
-    } else {
-      $providers = $this->model->getByService(1); // Default
+    $selectedIds = [];
+    if (!empty($idsRaw)) {
+      if (is_array($idsRaw)) {
+        $selectedIds = array_values(array_filter(array_map('intval', $idsRaw)));
+      } elseif (is_string($idsRaw)) {
+        $decoded = json_decode($idsRaw, true);
+        if (is_array($decoded)) {
+          $selectedIds = array_values(array_filter(array_map('intval', $decoded)));
+        } else {
+          $selectedIds = array_values(array_filter(array_map('intval', explode(',', $idsRaw))));
+        }
+      }
     }
 
-    $filename = "providers_" . ($status ?? 'all') . "_" . date('Ymd') . ".csv";
+    if (empty($status) && empty($type)) {
+      if (hasPermission('providers.view') || hasPermission('verified.view')) {
+        $status = 'active';
+      } elseif (hasPermission('fee_pending.view')) {
+        $status = 'pending_registration';
+      } elseif (hasPermission('wait_for_call.view') || hasPermission('wait_for_call_24.view')) {
+        $status = 'pending_verification';
+      } elseif (hasPermission('manager_approval.view')) {
+        $status = 'approval';
+      } elseif (hasPermission('kyc_pending.view')) {
+        $status = 'pending_kyc';
+      } elseif (hasPermission('old_non_verified.view')) {
+        $status = 'non_verified';
+      } elseif (hasPermission('suspended.view')) {
+        $status = 'inactive';
+      } else {
+        $status = 'active';
+      }
+    }
 
-    header('Content-Type: text/csv');
+    if (empty($status) && !empty($type) && !in_array($type, ['walkers', 'groomers', 'trainers', 'boarders', 'sitters'])) {
+      $status = $type;
+    }
+
+    $perServiceStatuses = ['pending_registration', 'pending_verification', 'approval', 'active', 'non_verified', 'pending_kyc', 'rejected', 'inactive'];
+
+    if ($status && in_array($status, $perServiceStatuses)) {
+      $providers = $this->model->getServiceWiseProviders($status, $experience, $filter_service_id, $city, $area, $overdue, null, 0, false, $search, $reg_type, $selectedIds);
+    } elseif ($status) {
+      $providers = $this->model->getAll($status, $filter_service_id, $city, $area, null, 0, false, $search, $reg_type, $selectedIds);
+    } else {
+      switch ($type) {
+        case 'walkers':  $service_id = 4; break;
+        case 'groomers': $service_id = 2; break;
+        case 'trainers': $service_id = 3; break;
+        case 'sitters':  $service_id = 6; break;
+        case 'boarders': $service_id = 1; break;
+        default:         $service_id = 1;
+      }
+      $providers = $this->model->getByService($service_id, null, 0, false, $search, $selectedIds);
+    }
+
+    $filename = "providers_" . ($status ?? $type ?? 'all') . "_" . date('Ymd_His') . ".csv";
+
+    if (ob_get_level() > 0) {
+      ob_end_clean();
+    }
+
+    header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Pragma: no-cache');
+    header('Expires: 0');
 
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['ID', 'Name', 'Phone', 'Email', 'Gender', 'City', 'Area', 'Status', 'Joined At']);
+    fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+    if ($status === 'pending_verification' && !empty($providers)) {
+      $pids = [];
+      foreach ($providers as $p) {
+        $pids[] = is_object($p) ? $p->id : $p['id'];
+      }
+      $callAttempts = $this->model->batchGetCallAttempts($pids);
+      foreach ($providers as $p) {
+        $pid = is_object($p) ? $p->id : $p['id'];
+        $srv = is_object($p) ? ($p->service_id ?? null) : ($p['service_id'] ?? null);
+        $att = 0;
+        if (isset($callAttempts[$pid])) {
+          if ($srv && isset($callAttempts[$pid]['by_service'][$srv])) {
+            $att = $callAttempts[$pid]['by_service'][$srv];
+          } else {
+            $att = $callAttempts[$pid]['total_attempts'] ?? 0;
+          }
+        }
+        if (is_object($p)) {
+          $p->call_attempts_count = $att;
+        } else {
+          $p['call_attempts_count'] = $att;
+        }
+      }
+    }
+
+    $csvHeaders = [
+      'ID', 'Name', 'Phone', 'Email', 'Gender', 'Services',
+      'Experience', 'City', 'Area', 'State', 'Service Address', 'Joined At'
+    ];
+    if ($status === 'pending_verification') {
+      $csvHeaders[] = 'Call Attempts';
+    }
+
+    fputcsv($output, $csvHeaders);
 
     foreach ($providers as $provider) {
-      fputcsv($output, [
-        $provider->id,
-        $provider->name,
-        $provider->phone,
-        $provider->email,
-        $provider->gender,
-        $provider->city,
-        $provider->area,
-        $provider->status,
-        $provider->created_at
-      ]);
+      $p = is_array($provider) ? (object) $provider : $provider;
+
+      $services = $p->service_name ?? '';
+      if (empty($services) && !empty($p->serviceDetails) && is_array($p->serviceDetails)) {
+        $services = implode(', ', array_keys($p->serviceDetails));
+      }
+
+      $exp = '';
+      if (isset($p->experience) && $p->experience !== '' && $p->experience !== null) {
+        $exp = strpos((string)$p->experience, 'Y') !== false ? (string)$p->experience : $p->experience . ' Yrs';
+      }
+
+      $row = [
+        $p->id ?? '',
+        $p->name ?? '',
+        $p->phone ?? '',
+        $p->email ?? '',
+        $p->gender ?? '',
+        $services,
+        $exp,
+        $p->city ?? '',
+        $p->area ?? '',
+        $p->state ?? '',
+        $p->service_address ?? '',
+        $p->created_at ?? ''
+      ];
+      if ($status === 'pending_verification') {
+        $row[] = (int) ($p->call_attempts_count ?? 0);
+      }
+
+      fputcsv($output, $row);
     }
 
     fclose($output);
@@ -1314,5 +1695,82 @@ class ProviderController extends BaseController
     }
 
     return array_unique($selected_types);
+  }
+
+  public function serviceMedia()
+  {
+    $status      = $this->request->getGet('status');
+    $media_type  = $this->request->getGet('media_type');
+    $search      = $this->request->getGet('search');
+    $provider_id = $this->request->getGet('provider_id');
+
+    $perPage = (int) ($this->request->getGet('limit') ?? 24);
+    if (!in_array($perPage, [12, 24, 48, 96, 500])) {
+      $perPage = 24;
+    }
+    $page = (int) ($this->request->getGet('page') ?? 1);
+    if ($page < 1) {
+      $page = 1;
+    }
+    $offset = ($page - 1) * $perPage;
+
+    $total  = $this->model->getServiceMedia($status === 'all' ? null : $status, $media_type === 'all' ? null : $media_type, $provider_id, $search, null, 0, true);
+    $media  = $this->model->getServiceMedia($status === 'all' ? null : $status, $media_type === 'all' ? null : $media_type, $provider_id, $search, $perPage, $offset, false);
+    $counts = $this->model->getServiceMediaCounts();
+
+    foreach ($media as &$item) {
+      $item->file_url = ('https://api.petsfolio.in/public/uploads/providers_service/' . $item->file_name);
+      $ext = strtolower(pathinfo($item->file_name, PATHINFO_EXTENSION));
+      if (in_array($ext, ['mp4', 'mov', 'avi', 'mkv', 'webm', '3gp'])) {
+        $item->is_video = true;
+      } else {
+        $item->is_video = ($item->file_type === 'video' || $item->file_type === 'recording_video');
+      }
+    }
+
+    $pager = service('pager');
+    $pager->only(['status', 'media_type', 'search', 'limit', 'provider_id']);
+    $data['pager']        = $pager;
+    $data['pager_links']  = $pager->makeLinks($page, $perPage, $total, 'default_full');
+    $data['total_items']  = $total;
+    $data['per_page']     = $perPage;
+    $data['current_page'] = $page;
+    $data['media']        = $media;
+    $data['counts']       = $counts;
+    $data['status']       = $status ?? 'all';
+    $data['media_type']   = $media_type ?? 'all';
+    $data['search']       = $search;
+    $data['provider_id']  = $provider_id;
+    $data['title']        = 'Service Media Approval';
+    $data['page']         = 'provider/service_media';
+
+    return $this->loadView('admin/provider/service_media', $data);
+  }
+
+  public function updateServiceMediaStatus()
+  {
+    $media_ids = $this->request->getPost('media_ids');
+    $status    = $this->request->getPost('status');
+
+    if (empty($media_ids) || empty($status)) {
+      if ($this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => false, 'message' => 'Invalid parameters']);
+      }
+      return redirect()->back()->with('error', 'Invalid parameters');
+    }
+
+    $result = $this->model->updateServiceMediaStatus($media_ids, $status);
+
+    if ($result) {
+      if ($this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => true, 'message' => 'Status updated successfully']);
+      }
+      return redirect()->back()->with('success', 'Service media status updated successfully');
+    } else {
+      if ($this->request->isAJAX()) {
+        return $this->response->setJSON(['status' => false, 'message' => 'Failed to update status']);
+      }
+      return redirect()->back()->with('error', 'Failed to update service media status');
+    }
   }
 }

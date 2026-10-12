@@ -2,16 +2,244 @@
 <!--start content-->
 <?php echo $this->section('content'); ?>
 <style>
+    /* SaaS Design System & Hero Banner */
+    .nl-hero-banner {
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);
+        border-radius: 20px;
+        padding: 1.75rem 2rem;
+        color: white;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.2), 0 8px 10px -6px rgba(49, 46, 129, 0.2);
+    }
+    .nl-hero-banner::after {
+        content: '';
+        position: absolute;
+        top: -30%;
+        right: -10%;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .nl-live-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(8px);
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        margin-bottom: 0.5rem;
+    }
+    .nl-stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+        transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .nl-stat-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.14);
+    }
+    .nl-stat-val {
+        font-size: 1.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+    .nl-stat-lbl {
+        font-size: 0.75rem;
+        opacity: 0.85;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 2px;
+    }
+
+    /* Segmented Status Tabs */
+    .nl-segmented-tabs {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 6px;
+        overflow-x: auto;
+        white-space: nowrap;
+        margin-bottom: 1.25rem;
+    }
+    .nl-tab-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+    }
+    .nl-tab-pill:hover {
+        color: #1e293b;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    .nl-tab-pill.active {
+        background: white;
+        color: #4338ca;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    .nl-tab-pill .badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 50px;
+    }
+
+    /* Filter Toolbar */
+    .nl-filter-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+    .nl-search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 240px;
+    }
+    .nl-search-wrap i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+    .nl-search-wrap input {
+        padding-left: 36px !important;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.875rem;
+    }
+    .nl-select {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.875rem;
+        padding: 0.45rem 1rem 0.45rem 0.75rem;
+        background-color: #f8fafc;
+        color: #334155;
+        font-weight: 500;
+    }
+
+    /* Table Container */
+    .nl-table-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+    }
+    .nl-table {
+        margin-bottom: 0;
+        width: 100%;
+    }
+    .nl-table thead th {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        font-size: 0.75rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        padding: 0.85rem 0.75rem !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        white-space: nowrap;
+    }
+    .nl-table tbody td {
+        padding: 0.85rem 0.75rem !important;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9 !important;
+        font-size: 0.85rem;
+        color: #1e293b;
+    }
+    .nl-table tbody tr {
+        transition: background-color 0.15s ease;
+        cursor: pointer;
+    }
+    .nl-table tbody tr:hover {
+        background-color: #f8fafc !important;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        background: transparent;
+        text-decoration: none;
+    }
+    .action-btn-view {
+        color: #0284c7;
+        background: #f0f9ff;
+        border-color: #e0f2fe;
+    }
+    .action-btn-view:hover {
+        background: #0284c7;
+        color: white;
+    }
+    .action-btn-notify {
+        color: #d97706;
+        background: #fffbeb;
+        border-color: #fef3c7;
+    }
+    .action-btn-notify:hover {
+        background: #d97706;
+        color: white;
+    }
+    .action-btn-edit {
+        color: #4f46e5;
+        background: #eef2ff;
+        border-color: #e0e7ff;
+    }
+    .action-btn-edit:hover {
+        background: #4f46e5;
+        color: white;
+    }
+    .action-btn-delete {
+        color: #dc2626;
+        background: #fef2f2;
+        border-color: #fee2e2;
+    }
+    .action-btn-delete:hover {
+        background: #dc2626;
+        color: white;
+    }
+
     /* Edit Modal Styling */
     #form-offcanvas {
         width: 450px !important;
     }
-
     .client-avatar-large {
         width: 80px;
         height: 80px;
         border-radius: 50%;
-        /* background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); */
         color: white;
         display: flex;
         align-items: center;
@@ -20,364 +248,29 @@
         border: 4px solid white;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-
-    #form-offcanvas .card {
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    #form-offcanvas .card:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    #form-offcanvas .card-title {
-        font-size: 0.95rem;
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-
-    #form-offcanvas .form-label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-        color: #495057;
-    }
-
-    #form-offcanvas .input-group-text {
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #6c757d;
-    }
-
-    #form-offcanvas .form-control {
-        border-color: #dee2e6;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-
-    #form-offcanvas .form-control:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-    }
-
-    #form-offcanvas .form-check-input {
-        width: 2.5em;
-        height: 1.25em;
-    }
-
-    #form-offcanvas .form-check-input:checked {
-        background-color: #6366f1;
-        border-color: #6366f1;
-    }
-
-    #form-offcanvas .form-check-label {
-        font-size: 0.9rem;
-        color: #495057;
-    }
-
-    #form-offcanvas .btn-primary {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        border: none;
-        padding: 0.75rem;
-        font-weight: 500;
-    }
-
-    #form-offcanvas .btn-primary:hover {
-        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    #form-offcanvas .btn-light {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        padding: 0.75rem;
-        font-weight: 500;
-    }
-
-    #form-offcanvas .btn-light:hover {
-        background-color: #e9ecef;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        #form-offcanvas {
-            width: 100% !important;
-        }
-
-        .client-avatar-large {
-            width: 60px;
-            height: 60px;
-            font-size: 1.5rem;
-        }
-    }
-
     #send_push_notification {
         width: 500px !important;
     }
-
-    #send_push_notification .offcanvas-header {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
-        padding: 1.25rem 1.5rem;
+    #clientDetailsDrawer {
+        width: 550px !important;
     }
 
-    #send_push_notification .preview-card {
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        background: #f8f9fa;
-    }
-
-    #send_push_notification .preview-card .rounded-circle {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-    }
-
-    #send_push_notification .card {
-        border: 1px solid #e9ecef;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-    }
-
-    #send_push_notification .card:hover {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    #send_push_notification .card-title {
-        font-size: 0.95rem;
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 0.75rem;
-    }
-
-    #send_push_notification .form-label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-        color: #495057;
-    }
-
-    #send_push_notification .input-group-text {
-        background-color: #f8f9fa;
-        border-color: #dee2e6;
-        color: #6c757d;
-    }
-
-    #send_push_notification .form-control {
-        border-color: #dee2e6;
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-
-    #send_push_notification textarea.form-control {
-        min-height: 120px;
-        resize: vertical;
-    }
-
-    #send_push_notification .form-control:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-    }
-
-    #send_push_notification .form-check-input {
-        width: 2.5em;
-        height: 1.25em;
-    }
-
-    #send_push_notification .form-check-input:checked {
-        background-color: #6366f1;
-        border-color: #6366f1;
-    }
-
-    #send_push_notification .form-check-label {
-        font-size: 0.9rem;
-        color: #495057;
-    }
-
-    #send_push_notification .btn-primary {
-        background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        border: none;
-        padding: 0.75rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    #send_push_notification .btn-primary:hover {
-        background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-    }
-
-    #send_push_notification .btn-light {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        padding: 0.75rem;
-        font-weight: 500;
-    }
-
-    #send_push_notification .btn-light:hover {
-        background-color: #e9ecef;
-    }
-
-    #send_push_notification .alert-info {
-        background-color: rgba(99, 102, 241, 0.1);
-        border: 1px solid rgba(99, 102, 241, 0.2);
-        color: #6366f1;
-    }
-
-    /* Character count styling */
-    #charCount {
-        font-size: 0.8rem;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        #send_push_notification {
-            width: 100% !important;
-        }
-
-        #send_push_notification .offcanvas-body {
-            padding: 1rem;
-        }
-    }
-
-    /* Pagination Styling */
+    /* Pagination controls */
     .pagination-wrapper {
-        padding: 1rem;
-        background: #f8f9fa;
-        border-top: 1px solid #e5e7eb;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 1rem 1.5rem;
+        background-color: #f8fafc;
+        border-top: 1px solid #e2e8f0;
         flex-wrap: wrap;
         gap: 1rem;
     }
-
-    .pagination-info {
-        color: #6c757d;
-        font-size: 0.875rem;
-    }
-
-    .pagination {
-        margin: 0;
-        gap: 0.25rem;
-    }
-
-    .page-link {
-        border: 1px solid #dee2e6;
-        padding: 0.5rem 0.75rem;
-        color: #6366f1;
-        border-radius: 0.375rem;
-        transition: all 0.2s;
-        cursor: pointer;
-    }
-
-    .page-link:hover {
-        background-color: #6366f1;
-        border-color: #6366f1;
-        color: white;
-    }
-
-    .page-item.active .page-link {
-        background-color: #6366f1;
-        border-color: #6366f1;
-        color: white;
-    }
-
-    .page-item.disabled .page-link {
-        color: #6c757d;
-        pointer-events: none;
-        background-color: #fff;
-        border-color: #dee2e6;
-        cursor: not-allowed;
-    }
-
-    .items-per-page {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .items-per-page select {
-        padding: 0.375rem 2rem 0.375rem 0.75rem;
-        border: 1px solid #dee2e6;
-        border-radius: 0.375rem;
-        background-color: white;
-        color: #495057;
-        font-size: 0.875rem;
-        cursor: pointer;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-        background-repeat: no-repeat;
-        background-position: right 0.5rem center;
-        background-size: 16px 12px;
-        appearance: none;
-    }
-
-    .items-per-page select:focus {
-        outline: none;
-        border-color: #6366f1;
-        box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
-    }
-
-    @media (max-width: 576px) {
-        .pagination-wrapper {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .pagination {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    /* Hide rows when paginated */
-    .pagination-row {
-        display: table-row;
-    }
-
     .pagination-row.hidden {
-        display: none;
+        display: none !important;
     }
-
-    /* Fixed gradient header */
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%) !important;
-    }
-
-    /* Modern Table Styling */
-    .table-hover tbody tr:hover {
-        background-color: rgba(99, 102, 241, 0.03) !important;
-        transition: all 0.2s ease;
-    }
-
-    .table thead th {
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 0.05em;
-        padding-top: 0.75rem !important;
-        padding-bottom: 0.75rem !important;
-        border: none !important;
-        white-space: nowrap;
-        background-color: #c6d2ff !important;
-        color: #1e293b !important;
-        font-weight: 700 !important;
-        vertical-align: middle;
-    }
-
-    .table td {
-        border: none !important;
-        border-bottom: 1px solid #e5e7eb !important;
-        vertical-align: middle;
-        padding: 0.4rem 0.4rem !important;
-        font-size: 0.85rem;
-    }
-
-    .table tbody tr:last-child td {
-        border-bottom: none !important;
+    .pagination-row.search-hidden {
+        display: none !important;
     }
 </style>
 
@@ -387,82 +280,147 @@
         <?php echo $this->include('admin/nav_bar') ?>
     </div>
 
-    <div class="conatiner-fluid content-inner px-4" id="bk-pgrs">
-        <!-- Modern Header Section -->
-        <div class="container-fluid bg-gradient-primary rounded-3  p-0 mb-4">
-            <div class=" text-white p-3 rounded-3 shadow position-relative overflow-hidden">
-                <div class="position-relative z-1">
-                    <h1 class="h2 fw-bold mb-2 text-white">Clients</h1>
-                    <p class="text-white-75 mb-0">Manage and monitor all clients in the system</p>
+    <div class="container-fluid content-inner px-4" id="bk-pgrs">
+        <?php
+        $clients = $clients ?? [];
+        $totalClientsCount = !empty($clients) ? count($clients) : 0;
+        $activeClientsCount = $active_count ?? 0;
+        $inactiveClientsCount = $inactive_count ?? 0;
+        $incompleteClientsCount = $incomplete_count ?? 0;
+        $globalTotalCount = $total_count ?? $totalClientsCount;
+        $withPetsCount = 0;
+        if (!empty($clients)) {
+            foreach ($clients as $c) {
+                if (!empty($c->pets)) $withPetsCount++;
+            }
+        }
+        $currStatus = $current_status ?? ($_GET['status'] ?? 'active');
+        ?>
+
+        <!-- Hero Banner -->
+        <div class="nl-hero-banner">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                <div>
+                    <div class="nl-live-pill">
+                        <i class="bi bi-circle-fill text-success" style="font-size: 0.55rem;"></i> System Active
+                    </div>
+                    <h1 class="h2 fw-bold text-white mb-1">Clients Network</h1>
+                    <p class="text-white-50 mb-0 small">Manage client profiles, wallet balances, registered pets, and push alerts</p>
                 </div>
-                <i class="bi bi-people position-absolute end-0 bottom-0 opacity-10"
-                    style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-warning d-flex align-items-center gap-1 shadow-sm px-3 py-2 fw-semibold opacity-50"
+                        id="send-bulk-notification" data-bs-toggle="offcanvas" data-bs-target="#send_push_notification" disabled>
+                        <i class="fa-regular fa-paper-plane me-1"></i> Bulk Notification
+                    </button>
+                    <a href="javascript:void(0)" onclick="downloadProviders()"
+                        class="btn btn-light d-flex align-items-center gap-2 shadow-sm px-3 py-2 fw-semibold border">
+                        <i class="fa-solid fa-download text-primary"></i> Download
+                    </a>
+                </div>
             </div>
-            <div class="p-3">
-                <div class="card border-0 shadow-sm mb-0 rounded-3">
-                    <div class="card-body p-3">
-                        <div class="row  align-items-center g-3">
-                            <div class="col-8 d-flex align-items-center gap-3">
-                                <!-- Search Box -->
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                    <input type="text" class="form-control border-start-0" id="searchClients"
-                                        placeholder="Search clients by name, email, phone..."
-                                        style="padding: 0.5rem 0.75rem;">
-                                </div>
 
-                                <!-- Show Entries Dropdown -->
-                                <div class="d-flex align-items-center gap-2">
-                                    <label class="text-black small mb-0">Show</label>
-                                    <select class="form-select form-select-sm" id="entriesPerPageTop">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                    <label class="text-muted small mb-0">entries</label>
-                                </div>
-                            </div>
-
-                            <div class="col-auto">
-                                <a href="#" onclick="downloadProviders()" class="btn btn-primary"
-                                    style="background: #0062ff !important;">
-                                    <i class="fa-solid fa-download"></i>
-                                    Download
-                                </a>
-                                <button type="button" class="btn btn-warning w-80" id="send-bulk-notification"
-                                    data-bs-toggle="offcanvas" data-bs-target="#send_push_notification"
-                                    disabled="disabled" style="background: #000000 !important;">
-                                    <i class="fa-regular fa-paper-plane"></i> Send Bulk Notification
-                                </button>
-                            </div>
-                        </div>
+            <!-- KPI Metric Stat Cards -->
+            <div class="row g-3">
+                <div class="col-6 col-md-2">
+                    <div class="nl-stat-card">
+                        <div class="nl-stat-val text-white"><?= $totalClientsCount ?></div>
+                        <div class="nl-stat-lbl text-white-50">Total in View</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="nl-stat-card">
+                        <div class="nl-stat-val text-success"><?= $activeClientsCount ?></div>
+                        <div class="nl-stat-lbl text-white-50">Active Clients</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-2">
+                    <div class="nl-stat-card">
+                        <div class="nl-stat-val text-danger"><?= $inactiveClientsCount ?></div>
+                        <div class="nl-stat-lbl text-white-50">Blocked / Inactive</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="nl-stat-card">
+                        <div class="nl-stat-val text-warning"><?= $incompleteClientsCount ?></div>
+                        <div class="nl-stat-lbl text-white-50">Incomplete Profiles</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="nl-stat-card">
+                        <div class="nl-stat-val text-info"><?= $withPetsCount ?></div>
+                        <div class="nl-stat-lbl text-white-50">With Registered Pets</div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Segmented Status Tabs -->
+        <div class="nl-segmented-tabs">
+            <a href="<?= base_url('clients?status=active') ?>" class="nl-tab-pill <?= $currStatus === 'active' ? 'active' : '' ?>">
+                <i class="bi bi-person-check-fill text-success"></i> Active Clients
+                <span class="badge <?= $currStatus === 'active' ? 'bg-primary' : 'bg-light text-dark' ?>"><?= $activeClientsCount ?></span>
+            </a>
+            <a href="<?= base_url('clients?status=inactive') ?>" class="nl-tab-pill <?= $currStatus === 'inactive' ? 'active' : '' ?>">
+                <i class="bi bi-person-x-fill text-danger"></i> Blocked Clients
+                <span class="badge <?= $currStatus === 'inactive' ? 'bg-danger' : 'bg-light text-dark' ?>"><?= $inactiveClientsCount ?></span>
+            </a>
+            <a href="<?= base_url('clients?status=incomplete') ?>" class="nl-tab-pill <?= $currStatus === 'incomplete' ? 'active' : '' ?>">
+                <i class="bi bi-person-exclamation text-warning"></i> Incomplete Users
+                <span class="badge <?= $currStatus === 'incomplete' ? 'bg-warning text-dark' : 'bg-light text-dark' ?>"><?= $incompleteClientsCount ?></span>
+            </a>
+            <a href="<?= base_url('clients?status=all') ?>" class="nl-tab-pill <?= $currStatus === 'all' ? 'active' : '' ?>">
+                <i class="bi bi-people-fill text-primary"></i> All Clients
+                <span class="badge <?= $currStatus === 'all' ? 'bg-dark' : 'bg-light text-dark' ?>"><?= $globalTotalCount ?></span>
+            </a>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="nl-filter-card">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="nl-search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" id="searchClients"
+                        placeholder="Search clients by name, email, phone, location...">
+                </div>
+                <div class="d-flex align-items-center gap-3 text-nowrap">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="text-muted small mb-0">Show:</label>
+                        <select class="form-select form-select-sm nl-select" id="entriesPerPageTop" style="width: 85px;">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="10000">All</option>
+                        </select>
+                        <span class="text-muted small">entries</span>
+                    </div>
+                    <button type="button" class="btn btn-light border d-flex align-items-center gap-1 text-muted" onclick="resetClientFilters()" title="Reset Search">
+                        <i class="fas fa-undo small"></i> Clear
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Main Table Card -->
-        <div class="card border-0 shadow-sm overflow-hidden rounded-3">
+        <div class="nl-table-card">
             <div class="table-responsive">
-                <table class="table table-hover" id="clientsTable">
+                <table class="table nl-table" id="clientsTable">
                     <thead>
                         <tr>
-                            <th style="background: #c6d2ff !important; width: 50px;">
+                            <th style="width: 45px;" class="text-center">
                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                     id="select-all-table" onclick="selectAllTable(this)">
                             </th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important; width: 50px;">S.No</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Client</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Pets</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Location</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Joined At</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Wallet</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Status</th>
-                            <th class="text-dark  fs-6" style="background: #c6d2ff !important;">Action</th>
+                            <th style="width: 55px;" class="text-center">S.No</th>
+                            <th>Client Details</th>
+                            <th>Acquisition Source</th>
+                            <th>Pets Registered</th>
+                            <th>Location</th>
+                            <th>Joined Date</th>
+                            <th>Wallet</th>
+                            <th class="text-center">Device & App</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center" style="width: 140px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -471,58 +429,82 @@
                         foreach ($clients as $client) {
                         ?>
                             <tr class="pagination-row" data-client-data='<?= htmlspecialchars(json_encode($client), ENT_QUOTES, 'UTF-8') ?>'>
-                                <td>
+                                <td class="text-center">
                                     <input type="checkbox" class="form-check-input select-table-row"
                                         id="datatable-row-<?= $client->id ?>" name="datatable_ids[]"
                                         value="<?= $client->id ?>" data-module="users">
                                 </td>
-                                <td class="text-center"><?= $i ?></td>
+                                <td class="text-center text-muted fw-bold"><?= $i ?></td>
 
                                 <!-- Client Column with Email and Mobile -->
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <?php
-                                        $name = $client->name ?? '';
-                                        $initial = $name ? strtoupper(substr(trim($name), 0, 1)) : '?';
+                                        $name = trim($client->name ?? '');
+                                        $hasName = !empty($name);
+                                        $hasEmail = !empty($client->email);
+                                        $hasGender = !empty($client->gender);
+                                        $isIncomplete = (!$hasName || !$hasEmail || !$hasGender);
+                                        $initial = $hasName ? strtoupper(substr($name, 0, 1)) : ($client->phone ? '#' : '?');
                                         ?>
                                         <!-- Avatar -->
-                                        <div class="rounded-circle bg-primary bg-opacity-10 fw-bold d-flex align-items-center justify-content-center flex-shrink-0"
-                                            style="width:32px; height:32px; border: 2px solid #e5dbff; color: #ffffff;">
+                                        <div class="rounded-circle <?= $isIncomplete ? 'bg-warning bg-opacity-10 text-warning border-warning' : 'bg-primary bg-opacity-10 text-primary border-primary' ?> fw-bold d-flex align-items-center justify-content-center flex-shrink-0"
+                                            style="width:34px; height:34px; border: 2px solid;">
                                             <?= $initial ?>
                                         </div>
 
                                         <!-- Details -->
                                         <div>
-                                            <div class="fw-bold text-dark">
+                                            <div class="fw-bold text-dark d-flex align-items-center gap-2">
                                                 <a href="<?= base_url('userDetails/user/' . $client->id) ?>" class="text-decoration-none text-dark" style="transition: color 0.2s;">
-                                                    <?= $client->name ?? '--' ?>
+                                                    <?= $hasName ? esc($name) : '<span class="text-muted fst-italic">Name Not Provided</span>' ?>
                                                 </a>
+                                                <?php if ($isIncomplete): ?>
+                                                    <span class="badge bg-warning-subtle text-warning border border-warning px-1 py-0" style="font-size: 0.65rem;">
+                                                        Incomplete Profile
+                                                    </span>
+                                                <?php endif; ?>
                                             </div>
-                                            <div class="text-muted small">
-                                                <i class="bi bi-envelope me-1"></i> <?= $client->email ?? '--' ?>
+                                            <div class="text-muted small" style="font-size: 0.75rem;">
+                                                <i class="bi bi-envelope me-1"></i> <?= $hasEmail ? esc($client->email) : '<span class="text-muted opacity-75">No email</span>' ?>
                                             </div>
-                                            <div class="text-muted small">
-                                                <i class="bi bi-telephone me-1"></i> <?= $client->phone ?? '--' ?>
+                                            <div class="text-muted small" style="font-size: 0.75rem;">
+                                                <i class="bi bi-telephone me-1"></i> <?= !empty($client->phone) ? esc($client->phone) : '--' ?>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
 
+                                <!-- Acquisition Source Column -->
+                                <td>
+                                    <?php
+                                    $rawSource = strtolower(trim($client->source ?? ''));
+                                    if ($rawSource === 'web') {
+                                        echo '<span class="badge bg-purple-subtle text-purple border" style="background:#f3e8ff; color:#7e22ce; border-color:#d8b4fe;"><i class="bi bi-globe me-1"></i> Web</span>';
+                                    } elseif (!empty($rawSource)) {
+                                        echo '<span class="badge bg-light text-dark border"><i class="bi bi-tag me-1"></i> ' . esc(ucfirst($rawSource)) . '</span>';
+                                    } elseif (!empty($client->has_app_installed)) {
+                                        echo '<span class="badge bg-primary-subtle text-primary border border-primary"><i class="bi bi-phone me-1"></i> Mobile App</span>';
+                                    } else {
+                                        echo '<span class="badge bg-secondary-subtle text-secondary border border-secondary"><i class="bi bi-phone me-1"></i> App / Direct</span>';
+                                    }
+                                    ?>
+                                </td>
+
+
                                 <!-- Pets Column -->
                                 <td>
                                     <?php if (!empty($client->pets)): ?>
-                                        <div class="pet-pills">
+                                        <div class="d-flex flex-wrap gap-1">
                                             <?php foreach ($client->pets as $index => $pet): ?>
                                                 <?php if ($index < 3): ?>
-                                                    <span class="badge bg-info-subtle text-info border border-info mb-1 me-1" style="background-color: rgba(59, 130, 246, 0.1) !important;
-        color: #2563eb !important;
-        border: 1px solid rgba(59, 130, 246, 0.2) !important;">
+                                                    <span class="badge bg-info-subtle text-info border border-info px-2 py-1" style="font-size: 0.72rem;">
                                                         <?= $pet->name ?>
                                                     </span>
                                                 <?php endif; ?>
                                             <?php endforeach; ?>
                                             <?php if (count($client->pets) > 3): ?>
-                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary">
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary px-2 py-1" style="font-size: 0.72rem;">
                                                     +<?= count($client->pets) - 3 ?>
                                                 </span>
                                             <?php endif; ?>
@@ -537,7 +519,7 @@
                                     <?php if (count($client->addresses) > 0): ?>
                                         <div class="d-flex align-items-center gap-1">
                                             <i class="bi bi-geo-alt text-primary small"></i>
-                                            <span class="text-muted small text-truncate" style="max-width: 120px;">
+                                            <span class="text-muted small text-truncate" style="max-width: 130px;">
                                                 <?= $client->addresses[0]->state ?? 'N/A' ?>
                                             </span>
                                         </div>
@@ -546,20 +528,39 @@
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?= esc(date('d M Y', strtotime($client->created_at)) ?? '') ?>
+                                    <span class="text-muted small"><?= esc(date('d M Y', strtotime($client->created_at)) ?? '') ?></span>
                                 </td>
                                 <!-- Wallet Amount -->
                                 <td>
-                                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1"
-                                        style="background: rgba(34, 197, 94, 0.1) !important; color: #16a34a !important;
-        border: 1px solid rgba(34, 197, 94, 0.2) !important; font-weight: 600;">
-                                        ₹<?= $client->wallet_amount ?>
+                                    <span class="badge bg-success-subtle text-success border border-success px-2 py-1" style="font-weight: 600;">
+                                        ₹<?= $client->wallet_amount ?? 0 ?>
                                     </span>
                                 </td>
-
-                                <!-- Status -->
+                                <!-- Device & App Column -->
                                 <td>
-                                    <div class="form-check form-switch d-inline-block">
+                                    <?php if (!empty($client->latest_device)): ?>
+                                        <?php $dev = $client->latest_device; ?>
+                                        <div class="d-flex flex-column align-items-center text-center">
+                                            <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                            </span>
+                                            <span class="text-dark small fw-bold">
+                                                <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                            </span>
+                                            <span class="text-muted small" style="font-size: 0.75rem;">
+                                                <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                            </span>
+                                            <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                            </span>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                    <?php endif; ?>
+                                </td>
+                                <!-- Status -->
+                                <td class="text-center">
+                                    <div class="form-check form-switch d-inline-block m-0">
                                         <input type="checkbox" class="form-check-input status"
                                             data-url="<?= base_url() ?>updateStatus" data-module="users"
                                             data-id="<?= $client->id ?>" value="<?= $client->status ?>"
@@ -569,39 +570,32 @@
 
                                 <!-- Action Column -->
                                 <td>
-                                    <div class="d-flex gap-1 align-items-center">
-                                        <button type="button"
-                                            class="btn btn-sm btn-outline-primary border-0 view-client-btn "
-                                            style="padding:10px !important" data-client-id="<?= $client->id ?>"
-                                            title="View Details">
-                                            <i class="bi bi-eye fs-6"></i>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button type="button" class="action-btn action-btn-view view-client-btn"
+                                            data-client-id="<?= $client->id ?>" title="View Details">
+                                            <i class="bi bi-eye"></i>
                                         </button>
 
-                                        <button type="button" data-assign-module="<?= $client->id ?>"
-                                            style="padding:10px !important" data-assign-target="#send_push_notification"
-                                            data-assign-event="employee_assign"
-                                            class="btn btn-sm btn-outline-warning border-0" data-bs-toggle="offcanvas"
-                                            data-bs-target="#send_push_notification" aria-label="Send Push Notification"
-                                            data-id="<?= $client->id ?>" data-module="users" title="Send Notification">
-                                            <i class="fa-regular fa-paper-plane fs-6"></i>
+                                        <button type="button" class="action-btn action-btn-notify"
+                                            data-assign-module="<?= $client->id ?>" data-id="<?= $client->id ?>"
+                                            data-module="users" data-bs-toggle="offcanvas" data-bs-target="#send_push_notification"
+                                            title="Send Notification">
+                                            <i class="fa-regular fa-paper-plane"></i>
                                         </button>
 
-                                        <button type="button" class="btn btn-sm btn-outline-primary border-0"
-                                            style="padding:10px !important" data-bs-toggle="offcanvas"
-                                            data-bs-target="#form-offcanvas" aria-label="Edit" data-bs-original-title="Edit"
+                                        <button type="button" class="action-btn action-btn-edit"
+                                            data-bs-toggle="offcanvas" data-bs-target="#form-offcanvas"
                                             data-edit="<?= $client->id ?>" data-module="users"
                                             data-url="<?= base_url() ?>getUser" data-id="<?= $client->id ?>" title="Edit">
-                                            <i class="fas fa-pencil-alt fs-6"></i>
+                                            <i class="fas fa-pencil-alt"></i>
                                         </button>
 
-                                        <a href="<?= base_url() ?>deleteUser" style="padding:10px !important"
-                                            id="delete-employees-<?= $client->id ?>"
-                                            class="btn btn-sm btn-outline-danger border-0" data-type="ajax"
-                                            data-method="DELETE" data-token="<?= csrf_hash() ?>" data-bs-toggle="tooltip"
+                                        <a href="<?= base_url() ?>deleteUser" id="delete-employees-<?= $client->id ?>"
+                                            class="action-btn action-btn-delete" data-type="ajax"
+                                            data-method="DELETE" data-token="<?= csrf_hash() ?>"
                                             data-id="<?= $client->id ?>"
-                                            data-confirm="Are you certain you want to delete it?" aria-label="Delete"
-                                            title="Delete">
-                                            <i class="fa fa-trash fs-6" aria-hidden="true"></i>
+                                            data-confirm="Are you certain you want to delete this client?" title="Delete">
+                                            <i class="fa fa-trash"></i>
                                         </a>
                                     </div>
                                 </td>
@@ -649,14 +643,21 @@
         <input type="hidden" name="module" value="users">
         <div class="offcanvas offcanvas-end" tabindex="-1" id="send_push_notification"
             aria-labelledby="form-offcanvasLabel">
-            <div class="offcanvas-header border-bottom bg-primary text-white">
-                <h5 class="offcanvas-title mb-1 text-white">
-                    <i class="fa-regular fa-paper-plane me-2"></i>Send Push Notification
-                </h5>
+            <div class="offcanvas-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <div>
+                    <h5 class="offcanvas-title text-white fw-bold d-flex align-items-center gap-2 mb-1" style="font-size: 1.05rem;">
+                        <i class="fa-regular fa-paper-plane text-warning"></i> Send Push Notification
+                    </h5>
+                    <p class="text-white-50 mb-0 small" style="font-size: 0.78rem;">Dispatch instant notification alert to selected clients</p>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
-            <div class="offcanvas-body">
-                <div class="container-fluid">
+            <div class="offcanvas-body" style="background: #f8fafc; padding: 1.25rem;">
+                <div id="notificationRecipientInfo" class="alert alert-primary py-2 px-3 mb-3 d-flex align-items-center gap-2 rounded-3 border-0 shadow-sm" style="background: rgba(99,102,241,0.1); color: #4338ca; font-size: 0.82rem; font-weight: 500;">
+                    <i class="fas fa-users-viewfinder fs-6"></i>
+                    <span id="recipientCountText">Sending to selected clients</span>
+                </div>
+                <div class="container-fluid p-0">
                     <div class="row">
                         <div class="col-12">
                             <div class="card border-0 shadow-sm mb-4">
@@ -697,12 +698,12 @@
                     </div>
                 </div>
             </div>
-            <div class="offcanvas-footer border-top p-3 bg-light">
+            <div class="offcanvas-footer border-top p-3 bg-white">
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-light flex-fill" data-bs-dismiss="offcanvas">
+                    <button type="button" class="btn btn-light flex-fill rounded-3 py-2 fw-semibold" data-bs-dismiss="offcanvas">
                         <i class="fas fa-times me-2"></i> Cancel
                     </button>
-                    <button type="submit" class="btn btn-primary flex-fill" id="sendNotificationBtn">
+                    <button type="submit" class="btn btn-primary flex-fill rounded-3 py-2 fw-semibold" id="sendNotificationBtn" style="background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); border: none;">
                         <i class="fa-regular fa-paper-plane me-2"></i> Send Notification
                     </button>
                 </div>
@@ -714,8 +715,13 @@
     <form action="<?= base_url() ?>update" id="updateUser">
         <div class="offcanvas offcanvas-end" tabindex="-1" id="form-offcanvas" aria-labelledby="form-offcanvasLabel"
             aria-modal="true" role="dialog">
-            <div class="offcanvas-header border-bottom bg-primary text-white">
-                <h5 class="offcanvas-title text-white" id="form-offcanvasLabel">Edit Client</h5>
+            <div class="offcanvas-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <div>
+                    <h5 class="offcanvas-title text-white fw-bold d-flex align-items-center gap-2 mb-1" id="form-offcanvasLabel" style="font-size: 1.05rem;">
+                        <i class="fas fa-user-edit text-info"></i> Edit Client
+                    </h5>
+                    <p class="text-white-50 mb-0 small" style="font-size: 0.78rem;">Update client personal details and account status</p>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
             </div>
@@ -861,9 +867,14 @@
 
     <!-- Client Details Drawer -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="clientDetailsDrawer"
-        aria-labelledby="clientDetailsDrawerLabel" style="width: 500px;">
-        <div class="offcanvas-header border-bottom bg-primary text-white">
-            <h5 class="offcanvas-title text-white" id="clientDetailsDrawerLabel">Client Details</h5>
+        aria-labelledby="clientDetailsDrawerLabel" style="width: 520px; max-width: 92vw;">
+        <div class="offcanvas-header" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div>
+                <h5 class="offcanvas-title text-white fw-bold d-flex align-items-center gap-2 mb-1" id="clientDetailsDrawerLabel" style="font-size: 1.05rem;">
+                    <i class="bi bi-person-badge text-primary"></i> Client Details
+                </h5>
+                <p class="text-white-50 mb-0 small" style="font-size: 0.78rem;">Detailed profile, pets, and address directory</p>
+            </div>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                 aria-label="Close"></button>
         </div>
@@ -878,62 +889,6 @@
 </main>
 
 <style>
-    /* Modern Table Styling */
-    .table-hover tbody tr:hover {
-        background-color: rgba(99, 102, 241, 0.03) !important;
-    }
-
-    .table thead th {
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        padding: 1rem 0.75rem;
-        border: none !important;
-        font-weight: 600;
-    }
-
-    .table td {
-        border: none !important;
-        border-bottom: 1px solid #e5e7eb !important;
-        padding: 0.75rem;
-        vertical-align: middle;
-    }
-
-    .table tbody tr:last-child td {
-        border-bottom: none !important;
-    }
-
-    /* Fixed gradient header */
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%) !important;
-    }
-
-    /* Button Styling */
-    .btn-outline-primary {
-        border-color: #dee2e6;
-        color: #6c757d;
-    }
-
-    .btn-outline-primary:hover {
-        border-color: #6366f1;
-        color: #6366f1;
-        background-color: transparent;
-    }
-
-    /* Status switch styling */
-    .form-check-input:checked {
-        background-color: #6366f1;
-        border-color: #6366f1;
-    }
-
-    /* Badge styling */
-    .badge {
-        font-weight: 500;
-        letter-spacing: 0.02em;
-        font-size: 0.75rem;
-        border-radius: 50px
-    }
-
     /* Pet pills styling */
     .pet-pills {
         display: flex;
@@ -947,7 +902,7 @@
     }
 
     .client-detail-section {
-        padding: 1.5rem;
+        padding: 1.25rem 1.5rem;
         border-bottom: 1px solid #e9ecef;
     }
 
@@ -956,23 +911,26 @@
     }
 
     .detail-label {
-        font-size: 0.875rem;
+        font-size: 0.78rem;
         color: #6c757d;
         font-weight: 500;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
     }
 
     .detail-value {
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: #212529;
-        font-weight: 500;
+        font-weight: 600;
     }
 
     .detail-card {
         background: #f8f9fa;
         border-radius: 8px;
-        padding: 1rem;
+        padding: 0.85rem 1rem;
         margin-bottom: 0.75rem;
+        border: 1px solid #edf2f7;
     }
 
     .detail-card:last-child {
@@ -981,32 +939,22 @@
 
     /* Avatar in drawer */
     .client-avatar {
-        width: 60px;
-        height: 60px;
+        width: 54px;
+        height: 54px;
         border-radius: 50%;
-        /* background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); */
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
+        font-size: 1.35rem;
         font-weight: bold;
         margin-right: 1rem;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
-
-        .table td,
-        .table th {
-            padding: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .badge {
-            font-size: 0.7rem;
-        }
-
         #clientDetailsDrawer {
             width: 100% !important;
         }
@@ -1175,6 +1123,8 @@
             let selectedIds = getSelectedIds();
             if (sendBulkNotificationBtn) {
                 sendBulkNotificationBtn.disabled = selectedIds.length === 0;
+                sendBulkNotificationBtn.innerHTML = `<i class="fa-regular fa-paper-plane me-1"></i> Send Push Notification` + 
+                    (selectedIds.length > 0 ? ` <span class="badge bg-white text-primary ms-1" style="font-size:0.75rem; vertical-align:middle;">${selectedIds.length}</span>` : '');
             }
             if (selectedProviderIds) {
                 selectedProviderIds.value = JSON.stringify(selectedIds);
@@ -1193,9 +1143,6 @@
             } else if (checkedVisibleCheckboxes.length === visibleCheckboxes.length) {
                 selectAllCheckbox.checked = true;
                 selectAllCheckbox.indeterminate = false;
-            } else if (checkedVisibleCheckboxes.length > 0) {
-                selectAllCheckbox.checked = false;
-                selectAllCheckbox.indeterminate = true;
             } else {
                 selectAllCheckbox.checked = false;
                 selectAllCheckbox.indeterminate = false;
@@ -1220,22 +1167,40 @@
             }
         });
 
+        // Prevent row selection / details click when clicking checkboxes or buttons
+        $(document).on('click', '.select-table-row, .status, .action-btn, a, button', function(e) {
+            e.stopPropagation();
+        });
+
         if (sendBulkNotificationBtn) {
             sendBulkNotificationBtn.addEventListener("click", function() {
                 let selectedIds = getSelectedIds();
                 if (selectedIds.length > 0 && selectedProviderIds) {
                     selectedProviderIds.value = JSON.stringify(selectedIds);
                 }
+                const countText = document.getElementById('recipientCountText');
+                if (countText) {
+                    countText.textContent = `Sending to ${selectedIds.length} selected client${selectedIds.length > 1 ? 's' : ''}`;
+                }
+                $('#sendNotification1').data('id', null);
             });
         }
 
         // Send notification form submission
-        $(document).on('click', '[data-assign-module]', function() {
+        $(document).on('click', '[data-assign-module]', function(e) {
+            e.stopPropagation();
             const dataId = $(this).data('id');
             const moduleId = $(this).data('module');
             const targetForm = $('#sendNotification1');
             targetForm.data('id', dataId);
             targetForm.data('module', moduleId);
+            if (selectedProviderIds) {
+                selectedProviderIds.value = JSON.stringify([dataId]);
+            }
+            const countText = document.getElementById('recipientCountText');
+            if (countText) {
+                countText.textContent = `Sending to 1 client (ID: #${dataId})`;
+            }
         });
 
         $('#sendNotification1').on('submit', function(e) {
@@ -1243,12 +1208,13 @@
 
             const url = $(this).attr('action');
             let id = $(this).data('id') || $('#selectedProviderIds').val();
-            if (!Array.isArray(id)) {
-                id = id;
-            }
             const title = $('#Title').val();
             const message = $('#description').val();
-            let module = $(this).data('module') || $('#module').val();
+            let module = $(this).data('module') || 'users';
+
+            const submitBtn = $('#sendNotificationBtn');
+            const originalBtnHtml = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Sending...');
 
             $.ajax({
                 url: url,
@@ -1264,15 +1230,26 @@
                 },
                 traditional: true,
                 success: function(response) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
                     if (response.status) {
-                        Swal.fire('Success!', 'Notification sent successfully.', 'success').then(() => {
+                        const offcanvasEl = document.getElementById('send_push_notification');
+                        const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                        if (offcanvas) offcanvas.hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sent!',
+                            text: 'Notification sent successfully.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
                             location.reload();
                         });
                     } else {
-                        Swal.fire('Error!', response.message, 'error');
+                        Swal.fire('Error!', response.message || 'Failed to send notification.', 'error');
                     }
                 },
                 error: function(xhr, status, error) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
                     console.error('Error sending notification:', error);
                     Swal.fire('Error!', 'An error occurred. Please try again later.', 'error');
                 }
@@ -1564,6 +1541,20 @@
                 downloadUrl += `&status=${encodeURIComponent(status)}`;
             }
             window.location.href = downloadUrl;
+        }
+    }
+
+    // Reset filters
+    function resetClientFilters() {
+        const searchInput = document.getElementById('searchClients');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+        }
+        const topSelect = document.getElementById('entriesPerPageTop');
+        if (topSelect) {
+            topSelect.value = '10';
+            topSelect.dispatchEvent(new Event('change'));
         }
     }
 </script>

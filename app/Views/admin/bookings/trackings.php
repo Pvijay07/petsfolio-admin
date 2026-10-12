@@ -7,30 +7,58 @@
     <?php echo $this->include('admin/nav_bar') ?>
   </div>
   <div class="container-fluid px-4 mb-4 " style="margin-top: -50px !important;">
-    <div class="modern-header">
-      <div class="position-relative z-1">
-        <h1 class="h2 fw-bold mb-2 text-white">Service Wallet Statement</h1>
-        <p class="text-white-75 mb-0">Track payments, commissions, refunds, and wallet balances for service bookings</p>
+    <!-- Modern Header Section -->
+    <div class="container-fluid p-0 mb-4">
+      <div class="p-4 p-md-5 rounded-4 shadow-lg position-relative overflow-hidden text-white"
+        style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);">
+        
+        <!-- Subtle glass background circles -->
+        <div class="position-absolute" style="top: -60px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        <div class="position-absolute" style="bottom: -50px; left: 30%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2.5">
+              <span class="badge rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-2"
+                style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: #a7f3d0; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem;">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);"></span>
+                • Wallet & Ledger Tracking
+              </span>
+              <span class="badge rounded-pill px-2.5 py-1 text-white-50 tiny font-monospace" style="background: rgba(0,0,0,0.25);">
+                Booking: #<?= $booking_id ?? 'N/A' ?>
+              </span>
+            </div>
+            <h1 class="h2 fw-bold text-white mb-2 tracking-tight">Service Wallet Statement</h1>
+            <p class="text-white-50 mb-0 fs-6">
+              Track real-time payouts, commissions, refunds, and net wallet balances for service execution.
+            </p>
+          </div>
+          
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="<?= base_url('bookings') ?>"
+              class="btn btn-outline-light rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2"
+              style="backdrop-filter: blur(10px); border-color: rgba(255,255,255,0.3);">
+              <i class="bi bi-arrow-left"></i> Back to Bookings
+            </a>
+          </div>
+        </div>
       </div>
-      <i class="bi bi-wallet2 position-absolute end-0 bottom-0 opacity-10"
-        style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
     </div>
+
     <div class="row">
       <div class="col-xl-12 col-lg-8">
         <!-- Summary Cards -->
-        <div class="card border-0 shadow-sm mb-4 rounded-3">
-          <div class="card-header p-3" style="background: #c6d2ff !important; border-bottom: 2px solid #a3b4ff;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="header-title">
-                <h5 class="card-title mb-0 text-black">
-                  <i class="bi bi-graph-up me-2"></i>Financial Summary
-                </h5>
+        <div class="card border-0 shadow-sm mb-4 rounded-4 bg-white overflow-hidden">
+          <div class="card-header px-4 py-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                <i class="bi bi-wallet2 fs-5"></i>
               </div>
-              <div class="text-muted small">
-                <i class="bi bi-info-circle me-1"></i>
-                Real-time financial overview
-              </div>
+              <h6 class="mb-0 fw-bold text-dark fs-6">Financial Ledger Overview</h6>
             </div>
+            <span class="badge bg-light text-muted border rounded-pill px-3 py-1 tiny fw-semibold">
+              <i class="bi bi-clock-history me-1 text-primary"></i>Live Audit Log
+            </span>
           </div>
           <div class="card-body">
             <input type="hidden" name="booking_id" value="<?= $booking_id ?>" id="booking_id">
@@ -147,19 +175,17 @@
         </div>
 
         <!-- Tracking Details Table -->
-        <div class="card border-0 shadow-sm overflow-hidden rounded-3">
-          <div class="card-header p-3" style="background: #c6d2ff !important; border-bottom: 2px solid #a3b4ff;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="header-title">
-                <h5 class="card-title mb-0 text-black">
-                  <i class="bi bi-clock-history me-2"></i>Tracking Details
-                </h5>
+        <div class="card border-0 shadow-sm overflow-hidden rounded-4 bg-white">
+          <div class="card-header px-4 py-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <i class="bi bi-clock-history fs-5"></i>
               </div>
-              <div class="text-muted small">
-                <i class="bi bi-filter me-1"></i>
-                Real-time transaction log
-              </div>
+              <h6 class="mb-0 fw-bold text-dark fs-6">Tracking Details & Session Logs</h6>
             </div>
+            <span class="text-muted tiny">
+              <i class="bi bi-shield-check me-1 text-success"></i>Audited Records
+            </span>
           </div>
           <div class="card-body p-0">
             <div class="table-responsive">
@@ -288,14 +314,14 @@
 
   /* Table Styling */
   .table thead th {
-    background: #c6d2ff !important;
-    color: #1e40af !important;
-    font-weight: 600;
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700;
     text-transform: uppercase;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     letter-spacing: 0.05em;
-    border: none;
-    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 0.85rem 1rem;
   }
 
   .table tbody td {
@@ -671,11 +697,76 @@
                             </tr>
                         `);
 
-          } else if (serviceId == '3' || serviceId == '2') {
+          } else if (serviceId == '3') {
+            // Training service - uses status enum ('pending','in_progress','completed','rejected','approved')
+            // and payment_status enum ('pending','paid','failed')
+            var isApproved = tracking.status === 'approved';
+            var isRejected = tracking.status === 'rejected';
+            var approvalStatus = isApproved ? 'APPROVED' : isRejected ? 'REJECTED' : 'PENDING';
+            var statusClass = tracking.status === 'approved' ? 'status-approved' :
+              tracking.status === 'rejected' ? 'status-rejected' : 'status-pending';
+
+            var addon_price = 0;
+            var commissionAmount = 0;
+
+            if (isApproved) {
+              addon_price = parseFloat(tracking.addon_price) || 0;
+              commissionAmount = parseFloat(tracking.platformCharges) || (addon_price * 0.10);
+              creditAmount += addon_price;
+              totalSpAmount += addon_price;
+              totalCommission += commissionAmount;
+            }
+
+            // Approval status class based on status field
+            var approvalStatusClass = isApproved ? 'status-approved' :
+              isRejected ? 'status-rejected' : 'status-pending';
+
+            // Payment status class based on payment_status field (enum: 'pending','paid','failed')
+            var paymentStatusClass = tracking.payment_status === 'paid' ? 'status-approved' :
+              tracking.payment_status === 'failed' ? 'status-rejected' : 'status-pending';
+
+            var paymentStatusLabel = tracking.payment_status === 'paid' ? 'PAID' :
+              tracking.payment_status === 'failed' ? 'FAILED' : 'PENDING';
+
+            $('#trackingTable tbody').append(`
+                            <tr>
+                                <td class="text-center text-dark">${tracking.pet_name || 'N/A'}</td>
+                                <td class="text-center text-dark">${tracking.pet_breed || 'N/A'}</td>
+                                <td class="text-center text-dark">${tracking.addon || 'N/A'}</td>
+                                <td class="text-center text-dark">${tracking.tracking_date || 'N/A'}</td>
+                                <td class="text-center">
+                                    <span class="status-badge ${statusClass}">
+                                        ${tracking.status ? tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1) : 'N/A'}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="status-badge ${approvalStatusClass}">
+                                        ${approvalStatus}
+                                    </span>
+                                </td>
+                                <td class="text-center text-dark">${tracking.approved_at || 'N/A'}</td>
+                                
+                                <td class="text-center">
+                                    <span class="status-badge ${paymentStatusClass}">
+                                        ${paymentStatusLabel}
+                                    </span>
+                                </td>
+                                <td class="text-center fw-bold text-debit">
+                                    ${addon_price > 0 ? '-₹' + addon_price.toFixed(2) : '₹0.00'}
+                                </td>
+                                <td class="text-center fw-bold text-secondary">
+                                    ${commissionAmount > 0 ? '-₹' + commissionAmount.toFixed(2) : '₹0.00'}
+                                </td>
+                                <td class="text-center fw-bold text-primary">
+                                    ₹${creditAmount.toFixed(2)}
+                                </td>
+                            </tr>
+                        `);
+
+          } else if (serviceId == '2') {
+            // Grooming service - uses is_approved ('1'/'0') and payment_status ('1'/'0')
             var approvalStatus = tracking.approved_at ? 'Approved' : 'Pending';
             var statusClass = approvalStatus === 'Approved' ? 'status-approved' : 'status-pending';
-            var paymentStatus = tracking.payment_status === '1' ? 'Paid' :
-              tracking.payment_status === '0' ? 'Pending' : 'Processing';
 
             var addon_price = 0;
             var commissionAmount = 0;
@@ -687,8 +778,12 @@
               totalSpAmount += addon_price;
               totalCommission += commissionAmount;
             }
-            console.log("tracking.payment_status", typeof tracking.payment_status)
 
+            // Approval status class based on is_approved field
+            var approvalStatusClass = tracking.is_approved === '1' ? 'status-approved' :
+              tracking.is_approved === '0' ? 'status-rejected' : 'status-pending';
+
+            // Payment status class based on payment_status field
             var paymentStatusClass = tracking.payment_status === '1' ? 'status-approved' :
               tracking.payment_status === '0' ? 'status-pending' : 'status-processing';
 
@@ -704,15 +799,15 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <span class="status-badge ${paymentStatusClass}">
-                                        ${tracking.is_approved === '1' ? 'Approved' : tracking.is_approved === '0' ? 'Rejected' : 'Rejected' || 'N/A'}
+                                    <span class="status-badge ${approvalStatusClass}">
+                                        ${tracking.is_approved === '1' ? 'APPROVED' : tracking.is_approved === '0' ? 'REJECTED' : 'PENDING'}
                                     </span>
                                 </td>
                                 <td class="text-center text-dark">${tracking.approved_at || 'N/A'}</td>
                                 
                                 <td class="text-center">
                                     <span class="status-badge ${paymentStatusClass}">
-                                        ${tracking.payment_status === '1' ? 'Paid' : tracking.payment_status === '0' ? 'Processing' : 'Processing' || 'N/A'}
+                                        ${tracking.payment_status === '1' ? 'PAID' : tracking.payment_status === '0' ? 'PENDING' : 'PROCESSING'}
                                     </span>
                                 </td>
                                 <td class="text-center fw-bold text-debit">

@@ -208,20 +208,26 @@ class ServiceModel extends Model
             ->where('id', $queryId)
             ->update(['status' => 'completed']);
     }
-    public function getAllProviders($selectedIds, $status)
+    public function getAllProviders($selectedIds, $status = null)
     {
         $builder = $this->db->table('service_providers');
         $builder->select('service_providers.name,service_providers.phone,service_providers.area,service_providers.city');
-        $data = $builder->whereIn('id', $selectedIds)->where('status', $status)->orderBy('service_providers.id', 'DESC')->get()->getResultArray();
+        $builder->whereIn('id', $selectedIds);
+        if (!empty($status)) {
+            $builder->where('status', $status);
+        }
+        $data = $builder->orderBy('service_providers.id', 'DESC')->get()->getResultArray();
         return $data;
     }
-    public function getAllUsers($selectedIds, $status)
+    public function getAllUsers($selectedIds, $status = null)
     {
-        $users = $this->db->table('users')
+        $builder = $this->db->table('users')
             ->select('users.id, users.name, users.phone, users.email')
-            ->whereIn('id', $selectedIds)
-            ->where('status', $status)
-            ->orderBy('id', 'DESC')
+            ->whereIn('id', $selectedIds);
+        if (!empty($status)) {
+            $builder->where('status', $status);
+        }
+        $users = $builder->orderBy('id', 'DESC')
             ->get()
             ->getResultArray();
 
@@ -253,7 +259,12 @@ class ServiceModel extends Model
 
     public function getBanners()
     {
-        return $this->db->table('banners')->get()->getResult();
+        return $this->db->table('banners')->orderBy('id', 'DESC')->get()->getResult();
+    }
+
+    public function getBannerById($id)
+    {
+        return $this->db->table('banners')->where('id', $id)->get()->getRow();
     }
 
     public function addBanner($data)
@@ -268,7 +279,8 @@ class ServiceModel extends Model
 
     public function updateBannerStatus($id, $status)
     {
-        return $this->db->table('banners')->where('id', $id)->update(['status' => $status]);
+        $isActive = ($status === 'active' || $status == 1 || $status === '1') ? 1 : 0;
+        return $this->db->table('banners')->where('id', $id)->update(['is_active' => $isActive]);
     }
     public function checkProviderJobStatus($provider_id)
     {

@@ -158,4 +158,57 @@ class InsurancePolicy extends Model
       'total' => $requests + $claims
     ];
   }
+
+  public function getTabCounts()
+  {
+    $tenDaysFromNow = date('Y-m-d', strtotime('+10 days'));
+    $today = date('Y-m-d');
+
+    $enquiries = $this->db->table('insurance_policies as ip')
+      ->join('insurance_policies_quotations as ipq', 'TRIM(ip.policy_number) = TRIM(ipq.policy_id)', 'left', false)
+      ->where('ip.status', 'Pending')
+      ->where('ipq.id', null)
+      ->countAllResults();
+
+    $quotations = $this->db->table('insurance_policies_quotations as ipq')
+      ->join('insurance_policies', 'TRIM(insurance_policies.policy_number)=TRIM(ipq.policy_id)', 'left', false)
+      ->where('insurance_policies.status', 'Pending')
+      ->countAllResults();
+
+    $active = $this->db->table('insurance_policies')
+      ->where('status', 'Active')
+      ->countAllResults();
+
+    $expiring = $this->db->table('insurance_policies')
+      ->where('status', 'Active')
+      ->where('end_date <=', $tenDaysFromNow)
+      ->where('end_date >=', $today)
+      ->countAllResults();
+
+    $claims = $this->db->table('insurance_claims')->countAllResults();
+
+    return [
+      'enquiries'  => $enquiries,
+      'quotations' => $quotations,
+      'active'     => $active,
+      'expiring'   => $expiring,
+      'claims'     => $claims,
+    ];
+  }
+
+  public function getEnquiryById($id)
+  {
+    return $this->db->table('insurance_policies as ip')
+      ->select('ip.*, iu.full_name as client_name, iu.phone as client_phone, iu.email as client_email, up.name as pet_name, up.breed as pet_breed, up.gender, up.dob')
+      ->join('insurance_users as iu', 'iu.id = ip.insurance_user_id', 'left')
+      ->join('user_pets as up', 'up.id = ip.pet_id', 'left')
+      ->where('ip.id', $id)
+      ->get()
+      ->getRow();
+  }
+
+  public function deleteEnquiry($id)
+  {
+    return $this->db->table('insurance_policies')->where('id', $id)->delete();
+  }
 }

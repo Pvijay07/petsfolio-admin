@@ -1,0 +1,308 @@
+Call Analysis – AI-Based Verification Call Analysis
+1. Objective
+The Call Analysis feature will use AI to analyze recorded Verification Calls between the Verification Executive and Service Provider (SP).
+The primary purpose is to verify whether the conversation is:
+Relevant to the Verification Process
+Professional and appropriate
+Free from abusive/bad language
+Free from unrelated conversations
+Properly conducted by the Verification Executive
+Of acceptable communication quality
+The AI should analyze the complete conversation and provide a Summary, Alerts, Highlighted Conversations, and Call Rating.
+
+2. Call Analysis – Main Sections
+The Call Analysis page should contain the following sections:
+A. Call Summary
+B. Conversation Analysis
+C. Alerts
+D. Call Rating
+E. Call Quality
+F. Communication Quality
+
+3. Call Summary
+The Summary is the main section of the Call Analysis.
+AI should analyze the complete conversation and generate a concise summary of what was discussed during the call.
+The summary should include:
+Main purpose of the call
+Verification-related discussion
+Important information provided by the SP
+Questions asked by the Verification Executive
+Responses provided by the SP
+Verification status/details discussed
+Any issues identified during the call
+Example
+Summary:
+The Verification Executive contacted the SP to complete the verification process. The executive verified the SP's basic details, discussed the required documents, and explained the verification process.
+If unrelated conversation is detected, AI should mention it in the summary.
+
+4. Unrelated Conversation Detection
+AI should identify conversations that are not related to the Verification Process.
+Examples:
+Personal conversations
+Movies
+Songs
+Politics
+Sports
+Personal relationships
+Unnecessary discussions
+Other unrelated topics
+Example
+Conversation:
+Executive: Please confirm your name and address.
+SP: My name is Rahul and I live in Hyderabad.
+Executive: Okay. Which cricket team do you support?
+The cricket-related conversation should be identified as Unrelated Conversation.
+Highlight
+The unrelated sentence should be highlighted in the Call Analysis.
+Example:
+Executive: Please confirm your address.
+SP: I live in Hyderabad.
+Executive: Which cricket team do you support? ⚠️
+The highlighted sentence should be clearly visible to the Admin.
+
+5. Bad / Abusive Language Detection
+AI should detect if the SP or Verification Executive uses:
+Bad words
+Abusive language
+Offensive language
+Threatening language
+Disrespectful communication
+Inappropriate language
+The identified sentence should be highlighted.
+Example
+Executive: Please upload your required document.
+SP: [Offensive/abusive statement] ⚠️
+The Admin should be able to identify:
+Who used the language
+Exact conversation timestamp
+Category of violation
+Highlighted sentence
+
+6. Verification Process Relevance
+AI should determine whether the call is actually being used for the intended Verification Process.
+The AI should check whether the conversation contains verification-related topics such as:
+SP identity verification
+Personal/basic details
+Address verification
+Documents
+Bank details, where applicable
+Verification requirements
+Service Provider information
+Verification instructions
+Verification status
+Other approved verification questions
+If the majority of the call is unrelated to verification, the system should generate an alert.
+Alert Example
+⚠️ Verification Relevance Alert
+A significant portion of this call appears to be unrelated to the Service Provider verification process.
+
+7. Song / Audio Upload Detection
+The Verification Executive must upload the actual Verification Call recording.
+AI should detect if the uploaded audio contains:
+Songs
+Music
+Unrelated audio
+Blank/empty audio
+Excessive background noise
+Audio that does not contain a verification conversation
+Alert Example
+🔴 Alert: Unrelated Audio Detected
+The uploaded recording contains music/song content that is unrelated to the verification process.
+The Admin should be able to review the recording and timestamp where the issue was detected.
+
+8. Call Rating
+The system should automatically generate a Call Rating based on the overall quality of the verification call.
+The rating should consider:
+A. Verification Relevance
+Was the conversation related to the verification process?
+B. Communication Quality
+Was the communication clear and professional?
+C. Professional Behaviour
+Did the executive communicate appropriately?
+D. Unrelated Conversation
+Was unnecessary conversation detected?
+E. Bad / Abusive Language
+Was inappropriate language detected?
+F. Verification Completion
+Was the required verification process properly completed?
+
+9. Call Rating Display
+The Call Rating should be displayed prominently on the Call Analysis page.
+Example:
+Call Rating: 8.5 / 10
+The rating should use a visual indicator.
+Normal Call
+Call Rating: 9.2 / 10
+Issue Detected
+Call Rating: 5.4 / 10 🔴
+If the AI identifies serious issues such as abusive language, significant unrelated conversation, songs, or failure to conduct verification properly, the Call Rating should be displayed in Red.
+
+10. Rating Criteria
+Suggested rating logic:
+Category
+Weight
+Verification Relevance
+30%
+Communication Quality
+25%
+Professional Behaviour
+20%
+Verification Completion
+15%
+Unrelated Conversation
+5%
+Appropriate Language
+5%
+
+The final rating should be calculated based on the AI analysis.
+
+11. Alerts
+The system should generate alerts whenever a significant issue is detected.
+Alert Types
+🔴 Critical Alert
+Abusive language
+Threatening language
+Fake/incorrect recording
+Song/music uploaded instead of call
+Call does not contain verification conversation
+🟠 Warning
+Excessive unrelated conversation
+Poor communication
+Excessive background noise
+Verification process partially completed
+🟢 Good
+Verification process completed
+Professional communication
+Relevant conversation
+No major issues detected
+
+12. Conversation Highlighting
+The Call Analysis should highlight specific sentences identified by AI.
+Each highlighted conversation should show:
+Speaker: Verification Executive / SP
+Timestamp: 05:42
+Category: Unrelated Conversation
+Conversation: Identified sentence
+Severity: Warning
+Example
+🔴 SP – 05:42 – Abusive Language
+"[Detected inappropriate sentence]"
+🟠 Executive – 07:15 – Unrelated Conversation
+"[Detected unrelated sentence]"
+
+13. Call Analysis Dashboard
+Admin should be able to see:
+Call ID
+Booking/Verification ID
+Verification Executive
+Service Provider
+Call Date & Time
+Call Duration
+Call Rating
+Call Quality
+Communication Quality
+Verification Relevance
+Number of Alerts
+Analysis Status
+
+14. Suggested Call Analysis Screen
+CALL ANALYSIS
+Call ID: CALL-2026-000125
+Executive: Verification Executive Name
+SP: Service Provider Name
+Duration: 08:42
+Overall Rating
+8.5 / 10
+Call Quality: Good
+Communication: Professional
+Verification Relevance: High
+
+SUMMARY
+The Verification Executive contacted the Service Provider to complete the verification process. The executive verified the required details and explained the verification requirements.
+⚠️ AI Observation:
+A short unrelated conversation was detected during the call.
+
+ALERTS
+🔴 1 Alert – Unrelated Conversation
+🟠 1 Warning – Communication Quality
+
+HIGHLIGHTED CONVERSATION
+07:15 – Verification Executive
+🟠 Unrelated Conversation
+"[Detected unrelated sentence]"
+
+AI RECOMMENDATION
+The call was mostly relevant to the verification process. However, the executive should avoid unrelated conversations in future verification calls.
+
+15. Admin Actions
+Admin should be able to:
+Play the original call recording
+View AI-generated summary
+View highlighted sentences
+View timestamps
+View alerts
+View call rating
+View communication analysis
+View verification relevance
+Review AI recommendation
+Mark alert as Reviewed
+Add Admin remarks
+
+16. Important Business Rule
+The AI Summary should be the primary section of Call Analysis.
+The summary must not only provide a general overview. It should also identify important issues detected during the conversation.
+If an unrelated, abusive, inappropriate, or verification-irrelevant sentence is detected:
+AI should identify the sentence.
+The sentence should be highlighted.
+The category should be displayed.
+Timestamp should be displayed.
+An alert should be generated.
+The Call Rating should be reduced based on severity.
+If the issue is serious, the Call Rating should be displayed in Red.
+
+17. Overall Flow
+Verification Call Started
+↓
+Call Recorded
+↓
+Executive Uploads Call Recording
+↓
+AI Processes Audio
+↓
+Speech-to-Text Conversion
+↓
+Conversation Analysis
+↓
+Summary Generated
+↓
+Unrelated / Abusive / Inappropriate Content Detection
+↓
+Sentences Highlighted
+↓
+Alerts Generated
+↓
+Call Quality & Communication Analysis
+↓
+Call Rating Generated
+↓
+Admin Reviews Call Analysis
+
+Expected Result
+The Call Analysis module should help Admin quickly understand:
+What happened in the call?
+→ Summary
+Was the call relevant to verification?
+→ Verification Relevance
+Did anyone use bad/inappropriate language?
+→ Language Detection
+Was there unrelated conversation?
+→ Highlighted Conversation
+Was a song or unrelated audio uploaded?
+→ Audio Alert
+How well was the call conducted?
+→ Call Quality
+How professional was the communication?
+→ Communication Quality
+What is the overall performance?
+→ Call Rating
+

@@ -55,8 +55,9 @@ class CommunityAdminController extends BaseController
     public function viewPost($id)
     {
         $filter = $this->request->getVar('filter') ?? 'all';
-        $post   = $this->postModel->select('community_posts.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile, community_channels.name as channel_name')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+        $post   = $this->postModel->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_channels.name as channel_name')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
             ->join('community_channels', 'community_channels.id = community_posts.channel_id', 'left')
             ->find($id);
@@ -70,10 +71,11 @@ class CommunityAdminController extends BaseController
         $post['dislikes_count'] = $this->postDislikeModel->where('post_id', $id)->countAllResults();
 
         $data['post']  = $post;
-        $data['media'] = $this->mediaModel->where('post_id', $id)->findAll();
+        $data['media'] = $this->normalizeMediaList($this->mediaModel->where('post_id', $id)->findAll());
 
-        $query       = $this->commentModel->select('community_post_comments.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile')
-            ->join('users', "users.id = community_post_comments.user_id AND community_post_comments.user_type != 'admin'", 'left')
+        $query       = $this->commentModel->select('community_post_comments.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
+            ->join('users', "users.id = community_post_comments.user_id AND (community_post_comments.user_type = 'user' OR community_post_comments.user_type = 'client' OR community_post_comments.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_post_comments.user_id AND community_post_comments.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_post_comments.user_id AND community_post_comments.user_type = 'admin'", 'left')
             ->where('post_id', $id);
         $allComments = $query->orderBy('created_at', 'ASC')
@@ -105,8 +107,9 @@ class CommunityAdminController extends BaseController
 
     public function viewPostReports($id)
     {
-        $post = $this->postModel->select('community_posts.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+        $post = $this->postModel->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
             ->find($id);
 
@@ -115,9 +118,12 @@ class CommunityAdminController extends BaseController
         }
 
         $data['post']    = $post;
-        $data['media']   = $this->mediaModel->where('post_id', $id)->first();
-        $data['reports'] = $this->reportModel->select('community_post_reports.*, users.name, users.profile, community_post_reports.user_type')
-            ->join('users', 'users.id = community_post_reports.user_id')
+        $mediaRow        = $this->mediaModel->where('post_id', $id)->first();
+        $data['media']   = $mediaRow ? $this->normalizeMediaList([$mediaRow])[0] : null;
+        $data['reports'] = $this->reportModel->select('community_post_reports.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown Reporter") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_post_reports.user_type')
+            ->join('users', "users.id = community_post_reports.user_id AND (community_post_reports.user_type = 'user' OR community_post_reports.user_type = 'client' OR community_post_reports.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_post_reports.user_id AND community_post_reports.user_type = 'provider'", 'left')
+            ->join('employees', "employees.id = community_post_reports.user_id AND community_post_reports.user_type = 'admin'", 'left')
             ->where('post_id', $id)
             ->orderBy('created_at', 'DESC')
             ->findAll();
@@ -167,8 +173,9 @@ class CommunityAdminController extends BaseController
         // Fetch posts for this channel
         $search = $this->request->getVar('search');
         $query  = $this->postModel
-            ->select('community_posts.*, COALESCE(users.name, employees.name) as name')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+            ->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
             ->where('community_posts.channel_id', $id)
             ->where('community_posts.status', 'active');
@@ -177,6 +184,7 @@ class CommunityAdminController extends BaseController
             $query->groupStart()
                 ->like('community_posts.post_text', $search)
                 ->orLike('users.name', $search)
+                ->orLike('service_providers.name', $search)
                 ->orLike('employees.name', $search)
                 ->groupEnd();
         }
@@ -185,7 +193,7 @@ class CommunityAdminController extends BaseController
         $data['request'] = $this->request;
 
         foreach ($data['posts'] as &$post) {
-            $post['media'] = $this->mediaModel->where('post_id', $post['id'])->findAll();
+            $post['media'] = $this->normalizeMediaList($this->mediaModel->where('post_id', $post['id'])->findAll());
         }
 
         return view('admin/community/community_channel_view', $data);
@@ -262,10 +270,10 @@ class CommunityAdminController extends BaseController
         }
 
         $userModel        = new User();
-        $data['user']     = $post['user_type'] == 'admin' ? (array) $userModel->getUser($post['user_id']) :(array) $userModel->getUserById($post['user_id']);
+        $data['user']     = (array) $userModel->getUserById($post['user_id']);
         $data['post']     = $post;
         $data['channels'] = $this->channelModel->findAll();
-        $data['media']    = $this->mediaModel->where('post_id', $id)->findAll();
+        $data['media']    = $this->normalizeMediaList($this->mediaModel->where('post_id', $id)->findAll());
         $data['title']    = 'Edit Community Post';
 
         return view('admin/community/community_post_form', $data);
@@ -277,6 +285,7 @@ class CommunityAdminController extends BaseController
             'channel_id'      => $this->request->getPost('channel_id'),
             'user_id'         => session()->get('user')->id ?? 1,
             'user_type'       => 'admin',
+            'category'        => $this->request->getPost('category') ?? 'post',
             'post_text'       => $this->request->getPost('post_text'),
             'post_type'       => 'text',
             'status'          => 'active',
@@ -308,11 +317,12 @@ class CommunityAdminController extends BaseController
         }
 
         if (!empty($allFiles)) {
-
             foreach ($allFiles as $img) {
                 if ($img && $img->isValid() && !$img->hasMoved()) {
-                    $mimeType  = $img->getMimeType();
-                    $mediaType = strpos($mimeType, 'video') !== false ? 'video' : 'image';
+                    $mimeType  = $img->getMimeType() ?: $img->getClientMimeType();
+                    $clientExt = strtolower($img->getClientExtension() ?: pathinfo($img->getName(), PATHINFO_EXTENSION));
+                    $isVideo   = (strpos($mimeType, 'video') !== false) || in_array($clientExt, ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v']);
+                    $mediaType = $isVideo ? 'video' : 'image';
                     $newName   = $img->getRandomName();
 
                     $img->move(FCPATH . 'public/uploads/community/media', $newName);
@@ -335,7 +345,8 @@ class CommunityAdminController extends BaseController
                     $data['channel_id'],
                     $postId,
                     "Don’t miss this! A new announcement has been posted in #{$channelName}.",
-                    "By Petsfolio: Important Update"
+                    "By Petsfolio: Important Update",
+                    $data['visibility']
                 );
             }
         } catch (Exception $e) {
@@ -345,29 +356,62 @@ class CommunityAdminController extends BaseController
         return redirect()->to(base_url('community/posts'))->with('success', 'Post published successfully');
     }
 
-    private function notifyChannelMembers($channelId, $postId, $message, $title = "New Post")
+    private function notifyChannelMembers($channelId, $postId, $message, $title = "New Post", $targetAudience = 'all')
     {
         try {
             $members = $this->channelJoinModel->where('channel_id', $channelId)->findAll();
             if (!empty($members)) {
                 $memberIds = array_column($members, 'user_id');
-                $db        = \Config\Database::connect();
-                $tokens    = $db->table('users')
-                    ->select('device_token')
-                    ->whereIn('id', $memberIds)
-                    ->where('device_token !=', '')
-                    ->get()->getResultArray();
+                $db        = Database::connect();
+                $fcmTokens = [];
 
-                $fcmTokens = array_column($tokens, 'device_token');
+                if ($targetAudience === 'all' || $targetAudience === 'public' || $targetAudience === 'user' || $targetAudience === 'client') {
+                    $tokens = $db->table('users')
+                        ->select('device_token')
+                        ->whereIn('id', $memberIds)
+                        ->where('device_token !=', '')
+                        ->get()->getResultArray();
+                    $fcmTokens = array_merge($fcmTokens, array_column($tokens, 'device_token'));
+                }
+
+                if ($targetAudience === 'all' || $targetAudience === 'public' || $targetAudience === 'provider') {
+                    $tokens = $db->table('service_providers')
+                        ->select('device_token')
+                        ->whereIn('id', $memberIds)
+                        ->where('device_token !=', '')
+                        ->get()->getResultArray();
+                    $fcmTokens = array_merge($fcmTokens, array_column($tokens, 'device_token'));
+                }
+
+                $fcmTokens = array_unique(array_filter($fcmTokens));
 
                 if (!empty($fcmTokens)) {
-                    $this->pushNotify->sendMulticast(
+                    $results = $this->pushNotify->sendMulticast(
                         $fcmTokens,
                         $title,
                         $message,
                         'PostDetailScreen',
                         ['postId' => $postId]
                     );
+
+                    $logModel = new \App\Models\NotificationLogModel();
+                    $batchLogs = [];
+                    foreach ($results as $res) {
+                        $isSent = (($res['status'] ?? '') === 'sent');
+                        $batchLogs[] = [
+                            'channel'       => 'push',
+                            'title'         => $title,
+                            'body'          => $message,
+                            'status'        => $isSent ? 'sent' : 'failed',
+                            'error_message' => $isSent ? null : ($res['error'] ?? 'Push failed'),
+                            'device_token'  => $res['token'] ?? null,
+                            'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+                            'created_at'    => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                    if (!empty($batchLogs)) {
+                        $logModel->createBatchLogs($batchLogs);
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -379,6 +423,7 @@ class CommunityAdminController extends BaseController
     {
         $data = [
             'channel_id'      => $this->request->getPost('channel_id'),
+            'category'        => $this->request->getPost('category') ?? 'post',
             'post_text'       => $this->request->getPost('post_text'),
             'is_pinned'       => $this->request->getPost('is_pinned') ? 1 : 0,
             'visibility'      => $this->request->getPost('visibility') ?? 'public',
@@ -433,11 +478,12 @@ class CommunityAdminController extends BaseController
         }
 
         if (!empty($allFiles)) {
-
             foreach ($allFiles as $img) {
                 if ($img && $img->isValid() && !$img->hasMoved()) {
-                    $mimeType  = $img->getMimeType();
-                    $mediaType = strpos($mimeType, 'video') !== false ? 'video' : 'image';
+                    $mimeType  = $img->getMimeType() ?: $img->getClientMimeType();
+                    $clientExt = strtolower($img->getClientExtension() ?: pathinfo($img->getName(), PATHINFO_EXTENSION));
+                    $isVideo   = (strpos($mimeType, 'video') !== false) || in_array($clientExt, ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v']);
+                    $mediaType = $isVideo ? 'video' : 'image';
                     $newName   = $img->getRandomName();
 
                     $img->move(FCPATH . 'public/uploads/community/media', $newName);
@@ -462,26 +508,32 @@ class CommunityAdminController extends BaseController
 
         // Main Query
         $query = $this->postModel
-            ->select('community_posts.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile, community_channels.name as channel_name')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+            ->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_channels.name as channel_name')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
             ->join('community_channels', 'community_channels.id = community_posts.channel_id', 'left')
             ->where('community_posts.status !=', 'deleted');
 
         if ($status == 'admin') {
             $query->where('community_posts.user_type', 'admin')->where('community_posts.status', 'active');
+        } elseif ($status == 'user' || $status == 'client') {
+            $query->whereIn('community_posts.user_type', ['user', 'client'])->where('community_posts.status', 'active');
+        } elseif ($status == 'provider') {
+            $query->where('community_posts.user_type', 'provider')->where('community_posts.status', 'active');
         } elseif ($status == 'scheduled') {
             $query->where('community_posts.status', 'scheduled');
         } elseif ($status == 'questions') {
             $query->where('community_posts.category', 'question')->where('community_posts.status', 'active');
         } else {
-            $query->where('community_posts.user_type !=', 'admin')->where('community_posts.status', 'active');
+            $query->where('community_posts.status', 'active');
         }
 
         if ($search) {
             $query->groupStart()
                 ->like('community_posts.post_text', $search)
                 ->orLike('users.name', $search)
+                ->orLike('service_providers.name', $search)
                 ->orLike('employees.name', $search)
                 ->groupEnd();
         }
@@ -493,12 +545,11 @@ class CommunityAdminController extends BaseController
         $data['posts']    = $query->orderBy('community_posts.id', 'DESC')->findAll();
         $data['channels'] = $this->channelModel->findAll();
         foreach ($data['posts'] as &$post) {
-            $post['media']          = $this->mediaModel->where('post_id', $post['id'])->findAll();
-            $post['likes_count']    = $this->likeModel->where('post_id', $post['id'])->countAllResults();
+            $post['media']          = $this->normalizeMediaList($this->mediaModel->where('post_id', $post['id'])->findAll());
             $post['comments_count'] = $this->commentModel->where('post_id', $post['id'])->countAllResults();
+            $post['likes_count']    = $this->likeModel->where('post_id', $post['id'])->countAllResults();
+            $post['dislikes_count'] = $this->postDislikeModel->where('post_id', $post['id'])->countAllResults();
         }
-
-        // Calculate counts for tabs independently with fresh instances to avoid builder pollution
         $adminCountBuilder = new CommunityPostModel();
         $adminCountBuilder->where('status', 'active')->where('user_type', 'admin');
         if ($search) $adminCountBuilder->groupStart()->like('post_text', $search)->groupEnd();
@@ -506,10 +557,16 @@ class CommunityAdminController extends BaseController
         $data['admin_posts_count'] = $adminCountBuilder->countAllResults();
 
         $userCountBuilder = new CommunityPostModel();
-        $userCountBuilder->where('status', 'active')->where('user_type !=', 'admin');
+        $userCountBuilder->where('status', 'active')->whereIn('user_type', ['user', 'client']);
         if ($search) $userCountBuilder->groupStart()->like('post_text', $search)->groupEnd();
         if ($channelId) $userCountBuilder->where('channel_id', $channelId);
         $data['user_posts_count'] = $userCountBuilder->countAllResults();
+
+        $providerCountBuilder = new CommunityPostModel();
+        $providerCountBuilder->where('status', 'active')->where('user_type', 'provider');
+        if ($search) $providerCountBuilder->groupStart()->like('post_text', $search)->groupEnd();
+        if ($channelId) $providerCountBuilder->where('channel_id', $channelId);
+        $data['provider_posts_count'] = $providerCountBuilder->countAllResults();
 
         $scheduledCountBuilder = new CommunityPostModel();
         $scheduledCountBuilder->where('status', 'scheduled');
@@ -524,26 +581,37 @@ class CommunityAdminController extends BaseController
         $data['questions_count'] = $questionCountBuilder->countAllResults();
 
         // Fetch Metrics
-        $totalPosts   = $this->postModel->countAllResults();
+        $totalPosts   = $this->postModel->where('status !=', 'deleted')->countAllResults();
         $totalReports = $this->reportModel->countAllResults();
 
         $totalLikes        = $this->likeModel->countAllResults();
         $totalComments     = $this->commentModel->countAllResults();
         $totalInteractions = $totalLikes + $totalComments;
 
+        $activeUsers = (new CommunityPostModel())
+            ->whereIn('user_type', ['user', 'client'])
+            ->where('status !=', 'deleted')
+            ->select('user_id')->distinct()->countAllResults();
+
+        $activeProviders = (new CommunityPostModel())
+            ->where('user_type', 'provider')
+            ->where('status !=', 'deleted')
+            ->select('user_id')->distinct()->countAllResults();
+
         $data['stats'] = [
             'total_posts'        => $totalPosts,
-            'active_users'       => $this->postModel->select('user_id')->distinct()->countAllResults(),
+            'active_users'       => $activeUsers,
+            'active_providers'   => $activeProviders,
             'total_interactions' => $totalInteractions,
             'reporting_rate'     => ($totalPosts > 0) ? number_format(($totalReports / $totalPosts) * 100, 1) . '%' : '0.0%'
         ];
 
         // Fetch Last Hour Posts for Activity Feed
         $data['lastHourPosts'] = $this->postModel
-            ->select('community_posts.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile, community_channels.name as channel_name')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+            ->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
-            ->join('community_channels', 'community_channels.id = community_posts.channel_id', 'left')
             ->where('community_posts.created_at >=', date('Y-m-d H:i:s', strtotime('-1 hour')))
             ->where('community_posts.status !=', 'deleted')
             ->orderBy('community_posts.created_at', 'DESC')
@@ -555,7 +623,6 @@ class CommunityAdminController extends BaseController
 
         return view('admin/community/community_posts', $data);
     }
-
 
     public function approvePost($id)
     {
@@ -607,7 +674,7 @@ class CommunityAdminController extends BaseController
 
     public function addDirectComment()
     {
-        $postId      = $this->request->getPost('post_id');
+        $postId = $this->request->getPost('post_id');
         $commentText = $this->request->getPost('comment');
 
         if (!$postId || !$commentText) {
@@ -657,24 +724,51 @@ class CommunityAdminController extends BaseController
 
         $this->commentModel->insert($data);
 
-        // Notify the client of the admin's reply
+        // Notify the client or provider of the admin's reply
         if ($parentComment['user_type'] != 'admin' && !empty($parentComment['user_id'])) {
             try {
-                $db       = Database::connect();
-                $userData = $db->table('users')
-                    ->select('name, device_token')
-                    ->where('id', $parentComment['user_id'])
-                    ->where('device_token !=', '')
-                    ->get()->getRowArray();
+                $db          = Database::connect();
+                $deviceToken = null;
+                if ($parentComment['user_type'] == 'provider') {
+                    $spData = $db->table('service_providers')
+                        ->select('name, device_token')
+                        ->where('id', $parentComment['user_id'])
+                        ->where('device_token !=', '')
+                        ->get()->getRowArray();
+                    $deviceToken = $spData['device_token'] ?? null;
+                } else {
+                    $userData = $db->table('users')
+                        ->select('name, device_token')
+                        ->where('id', $parentComment['user_id'])
+                        ->where('device_token !=', '')
+                        ->get()->getRowArray();
+                    $deviceToken = $userData['device_token'] ?? null;
+                }
 
-                if ($userData && !empty($userData['device_token'])) {
-                    $this->pushNotify->sendMulticast(
-                        [$userData['device_token']],
-                        "Petsfolio respond to your comment",
+                if (!empty($deviceToken)) {
+                    $results = $this->pushNotify->sendMulticast(
+                        [$deviceToken],
+                        "Petsfolio replied to your comment",
                         "Petsfolio just replied to your comment in the community.",
                         'PostDetailScreen',
                         ['postId' => $parentComment['post_id']]
                     );
+
+                    $res = reset($results);
+                    $isSent = (($res['status'] ?? '') === 'sent');
+                    $logModel = new \App\Models\NotificationLogModel();
+                    $logModel->createLog([
+                        'user_id'       => $parentComment['user_id'] ?? null,
+                        'user_type'     => 'user',
+                        'channel'       => 'push',
+                        'title'         => "Petsfolio replied to your comment",
+                        'body'          => "Petsfolio just replied to your comment in the community.",
+                        'status'        => $isSent ? 'sent' : 'failed',
+                        'error_message' => $isSent ? null : ($res['error'] ?? 'Push failed'),
+                        'device_token'  => $deviceToken,
+                        'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+                        'created_at'    => date('Y-m-d H:i:s'),
+                    ]);
                 }
             } catch (Exception $e) {
                 \log_message('error', 'Push Notify Error (Admin Reply): ' . $e->getMessage());
@@ -689,10 +783,12 @@ class CommunityAdminController extends BaseController
         $this->postModel->update($id, ['status' => 'deleted']);
         return redirect()->back()->with('success', 'Post deleted');
     }
+
     public function postReports($id)
     {
-        $post = $this->postModel->select('community_posts.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile')
-            ->join('users', "users.id = community_posts.user_id AND community_posts.user_type != 'admin'", 'left')
+        $post = $this->postModel->select('community_posts.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
+            ->join('users', "users.id = community_posts.user_id AND (community_posts.user_type = 'user' OR community_posts.user_type = 'client' OR community_posts.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_posts.user_id AND community_posts.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_posts.user_id AND community_posts.user_type = 'admin'", 'left')
             ->find($id);
         if (!$post) {
@@ -700,19 +796,21 @@ class CommunityAdminController extends BaseController
         }
 
         $data['post']    = $post;
-        $data['media']   = $this->mediaModel->where('post_id', $id)->first();
-        $data['reports'] = $this->reportModel->select('community_post_reports.*, COALESCE(users.name, employees.name) as name, COALESCE(users.profile, employees.profile) as profile, community_post_reports.user_type')
-            ->join('users', "users.id = community_post_reports.user_id AND community_post_reports.user_type != 'admin'", 'left')
+        $mediaRow        = $this->mediaModel->where('post_id', $id)->first();
+        $data['media']   = $mediaRow ? $this->normalizeMediaList([$mediaRow])[0] : null;
+        $data['reports'] = $this->reportModel->select('community_post_reports.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown Reporter") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_post_reports.user_type')
+            ->join('users', "users.id = community_post_reports.user_id AND (community_post_reports.user_type = 'user' OR community_post_reports.user_type = 'client' OR community_post_reports.user_type IS NULL)", 'left')
+            ->join('service_providers', "service_providers.id = community_post_reports.user_id AND community_post_reports.user_type = 'provider'", 'left')
             ->join('employees', "employees.id = community_post_reports.user_id AND community_post_reports.user_type = 'admin'", 'left')
             ->where('post_id', $id)
             ->orderBy('created_at', 'DESC')
             ->findAll();
 
-
         $data['reports_count'] = $this->reportModel->where('post_id', $id)->countAllResults();
 
         return view('admin/community/community_post_reports', $data);
     }
+
     public function reports()
     {
         $search = $this->request->getVar('search');
@@ -720,16 +818,19 @@ class CommunityAdminController extends BaseController
         $status = $this->request->getVar('status') ?? 'all';
 
         $query = $this->reportModel
-            ->select('community_post_reports.*, community_posts.post_text, community_posts.status as post_status, COALESCE(users.name, employees.name) as name, community_channels.name as channel_name')
+            ->select('community_post_reports.*, community_posts.post_text, community_posts.status as post_status, community_posts.user_type as post_author_type, COALESCE(rep_emp.name, rep_sp.name, rep_u.name, "Unknown Reporter") as name, COALESCE(rep_emp.profile, rep_sp.profile, rep_u.profile) as profile, community_channels.name as channel_name')
             ->join('community_posts', 'community_posts.id = community_post_reports.post_id')
-            ->join('users', "users.id = community_post_reports.user_id AND community_post_reports.user_type != 'admin'", 'left')
-            ->join('employees', "employees.id = community_post_reports.user_id AND community_post_reports.user_type = 'admin'", 'left')
+            ->join('users rep_u', "rep_u.id = community_post_reports.user_id AND (community_post_reports.user_type = 'user' OR community_post_reports.user_type = 'client' OR community_post_reports.user_type IS NULL)", 'left')
+            ->join('service_providers rep_sp', "rep_sp.id = community_post_reports.user_id AND community_post_reports.user_type = 'provider'", 'left')
+            ->join('employees rep_emp', "rep_emp.id = community_post_reports.user_id AND community_post_reports.user_type = 'admin'", 'left')
             ->join('community_channels', 'community_channels.id = community_posts.channel_id', 'left');
 
         if ($search) {
             $query->groupStart()
                 ->like('community_posts.post_text', $search)
-                ->orLike('users.name', $search)
+                ->orLike('rep_u.name', $search)
+                ->orLike('rep_sp.name', $search)
+                ->orLike('rep_emp.name', $search)
                 ->orLike('community_post_reports.reason', $search)
                 ->groupEnd();
         }
@@ -828,7 +929,8 @@ class CommunityAdminController extends BaseController
                         $post['channel_id'],
                         $post['id'],
                         "Don’t miss this! A new announcement has been posted in #{$channelName}.",
-                        "By Petsfolio: Important Update"
+                        "By Petsfolio: Important Update",
+                        $post['visibility'] ?? 'all'
                     );
                 } catch (\Exception $e) {
                     \log_message('error', 'Push Notify Error (Scheduled Cron): ' . $e->getMessage());
@@ -838,5 +940,23 @@ class CommunityAdminController extends BaseController
         }
 
         return "Successfully processed and published {$count} scheduled posts.";
+    }
+
+    /**
+     * Normalize media items to ensure media_type is accurately identified as 'video' or 'image'
+     */
+    protected function normalizeMediaList(array $media): array
+    {
+        $videoExts = ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v'];
+        foreach ($media as &$m) {
+            $url = $m['media_url'] ?? '';
+            $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+            if (in_array($ext, $videoExts)) {
+                $m['media_type'] = 'video';
+            } elseif (empty($m['media_type'])) {
+                $m['media_type'] = 'image';
+            }
+        }
+        return $media;
     }
 }

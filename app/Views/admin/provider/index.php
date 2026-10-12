@@ -101,9 +101,256 @@
     }
 
 
-    /* Fixed gradient header */
+    /* Modern Dashboard UI Styles matching Bookings */
+    .nl-hero-banner {
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);
+        border-radius: 20px;
+        padding: 28px 32px;
+        color: #ffffff;
+        box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.25);
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .nl-hero-banner::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .nl-live-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 5px 14px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: 0.03em;
+        margin-bottom: 12px;
+    }
+    .nl-live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        box-shadow: 0 0 10px #22c55e;
+        animation: nl-pulse 2s infinite;
+    }
+    @keyframes nl-pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .nl-stat-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 14px;
+        padding: 14px 18px;
+        min-width: 115px;
+        flex: 1;
+        transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .nl-stat-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.12);
+    }
+    .nl-stat-card .label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+        margin-bottom: 4px;
+        display: block;
+    }
+    .nl-stat-card .value {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.15;
+        color: #ffffff;
+    }
+
+    /* Segmented Pill Tabs */
+    .nl-segmented-tabs {
+        background: #eef2f6;
+        padding: 4px;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        flex-wrap: wrap;
+    }
+    .nl-tab-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .nl-tab-pill:hover {
+        color: #1e293b;
+    }
+    .nl-tab-pill.active {
+        background: #ffffff;
+        color: #4338ca;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .nl-tab-badge {
+        border-radius: 50px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .nl-tab-pill.active .nl-tab-badge {
+        background: #e0e7ff;
+        color: #4338ca;
+    }
+    .nl-tab-pill:not(.active) .nl-tab-badge {
+        background: rgba(0, 0, 0, 0.06);
+        color: #64748b;
+    }
+
+    /* Action Buttons */
+    .nl-btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #334155;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .nl-btn-action:hover:not(:disabled) {
+        background: #f8fafc;
+        color: #0f172a;
+        border-color: #94a3b8;
+    }
+    .nl-btn-action:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Filter Card */
+    .nl-filter-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px 20px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        margin-bottom: 20px;
+    }
+    .nl-search-wrap {
+        position: relative;
+        width: 100%;
+    }
+    .nl-search-wrap .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+        font-size: 14px;
+    }
+    .nl-search-input {
+        width: 100%;
+        padding: 9px 14px 9px 38px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        font-size: 13px;
+        color: #0f172a;
+        transition: all 0.15s ease;
+    }
+    .nl-search-input:focus {
+        background: #ffffff;
+        border-color: #6366f1;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+    .nl-select {
+        padding: 9px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        font-size: 13px;
+        color: #334155;
+        font-weight: 500;
+        transition: all 0.15s ease;
+    }
+    .nl-select:focus {
+        border-color: #6366f1;
+        background: #ffffff;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+
+    /* Table Card */
+    .nl-table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        box-shadow: 0 2px 14px rgba(0,0,0,0.025);
+        overflow: hidden;
+    }
+    .nl-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    .nl-table thead th {
+        background: #f8fafc !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.06em !important;
+        text-transform: uppercase !important;
+        color: #64748b !important;
+        padding: 14px 16px !important;
+        vertical-align: middle !important;
+    }
+    .nl-table tbody td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        font-size: 13px;
+    }
+    .nl-table tbody tr {
+        transition: background 0.12s ease;
+    }
+    .nl-table tbody tr:hover {
+        background: rgba(99, 102, 241, 0.025);
+    }
+
+    /* Fixed gradient header matching bookings SaaS look */
     .bg-gradient-primary {
-        background: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%) !important;
+        background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;
     }
 
     /* Button Styling */
@@ -116,32 +363,6 @@
         border-color: #6366f1;
         color: #6366f1;
         background-color: transparent;
-    }
-
-    /* Nav Tabs Styling */
-    .nav-tabs {
-        border-bottom: none;
-    }
-
-    .nav-tabs .nav-link {
-        border: none;
-        border-radius: 50px;
-        padding: 0.75rem 1.5rem;
-        color: #6c757d;
-        background: transparent;
-        transition: all 0.3s ease;
-    }
-
-    .nav-tabs .nav-link:hover {
-        color: #6366f1;
-        background-color: rgba(99, 102, 241, 0.05);
-    }
-
-    .nav-tabs .nav-link.active {
-        background: #3f30e3;
-        color: #ffffff;
-        border-bottom: 1px solid #6366f1;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     }
 
     /* Details icon styling */
@@ -276,14 +497,36 @@
         box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
     }
 
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
+    /* Checkbox Styling */
+    .form-check-input {
+        background-color: #ffffff !important;
+        border: 1.5px solid #cbd5e1 !important;
+        background-image: none !important;
     }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+    .form-check-input:not(:checked) {
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border-color: #cbd5e1 !important;
+    }
+    .form-check-input:checked {
+        background-color: #3a57e8 !important;
+        border-color: #3a57e8 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e") !important;
+    }
+    .form-check-input:indeterminate {
+        background-color: #ffffff !important;
+        background-image: none !important;
+        border-color: #cbd5e1 !important;
+    }
+    .form-switch .form-check-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e") !important;
+        width: 2em !important;
+        border-radius: 2em !important;
+    }
+    .form-switch .form-check-input:checked {
+        background-color: #3a57e8 !important;
+        border-color: #3a57e8 !important;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ffffff'/%3e%3c/svg%3e") !important;
     }
 
     /* Custom Scrollbar */
@@ -495,144 +738,203 @@
         ];
         $displayTitle = $titles[$type] ?? 'Service Providers';
         ?>
-        <div class="container-fluid p-0 mb-4 bg-gradient-primary rounded-3 overflow-hidden shadow-sm">
-            <div class="text-white p-5 position-relative">
-                <div class="position-relative z-1">
-                    <h1 class="h2 fw-bold mb-2 text-white"><?= $displayTitle ?></h1>
-                    <p class="text-white-75 mb-0">Manage and monitor your service provider network efficiently</p>
+        <!-- Hero Banner matching Bookings Page -->
+        <div class="nl-hero-banner">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-6">
+                    <div class="nl-live-pill">
+                        <span class="nl-live-dot"></span>
+                        <span>Live Provider Network</span>
+                    </div>
+                    <h2 class="fw-bold text-white mb-2" style="font-size: 28px; letter-spacing: -0.02em;">
+                        <?= esc($displayTitle) ?>
+                    </h2>
+                    <p class="mb-0 text-white text-opacity-75" style="font-size: 13.5px; max-width: 540px; line-height: 1.55;">
+                        Manage, verify, and monitor your service provider fleet, credentials, and real-time onboarding status.
+                    </p>
                 </div>
-                <i class="bi bi-shield-check position-absolute end-0 bottom-0 opacity-10"
-                    style="font-size: 12rem; transform: rotate(12deg); margin-right: -2rem; margin-bottom: -2rem;"></i>
-            </div>
-        </div>
 
-        <?php if (isset($show_dashboard_counts) && $show_dashboard_counts): ?>
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card border-0 bg-primary text-white h-100 shadow-sm rounded-3" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase">Call Verifications Done</h6>
-                                    <h2 class="mb-0 fw-bold"><?= $call_verification_count ?? 0 ?></h2>
-                                </div>
-                                <div class="fs-1 text-white-50 opacity-50">
-                                    <i class="fas fa-headset"></i>
-                                </div>
+                <div class="col-lg-6">
+                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-lg-end">
+                        <div class="nl-stat-card">
+                            <span class="label">Total in View</span>
+                            <div class="value"><?= number_format($total_items ?? count($providers ?? [])) ?></div>
+                        </div>
+                        <?php if (isset($call_verification_count) && $call_verification_count > 0): ?>
+                            <div class="nl-stat-card">
+                                <span class="label">Call Verified</span>
+                                <div class="value" style="color: #6ee7b7;"><?= number_format($call_verification_count) ?></div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card border-0 bg-success text-white h-100 shadow-sm rounded-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-white-50 mb-1 fw-bold text-uppercase">Manager Approvals Done</h6>
-                                    <h2 class="mb-0 fw-bold"><?= $manager_approval_count ?? 0 ?></h2>
-                                </div>
-                                <div class="fs-1 text-white-50 opacity-50">
-                                    <i class="fas fa-check-double"></i>
-                                </div>
+                        <?php endif; ?>
+                        <?php if (isset($manager_approval_count) && $manager_approval_count > 0): ?>
+                            <div class="nl-stat-card">
+                                <span class="label">Approvals Done</span>
+                                <div class="value" style="color: #93c5fd;"><?= number_format($manager_approval_count) ?></div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Premium Filters Section -->
-        <div class="card border-0 shadow-sm mb-4 rounded-3">
-            <div class="card-body p-4">
-                <div class="row g-4 align-items-end">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Filter by Service</label>
-                        <select id="serviceFilter" class="form-select border-0 bg-light">
-                            <option value="">All Services</option>
-                            <?php foreach ($all_services as $s): ?>
-                                <option value="<?= $s->id ?>" <?= ($filter_service_id == $s->id) ? 'selected' : '' ?>><?= $s->name ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Filter by City</label>
-                        <select id="cityFilter" class="form-select border-0 bg-light">
-                            <option value="">All Cities</option>
-                            <?php foreach ($all_cities as $c): ?>
-                                <option value="<?= $c->city ?>" <?= ($city == $c->city) ? 'selected' : '' ?>><?= $c->city ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Filter by Area</label>
-                        <select id="areaFilter" class="form-select border-0 bg-light">
-                            <option value="">All Areas</option>
-                            <?php foreach ($all_areas as $a): ?>
-                                <option value="<?= $a->area ?>" <?= ($area == $a->area) ? 'selected' : '' ?>><?= $a->area ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="d-flex gap-2">
-                            <button onclick="applyFilters()" class="btn btn-primary w-100 fw-bold py-2 shadow-sm">
-                                <i class="fas fa-filter me-2"></i>Apply Filters
-                            </button>
-                            <button onclick="resetFilters()" class="btn btn-light border py-2 px-3 shadow-sm" title="Reset Filters">
-                                <i class="fas fa-undo"></i>
-                            </button>
-                        </div>
+                        <?php endif; ?>
+                        <?php if (isset($total_sp_count) && $total_sp_count > 0): ?>
+                            <div class="nl-stat-card">
+                                <span class="label">Total Network</span>
+                                <div class="value" style="color: #fde047;"><?= number_format($total_sp_count) ?></div>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons Card -->
-        <div class="card border-0 shadow-sm mb-4 rounded-3">
-            <div class="card-body p-3">
-                <div class="row g-3 justify-content-between align-items-center">
-                    <div class="col-md-7">
-                        <div class="d-flex gap-3 align-items-center">
-                            <div class="input-group" style="max-width: 400px;">
-                                <span class="input-group-text bg-white border-end-0" onclick="applySearch()" style="cursor: pointer;">
-                                    <i class="fas fa-search text-muted"></i>
-                                </span>
-                                <input type="text" class="form-control border-start-0 ps-0" id="searchProviders"
-                                    placeholder="Search by name, phone, or area..." value="<?= esc($search ?? '') ?>" onkeypress="if(event.key === 'Enter') applySearch()">
-                            </div>
+        <!-- Segmented Status Tabs & Action Bar -->
+        <?php
+        $currStatus = $type ?? 'active';
+        $currOverdue = isset($_GET['overdue']) && $_GET['overdue'] === '1';
+        ?>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+            <div class="nl-segmented-tabs">
+                <?php if (hasPermission('providers.view') || hasPermission('fee_pending.view')) : ?>
+                    <a href="<?= base_url('providers?status=pending_registration') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'pending_registration') ? 'active' : '' ?>">
+                        <i class="fas fa-receipt"></i>
+                        <span>Fee Pending</span>
+                    </a>
+                <?php endif; ?>
 
-                            <?php if ($type === 'active'): ?>
-                                <div style="min-width: 180px;">
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-end-0 small text-muted">Exp:</span>
-                                        <select id="experienceFilter" class="form-select border-start-0 ps-0"
-                                            onchange="applyExperienceFilter(this.value)">
-                                            <option value="">All Experience</option>
-                                            <option value="0-1" <?= ($experience ?? '') === '0-1' ? 'selected' : '' ?>>0-1 Year</option>
-                                            <option value="1-3" <?= ($experience ?? '') === '1-3' ? 'selected' : '' ?>>1-3 Years</option>
-                                            <option value="3-5" <?= ($experience ?? '') === '3-5' ? 'selected' : '' ?>>3-5 Years</option>
-                                            <option value="5+" <?= ($experience ?? '') === '5+' ? 'selected' : '' ?>>5+ Years</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                <?php if (hasPermission('providers.view') || hasPermission('wait_for_call.view')) : ?>
+                    <a href="<?= base_url('providers?status=pending_verification') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'pending_verification' && !$currOverdue) ? 'active' : '' ?>">
+                        <i class="fas fa-phone"></i>
+                        <span>Waiting for Call</span>
+                    </a>
+                <?php endif; ?>
 
-                    <div class="col-md-5">
-                        <div class="d-flex justify-content-md-end gap-2">
-                            <button onclick="downloadProviders()" class="btn btn-light border fw-600 px-3">
-                                <i class="fa-solid fa-download me-1 text-primary"></i> Download
-                            </button>
-                            <button type="button" class="btn btn-dark fw-600 px-3" id="send-bulk-notification"
-                                data-bs-toggle="offcanvas" data-bs-target="#send_push_notification" disabled>
-                                <i class="fa-regular fa-paper-plane me-1"></i> Bulk Notification
-                            </button>
-                        </div>
+                <?php if (hasPermission('providers.view') || hasPermission('wait_for_call_24.view') || hasPermission('wait_for_call.view')) : ?>
+                    <a href="<?= base_url('providers?status=pending_verification&overdue=1') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'pending_verification' && $currOverdue) ? 'active' : '' ?>">
+                        <i class="fas fa-clock text-danger"></i>
+                        <span>Waiting (>24h)</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view') || hasPermission('manager_approval.view')) : ?>
+                    <a href="<?= base_url('providers?status=approval') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'approval') ? 'active' : '' ?>">
+                        <i class="fas fa-user-check"></i>
+                        <span>Manager Approval</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view') || hasPermission('kyc_pending.view')) : ?>
+                    <a href="<?= base_url('providers?status=pending_kyc') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'pending_kyc') ? 'active' : '' ?>">
+                        <i class="fas fa-id-card"></i>
+                        <span>KYC Pending</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view') || hasPermission('verified.view') || hasPermission('old_verified.view')) : ?>
+                    <a href="<?= base_url('providers?status=active') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'active') ? 'active' : '' ?>">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verified</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view') || hasPermission('old_non_verified.view')) : ?>
+                    <a href="<?= base_url('providers?status=non_verified') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'non_verified') ? 'active' : '' ?>">
+                        <i class="fas fa-user-clock"></i>
+                        <span>Old SP - Non Verified</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view') || hasPermission('suspended.view')) : ?>
+                    <a href="<?= base_url('providers?status=inactive') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'inactive') ? 'active' : '' ?>">
+                        <i class="fas fa-ban"></i>
+                        <span>Suspended</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (hasPermission('providers.view')) : ?>
+                    <a href="<?= base_url('providers?status=rejected') ?>"
+                       class="nl-tab-pill <?= ($currStatus === 'rejected') ? 'active' : '' ?>">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Rejected</span>
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" onclick="downloadProviders()" class="nl-btn-action" title="Export / Download Providers">
+                    <i class="fa-solid fa-download text-primary"></i>
+                    <span>Download</span>
+                </button>
+                <button type="button" class="nl-btn-action" id="send-bulk-notification"
+                        data-bs-toggle="offcanvas" data-bs-target="#send_push_notification" disabled>
+                    <i class="fa-regular fa-paper-plane text-indigo"></i>
+                    <span>Bulk Notification</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modern Filter Toolbar matching Bookings Page -->
+        <div class="nl-filter-card">
+            <div class="row g-3 align-items-center">
+                <div class="col-lg-3 col-md-6">
+                    <div class="nl-search-wrap">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="nl-search-input" id="searchProviders"
+                               placeholder="Search name, phone, area..."
+                               value="<?= esc($search ?? '') ?>"
+                               onkeypress="if(event.key === 'Enter') applySearch()">
                     </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <select id="serviceFilter" class="form-select nl-select w-100" onchange="applyFilters()">
+                        <option value="">All Services</option>
+                        <?php foreach ($all_services as $s): ?>
+                            <option value="<?= $s->id ?>" <?= ($filter_service_id == $s->id) ? 'selected' : '' ?>><?= esc($s->name) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <select id="cityFilter" class="form-select nl-select w-100">
+                        <option value="">All Cities</option>
+                        <?php foreach ($all_cities as $c): ?>
+                            <option value="<?= esc($c->city) ?>" <?= ($city == $c->city) ? 'selected' : '' ?>><?= esc($c->city) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <select id="areaFilter" class="form-select nl-select w-100" onchange="applyFilters()">
+                        <option value="">All Areas</option>
+                        <?php foreach ($all_areas as $a): ?>
+                            <option value="<?= esc($a->area) ?>" <?= ($area == $a->area) ? 'selected' : '' ?>><?= esc($a->area) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <?php if ($currStatus === 'active'): ?>
+                    <div class="col-lg-2 col-md-6">
+                        <select id="experienceFilter" class="form-select nl-select w-100" onchange="applyExperienceFilter(this.value)">
+                            <option value="">All Experience</option>
+                            <option value="0-1" <?= ($experience ?? '') === '0-1' ? 'selected' : '' ?>>0-1 Year</option>
+                            <option value="1-3" <?= ($experience ?? '') === '1-3' ? 'selected' : '' ?>>1-3 Years</option>
+                            <option value="3-5" <?= ($experience ?? '') === '3-5' ? 'selected' : '' ?>>3-5 Years</option>
+                            <option value="5+" <?= ($experience ?? '') === '5+' ? 'selected' : '' ?>>5+ Years</option>
+                        </select>
+                    </div>
+                <?php endif; ?>
+                <div class="col-auto ms-auto d-flex align-items-center gap-2">
+                    <button onclick="applyFilters()" class="btn btn-primary px-3 py-2 rounded-3 fw-bold small d-inline-flex align-items-center gap-1 shadow-sm">
+                        <i class="fas fa-filter"></i> Apply
+                    </button>
+                    <button onclick="resetFilters()" class="btn btn-light border px-3 py-2 rounded-3 fw-bold small text-muted" title="Reset Filters">
+                        <i class="fas fa-undo"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="card border-0 shadow-sm overflow-hidden rounded-3">
+
+        <div class="nl-table-card">
             <div class="card-body p-0">
                 <div id="singleProviderView">
                     <!-- Dynamic Table Content Based on Type -->
@@ -640,23 +942,24 @@
                         <!-- Verified Providers Table -->
                         <div id="verified">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="verifiedProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="verifiedProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;" class="fs-6">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-verified" onclick="selectAllTable(this)">
                                             </th>
-                                            <th class="text-center fs-6" style="width: 60px; background: #c6d2ff !important;">Select</th>
-                                            <th style="background: #c6d2ff !important;" class="fs-6">Provider</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Rating</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Joined At</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Call Verified At</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Approved At</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Verified By</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Status</th>
-                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Action</th>
+                                            <th class="text-center" style="width: 60px;">Select</th>
+                                            <th>Provider</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Rating</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Call Verified At</th>
+                                            <th class="text-center">Approved At</th>
+                                            <th class="text-center">Verified By</th>
+                                            <th class="text-center">Device & App</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -729,6 +1032,27 @@
                                                             <i class="fas fa-user-shield me-1 text-primary"></i> <?= htmlspecialchars($provider->verifier_name ?? 'N/A') ?>
                                                         </span>
                                                     </td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($provider->latest_device)): ?>
+                                                            <?php $dev = $provider->latest_device; ?>
+                                                            <div class="d-flex flex-column align-items-center text-center">
+                                                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                    v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                </span>
+                                                                <span class="text-dark small fw-bold">
+                                                                    <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                </span>
+                                                                <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                    <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                </span>
+                                                                <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                    <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                        <?php endif; ?>
+                                                    </td>
 
                                                     <td class="text-center">
                                                         <div class="form-check form-switch d-flex justify-content-center">
@@ -781,24 +1105,25 @@
                         <!-- Manager Approval Table -->
                         <div id="approval">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="nonverifiedProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="nonverifiedProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-nonverified" onclick="selectAllTable(this)">
                                             </th>
-                                            <th class="text-center" style="width: 60px; background: #c6d2ff !important;">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Rating</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Status</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Call Verified At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Approved At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Verified By</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Approval Action</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Action</th>
+                                            <th class="text-center" style="width: 60px;">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Rating</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Call Verified At</th>
+                                            <th class="text-center">Approved At</th>
+                                            <th class="text-center">Verified By</th>
+                                            <th class="text-center">Approval Action</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -884,6 +1209,27 @@
                                                         </a>
                                                     </td>
                                                     <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($provider->latest_device)): ?>
+                                                            <?php $dev = $provider->latest_device; ?>
+                                                            <div class="d-flex flex-column align-items-center text-center">
+                                                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                    v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                </span>
+                                                                <span class="text-dark small fw-bold">
+                                                                    <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                </span>
+                                                                <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                    <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                </span>
+                                                                <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                    <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                        <?php endif; ?>
+                                                    </td>
                                                     <td>
                                                         <div class="d-flex gap-2 justify-content-center">
                                                             <button type="button" data-assign-module="<?= $provider->id; ?>"
@@ -925,20 +1271,21 @@
                         <!-- Rejected Table -->
                         <div id="rejected">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="rejectedProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="rejectedProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-rejected" onclick="selectAllTable(this)">
                                             </th>
-                                            <th style="width: 60px; background: #c6d2ff !important;" class="text-center">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Status</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Approval Action</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Action</th>
+                                            <th style="width: 60px;" class="text-center">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Approval Action</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -998,6 +1345,27 @@
                                                         </a>
                                                     </td>
                                                     <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($provider->latest_device)): ?>
+                                                            <?php $dev = $provider->latest_device; ?>
+                                                            <div class="d-flex flex-column align-items-center text-center">
+                                                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                    v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                </span>
+                                                                <span class="text-dark small fw-bold">
+                                                                    <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                </span>
+                                                                <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                    <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                </span>
+                                                                <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                    <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                        <?php endif; ?>
+                                                    </td>
                                                     <td>
                                                         <div class="d-flex gap-2 justify-content-center">
                                                             <button type="button" data-assign-module="<?= $provider->id; ?>"
@@ -1038,154 +1406,75 @@
                     <?php elseif ($type === 'pending_registration') : ?>
                         <!-- Pending Registration Fee Tab -->
                         <div id="pending-registration">
-                            <?php
-                            $approved_cities = ['hyderabad', 'bengaluru', 'bangalore'];
-                            $approved_providers = [];
-                            $non_approved_providers = [];
-
-                            foreach ($providers as $provider) {
-                                if (in_array(strtolower(trim($provider->city)), $approved_cities)) {
-                                    $approved_providers[] = $provider;
-                                } else {
-                                    $non_approved_providers[] = $provider;
-                                }
-                            }
-
-                            // Build query params preserving filters
-                            $current_params = $_GET;
-
-                            $approved_params = $current_params;
-                            $approved_params['reg_type'] = 'approved';
-                            unset($approved_params['page']);
-                            $approved_url = base_url('providers?' . http_build_query($approved_params));
-
-                            $non_approved_params = $current_params;
-                            $non_approved_params['reg_type'] = 'non_approved';
-                            unset($non_approved_params['page']);
-                            $non_approved_url = base_url('providers?' . http_build_query($non_approved_params));
-
-                            $reg_type = $_GET['reg_type'] ?? 'approved';
-                            ?>
-
-                            <ul class="nav nav-tabs mb-3 px-4" id="pendingRegistrationTabs" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link <?= $reg_type === 'approved' ? 'active' : '' ?> fw-bold" id="approved-states-tab" href="<?= esc($approved_url) ?>" role="tab" aria-selected="<?= $reg_type === 'approved' ? 'true' : 'false' ?>">
-                                        Approved States
-                                        <br><small class="fw-normal" style="font-size: 0.65rem;">(Hyd, Blr - Flow: Details > Fee > Verification > KYC)</small>
-                                    </a>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <a class="nav-link <?= $reg_type === 'non_approved' ? 'active' : '' ?> fw-bold" id="non-approved-states-tab" href="<?= esc($non_approved_url) ?>" role="tab" aria-selected="<?= $reg_type === 'non_approved' ? 'true' : 'false' ?>">
-                                        Non-Approved States
-                                        <br><small class="fw-normal" style="font-size: 0.65rem;">(Others - Flow: Home > Fee > Verification > KYC)</small>
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <div class="tab-content" id="pendingRegistrationTabsContent">
-                                <!-- Approved States Tab -->
-                                <div class="tab-pane fade <?= $reg_type === 'approved' ? 'show active' : '' ?>" id="approved-states" role="tabpanel" aria-labelledby="approved-states-tab">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-premium" id="pending-registration-approvedProvidersTable">
-                                            <thead style="background: #c6d2ff !important;">
-                                                <tr>
-                                                    <th style="width: 50px; background: #c6d2ff !important;">
-                                                        <input type="checkbox" name="select_all_table" class="form-check-input" id="select-all-pending-registration-approved" onclick="selectAllTable(this)">
-                                                    </th>
-                                                    <th class="text-center" style="width: 60px; background: #c6d2ff !important;">Details</th>
-                                                    <th style="background: #c6d2ff !important;">Provider Info</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Profile Completion</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($approved_providers as $provider) : ?>
-                                                    <tr data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>'>
-                                                        <td><input type="checkbox" class="form-check-input select-table-row" value="<?= $provider->id; ?>"></td>
-                                                        <td class="details-control text-center">
-                                                            <i class="fa fa-plus-circle text-primary view-details" data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>' style="cursor: pointer;"></i>
-                                                        </td>
-                                                        <td>
-                                                            <div class="provider-info-card">
-                                                                <div class="provider-initial"><?= $provider->name ? strtoupper(substr(trim($provider->name), 0, 1)) : '?' ?></div>
-                                                                <div>
-                                                                    <div class="fw-bold text-dark">
-                                                                        <a href="<?= base_url() ?>reviews/<?= $provider->id; ?>" target="_blank" class="text-decoration-none text-primary"><?= $provider->name ?? '--'; ?></a>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center small text-muted mt-1"><i class="bi bi-telephone me-1"></i><?= $provider->phone; ?></div>
-                                                                    <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i><?= $provider->city; ?> / <?= $provider->area; ?></div>
-                                                                </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-premium nl-table" id="pending-registrationProvidersTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">
+                                                <input type="checkbox" name="select_all_table" class="form-check-input" id="select-all-pending-registration" onclick="selectAllTable(this)">
+                                            </th>
+                                            <th class="text-center" style="width: 60px;">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Profile Completion</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($providers as $provider) : ?>
+                                            <tr data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>'>
+                                                <td><input type="checkbox" class="form-check-input select-table-row" value="<?= $provider->id; ?>"></td>
+                                                <td class="details-control text-center">
+                                                    <i class="fa fa-plus-circle text-primary view-details" data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>' style="cursor: pointer;"></i>
+                                                </td>
+                                                <td>
+                                                    <div class="provider-info-card">
+                                                        <div class="provider-initial"><?= $provider->name ? strtoupper(substr(trim($provider->name), 0, 1)) : '?' ?></div>
+                                                        <div>
+                                                            <div class="fw-bold text-dark">
+                                                                <a href="<?= base_url() ?>reviews/<?= $provider->id; ?>" target="_blank" class="text-decoration-none text-primary"><?= $provider->name ?? '--'; ?></a>
                                                             </div>
-                                                        </td>
-                                                        <td class="text-center"><span class="badge badge-soft-info px-3"><?= $provider->service_name ?></span></td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-3 px-3">
-                                                                <div class="progress flex-grow-1" style="height: 8px;">
-                                                                    <div class="progress-bar bg-<?= $provider->completionPercentage == 100 ? 'success' : ($provider->completionPercentage > 50 ? 'warning' : 'danger') ?>" role="progressbar" style="width: <?= $provider->completionPercentage ?>%"></div>
-                                                                </div>
-                                                                <span class="badge badge-soft-dark border py-1 px-2"><?= $provider->completionPercentage ?>%</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Non-Approved States Tab -->
-                                <div class="tab-pane fade <?= $reg_type === 'non_approved' ? 'show active' : '' ?>" id="non-approved-states" role="tabpanel" aria-labelledby="non-approved-states-tab">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-premium" id="pending-registration-non-approvedProvidersTable">
-                                            <thead style="background: #c6d2ff !important;">
-                                                <tr>
-                                                    <th style="width: 50px; background: #c6d2ff !important;">
-                                                        <input type="checkbox" name="select_all_table" class="form-check-input" id="select-all-pending-registration-non-approved" onclick="selectAllTable(this)">
-                                                    </th>
-                                                    <th class="text-center" style="width: 60px; background: #c6d2ff !important;">Details</th>
-                                                    <th style="background: #c6d2ff !important;">Provider Info</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Profile Completion</th>
-                                                    <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php foreach ($non_approved_providers as $provider) : ?>
-                                                    <tr data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>'>
-                                                        <td><input type="checkbox" class="form-check-input select-table-row" value="<?= $provider->id; ?>"></td>
-                                                        <td class="details-control text-center">
-                                                            <i class="fa fa-plus-circle text-primary view-details" data-details='<?= htmlspecialchars(json_encode($provider, JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>' style="cursor: pointer;"></i>
-                                                        </td>
-                                                        <td>
-                                                            <div class="provider-info-card">
-                                                                <div class="provider-initial"><?= $provider->name ? strtoupper(substr(trim($provider->name), 0, 1)) : '?' ?></div>
-                                                                <div>
-                                                                    <div class="fw-bold text-dark">
-                                                                        <a href="<?= base_url() ?>reviews/<?= $provider->id; ?>" target="_blank" class="text-decoration-none text-primary"><?= $provider->name ?? '--'; ?></a>
-                                                                    </div>
-                                                                    <div class="d-flex align-items-center small text-muted mt-1"><i class="bi bi-telephone me-1"></i><?= $provider->phone; ?></div>
-                                                                    <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i><?= $provider->city; ?> / <?= $provider->area; ?></div>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center"><span class="badge badge-soft-info px-3"><?= $provider->service_name ?></span></td>
-                                                        <td>
-                                                            <div class="d-flex align-items-center gap-3 px-3">
-                                                                <div class="progress flex-grow-1" style="height: 8px;">
-                                                                    <div class="progress-bar bg-<?= $provider->completionPercentage == 100 ? 'success' : ($provider->completionPercentage > 50 ? 'warning' : 'danger') ?>" role="progressbar" style="width: <?= $provider->completionPercentage ?>%"></div>
-                                                                </div>
-                                                                <span class="badge badge-soft-dark border py-1 px-2"><?= $provider->completionPercentage ?>%</span>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                                            <div class="d-flex align-items-center small text-muted mt-1"><i class="bi bi-telephone me-1"></i><?= $provider->phone; ?></div>
+                                                            <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i><?= $provider->city; ?> / <?= $provider->area; ?></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center"><span class="badge badge-soft-info px-3"><?= $provider->service_name ?></span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center gap-3 px-3">
+                                                        <div class="progress flex-grow-1" style="height: 8px;">
+                                                            <div class="progress-bar bg-<?= $provider->completionPercentage == 100 ? 'success' : ($provider->completionPercentage > 50 ? 'warning' : 'danger') ?>" role="progressbar" style="width: <?= $provider->completionPercentage ?>%"></div>
+                                                        </div>
+                                                        <span class="badge badge-soft-dark border py-1 px-2"><?= $provider->completionPercentage ?>%</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                <td class="text-center">
+                                                    <?php if (!empty($provider->latest_device)): ?>
+                                                        <?php $dev = $provider->latest_device; ?>
+                                                        <div class="d-flex flex-column align-items-center text-center">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                            </span>
+                                                            <span class="text-dark small fw-bold">
+                                                                <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                            </span>
+                                                            <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                            </span>
+                                                            <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                            </span>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
@@ -1194,20 +1483,22 @@
                         <!-- Waiting for Call verification Tab -->
                         <div id="waiting-call-verification">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="waiting-call-verificationProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="waiting-call-verificationProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-waiting-call-verification"
                                                     onclick="selectAllTable(this)">
                                             </th>
-                                            <th style="width: 60px; background: #c6d2ff !important;" class="text-center">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Progress</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Call Action</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
+                                            <th style="width: 60px;" class="text-center">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Progress</th>
+                                            <th class="text-center">Call Attempts</th>
+                                            <th class="text-center">Call Action</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1271,12 +1562,55 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-center">
+                                                        <?php
+                                                        $attempts = (int) ($provider->call_attempts_count ?? 0);
+                                                        $totalAtt = (int) ($provider->total_call_attempts ?? $attempts);
+                                                        $displayAtt = max($attempts, $totalAtt);
+                                                        $lastCall = $provider->last_call_attempt_at ?? null;
+                                                        ?>
+                                                        <?php if ($displayAtt > 0) : ?>
+                                                            <span class="badge bg-danger rounded-pill px-3 py-1 fw-bold" style="font-size: 0.8rem;" title="Service attempts: <?= $attempts ?>, Total attempts: <?= $totalAtt ?>">
+                                                                <i class="bi bi-telephone-outbound-fill me-1"></i> <?= $displayAtt ?> <?= $displayAtt === 1 ? 'Attempt' : 'Attempts' ?>
+                                                            </span>
+                                                            <?php if ($lastCall) : ?>
+                                                                <div class="text-muted small mt-1" style="font-size: 0.72rem;">
+                                                                    Last: <?= date('d M, h:i A', strtotime($lastCall)) ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        <?php else : ?>
+                                                            <span class="badge bg-light text-muted border rounded-pill px-3 py-1" style="font-size: 0.78rem;">
+                                                                0 Attempts
+                                                            </span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td class="text-center">
                                                         <a href="<?= base_url('provider/verify/' . $provider->id . '/' . $provider->service_id) ?>"
                                                             class="btn btn-sm btn-info text-white rounded-pill px-3 fw-600">
                                                             <i class="bi bi-telephone-fill me-1"></i> Verify Call
                                                         </a>
                                                     </td>
                                                     <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($provider->latest_device)): ?>
+                                                            <?php $dev = $provider->latest_device; ?>
+                                                            <div class="d-flex flex-column align-items-center text-center">
+                                                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                    v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                </span>
+                                                                <span class="text-dark small fw-bold">
+                                                                    <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                </span>
+                                                                <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                    <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                </span>
+                                                                <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                    <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                         <?php endforeach;
                                         endif; ?>
@@ -1289,18 +1623,19 @@
                         <!-- Pending KYC Verification Tab -->
                         <div id="pending-kyc">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="pending-kycProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="pending-kycProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-pending-kyc" onclick="selectAllTable(this)">
                                             </th>
-                                            <th style="width: 60px; background: #c6d2ff !important;" class="text-center">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Progress</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
+                                            <th style="width: 60px;" class="text-center">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Progress</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1369,6 +1704,27 @@
                                                         </div>
                                                     </td>
                                                     <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                    <td class="text-center">
+                                                        <?php if (!empty($provider->latest_device)): ?>
+                                                            <?php $dev = $provider->latest_device; ?>
+                                                            <div class="d-flex flex-column align-items-center text-center">
+                                                                <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                    v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                </span>
+                                                                <span class="text-dark small fw-bold">
+                                                                    <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                </span>
+                                                                <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                    <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                </span>
+                                                                <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                    <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                </span>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                         <?php endforeach;
                                         endif; ?>
@@ -1380,20 +1736,21 @@
                         <!-- Suspended / Inactive Providers Table -->
                         <div id="suspended">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="inactiveProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="inactiveProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-inactive" onclick="selectAllTable(this)">
                                             </th>
-                                            <th style="width: 60px; background: #c6d2ff !important;" class="text-center">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Rating</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Status</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Action</th>
+                                            <th style="width: 60px;" class="text-center">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Rating</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1454,6 +1811,27 @@
                                                 </td>
                                                 <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
                                                 <td class="text-center">
+                                                    <?php if (!empty($provider->latest_device)): ?>
+                                                        <?php $dev = $provider->latest_device; ?>
+                                                        <div class="d-flex flex-column align-items-center text-center">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                            </span>
+                                                            <span class="text-dark small fw-bold">
+                                                                <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                            </span>
+                                                            <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                            </span>
+                                                            <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                            </span>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="text-center">
                                                     <div class="form-check form-switch d-flex justify-content-center">
                                                         <input type="checkbox" class="form-check-input status"
                                                             data-module="service_providers" data-id="<?= $provider->id ?>"
@@ -1491,19 +1869,20 @@
                         <!-- Non Verified Providers Table -->
                         <div id="non-verified">
                             <div class="table-responsive">
-                                <table class="table table-hover table-premium" id="non-verifiedProvidersTable">
-                                    <thead style="background: #c6d2ff !important;">
+                                <table class="table table-hover table-premium nl-table" id="non-verifiedProvidersTable">
+                                    <thead>
                                         <tr>
-                                            <th style="width: 50px; background: #c6d2ff !important;">
+                                            <th style="width: 50px;">
                                                 <input type="checkbox" class="form-check-input" name="select_all_table"
                                                     id="select-all-non-verified" onclick="selectAllTable(this)">
                                             </th>
-                                            <th style="width: 60px; background: #c6d2ff !important;" class="text-center">Details</th>
-                                            <th style="background: #c6d2ff !important;">Provider Info</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Service</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Status</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Joined At</th>
-                                            <th class="text-center" style="background: #c6d2ff !important;">Action</th>
+                                            <th style="width: 60px;" class="text-center">Details</th>
+                                            <th>Provider Info</th>
+                                            <th class="text-center">Service</th>
+                                            <th class="text-center">Status</th>
+                                            <th class="text-center">Joined At</th>
+                                            <th class="text-center">Device & App</th>
+                                            <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1578,6 +1957,27 @@
                                                     </span>
                                                 </td>
                                                 <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
+                                                <td class="text-center">
+                                                    <?php if (!empty($provider->latest_device)): ?>
+                                                        <?php $dev = $provider->latest_device; ?>
+                                                        <div class="d-flex flex-column align-items-center text-center">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                            </span>
+                                                            <span class="text-dark small fw-bold">
+                                                                <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                            </span>
+                                                            <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                            </span>
+                                                            <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                            </span>
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td>
                                                     <div class="d-flex gap-2 justify-content-center">
                                                         <button type="button" class="action-btn action-btn-edit"
@@ -1651,22 +2051,26 @@
         <input type="hidden" name="module" value="service_providers">
         <div class="offcanvas offcanvas-end" id="send_push_notification" tabindex="-1"
             aria-labelledby="form-offcanvasLabel">
-            <div class="offcanvas-header bg-gradient-primary text-white border-0">
+            <div class="offcanvas-header text-white border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important; padding: 1.25rem 1.5rem;">
                 <div class="d-flex align-items-center justify-content-between w-100">
                     <div>
-                        <h5 class="offcanvas-title text-white fw-bold" id="form-offcanvasLabel">
-                            <i class="fa-regular fa-paper-plane me-2"></i>Send Push Notification
+                        <h5 class="offcanvas-title text-white fw-bold mb-1" id="form-offcanvasLabel">
+                            <i class="fa-regular fa-paper-plane me-2 text-warning"></i>Send Push Notification
                         </h5>
-                        <p class="mb-0 small opacity-75">Send notification to selected users</p>
+                        <p class="mb-0 small text-white-50">Send push notification to providers</p>
                     </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
             </div>
             <div class="offcanvas-body p-4">
                 <div class="row">
                     <div class="col-12">
-                        <div class="card border-0 mb-4">
-                            <div class="card-body">
+                        <div id="notificationRecipientInfo" class="alert alert-primary d-flex align-items-center gap-2 mb-3 py-2 px-3 small border-0" style="background: rgba(99, 102, 241, 0.1); color: #4338ca; border-radius: 8px;">
+                            <i class="fas fa-users"></i>
+                            <span id="recipientCountText">Recipient: <strong>Selected Providers</strong></span>
+                        </div>
+                        <div class="card border-0 mb-4 shadow-none">
+                            <div class="card-body p-0">
                                 <h6 class="card-title text-primary mb-3 fw-bold">
                                     <i class="fas fa-bell me-2"></i>Notification Content
                                 </h6>
@@ -1697,6 +2101,16 @@
                                             required placeholder="Enter your notification message" rows="5"></textarea>
                                     </div>
                                 </div>
+
+                                <div class="mb-3 p-3 bg-light rounded border">
+                                    <div class="form-check form-switch d-flex align-items-center gap-2 m-0">
+                                        <input class="form-check-input" type="checkbox" id="sp_queue_only" name="queue_only" value="1" checked style="cursor: pointer; transform: scale(1.15);">
+                                        <label class="form-check-label fw-bold text-dark mb-0 small" for="sp_queue_only" style="cursor: pointer;">
+                                            <i class="bi bi-clock-history text-primary me-1"></i> Send notifications as Queue Only
+                                        </label>
+                                    </div>
+                                    <div class="small text-muted mt-1 ps-4">Queues notifications in the background to dispatch reliably without UI delay.</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1721,8 +2135,13 @@
     <form action="<?= base_url() ?>update" id="updateUser">
         <div class="offcanvas offcanvas-end" tabindex="-1" id="form-offcanvas" aria-labelledby="form-offcanvasLabel"
             aria-modal="true" role="dialog">
-            <div class="offcanvas-header border-bottom bg-primary text-white">
-                <h5 class="offcanvas-title" id="form-offcanvasLabel">Edit Service Provider</h5>
+            <div class="offcanvas-header border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important; padding: 1.25rem 1.5rem;">
+                <div>
+                    <h5 class="offcanvas-title text-white fw-bold mb-1" id="form-offcanvasLabel">
+                        <i class="fas fa-user-edit me-2 text-warning"></i>Edit Service Provider
+                    </h5>
+                    <p class="mb-0 small text-white-50">Update provider profile and settings</p>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
             </div>
@@ -1889,13 +2308,15 @@
     <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg p-0 m-1" style="border-radius: 16px; overflow: hidden;">
-                <div class="modal-header bg-gradient-primary text-white border-0">
+                <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important; padding: 1.25rem 1.5rem;">
                     <div class="d-flex align-items-center justify-content-between w-100">
                         <div>
-                            <h5 class="modal-title text-white fw-bold">Update Rating</h5>
-                            <p class="mb-0 small opacity-75">Rate and comment on provider performance</p>
+                            <h5 class="modal-title text-white fw-bold mb-1">
+                                <i class="fas fa-star me-2 text-warning"></i>Update Rating
+                            </h5>
+                            <p class="mb-0 small text-white-50">Rate and comment on provider performance</p>
                         </div>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                 </div>
                 <form id="ratingForm" class="ratingForm" method="POST" action="<?= base_url('updateRating') ?>">
@@ -1945,12 +2366,13 @@
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg p-0 m-0"
                 style="border-radius: 16px; overflow: hidden; height: 80vh;">
-                <div class="modal-header bg-gradient-primary text-white border-0">
+                <div class="modal-header text-white border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important; padding: 1.25rem 1.5rem;">
                     <div class="d-flex align-items-center justify-content-between w-100">
                         <div>
-                            <h5 class="modal-title text-white fw-bold" id="documentModalLabel">Verification Documents
+                            <h5 class="modal-title text-white fw-bold mb-1" id="documentModalLabel">
+                                <i class="fas fa-id-card me-2 text-warning"></i>Verification Documents
                             </h5>
-                            <p class="mb-0 small opacity-75">Review and verify provider documents</p>
+                            <p class="mb-0 small text-white-50">Review and verify provider documents</p>
                         </div>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
@@ -1959,17 +2381,17 @@
 
                 <div class="modal-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle" id="verificationDetails">
-                            <thead style="background: #c6d2ff !important;">
+                        <table class="table table-hover align-middle mb-0" id="verificationDetails">
+                            <thead>
                                 <tr>
-                                    <th class="fw-bold text-primary fs-6"
-                                        style="min-width: 150px; background: #c6d2ff !important;">Document Type</th>
-                                    <th class="fw-bold text-primary fs-6"
-                                        style="min-width: 150px; background: #c6d2ff !important;">Image Preview</th>
-                                    <th class="fw-bold text-primary fs-6"
-                                        style="min-width: 120px; background: #c6d2ff !important;">Status</th>
+                                    <th style="min-width: 150px;">Document Type</th>
+                                    <th style="min-width: 150px;">Image Preview</th>
+                                    <th style="min-width: 120px;">Status</th>
                                 </tr>
                             </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                             <tbody></tbody>
                         </table>
                     </div>
@@ -2129,9 +2551,14 @@
     <!-- Details Offcanvas -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="detailsModal" aria-labelledby="detailsModalLabel"
         style="width: 750px;">
-        <div class="offcanvas-header bg-primary text-white border-0">
+        <div class="offcanvas-header text-white border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important; padding: 1.25rem 1.5rem;">
             <div class="d-flex align-items-center justify-content-between w-100">
-                <h5 class="offcanvas-title text-white fw-bold" id="detailsModalLabel">Provider Details</h5>
+                <div>
+                    <h5 class="offcanvas-title text-white fw-bold mb-1" id="detailsModalLabel">
+                        <i class="fas fa-id-badge me-2 text-warning"></i>Provider Details
+                    </h5>
+                    <p class="mb-0 small text-white-50">Complete provider profile and verification status</p>
+                </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
                     aria-label="Close"></button>
             </div>
@@ -2156,56 +2583,150 @@
         // Tab management is handled server-side via URL parameters
 
         // ============================
-        // 1. BULK NOTIFICATION FUNCTIONALITY
+        // 1. BULK NOTIFICATION & CHECKBOXES
         // ============================
-        let sendBulkNotificationBtn = document.getElementById("send-bulk-notification");
-        let selectedProviderIds = document.getElementById("selectedProviderIds");
+        const sendBulkNotificationBtn = document.getElementById("send-bulk-notification");
+        const selectedProviderIds = document.getElementById("selectedProviderIds");
 
-        function getActiveTableCheckboxes() {
+        function getVisibleRowCheckboxes() {
             const activePane = document.querySelector('.tab-pane.active');
             if (activePane) {
-                return activePane.querySelectorAll('.select-table-row');
+                return Array.from(activePane.querySelectorAll('.select-table-row'));
             }
-            return document.querySelectorAll('.select-table-row');
+            return Array.from(document.querySelectorAll('.select-table-row'));
         }
 
-        function updateBulkNotificationButtonState() {
-            const checkboxes = getActiveTableCheckboxes();
-            const selectedIds = Array.from(checkboxes)
-                .filter(checkbox => checkbox.checked)
-                .map(checkbox => checkbox.value);
+        window.updateBulkNotificationButtonState = function() {
+            const checkboxes = getVisibleRowCheckboxes();
+            const checkedBoxes = checkboxes.filter(cb => cb.checked);
+            const selectedIds = checkedBoxes.map(cb => cb.value).filter(val => val !== "" && val !== undefined);
 
-            sendBulkNotificationBtn.disabled = selectedIds.length === 0;
+            if (sendBulkNotificationBtn) {
+                const count = selectedIds.length;
+                sendBulkNotificationBtn.disabled = count === 0;
+                if (count > 0) {
+                    sendBulkNotificationBtn.classList.remove('opacity-50');
+                    sendBulkNotificationBtn.innerHTML = `<i class="fa-regular fa-paper-plane me-1"></i> Bulk Notification <span class="badge bg-dark ms-1" style="font-size: 0.72rem; padding: 0.2rem 0.45rem;">${count}</span>`;
+                } else {
+                    sendBulkNotificationBtn.classList.add('opacity-50');
+                    sendBulkNotificationBtn.innerHTML = `<i class="fa-regular fa-paper-plane me-1"></i> Bulk Notification`;
+                }
+            }
+
             if (selectedProviderIds) {
                 selectedProviderIds.value = JSON.stringify(selectedIds);
             }
-        }
 
-        function initializeCheckboxes() {
-            document.querySelectorAll('.select-table-row').forEach(checkbox => {
-                checkbox.addEventListener('change', updateBulkNotificationButtonState);
-            });
-
-            document.querySelectorAll('[id^="select-all-"]').forEach(selectAll => {
-                selectAll.addEventListener('change', function() {
-                    const tableId = this.id.replace('select-all-', '') + 'ProvidersTable';
-                    const table = document.getElementById(tableId);
-                    if (table) {
-                        const checkboxes = table.querySelectorAll('.select-table-row');
-                        checkboxes.forEach(cb => {
-                            cb.checked = this.checked;
-                        });
-                        updateBulkNotificationButtonState();
+            // Sync master checkbox state for each table on the page
+            document.querySelectorAll('table.nl-table').forEach(table => {
+                const master = table.querySelector('input[name="select_all_table"], [id^="select-all-"]');
+                if (master) {
+                    const tableRows = Array.from(table.querySelectorAll('.select-table-row'));
+                    const tableChecked = tableRows.filter(cb => cb.checked);
+                    if (tableRows.length > 0 && tableChecked.length === tableRows.length) {
+                        master.checked = true;
+                        master.indeterminate = false;
+                    } else if (tableChecked.length > 0) {
+                        master.checked = false;
+                        master.indeterminate = true;
+                    } else {
+                        master.checked = false;
+                        master.indeterminate = false;
                     }
-                });
+                }
             });
-        }
+        };
 
-        // Tab change handler
+        window.selectAllTable = function(checkbox) {
+            const table = checkbox.closest('table');
+            if (table) {
+                const checkboxes = table.querySelectorAll('.select-table-row');
+                checkboxes.forEach(cb => {
+                    cb.checked = checkbox.checked;
+                });
+                updateBulkNotificationButtonState();
+                if (typeof updateApplyButtonState === 'function') {
+                    updateApplyButtonState();
+                }
+            }
+        };
+
+        // Delegated checkbox handlers with stopPropagation to prevent row clicks
+        $(document).on('click', '.select-table-row', function(e) {
+            e.stopPropagation();
+        });
+
+        $(document).on('change', '.select-table-row', function(e) {
+            e.stopPropagation();
+            updateBulkNotificationButtonState();
+            if (typeof updateApplyButtonState === 'function') {
+                updateApplyButtonState();
+            }
+        });
+
+        $(document).on('click', 'input[name="select_all_table"], [id^="select-all-"]', function(e) {
+            e.stopPropagation();
+            selectAllTable(this);
+        });
+
+        // Tab change listener to re-evaluate checkbox and bulk button state
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
             tab.addEventListener('shown.bs.tab', function() {
-                setTimeout(updateBulkNotificationButtonState, 100);
+                setTimeout(() => {
+                    updateBulkNotificationButtonState();
+                    if (typeof updateApplyButtonState === 'function') {
+                        updateApplyButtonState();
+                    }
+                }, 100);
             });
+        });
+
+        // Safe Row Click: click row to view details without triggering when clicking buttons/inputs/badges
+        $(document).on('click', '.nl-table tbody tr', function(e) {
+            if ($(e.target).closest('input, button, a, select, textarea, label, .action-btn, .form-check, .btn-verify-chip, .open-rating-modal, .viewDocumentsLink, .verifyBtn, .move-back-btn, .badge').length > 0) {
+                return;
+            }
+            const viewDetailsBtn = $(this).find('.view-details');
+            if (viewDetailsBtn.length > 0) {
+                viewDetailsBtn.trigger('click');
+            }
+        });
+
+        // Prevent button actions in tables from triggering row click
+        $(document).on('click', '.action-btn, .btn-verify-chip, .open-rating-modal, .viewDocumentsLink, .verifyBtn, .move-back-btn', function(e) {
+            e.stopPropagation();
+        });
+
+        // Bulk Notification trigger button click
+        $(document).on('click', '#send-bulk-notification', function(e) {
+            const checkboxes = getVisibleRowCheckboxes();
+            const selectedIds = checkboxes.filter(cb => cb.checked).map(cb => cb.value).filter(val => val !== "");
+
+            if (selectedIds.length === 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                Swal.fire({
+                    icon: 'info',
+                    title: 'No Providers Selected',
+                    text: 'Please select one or more providers from the table using checkboxes to send a bulk notification.'
+                });
+                return false;
+            }
+
+            // Clear any single provider ID data
+            const targetForm = $('#sendNotification1');
+            targetForm.removeData('id');
+            targetForm.removeData('module');
+            $('#selectedProviderIds').val(JSON.stringify(selectedIds));
+
+            $('#recipientCountText').html(`Target: <strong>${selectedIds.length} Selected Provider(s)</strong>`);
+            $('#Title').val('');
+            $('#description').val('');
+
+            const offcanvasEl = document.getElementById('send_push_notification');
+            if (offcanvasEl) {
+                bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show();
+            }
         });
 
         // ============================
@@ -2565,31 +3086,31 @@
             const verificationFields = [{
                     label: 'Identity Proof',
                     field: 'identity_proof_verified',
-                    imageUrl: `https://petsfolio.in/public/uploads/aadhaar_photos/`,
+                    imageUrl: `https://api.petsfolio.in/public/uploads/aadhaar_photos/`,
                     type: 'identity_proof'
                 },
                 {
                     label: 'Police Verification',
                     field: 'police_verification_verified',
-                    imageUrl: `https://petsfolio.in/public/uploads/providers/verifications/`,
+                    imageUrl: `https://api.petsfolio.in/public/uploads/providers/verifications/`,
                     type: 'police_verification'
                 },
                 {
                     label: 'Walking Certificate',
                     field: 'walking_verified',
-                    imageUrl: `https://petsfolio.in/public/uploads/providers/verifications/`,
+                    imageUrl: `https://api.petsfolio.in/public/uploads/providers/verifications/`,
                     type: 'walking'
                 },
                 {
                     label: 'Grooming Certificate',
                     field: 'grooming_verified',
-                    imageUrl: `https://petsfolio.in/public/uploads/providers/verifications/`,
+                    imageUrl: `https://api.petsfolio.in/public/uploads/providers/verifications/`,
                     type: 'grooming'
                 },
                 {
                     label: 'Training Certificate',
                     field: 'training_verified',
-                    imageUrl: `https://petsfolio.in/public/uploads/providers/verifications/`,
+                    imageUrl: `https://api.petsfolio.in/public/uploads/providers/verifications/`,
                     type: 'training'
                 }
             ];
@@ -2858,6 +3379,18 @@
                             <div class="col-md-6 mb-3">
                                 <div class="text-black small mb-1 fw-bold">Wallet Balance</div>
                                 <div class="fw-medium text-success">₹${data.wallet_amount || 0}</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="text-black small mb-1 fw-bold">Device & App</div>
+                                <div class="fw-medium text-dark">
+                                    ${data.latest_device ? `
+                                        <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1">
+                                            v${data.latest_device.app_version || 'N/A'} ${data.latest_device.build_number ? '(' + data.latest_device.build_number + ')' : ''}
+                                        </span>
+                                        <div><strong>${data.latest_device.os ? data.latest_device.os.charAt(0).toUpperCase() + data.latest_device.os.slice(1) : ''} ${data.latest_device.os_version || ''}</strong></div>
+                                        <small class="text-muted">${(data.latest_device.manufacturer || '') + ' ' + (data.latest_device.model || data.latest_device.device_name || '')}</small>
+                                    ` : '<span class="text-muted">No Device</span>'}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3131,31 +3664,12 @@
         // ============================
         // 9. INITIALIZE EVERYTHING
         // ============================
-        initializeCheckboxes();
-        updateBulkNotificationButtonState();
-        updateApplyButtonState();
-
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('select-table-row') ||
-                e.target.name === 'select_all_table') {
-                updateBulkNotificationButtonState();
-                updateApplyButtonState();
-            }
-        });
-
-        // Global function for select all
-        window.selectAllTable = function(checkbox) {
-            const tableId = checkbox.id.replace('select-all-', '') + 'ProvidersTable';
-            const table = document.getElementById(tableId);
-            console.log(tableId)
-            if (table) {
-                const checkboxes = table.querySelectorAll('.select-table-row');
-                checkboxes.forEach(cb => {
-                    cb.checked = checkbox.checked;
-                });
-                document.dispatchEvent(new Event('change'));
-            }
-        };
+        if (typeof updateBulkNotificationButtonState === 'function') {
+            updateBulkNotificationButtonState();
+        }
+        if (typeof updateApplyButtonState === 'function') {
+            updateApplyButtonState();
+        }
 
         const searchInput = document.getElementById('searchProviders');
 
@@ -3196,90 +3710,188 @@
 
         // Download providers functionality
         window.downloadProviders = function() {
-            const selectedIds = Array.from(document.querySelectorAll('.select-table-row:checked'))
-                .map(checkbox => checkbox.value);
+            // 1. Collect all checked provider IDs
+            const selectedCheckboxes = document.querySelectorAll('.select-table-row:checked');
+            const selectedIds = Array.from(selectedCheckboxes)
+                .map(cb => cb.value)
+                .filter(val => val !== "" && val !== undefined && val !== null);
 
+            // 2. Collect current URL and DOM filter values
             const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
 
-            if (selectedIds.length === 0) {
-                if (confirm('No providers selected. Download all providers?')) {
-                    let downloadUrl = "<?= base_url() ?>downloadProviders";
-                    if (status) {
-                        downloadUrl += `?status=${encodeURIComponent(status)}`;
-                    }
-                    window.location.href = downloadUrl;
-                }
-            } else {
-                const form = document.createElement("form");
-                form.method = "GET";
-                form.action = "<?= base_url() ?>downloadProviders";
-                form.style.display = "none";
+            const serviceFilter = document.getElementById('serviceFilter');
+            if (serviceFilter && serviceFilter.value) {
+                urlParams.set('service_id', serviceFilter.value);
+            }
 
+            const cityFilter = document.getElementById('cityFilter');
+            if (cityFilter && cityFilter.value) {
+                urlParams.set('city', cityFilter.value);
+            }
+
+            const areaFilter = document.getElementById('areaFilter');
+            if (areaFilter && areaFilter.value) {
+                urlParams.set('area', areaFilter.value);
+            }
+
+            const experienceFilter = document.getElementById('experienceFilter');
+            if (experienceFilter && experienceFilter.value) {
+                urlParams.set('experience', experienceFilter.value);
+            }
+
+            const searchInput = document.getElementById('searchProviders');
+            if (searchInput && searchInput.value.trim()) {
+                urlParams.set('search', searchInput.value.trim());
+            }
+
+            // 3. Create a form to POST / GET download request
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "<?= base_url('downloadProviders') ?>";
+            form.style.display = "none";
+
+            const csrfTokenName = '<?= csrf_token() ?>';
+            const csrfHash = '<?= csrf_hash() ?>';
+            if (csrfTokenName && csrfHash) {
+                const inputCsrf = document.createElement("input");
+                inputCsrf.type = "hidden";
+                inputCsrf.name = csrfTokenName;
+                inputCsrf.value = csrfHash;
+                form.appendChild(inputCsrf);
+            }
+
+            if (selectedIds.length > 0) {
                 const inputIds = document.createElement("input");
                 inputIds.type = "hidden";
                 inputIds.name = "ids";
                 inputIds.value = JSON.stringify(selectedIds);
                 form.appendChild(inputIds);
-
-                if (status) {
-                    const inputStatus = document.createElement("input");
-                    inputStatus.type = "hidden";
-                    inputStatus.name = "status";
-                    inputStatus.value = status;
-                    form.appendChild(inputStatus);
-                }
-
-                document.body.appendChild(form);
-                form.submit();
             }
+
+            for (const [key, value] of urlParams.entries()) {
+                if (key !== 'ids' && key !== 'page') {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                }
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            setTimeout(() => {
+                if (document.body.contains(form)) {
+                    document.body.removeChild(form);
+                }
+            }, 1000);
         };
 
-        // Send notification functionality
-        $(document).on('click', '[data-assign-module]', function() {
-            const dataId = $(this).data('id');
-            const moduleId = $(this).data('module');
+        // Send notification functionality (Individual click)
+        $(document).on('click', '[data-assign-module]', function(e) {
+            e.stopPropagation();
+            const dataId = $(this).data('id') || $(this).data('assign-module');
+            const moduleId = $(this).data('module') || 'service_providers';
 
             const targetForm = $('#sendNotification1');
             targetForm.data('id', dataId);
             targetForm.data('module', moduleId);
+            $('#selectedProviderIds').val('');
+
+            $('#recipientCountText').html(`Target: <strong>Provider ID #${dataId}</strong>`);
+            $('#Title').val('');
+            $('#description').val('');
+
+            const offcanvasEl = document.getElementById('send_push_notification');
+            if (offcanvasEl) {
+                bootstrap.Offcanvas.getOrCreateInstance(offcanvasEl).show();
+            }
         });
 
+        // Send notification submit (handles both single provider and bulk selected providers)
         $('#sendNotification1').on('submit', function(e) {
             e.preventDefault();
 
             const url = $(this).attr('action');
-            let id = $(this).data('id') || $('#selectedProviderIds').val();
-            const title = $('#Title').val();
-            const message = $('#description').val();
+            let id = $(this).data('id');
+            if (!id) {
+                id = $('#selectedProviderIds').val();
+            }
+
+            const title = $('#Title').val().trim();
+            const message = $('#description').val().trim();
             let module = $(this).data('module') || 'service_providers';
+            const queueOnly = $('#sp_queue_only').length ? ($('#sp_queue_only').is(':checked') ? 1 : 0) : 1;
+
+            if (!id || id === '[]' || id === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Recipient Selected',
+                    text: 'Please select at least one provider to send notification.'
+                });
+                return;
+            }
+
+            if (!title || !message) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Information',
+                    text: 'Please enter both Title and Message.'
+                });
+                return;
+            }
+
+            const submitBtn = $('#sendNotificationBtn');
+            const originalBtnHtml = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Sending...');
 
             $.ajax({
                 url: url,
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': csrfToken || $('meta[name="csrf-token"]').attr('content')
                 },
                 data: {
-                    'id': id,
+                    id: id,
                     title: title,
                     message: message,
-                    module: module
+                    module: module,
+                    queue_only: queueOnly
                 },
                 traditional: true,
                 success: function(response) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
                     if (response.status) {
-                        Swal.fire('Success!', 'Notification sent successfully.', 'success')
-                        setTimeout(() => {
-                            location.reload();
-                        }, 1000)
+                        const offcanvasEl = document.getElementById('send_push_notification');
+                        if (offcanvasEl) {
+                            const inst = bootstrap.Offcanvas.getInstance(offcanvasEl);
+                            if (inst) inst.hide();
+                        }
+                        const successMsg = response.message || (response.is_queue ? 'Notification queued successfully.' : 'Notification sent successfully.');
+                        Swal.fire('Success!', successMsg, 'success');
+
+                        // Reset selection & inputs
+                        $('#Title').val('');
+                        $('#description').val('');
+                        document.querySelectorAll('.select-table-row').forEach(cb => cb.checked = false);
+                        document.querySelectorAll('input[name="select_all_table"], [id^="select-all-"]').forEach(cb => {
+                            cb.checked = false;
+                            cb.indeterminate = false;
+                        });
+                        if (typeof updateBulkNotificationButtonState === 'function') {
+                            updateBulkNotificationButtonState();
+                        }
+                        if (typeof updateApplyButtonState === 'function') {
+                            updateApplyButtonState();
+                        }
                     } else {
-                        Swal.fire('Error!', response.message, 'error');
+                        Swal.fire('Error!', response.message || 'Failed to send notification.', 'error');
                     }
                 },
                 error: function(xhr, status, error) {
+                    submitBtn.prop('disabled', false).html(originalBtnHtml);
                     console.error('Error sending notification:', error);
-                    Swal.fire('Error!', 'An error occurred. Please try again later.', 'error');
+                    Swal.fire('Error!', 'An error occurred while sending notification. Please try again.', 'error');
                 }
             });
         });
@@ -3322,19 +3934,35 @@
     });
 
     function applyFilters() {
-        const service = document.getElementById('serviceFilter').value;
-        const city = document.getElementById('cityFilter').value;
-        const area = document.getElementById('areaFilter').value;
+        const searchInput = document.getElementById('searchProviders');
+        const serviceSelect = document.getElementById('serviceFilter');
+        const citySelect = document.getElementById('cityFilter');
+        const areaSelect = document.getElementById('areaFilter');
+        const experienceSelect = document.getElementById('experienceFilter');
 
         let url = new URL(window.location.href);
-        if (service) url.searchParams.set('service_id', service);
+
+        const searchVal = searchInput ? searchInput.value.trim() : '';
+        if (searchVal) url.searchParams.set('search', searchVal);
+        else url.searchParams.delete('search');
+
+        const serviceVal = serviceSelect ? serviceSelect.value : '';
+        if (serviceVal) url.searchParams.set('service_id', serviceVal);
         else url.searchParams.delete('service_id');
 
-        if (city) url.searchParams.set('city', city);
+        const cityVal = citySelect ? citySelect.value : '';
+        if (cityVal) url.searchParams.set('city', cityVal);
         else url.searchParams.delete('city');
 
-        if (area) url.searchParams.set('area', area);
+        const areaVal = areaSelect ? areaSelect.value : '';
+        if (areaVal) url.searchParams.set('area', areaVal);
         else url.searchParams.delete('area');
+
+        if (experienceSelect) {
+            const expVal = experienceSelect.value;
+            if (expVal) url.searchParams.set('experience', expVal);
+            else url.searchParams.delete('experience');
+        }
 
         url.searchParams.delete('page');
 
@@ -3353,20 +3981,11 @@
     }
 
     function applySearch() {
-        const search = document.getElementById('searchProviders').value.trim();
-        let url = new URL(window.location.href);
-        if (search) url.searchParams.set('search', search);
-        else url.searchParams.delete('search');
-        url.searchParams.delete('page');
-        window.location.href = url.toString();
+        applyFilters();
     }
 
     function applyExperienceFilter(val) {
-        let url = new URL(window.location.href);
-        if (val) url.searchParams.set('experience', val);
-        else url.searchParams.delete('experience');
-        url.searchParams.delete('page');
-        window.location.href = url.toString();
+        applyFilters();
     }
 
     function changeLimit(limit) {
@@ -3375,12 +3994,5 @@
         url.searchParams.delete('page');
         window.location.href = url.toString();
     }
-
-    window.downloadProviders = function() {
-        const baseUrl = '<?= base_url() ?>';
-        const params = new URLSearchParams(window.location.search);
-        window.location.href = baseUrl + 'downloadProviders?' + params.toString();
-    }
 </script>
-</main>
 <?= $this->endSection(); ?>

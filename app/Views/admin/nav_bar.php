@@ -52,7 +52,7 @@
                                 </div>
                             </div>
                             <div class="p-3 border-top">
-                                <a href="https://petsfolio.in/admin/support" class="btn btn-outline-primary w-100">
+                                <a href="https://admin.petsfolio.in/support" class="btn btn-outline-primary w-100">
                                     <i class="bi bi-eye me-1"></i> View All Notifications
                                 </a>
                             </div>
@@ -463,12 +463,12 @@
         const li = document.createElement('div');
         li.className = 'notification-item border-bottom';
         li.innerHTML = `
-            <a class="dropdown-item " href="https://petsfolio.in/admin/support">
+            <a class="dropdown-item " href="https://admin.petsfolio.in//support">
                 <div class="d-flex gap-3">
                     <div class="flex-shrink-0">
                         <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
                             <img class="img-fluid h-100 w-100" style="object-fit: cover;"
-                                src="${notification.profile ? `https://petsfolio.in/public/uploads/${path}/${notification.profile}` : 'https://petsfolio.in/admin/public/assets/images/avatars/user.png'}"
+                                src="${notification.profile ? `https://admin.petsfolio.in/public/uploads/${path}/${notification.profile}` : 'https://petsfolio.in/admin/public/assets/images/avatars/user.png'}"
                                 alt="${notification.name}">
                         </div>
                     </div>

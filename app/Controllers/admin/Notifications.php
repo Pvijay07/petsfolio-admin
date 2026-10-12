@@ -106,7 +106,7 @@ class Notifications extends Controller
           'image' => $this->request->getVar('image'),
           'url' => $this->request->getVar('url'),
           'sound' => $this->request->getVar('sound') ?? true,
-          'soundUrl' => $this->request->getVar('sound_url') ?? 'https://beta.petsfolio.in/admin/public/assets/sounds/bark.mp3',
+          'soundUrl' => $this->request->getVar('sound_url') ?? 'https://staging-api.petsfolio.in/admin/public/assets/sounds/bark.mp3',
           'tag' => $this->request->getVar('tag') ?? 'general',
           'requireInteraction' => $this->request->getVar('require_interaction') ?? false,
           'silent' => $this->request->getVar('silent') ?? false
@@ -304,6 +304,35 @@ class Notifications extends Controller
       }
     } catch (\Exception $e) {
       return $this->response->setJSON(['valid' => false, 'error' => $e->getMessage()]);
+    }
+  }
+
+  /**
+   * Purge old notifications via API / admin request.
+   */
+  public function purgeOld()
+  {
+    $days = (int)($this->request->getVar('days') ?? 30);
+    $table = (string)($this->request->getVar('table') ?? 'notifications');
+    $readOnly = (bool)($this->request->getVar('read_only') ?? false);
+    $dryRun = (bool)($this->request->getVar('dry_run') ?? false);
+
+    try {
+      $purgeService = new \App\Libraries\NotificationPurgeService();
+      $result = $purgeService->purge([
+        'days'      => $days,
+        'table'     => $table,
+        'read_only' => $readOnly,
+        'dry_run'   => $dryRun
+      ]);
+
+      return $this->response->setJSON($result);
+    } catch (\Exception $e) {
+      log_message('error', 'Purge error: ' . $e->getMessage());
+      return $this->response->setStatusCode(500)->setJSON([
+        'success' => false,
+        'error'   => $e->getMessage()
+      ]);
     }
   }
 }

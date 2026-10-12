@@ -9,71 +9,161 @@
     </div>
 
     <div class="container-fluid px-4 content-inner pb-0" id="page_layout">
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col-12">
-                <div class="dashboard-header-gradient rounded-3">
-                    <div class="card border-0 overflow-hidden rounded-3 glass-card mb-0">
-                        <div class="card-body p-3 position-relative text-white">
+                <div class="dashboard-header-gradient rounded-4 shadow-sm" style="background: linear-gradient(135deg, #0d424d 0%, #165b69 100%);">
+                    <div class="card border-0 bg-transparent rounded-4 mb-0">
+                        <div class="card-body p-4 text-white">
                             <div class="row align-items-center">
-                                <div class="col-lg-8 mb-4 mb-lg-0">
+                                <div class="col-lg-7 mb-3 mb-lg-0">
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="glass-pill rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
-                                            style="width: 50px; height: 50px;">
-                                            <i class="bi bi-speedometer2 fs-3"></i>
+                                            style="width: 54px; height: 54px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25);">
+                                            <i class="bi bi-speedometer2 fs-2 text-warning"></i>
                                         </div>
                                         <div>
-                                            <h3 class="fw-bold mb-2 text-white">Dashboard Analytics</h3>
-                                            <p class="text-white-75 mb-0">
-                                                Welcome back! Here's your business overview
+                                            <h3 class="fw-bold mb-1 text-white">Petsfolio Executive Dashboard</h3>
+                                            <p class="text-white-75 mb-0 small">
+                                                Real-time business overview, financial analytics, provider verification & AI call intelligence
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div class="d-flex flex-wrap gap-3">
-                                        <div class="d-flex align-items-center glass-pill rounded-3 px-3 py-2">
-                                            <i class="bi bi-calendar-check me-2"></i>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex align-items-center glass-pill rounded-pill px-3 py-1" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem;">
+                                            <i class="bi bi-calendar-check text-info me-2"></i>
                                             <span><?= date('F d, Y') ?></span>
                                         </div>
 
-                                        <div class="d-flex align-items-center glass-pill rounded-3 px-3 py-2">
-                                            <i class="bi bi-currency-rupee me-2"></i>
-                                            <span>₹<?= number_format($profit ?? 0) ?> Net Profit</span>
+                                        <div class="d-flex align-items-center glass-pill rounded-pill px-3 py-1" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem;">
+                                            <i class="bi bi-currency-rupee text-success me-1"></i>
+                                            <span class="fw-bold">₹<?= number_format($profit ?? 0) ?></span> <span class="ms-1 text-white-50">Net Profit</span>
                                         </div>
 
-                                        <div class="d-flex align-items-center glass-pill rounded-3 px-3 py-2">
-                                            <i class="bi bi-people me-2"></i>
-                                            <span><?= $active_customers_count ?> Active Customers</span>
+                                        <div class="d-flex align-items-center glass-pill rounded-pill px-3 py-1" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem;">
+                                            <i class="bi bi-people text-warning me-2"></i>
+                                            <span><strong class="text-warning"><?= number_format($active_customers_count ?? 0) ?></strong> Active Customers</span>
                                         </div>
 
-                                        <div class="d-flex align-items-center glass-pill rounded-3 px-3 py-2"
-                                            title="Cashfree Payout Balance">
-                                            <i class="bi bi-wallet2 me-2"></i>
-                                            <span>₹<?= number_format($payout_balance['available'] ?? 0, 2) ?> Payout
-                                                Balance</span>
+                                        <div class="d-flex align-items-center glass-pill rounded-pill px-3 py-1" style="background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.85rem;" title="Cashfree Payout Balance">
+                                            <i class="bi bi-wallet2 text-success me-2"></i>
+                                            <span>₹<?= number_format($payout_balance['available'] ?? 0, 2) ?> Payout Balance</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-lg-4 text-lg-end">
-                                    <div class="d-flex flex-column gap-3">
-                                        <div class="glass-pill rounded-3 p-3 d-inline-block">
-                                            <h4 class="mb-0 fw-bold text-white"><?= date('M Y') ?></h4>
-                                            <small class="text-white-75">Current Period</small>
-                                        </div>
+                                <div class="col-lg-5 text-lg-end">
+                                    <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                                        <!-- AI Business Analyst Button -->
+                                        <a href="<?= base_url('ai-analyst') ?>" class="btn rounded-pill px-3 py-2 text-white fw-bold d-flex align-items-center gap-2 shadow-sm" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 1px solid rgba(255, 255, 255, 0.3);">
+                                            <i class="bi bi-magic fs-6 text-warning"></i>
+                                            <span>AI Business Analyst</span>
+                                        </a>
 
-                                        <button class="btn glass-btn fw-semibold text-black" onclick="generateReport()">
-                                            <i class="bi bi-download me-2"></i>Export Report
+                                        <!-- AI Call Analysis Button -->
+                                        <a href="<?= base_url('call-analysis') ?>" class="btn rounded-pill px-3 py-2 text-white fw-bold d-flex align-items-center gap-2 shadow-sm" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border: 1px solid rgba(255, 255, 255, 0.3);">
+                                            <i class="bi bi-mic-fill fs-6 text-info"></i>
+                                            <span>Call Analysis</span>
+                                            <?php if (!empty($call_stats['flagged_calls']) && $call_stats['flagged_calls'] > 0): ?>
+                                                <span class="badge bg-danger rounded-pill ms-1"><?= $call_stats['flagged_calls'] ?> Flagged</span>
+                                            <?php endif; ?>
+                                        </a>
+
+                                        <button class="btn btn-outline-light rounded-pill px-3 py-2 font-medium d-flex align-items-center gap-1" onclick="generateReport()">
+                                            <i class="bi bi-download me-1"></i> Export
                                         </button>
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Top Key Metric Cards Row -->
+        <div class="row g-3 mb-4">
+            <!-- Revenue & Profit Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-3 position-relative overflow-hidden" style="background: #ffffff;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">Total Net Revenue</span>
+                            <h2 class="fw-bold text-dark my-1">₹<?= number_format($revenue ?? 0) ?></h2>
+                        </div>
+                        <div class="p-3 rounded-4" style="background: rgba(13, 66, 77, 0.08); color: #0d424d;">
+                            <i class="bi bi-graph-up-arrow fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-auto pt-2 border-top border-light">
+                        <span class="badge bg-success-subtle text-success fw-bold rounded-pill px-2 py-1">
+                            <i class="bi bi-arrow-up-right me-1"></i><?= $margin ?? 0 ?>% Margin
+                        </span>
+                        <span class="small text-muted">₹<?= number_format($profit ?? 0) ?> Profit</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Bookings Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-3 position-relative overflow-hidden" style="background: #ffffff;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">Completed Bookings</span>
+                            <h2 class="fw-bold text-dark my-1"><?= number_format($total_completed_bookings ?? 0) ?></h2>
+                        </div>
+                        <div class="p-3 rounded-4" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                            <i class="bi bi-check2-circle fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mt-auto pt-2 border-top border-light">
+                        <span class="badge bg-success rounded-pill px-2 py-1 small">Active Fulfillment</span>
+                        <span class="small text-muted"><?= number_format($total_pending_bookings ?? 0) ?> Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Providers & Verification Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-3 position-relative overflow-hidden" style="background: #ffffff;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">Service Providers</span>
+                            <h2 class="fw-bold text-dark my-1"><?= number_format($providers->total ?? 0) ?></h2>
+                        </div>
+                        <div class="p-3 rounded-4" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                            <i class="bi bi-person-badge fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top border-light">
+                        <span class="badge bg-warning-subtle text-warning-emphasis fw-bold rounded-pill px-2 py-1">
+                            <?= number_format($providers->pending_verification ?? 0) ?> Pending Verification
+                        </span>
+                        <a href="<?= base_url('/providers?status=active') ?>" class="small text-decoration-none fw-semibold" style="color: #0d424d;">Verify &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Call Recording Quality Score Card -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-3 position-relative overflow-hidden" style="background: #ffffff;">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.5px;">AI Call Quality Score</span>
+                            <h2 class="fw-bold text-dark my-1"><?= $call_stats['avg_score'] ?? 0 ?><small class="fs-6 text-muted">/100</small></h2>
+                        </div>
+                        <div class="p-3 rounded-4" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                            <i class="bi bi-mic-fill fs-4"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top border-light">
+                        <span class="small text-muted">
+                            <strong class="text-dark"><?= number_format($call_stats['completed_analysis'] ?? 0) ?></strong> Calls Analyzed
+                        </span>
+                        <a href="<?= base_url('call-analysis') ?>" class="small text-decoration-none fw-semibold text-primary">Audit Log &rarr;</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Quick Stats Tabs -->
@@ -82,7 +172,7 @@
                 <div class="glass-card rounded-5">
                     <div class="card mb-0 rounded-5 border">
                         <div class="card-body p-2 rounded-5 border" style="border-color: #6e90ff !important;">
-                            <div class="d-flex flex-wrap gap-5 justify-content-center">
+                            <div class="d-flex flex-wrap gap-4 justify-content-center">
                                 <button class="dashboard-tab active" onclick="switchTab('overview')">
                                     <i class="bi bi-speedometer2 me-2"></i>Quick Actions
                                 </button>
@@ -94,6 +184,9 @@
                                 </button>
                                 <button class="dashboard-tab" onclick="switchTab('providers')">
                                     <i class="bi bi-people me-2"></i>Providers
+                                </button>
+                                <button class="dashboard-tab" onclick="switchTab('ai-analysis')">
+                                    <i class="bi bi-mic me-2"></i>AI Call Analysis
                                 </button>
                             </div>
                         </div>
@@ -655,6 +748,34 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="card border-0 shadow-sm rounded-3 h-100 mb-0 border-start border-3 border-danger">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="stat-icon-wrapper me-3 bg-danger" style="width: 48px; height: 48px; border-radius: 8px;">
+                                            <i class="bi bi-shield-exclamation text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-danger fw-bold small d-block">Unauthorized Provider Visits</span>
+                                            <div class="d-flex align-items-baseline">
+                                                <span class="fw-bold fs-3 text-danger"><?= $suspicious_visits_count ?? 0 ?></span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2">Flagged</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between small mb-1">
+                                            <span>Stayed 5+ min without booking</span>
+                                            <span><?= $suspicious_visits_count ?? 0 ?> visits</span>
+                                        </div>
+                                        <a href="<?= base_url('/suspicious-visits') ?>"
+                                            class="btn btn-sm btn-outline-danger w-100 mt-2">
+                                            <i class="bi bi-shield-slash me-1"></i>View Flagged Visits
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1016,53 +1137,55 @@
                                                 class="border-0 text-center text-white">Service</th>
                                             <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
                                                 class="border-0 text-center text-white">Completed</th>
+                                                <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                class="border-0 text-center text-white">Rating</th>
                                             <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
                                                 class="border-0 text-center text-white">Earnings</th>
                                             <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
                                                 class="border-0 text-center text-white">Status</th>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $top_providers = [
-                                            ['name' => 'John Smith', 'service' => 'Grooming', 'rating' => 4.9, 'completed' => 42, 'earnings' => '₹1,25,400', 'status' => 'active'],
-                                            ['name' => 'Emma Wilson', 'service' => 'Training', 'rating' => 4.8, 'completed' => 38, 'earnings' => '₹98,500', 'status' => 'active'],
-                                            ['name' => 'Mike Johnson', 'service' => 'Walking', 'rating' => 4.7, 'completed' => 56, 'earnings' => '₹87,200', 'status' => 'active'],
-                                            ['name' => 'Sarah Davis', 'service' => 'Boarding', 'rating' => 4.9, 'completed' => 31, 'earnings' => '₹1,05,800', 'status' => 'active'],
-                                            ['name' => 'Robert Brown', 'service' => 'Grooming', 'rating' => 4.6, 'completed' => 27, 'earnings' => '₹76,300', 'status' => 'inactive']
-                                        ];
-
-                                        foreach ($top_providers as $provider) {
-                                            echo '
+                                                         <tbody>
+                                        <?php if (!empty($top_performing_providers)): ?>
+                                            <?php foreach ($top_performing_providers as $provider): 
+                                                $rating    = number_format((float)($provider['stat_avg_rating'] ?? 0), 1);
+                                                $completed = number_format((int)($provider['stat_completed_bookings'] ?? 0));
+                                                $earnings  = '₹' . number_format((float)($provider['wallet_amount'] ?? 0), 2);
+                                                $service   = esc($provider['primary_service'] ?? 'All Services');
+                                                $status    = strtolower((string)($provider['status'] ?? 'active'));
+                                                $is_active = in_array($status, ['active', '1', 'approved']);
+                                            ?>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        <div class="avatar-premium me-3" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
-                                                            ' . strtoupper(substr((string)($provider['name'] ?? ''), 0, 1)) . '
+                                                        <div class="avatar-premium me-3" style="background: linear-gradient(135deg, #0d424d 0%, #165b69 100%); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700;">
+                                                            <?= strtoupper(substr((string)($provider['name'] ?? 'P'), 0, 1)) ?>
                                                         </div>
-                                                       <div class="d-flex flex-column">
-                                                        <span class="fw-semibold">' . $provider['name'] . '</span>
-                                                        <span class="badge-premium bg-warning bg-opacity-10 text-warning" style="max-width:max-content;">
-                                                        ' . $provider['rating'] . ' ★
-                                                    </span>
-                                                       </div>
+                                                        <div class="d-flex flex-column">
+                                                            <span class="fw-semibold text-dark"><?= esc($provider['name'] ?? 'Unknown') ?></span>
+                                                            <small class="text-muted"><?= esc($provider['city'] ?? 'Unspecified') ?></small>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
-                                                    <span class="badge-premium" style="background-color: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                                        ' . $provider['service'] . '
+                                                    <span class="badge rounded-pill px-2.5 py-1" style="background-color: rgba(13, 66, 77, 0.08); color: #0d424d; font-weight: 600;">
+                                                        <?= $service ?>
                                                     </span>
                                                 </td>
-                                                <td class="text-center fw-semibold">' . $provider['completed'] . '</td>
-                                                <td class="text-center fw-bold" style="color: #10b981;">' . $provider['earnings'] . '</td>
+                                                <td class="text-center fw-semibold text-dark"><?= $completed ?></td>
+                                                <td class="text-center text-warning fw-bold"><?= $rating ?> ★</td>
+                                                <td class="text-center fw-bold" style="color: #10b981;"><?= $earnings ?></td>
                                                 <td class="text-center">
-                                                    <span class="badge-premium ' . ($provider['status'] === 'active' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger') . '">
-                                                        ' . ucfirst($provider['status']) . '
+                                                    <span class="badge rounded-pill <?= $is_active ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' ?> px-2.5 py-1">
+                                                        <?= $is_active ? 'Active' : 'Pending/Inactive' ?>
                                                     </span>
                                                 </td>
-                                            </tr>';
-                                        }
-                                        ?>
+                                            </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted py-4">No provider performance records found.</td>
+                                            </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -1073,10 +1196,10 @@
                 <div class="col-xl-4">
                     <!-- Provider Statistics -->
                     <div class="card glass-card border-0 shadow-sm rounded-3">
-                        <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                        <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #0d424d 0%, #165b69 100%)!important;  
                             border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
                             <h5 class="mb-1 fw-bold text-white">Provider Statistics</h5>
-                            <small class="text-white">Provider network overview</small>
+                            <small class="text-white">Real-time provider network metrics</small>
                         </div>
                         <div class="card-body">
                             <div class="row text-center">
@@ -1085,7 +1208,7 @@
                                         style="width: 48px; height: 48px;">
                                         <i class="bi bi-people"></i>
                                     </div>
-                                    <h4 class="mb-1 fw-bold"><?= $active_providers ?? 0 ?></h4>
+                                    <h4 class="mb-1 fw-bold text-dark"><?= number_format($provider_stats_dynamic['active'] ?? $providers->total ?? 0) ?></h4>
                                     <small class="text-muted">Active Providers</small>
                                 </div>
                                 <div class="col-6 mb-3">
@@ -1093,23 +1216,23 @@
                                         style="width: 48px; height: 48px;">
                                         <i class="bi bi-check-circle"></i>
                                     </div>
-                                    <h4 class="mb-1 fw-bold">94%</h4>
-                                    <small class="text-muted">Satisfaction</small>
+                                    <h4 class="mb-1 fw-bold text-success"><?= $provider_stats_dynamic['satisfaction_rate'] ?? 95 ?>%</h4>
+                                    <small class="text-muted">Satisfaction Rate</small>
                                 </div>
                                 <div class="col-6">
                                     <div class="stat-icon-wrapper dashboard-gradient-blue text-white mx-auto mb-2"
                                         style="width: 48px; height: 48px;">
                                         <i class="bi bi-clock"></i>
                                     </div>
-                                    <h4 class="mb-1 fw-bold"><?= $providers->pending_tracking_approvals ?? 0 ?></h4>
-                                    <small class="text-muted">Pending Approval</small>
+                                    <h4 class="mb-1 fw-bold text-warning"><?= number_format($providers->pending_verification ?? 0) ?></h4>
+                                    <small class="text-muted">Pending Verification</small>
                                 </div>
                                 <div class="col-6">
                                     <div class="stat-icon-wrapper dashboard-gradient-orange text-white mx-auto mb-2"
                                         style="width: 48px; height: 48px;">
                                         <i class="bi bi-star"></i>
                                     </div>
-                                    <h4 class="mb-1 fw-bold">4.7</h4>
+                                    <h4 class="mb-1 fw-bold text-dark"><?= number_format($provider_stats_dynamic['avg_rating'] ?? 4.8, 1) ?> ★</h4>
                                     <small class="text-muted">Avg. Rating</small>
                                 </div>
                             </div>
@@ -1126,6 +1249,103 @@
                         <div class="card-body">
                             <canvas id="providerServicesChart" style="height: 200px; width: 100%;"></canvas>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI CALL ANALYSIS & AUDIT SECTION -->
+        <div id="ai-analysis-tab" class="tab-content" style="display: none;">
+            <div class="row g-4 mb-4">
+                <!-- AI Call Quality Summary Card -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold mb-0 text-dark">AI Call Analysis</h5>
+                            <span class="badge bg-success-subtle text-success fw-bold rounded-pill px-3 py-1">Faster-Whisper AI</span>
+                        </div>
+                        
+                        <div class="text-center py-3">
+                            <div class="display-3 fw-bold my-1" style="color: #0d424d;"><?= $call_stats['avg_score'] ?? 0 ?></div>
+                            <div class="text-muted small fw-semibold">Average Call Quality Score (/100)</div>
+                            
+                            <div class="progress mt-3 rounded-pill" style="height: 10px;">
+                                <div class="progress-bar bg-success" style="width: <?= min(100, max(0, $call_stats['avg_score'] ?? 0)) ?>%"></div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-top mt-2">
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Total Recordings Analyzed:</span>
+                                <strong class="text-dark"><?= number_format($call_stats['completed_analysis'] ?? 0) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2 small">
+                                <span class="text-muted">Positive Sentiment Calls:</span>
+                                <strong class="text-success"><?= number_format($call_stats['positive_sentiment'] ?? 0) ?></strong>
+                            </div>
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-muted">Flagged / Low-Score Calls:</span>
+                                <strong class="<?= ($call_stats['flagged_calls'] ?? 0) > 0 ? 'text-danger fw-bold' : 'text-muted' ?>"><?= number_format($call_stats['flagged_calls'] ?? 0) ?></strong>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="<?= base_url('call-analysis') ?>" class="btn rounded-pill w-100 font-medium text-white fw-bold py-2.5 shadow-sm" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                                <i class="bi bi-mic-fill me-2"></i>Open Full Call Analysis Portal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Executives QA Audit Leaderboard -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-dark">Verification Executives Call Audit</h5>
+                                <small class="text-muted">Call verification metrics and manager approval ratios</small>
+                            </div>
+                            <a href="<?= base_url('call-analysis') ?>" class="btn btn-sm btn-light rounded-pill px-3 fw-semibold">
+                                <i class="bi bi-mic me-1 text-primary"></i>Audit Log
+                            </a>
+                        </div>
+
+                        <?php if(isset($verification_executives) && !empty($verification_executives)): ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Executive Name</th>
+                                        <th class="text-center">Call Verifications</th>
+                                        <th class="text-center">Manager Approvals</th>
+                                        <th class="text-center">Total SPs</th>
+                                        <th class="text-center">Approval Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($verification_executives as $exec): 
+                                        $rate = $exec->call_verification_count > 0 ? round(($exec->manager_approval_count / $exec->call_verification_count) * 100) : 0;
+                                    ?>
+                                    <tr>
+                                        <td class="fw-bold text-dark">
+                                            <i class="bi bi-person-circle me-2 text-secondary"></i><?= htmlspecialchars($exec->name ?? '') ?>
+                                        </td>
+                                        <td class="text-center fw-bold text-primary"><?= number_format($exec->call_verification_count) ?></td>
+                                        <td class="text-center fw-bold text-success"><?= number_format($exec->manager_approval_count) ?></td>
+                                        <td class="text-center fw-bold text-dark"><?= number_format($exec->total_sp_count) ?></td>
+                                        <td class="text-center">
+                                            <span class="badge <?= $rate >= 70 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning-emphasis' ?> rounded-pill px-2.5 py-1">
+                                                <?= $rate ?>%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        <?php else: ?>
+                            <div class="text-muted py-4 text-center">No verification executive activity recorded yet.</div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -1969,18 +2189,19 @@
         // Provider Services Chart
         const providerServicesCtx = document.getElementById('providerServicesChart')?.getContext('2d');
         if (providerServicesCtx) {
+            const distData = <?= json_encode(array_values($provider_service_distribution ?? ['Walking'=>1, 'Grooming'=>1, 'Training'=>1, 'Boarding'=>1, 'Sitting'=>1])) ?>;
             chartInstances.providerServices = new Chart(providerServicesCtx, {
                 type: 'doughnut',
                 data: {
-                    // labels: ['Grooming (28%)', 'Training (24%)', 'Boarding (23%)', 'Walking (15%)', 'Vet Care (10%)'],
+                    labels: ['Walking', 'Grooming', 'Training', 'Boarding', 'Sitting'],
                     datasets: [{
-                        data: [28, 24, 23, 15, 10],
+                        data: distData,
                         backgroundColor: [
-                            '#8b5cf6',
-                            '#3b82f6',
+                            '#0d424d',
                             '#10b981',
+                            '#8b5cf6',
                             '#f59e0b',
-                            '#06b6d4'
+                            '#3b82f6'
                         ],
                         borderWidth: 0,
                     }]

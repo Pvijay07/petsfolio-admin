@@ -7,6 +7,7 @@ use App\Controllers\BaseController;
 class UserController extends BaseController
 {
   protected $userModel;
+  protected $db;
   public function __construct()
   {
     $this->userModel = model('User');
@@ -14,8 +15,17 @@ class UserController extends BaseController
   }
   public function index()
   {
-    $status          = $this->request->getGet('status');
+    $status = $this->request->getGet('status');
+    if ($status === null || $status === '') {
+      $status = 'active';
+    }
     $data['clients'] = $this->userModel->getAll($status);
+    $data['current_status'] = $status;
+    $counts = $this->userModel->getClientCounts();
+    $data['total_count']      = $counts['total'];
+    $data['active_count']     = $counts['active'];
+    $data['inactive_count']   = $counts['inactive'];
+    $data['incomplete_count'] = $counts['incomplete'];
     $data['title']   = '';
     $data['page']    = 'client';
     if (!empty($data['clients'])) {

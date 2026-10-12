@@ -132,6 +132,7 @@
                           <input type="email" class="form-control" id="email" name="email"
                             placeholder="Enter your email">
                         </div>
+
                         <div class="d-flex justify-content-center">
                           <input type="button" id="sendOtp" class="btn btn-primary radius-30" value="Send OTP">
                         </div>
@@ -181,6 +182,12 @@
       </div>
     </section>
   </div>
+  <?php 
+    $siteKey = $recaptchaSiteKey ?? getenv('RECAPTCHA_SITE_KEY') ?: '';
+    if (!empty($siteKey)): 
+  ?>
+    <script src="https://www.google.com/recaptcha/api.js?render=<?= esc($siteKey); ?>"></script>
+  <?php endif; ?>
   <script src="<?= base_url() ?>public/assets/js/core/libs.min.js"></script>
 
   <!-- External Library Bundle Script -->
@@ -229,14 +236,9 @@
       const otpInput = document.getElementById("otp");
       const signInContainer = document.getElementById("signInContainer");
       const signInBtn = document.getElementById("signIn");
+      let cooldownTimer = null;
 
-      sendOtpBtn.addEventListener("click", function() {
-        const email = emailInput.value.trim();
-        if (email === "") {
-          Swal.fire('Error!', "Please enter your email.", 'error')
-          return;
-        }
-
+      function sendOtpRequest(email, recaptchaToken) {
         showLoader();
 
         fetch("<?= base_url('auth/send-otp'); ?>", {
@@ -246,7 +248,8 @@
               "X-CSRF-TOKEN": "<?= csrf_hash(); ?>"
             },
             body: JSON.stringify({
-              email: email
+              email: email,
+              "g-recaptcha-response": recaptchaToken
             })
           })
           .then(response => response.json())
@@ -255,17 +258,57 @@
             if (data.success) {
               Swal.fire('Success!', "OTP sent to your email.", 'success');
               emailInput.disabled = true;
-              sendOtpBtn.disabled = true;
               signInBtn.style.display = "block";
               otpField.style.display = "block";
+
+              // 60-second countdown cooldown for Send OTP button
+              let cooldown = 60;
+              sendOtpBtn.disabled = true;
+              sendOtpBtn.value = `Resend OTP (${cooldown}s)`;
+
+              if (cooldownTimer) clearInterval(cooldownTimer);
+              cooldownTimer = setInterval(() => {
+                cooldown--;
+                if (cooldown > 0) {
+                  sendOtpBtn.value = `Resend OTP (${cooldown}s)`;
+                } else {
+                  clearInterval(cooldownTimer);
+                  sendOtpBtn.disabled = false;
+                  sendOtpBtn.value = "Resend OTP";
+                }
+              }, 1000);
             } else {
-              Swal.fire('Error!', data.message, 'error')
+              Swal.fire('Error!', data.message, 'error');
             }
           })
           .catch(error => {
             hideLoader();
             console.error("Error:", error);
           });
+      }
+
+      sendOtpBtn.addEventListener("click", function() {
+        const email = emailInput.value.trim();
+        if (email === "") {
+          Swal.fire('Error!', "Please enter your email.", 'error');
+          return;
+        }
+
+        const recaptchaSiteKey = "<?= esc($siteKey); ?>";
+        if (recaptchaSiteKey && typeof grecaptcha !== 'undefined') {
+          showLoader();
+          grecaptcha.ready(function() {
+            grecaptcha.execute(recaptchaSiteKey, {action: 'send_otp'}).then(function(token) {
+              sendOtpRequest(email, token);
+            }).catch(function(err) {
+              hideLoader();
+              console.error('reCAPTCHA error:', err);
+              sendOtpRequest(email, '');
+            });
+          });
+        } else {
+          sendOtpRequest(email, '');
+        }
       });
 
       otpInput.addEventListener("input", function() {
