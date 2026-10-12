@@ -172,19 +172,8 @@
                 Transaction</th>
               <th width="140" class="py-3 text-black fs-6 fw-semibold border-bottom d-none d-lg-table-cell"
                 style="background: #c6d2ff!important;">Customer</th>
-<<<<<<< HEAD
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
                 style="background: #c6d2ff!important;">Amount</th>
-=======
-              <th width="110" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
-                style="background: #c6d2ff!important;">Amount</th>
-              <th width="110" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
-                style="background: #c6d2ff!important;">Paid Amount</th>
-              <th width="100" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
-                style="background: #c6d2ff!important;">GST</th>
-              <th width="110" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
-                style="background: #c6d2ff!important;">Platform</th>
->>>>>>> origin/main
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom text-center d-none d-md-table-cell"
                 style="background: #c6d2ff!important;">Status</th>
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom d-none d-xl-table-cell"
@@ -260,20 +249,7 @@
                   </div>
                 </td>
                 <td class="py-3 text-center">
-<<<<<<< HEAD
                   <span class="fw-bold text-dark">₹<?= number_format($payment->amount, 2) ?></span>
-=======
-                  <span class="fw-bold text-dark">₹<?= number_format($payment->base_amount ?? ($payment->amount > 0 ? round($payment->amount / 1.298, 2) : 0), 2) ?></span>
-                </td>
-                <td class="py-3 text-center">
-                  <span class="fw-bold text-success">₹<?= number_format($payment->paid_amount ?? $payment->amount, 2) ?></span>
-                </td>
-                <td class="py-3 text-center">
-                  <span class="fw-medium text-secondary">₹<?= number_format($payment->gst ?? 0, 2) ?></span>
-                </td>
-                <td class="py-3 text-center">
-                  <span class="fw-medium text-info">₹<?= number_format($payment->platform ?? $payment->platform_charges ?? 0, 2) ?></span>
->>>>>>> origin/main
                 </td>
                 <td class="py-3 text-center d-none d-md-table-cell">
                   <div class="d-flex flex-column align-items-center justify-content-center">
@@ -553,13 +529,8 @@
     const customerNames = new Set();
 
     filteredPayments.forEach(row => {
-<<<<<<< HEAD
       // Amount (4th column)
       const amountSpan = row.querySelector('td:nth-child(4) span');
-=======
-      // Paid Amount (5th column: td:nth-child(5) span)
-      const amountSpan = row.querySelector('td:nth-child(5) span') || row.querySelector('td:nth-child(4) span');
->>>>>>> origin/main
       if (amountSpan) {
         const val = parseFloat(amountSpan.textContent.replace(/[₹,]/g, '')) || 0;
         totalAmount += val;

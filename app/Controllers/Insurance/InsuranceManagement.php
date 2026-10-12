@@ -17,49 +17,29 @@ class InsuranceManagement extends BaseController
   public function index()
   {
     $data['enquiries'] = $this->model->getEnquiries();
-<<<<<<< HEAD
-=======
-    $data['tabCounts'] = $this->model->getTabCounts();
->>>>>>> origin/main
     return $this->loadView('admin/insurance/enquiries', $data);
   }
   public function quotations()
   {
     $data['quotations'] = $this->model->getQuotations();
-<<<<<<< HEAD
-=======
-    $data['tabCounts'] = $this->model->getTabCounts();
->>>>>>> origin/main
     return $this->loadView('admin/insurance/quotations', $data);
   }
   public function active()
   {
     $data['insurances'] = $this->model->getActiveInsurances();
-<<<<<<< HEAD
 
-=======
-    $data['tabCounts'] = $this->model->getTabCounts();
->>>>>>> origin/main
     return $this->loadView('admin/insurance/active', $data);
   }
   public function expiring()
   {
     $data['insurances'] = $this->model->getExpiringInsurances();
-<<<<<<< HEAD
 
-=======
-    $data['tabCounts'] = $this->model->getTabCounts();
->>>>>>> origin/main
     return $this->loadView('admin/insurance/expiring', $data);
   }
   public function claims()
   {
     $data['claims'] = $this->model->getClaims();
-<<<<<<< HEAD
 
-=======
-    $data['tabCounts'] = $this->model->getTabCounts();
->>>>>>> origin/main
     return $this->loadView('admin/insurance/claims', $data);
   }
 
@@ -69,26 +49,16 @@ class InsuranceManagement extends BaseController
 
     if ($this->model->quotationExists($json['policy_id'])) {
       return $this->response->setJSON([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Quotation already created for this policy'
       ]);
     }
 
     $data = [
       'policy_id' => $json['policy_id'],
-<<<<<<< HEAD
       'amount' => $json['amount'],
       'subject' => $json['subject'],
       'message' => $json['message']
-=======
-      'amount'    => $json['amount'],
-      'subject'   => $json['subject'],
-      'message'   => $json['message']
->>>>>>> origin/main
     ];
 
     $quote = $this->model->createQuotation($data);
@@ -101,7 +71,6 @@ class InsuranceManagement extends BaseController
 
   public function updateClaim()
   {
-<<<<<<< HEAD
     $claimId = $this->request->getPost('claimId');
     $claimAmount = $this->request->getPost('claimAmount');
     $status = $this->request->getPost('status');
@@ -115,48 +84,24 @@ class InsuranceManagement extends BaseController
       'settlement_date' => $settlementDate ?: null,
       'remarks' => $remarks,
       'updated_at' => date('Y-m-d H:i:s')
-=======
-    $claimId        = $this->request->getPost('claimId');
-    $claimAmount    = $this->request->getPost('claimAmount');
-    $status         = $this->request->getPost('status');
-    $settlementDate = $this->request->getPost('settlementDate');
-    $remarks        = $this->request->getPost('remarks');
-
-    // Update database here
-    $data = [
-      'amount'          => $claimAmount,
-      'status'          => $status,
-      'settlement_date' => $settlementDate ?: null,
-      'remarks'         => $remarks,
-      'updated_at'      => date('Y-m-d H:i:s')
->>>>>>> origin/main
     ];
 
     $result = $this->model->updateClaim($claimId, $data);
 
     if ($result) {
       return $this->response->setJSON([
-<<<<<<< HEAD
         'status' => true,
-=======
-        'status'  => true,
->>>>>>> origin/main
         'message' => 'Claim updated successfully'
       ]);
     } else {
       return $this->response->setJSON([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Failed to update claim'
       ]);
     }
   }
   public function sendAjaxMail()
   {
-<<<<<<< HEAD
     $email = $this->request->getPost('email');
     $subject = $this->request->getPost('subject');
     $message = $this->request->getPost('message');
@@ -164,17 +109,6 @@ class InsuranceManagement extends BaseController
     $emailSender = new SmsEmailLibrary();
 
     $emailSender->sendEmail($email, $subject, $message);
-=======
-    $email   = $this->request->getPost('email');
-    $subject = $this->request->getPost('subject');
-    $message = $this->request->getPost('message');
-
-    $emailSender = \Config\Services::email();
-    $emailSender->setTo($email);
-    $emailSender->setSubject($subject);
-    $emailSender->setMessage($message);
-    @$emailSender->send();
->>>>>>> origin/main
 
     return $this->response->setJSON(['status' => true, 'message' => 'Mail Sent Successfully']);
   }
@@ -189,28 +123,16 @@ class InsuranceManagement extends BaseController
     $phone = $this->request->getJSON()->phone;
 
     $clientModel = new \App\Models\User();
-<<<<<<< HEAD
     $client = $clientModel->getClient($phone);
-=======
-    $client      = $clientModel->getClient($phone);
->>>>>>> origin/main
 
     if ($client) {
       return $this->response->setJSON([
         'success' => true,
-<<<<<<< HEAD
         'client' => [
           'id' => $client->id,
           'full_name' => $client->name,
           'email' => $client->email,
           'phone' => $client->phone
-=======
-        'client'  => [
-          'id'        => $client->id,
-          'full_name' => $client->name,
-          'email'     => $client->email,
-          'phone'     => $client->phone
->>>>>>> origin/main
         ]
       ]);
     } else {
@@ -230,20 +152,12 @@ class InsuranceManagement extends BaseController
     $clientId = $this->request->getJSON()->client_id;
 
     $petModel = new \App\Models\User();
-<<<<<<< HEAD
     $pets = $petModel->getUserPets($clientId);
-=======
-    $pets     = $petModel->getUserPets($clientId);
->>>>>>> origin/main
 
     if ($pets) {
       return $this->response->setJSON([
         'success' => true,
-<<<<<<< HEAD
         'pets' => $pets
-=======
-        'pets'    => $pets
->>>>>>> origin/main
       ]);
     } else {
       return $this->response->setJSON([
@@ -258,11 +172,7 @@ class InsuranceManagement extends BaseController
     $breeds = $this->model->getBreeds();
     return $this->response->setJSON([
       'success' => true,
-<<<<<<< HEAD
       'breeds' => $breeds
-=======
-      'breeds'  => $breeds
->>>>>>> origin/main
     ]);
   }
 
@@ -270,11 +180,7 @@ class InsuranceManagement extends BaseController
   {
     if (!$this->request->isAJAX()) {
       return $this->response->setStatusCode(405)->setJSON([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Method not allowed'
       ]);
     }
@@ -290,23 +196,15 @@ class InsuranceManagement extends BaseController
     if (isset($json->is_new_client) && $json->is_new_client == 1) {
       // Create user in the main users table
       $newUserId = $this->model->createUser([
-<<<<<<< HEAD
         'name' => $json->new_client_name,
         'email' => $json->new_client_email ?? '',
         'phone' => $json->new_client_phone,
         'status' => 'active',
-=======
-        'name'       => $json->new_client_name,
-        'email'      => $json->new_client_email ?? '',
-        'phone'      => $json->new_client_phone,
-        'status'     => 'active',
->>>>>>> origin/main
         'created_at' => date('Y-m-d H:i:s')
       ]);
 
       // Create pet first to get pet_id
       $petData = [
-<<<<<<< HEAD
         'user_id' => $newUserId,
         'name' => $json->new_pet_name,
         'breed' => $json->new_pet_breed,
@@ -316,35 +214,16 @@ class InsuranceManagement extends BaseController
         'aggressiveness_level' => strtolower($json->new_pet_aggressive) ?? 'no',
         'vaccinated' => strtolower($json->new_pet_vaccinated) ?? 'yes',
         'created_at' => date('Y-m-d H:i:s')
-=======
-        'user_id'          => $newUserId,
-        'name'             => $json->new_pet_name,
-        'breed'            => $json->new_pet_breed,
-        'dob'              => $json->new_pet_dob,
-        'gender'           => $json->new_pet_gender,
-        'last_vaccination' => $json->new_pet_vaccination,
-        'aggressiveness_level'       => strtolower($json->new_pet_aggressive) ?? 'no',
-        'vaccinated'       => strtolower($json->new_pet_vaccinated) ?? 'yes',
-        'created_at'       => date('Y-m-d H:i:s')
->>>>>>> origin/main
       ];
       $petId = $this->model->createPet($petData);
 
       // Prepare user information using new fields
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $newUserId,
         'full_name' => $json->new_client_name,
         'email' => $json->new_client_email ?? '',
         'phone' => $json->new_client_phone,
         'address' => $json->new_client_address ?? ''
-=======
-        'user_id'   => $newUserId,
-        'full_name' => $json->new_client_name,
-        'email'     => $json->new_client_email ?? '',
-        'phone'     => $json->new_client_phone,
-        'address'   => $json->new_client_address ?? ''
->>>>>>> origin/main
       ];
 
       // Update local variables for policy creation
@@ -354,7 +233,6 @@ class InsuranceManagement extends BaseController
     } elseif ($isNewPet == 1) {
       // Existing client, but new pet
       $petData = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'name' => $json->new_pet_name,
         'breed' => $json->new_pet_breed,
@@ -364,32 +242,14 @@ class InsuranceManagement extends BaseController
         'aggressiveness_level' => strtolower($json->new_pet_aggressive) ?? 'no',
         'vaccinated' => strtolower($json->new_pet_vaccinated) ?? 'yes',
         'created_at' => date('Y-m-d H:i:s')
-=======
-        'user_id'          => $userId,
-        'name'             => $json->new_pet_name,
-        'breed'            => $json->new_pet_breed,
-        'dob'              => $json->new_pet_dob,
-        'gender'           => $json->new_pet_gender,
-        'last_vaccination' => $json->new_pet_vaccination,
-        'aggressiveness_level'       => strtolower($json->new_pet_aggressive) ?? 'no',
-        'vaccinated'       => strtolower($json->new_pet_vaccinated) ?? 'yes',
-        'created_at'       => date('Y-m-d H:i:s')
->>>>>>> origin/main
       ];
       $petId = $this->model->createPet($petData);
 
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'full_name' => $json->full_name,
         'email' => $json->email,
         'phone' => $json->phone
-=======
-        'user_id'   => $userId,
-        'full_name' => $json->full_name,
-        'email'     => $json->email,
-        'phone'     => $json->phone
->>>>>>> origin/main
       ];
     } else {
       // For existing clients, check if pet already has a policy
@@ -400,27 +260,16 @@ class InsuranceManagement extends BaseController
 
       if ($existing) {
         return $this->response->setJSON([
-<<<<<<< HEAD
           'status' => false,
-=======
-          'status'  => false,
->>>>>>> origin/main
           'message' => 'This pet already has an active or pending insurance policy.'
         ]);
       }
 
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'full_name' => $json->full_name,
         'email' => $json->email,
         'phone' => $json->phone
-=======
-        'user_id'   => $userId,
-        'full_name' => $json->full_name,
-        'email'     => $json->email,
-        'phone'     => $json->phone
->>>>>>> origin/main
       ];
     }
 
@@ -429,7 +278,6 @@ class InsuranceManagement extends BaseController
 
     // Prepare policy information
     $policyInfo = [
-<<<<<<< HEAD
       'policy_number' => 'PF' . random_int(111111, 999999),
       'insurance_user_id' => $insuranceUserId,
       'pet_id' => $petId,
@@ -439,17 +287,6 @@ class InsuranceManagement extends BaseController
       'end_date' => $json->end_date,
       'created_at' => date('Y-m-d H:i:s'),
       'status' => 'Pending' // Set as Pending for enquiries
-=======
-      'policy_number'     => 'PF' . random_int(111111, 999999),
-      'insurance_user_id' => $insuranceUserId,
-      'pet_id'            => $petId,
-      'coverage_type'     => $json->coverage_type,
-      'duration_years'    => $json->duration_years,
-      'start_date'        => $json->start_date,
-      'end_date'          => $json->end_date,
-      'created_at'        => date('Y-m-d H:i:s'),
-      'status'            => 'Pending' // Set as Pending for enquiries
->>>>>>> origin/main
     ];
 
     // Create insurance policy
@@ -457,21 +294,13 @@ class InsuranceManagement extends BaseController
 
     if ($policy) {
       return $this->response->setJSON([
-<<<<<<< HEAD
         'status' => true,
-=======
-        'status'  => true,
->>>>>>> origin/main
         'message' => 'Enquiry added successfully'
       ]);
     }
 
     return $this->response->setJSON([
-<<<<<<< HEAD
       'status' => false,
-=======
-      'status'  => false,
->>>>>>> origin/main
       'message' => 'Something went wrong, please try again'
     ]);
   }
@@ -480,11 +309,7 @@ class InsuranceManagement extends BaseController
   {
     if (!$this->request->isAJAX()) {
       return $this->response->setStatusCode(405)->setJSON([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Method not allowed'
       ]);
     }
@@ -500,26 +325,17 @@ class InsuranceManagement extends BaseController
     if (isset($json->is_new_client) && $json->is_new_client == 1) {
       // Create user in the main users table
       $newUserId = $this->model->createUser([
-<<<<<<< HEAD
         'name' => $json->new_client_name,
         'email' => $json->new_client_email ?? '',
         'phone' => $json->new_client_phone,
         // 'user_type'  => 'Client',
         'status' => 'active',
-=======
-        'name'       => $json->new_client_name,
-        'email'      => $json->new_client_email ?? '',
-        'phone'      => $json->new_client_phone,
-        // 'user_type'  => 'Client',
-        'status'     => 'active',
->>>>>>> origin/main
         'created_at' => date('Y-m-d H:i:s'),
 
       ]);
 
       // Create pet first to get pet_id
       $petData = [
-<<<<<<< HEAD
         'user_id' => $newUserId,
         'name' => $json->new_pet_name,
         'breed' => $json->new_pet_breed,
@@ -529,35 +345,16 @@ class InsuranceManagement extends BaseController
         'aggressiveness_level' => strtolower($json->new_pet_aggressive) ?? 'no',
         'vaccinated' => strtolower($json->new_pet_vaccinated) ?? 'yes',
         'created_at' => date('Y-m-d H:i:s')
-=======
-        'user_id'          => $newUserId,
-        'name'             => $json->new_pet_name,
-        'breed'            => $json->new_pet_breed,
-        'dob'              => $json->new_pet_dob,
-        'gender'           => $json->new_pet_gender,
-        'last_vaccination' => $json->new_pet_vaccination,
-        'aggressiveness_level'       => strtolower($json->new_pet_aggressive) ?? 'no',
-        'vaccinated'       => strtolower($json->new_pet_vaccinated) ?? 'yes',
-        'created_at'       => date('Y-m-d H:i:s')
->>>>>>> origin/main
       ];
       $petId = $this->model->createPet($petData);
 
       // Prepare user information using new fields
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $newUserId,
         'full_name' => $json->new_client_name,
         'email' => $json->new_client_email ?? '',
         'phone' => $json->new_client_phone,
         'address' => $json->new_client_address ?? ''
-=======
-        'user_id'   => $newUserId,
-        'full_name' => $json->new_client_name,
-        'email'     => $json->new_client_email ?? '',
-        'phone'     => $json->new_client_phone,
-        'address'   => $json->new_client_address ?? ''
->>>>>>> origin/main
       ];
 
       // Update local variables for policy creation
@@ -567,7 +364,6 @@ class InsuranceManagement extends BaseController
     } elseif ($isNewPet == 1) {
       // Existing client, but new pet
       $petData = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'name' => $json->new_pet_name,
         'breed' => $json->new_pet_breed,
@@ -577,32 +373,14 @@ class InsuranceManagement extends BaseController
         'aggressiveness_level' => strtolower($json->new_pet_aggressive) ?? 'no',
         'vaccinated' => strtolower($json->new_pet_vaccinated) ?? 'yes',
         'created_at' => date('Y-m-d H:i:s')
-=======
-        'user_id'          => $userId,
-        'name'             => $json->new_pet_name,
-        'breed'            => $json->new_pet_breed,
-        'dob'              => $json->new_pet_dob,
-        'gender'           => $json->new_pet_gender,
-        'last_vaccination' => $json->new_pet_vaccination,
-        'aggressiveness_level'       => strtolower($json->new_pet_aggressive) ?? 'no',
-        'vaccinated'       => strtolower($json->new_pet_vaccinated) ?? 'yes',
-        'created_at'       => date('Y-m-d H:i:s')
->>>>>>> origin/main
       ];
       $petId = $this->model->createPet($petData);
 
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'full_name' => $json->full_name,
         'email' => $json->email,
         'phone' => $json->phone
-=======
-        'user_id'   => $userId,
-        'full_name' => $json->full_name,
-        'email'     => $json->email,
-        'phone'     => $json->phone
->>>>>>> origin/main
       ];
     } else {
       // For existing clients, check if pet already has a policy
@@ -613,27 +391,16 @@ class InsuranceManagement extends BaseController
 
       if ($existing) {
         return $this->response->setJSON([
-<<<<<<< HEAD
           'status' => false,
-=======
-          'status'  => false,
->>>>>>> origin/main
           'message' => 'This pet already has an active or pending insurance policy.'
         ]);
       }
 
       $userInfo = [
-<<<<<<< HEAD
         'user_id' => $userId,
         'full_name' => $json->full_name,
         'email' => $json->email,
         'phone' => $json->phone
-=======
-        'user_id'   => $userId,
-        'full_name' => $json->full_name,
-        'email'     => $json->email,
-        'phone'     => $json->phone
->>>>>>> origin/main
       ];
     }
 
@@ -642,7 +409,6 @@ class InsuranceManagement extends BaseController
 
     // Prepare policy information
     $policyInfo = [
-<<<<<<< HEAD
       'policy_number' => 'PF' . random_int(111111, 999999),
       'insurance_user_id' => $insuranceUserId,
       'pet_id' => $petId,
@@ -652,17 +418,6 @@ class InsuranceManagement extends BaseController
       'end_date' => $json->end_date,
       'created_at' => date('Y-m-d H:i:s'),
       'status' => 'Active' // Since admin is adding directly, set as Active
-=======
-      'policy_number'     => 'PF' . random_int(111111, 999999),
-      'insurance_user_id' => $insuranceUserId,
-      'pet_id'            => $petId,
-      'coverage_type'     => $json->coverage_type,
-      'duration_years'    => $json->duration_years,
-      'start_date'        => $json->start_date,
-      'end_date'          => $json->end_date,
-      'created_at'        => date('Y-m-d H:i:s'),
-      'status'            => 'Active' // Since admin is adding directly, set as Active
->>>>>>> origin/main
     ];
 
     // Create insurance policy
@@ -671,13 +426,8 @@ class InsuranceManagement extends BaseController
     if ($policy) {
       // Create quotation record
       $quotationData = [
-<<<<<<< HEAD
         'policy_id' => $policyInfo['policy_number'],
         'amount' => (float) $json->premium,
-=======
-        'policy_id'  => $policyInfo['policy_number'],
-        'amount'     => (float) $json->premium,
->>>>>>> origin/main
         'created_at' => date('Y-m-d H:i:s')
       ];
 
@@ -685,20 +435,12 @@ class InsuranceManagement extends BaseController
 
       if ($quote) {
         return $this->response->setJSON([
-<<<<<<< HEAD
           'status' => true,
-=======
-          'status'  => true,
->>>>>>> origin/main
           'message' => 'Insurance policy and quotation created successfully'
         ]);
       } else {
         return $this->response->setJSON([
-<<<<<<< HEAD
           'status' => true,
-=======
-          'status'  => true,
->>>>>>> origin/main
           'message' => 'Insurance policy created but quotation failed',
           'warning' => true
         ]);
@@ -706,11 +448,7 @@ class InsuranceManagement extends BaseController
     }
 
     return $this->response->setJSON([
-<<<<<<< HEAD
       'status' => false,
-=======
-      'status'  => false,
->>>>>>> origin/main
       'message' => 'Something went wrong, please try again'
     ]);
   }
@@ -792,7 +530,6 @@ class InsuranceManagement extends BaseController
     ]);
   }
 
-<<<<<<< HEAD
 
   public function chatbotWidget()
   {
@@ -1275,92 +1012,4 @@ If a customer wants to upgrade, downgrade, or change their policy: Ask what chan
 
     return $decoded;
   }
-=======
-  public function deleteEnquiry()
-  {
-    if (!$this->request->isAJAX()) {
-      return $this->response->setStatusCode(405)->setJSON([
-        'status'  => false,
-        'message' => 'Method not allowed'
-      ]);
-    }
-
-    $id = $this->request->getPost('id') ?? ($this->request->getJSON()->id ?? null);
-    $reason = $this->request->getPost('reason') ?? ($this->request->getJSON()->reason ?? 'Deleted via admin panel');
-
-    if (!$id) {
-      return $this->response->setJSON([
-        'status'  => false,
-        'message' => 'Invalid enquiry ID provided'
-      ]);
-    }
-
-    $enquiry = $this->model->getEnquiryById($id);
-
-    if (!$enquiry) {
-      return $this->response->setJSON([
-        'status'  => false,
-        'message' => 'Insurance enquiry not found or already deleted'
-      ]);
-    }
-
-    $policyNumber = $enquiry->policy_number ?? "ID-{$id}";
-    $clientName   = $enquiry->client_name ?? 'Unknown Client';
-    $petName      = $enquiry->pet_name ?? 'Unknown Pet';
-
-    $deleted = $this->model->deleteEnquiry($id);
-
-    if ($deleted) {
-      // Clean up orphaned quotations if any existed for this policy number
-      if (!empty($enquiry->policy_number)) {
-        \Config\Database::connect()->table('insurance_policies_quotations')
-          ->where('policy_id', $enquiry->policy_number)
-          ->delete();
-      }
-
-      // Log action in audit logs with full snapshot
-      \App\Libraries\ActivityLogger::log(
-        'delete',
-        "Deleted Insurance Enquiry #{$id} (Policy Ref: {$policyNumber}, Client: {$clientName}, Pet: {$petName})",
-        'insurance_enquiry',
-        $id,
-        [
-          'id'             => $enquiry->id,
-          'policy_number'  => $enquiry->policy_number,
-          'client_name'    => $clientName,
-          'client_phone'   => $enquiry->client_phone ?? '',
-          'client_email'   => $enquiry->client_email ?? '',
-          'pet_name'       => $petName,
-          'pet_breed'      => $enquiry->pet_breed ?? '',
-          'gender'         => $enquiry->gender ?? '',
-          'dob'            => $enquiry->dob ?? '',
-          'coverage_type'  => $enquiry->coverage_type ?? '',
-          'duration_years' => $enquiry->duration_years ?? 1,
-          'status'         => $enquiry->status ?? 'Pending',
-          'remarks'        => $enquiry->remarks ?? '',
-          'created_at'     => $enquiry->created_at ?? '',
-        ],
-        null,
-        [
-          'enquiry_id'     => $id,
-          'policy_number'  => $policyNumber,
-          'deletion_reason'=> $reason,
-          'deleted_at'     => date('Y-m-d H:i:s')
-        ]
-      );
-
-      log_message('info', "Insurance Enquiry #{$id} (Policy: {$policyNumber}, Client: {$clientName}) was deleted by admin. Reason: {$reason}");
-
-      return $this->response->setJSON([
-        'status'  => true,
-        'message' => "Enquiry #{$policyNumber} deleted successfully"
-      ]);
-    }
-
-    return $this->response->setJSON([
-      'status'  => false,
-      'message' => 'Failed to delete insurance enquiry. Please try again.'
-    ]);
-  }
->>>>>>> origin/main
 }

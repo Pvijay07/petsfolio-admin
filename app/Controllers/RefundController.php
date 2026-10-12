@@ -32,7 +32,6 @@ class RefundController extends BaseController
         ->first();
 
       if ($pendingRefund) {
-<<<<<<< HEAD
         $wallet->refund_status = 'pending';
         $wallet->requested_amount = $pendingRefund['amount'];
       } elseif ($completedRefund) {
@@ -40,15 +39,6 @@ class RefundController extends BaseController
         $wallet->requested_amount = $completedRefund['amount'];
       } else {
         $wallet->refund_status = null;
-=======
-        $wallet->refund_status    = 'pending';
-        $wallet->requested_amount = $pendingRefund['amount'];
-      } elseif ($completedRefund) {
-        $wallet->refund_status    = 'completed';
-        $wallet->requested_amount = $completedRefund['amount'];
-      } else {
-        $wallet->refund_status    = null;
->>>>>>> origin/main
         $wallet->requested_amount = null;
       }
     }
@@ -69,36 +59,22 @@ class RefundController extends BaseController
     $refundModel = new RefundModel();
     $walletModel = new Booking();
 
-<<<<<<< HEAD
     $userId = $this->request->getPost('user_id');
     $amount = $this->request->getPost('amount');
     $reason = $this->request->getPost('reason');
-=======
-    $userId      = $this->request->getPost('user_id');
-    $amount      = $this->request->getPost('amount');
-    $reason      = $this->request->getPost('reason');
->>>>>>> origin/main
     $requestedBy = session()->get('user')->id;
 
     // Validation
     if (!$reason || !$amount) {
       return $this->respond([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Reason and amount are required.'
       ]);
     }
 
     if ($amount <= 0) {
       return $this->respond([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Amount must be greater than 0.'
       ]);
     }
@@ -107,11 +83,7 @@ class RefundController extends BaseController
     $wallet = $walletModel->getUserWallet($userId);
     if (!$wallet || $amount > $wallet->amount) {
       return $this->respond([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'Amount exceeds wallet balance.'
       ]);
     }
@@ -123,31 +95,19 @@ class RefundController extends BaseController
 
     if ($existing) {
       return $this->respond([
-<<<<<<< HEAD
         'status' => false,
-=======
-        'status'  => false,
->>>>>>> origin/main
         'message' => 'A pending refund request already exists for this client.'
       ]);
     }
 
     // Handle file upload
-<<<<<<< HEAD
     $file = $this->request->getFile('attachment');
-=======
-    $file     = $this->request->getFile('attachment');
->>>>>>> origin/main
     $fileName = null;
     if ($file && $file->isValid()) {
       // Validate file size and type
       if ($file->getSize() > 5242880) { // 5MB
         return $this->respond([
-<<<<<<< HEAD
           'status' => false,
-=======
-          'status'  => false,
->>>>>>> origin/main
           'message' => 'File size must be less than 5MB.'
         ]);
       }
@@ -155,11 +115,7 @@ class RefundController extends BaseController
       $allowedTypes = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!in_array($file->getMimeType(), $allowedTypes)) {
         return $this->respond([
-<<<<<<< HEAD
           'status' => false,
-=======
-          'status'  => false,
->>>>>>> origin/main
           'message' => 'Only JPG, PNG, PDF, and DOC files are allowed.'
         ]);
       }
@@ -170,7 +126,6 @@ class RefundController extends BaseController
 
     // Create refund request
     $refundData = [
-<<<<<<< HEAD
       'user_id' => $userId,
       'amount' => $amount,
       'reason' => $reason,
@@ -179,35 +134,17 @@ class RefundController extends BaseController
       'status' => 'pending',
       'created_at' => date('Y-m-d H:i:s'),
       'updated_at' => date('Y-m-d H:i:s')
-=======
-      'user_id'      => $userId,
-      'amount'       => $amount,
-      'reason'       => $reason,
-      'attachment'   => $fileName, // Changed from 'receipt' to 'attachment'
-      'requested_by' => $requestedBy,
-      'status'       => 'pending',
-      'created_at'   => date('Y-m-d H:i:s'),
-      'updated_at'   => date('Y-m-d H:i:s')
->>>>>>> origin/main
     ];
 
     $refundModel->insert($refundData);
 
     return $this->respond([
-<<<<<<< HEAD
       'status' => true,
-=======
-      'status'  => true,
->>>>>>> origin/main
       'message' => 'Refund request submitted successfully and is waiting for approval.'
     ]);
   }
 
-<<<<<<< HEAD
   public function refundProcess()
-=======
-public function refundProcess()
->>>>>>> origin/main
   {
     $request = \Config\Services::request();
 
@@ -259,7 +196,6 @@ public function refundProcess()
         'message' => 'An error occurred while processing refund: ' . $e->getMessage()
       ], 500);
     }
-<<<<<<< HEAD
   }
 
   public function processRefund()
@@ -278,25 +214,6 @@ public function refundProcess()
       'branch'              => $input['branch'] ?? '',
       'status'              => 'pending',
       'processed_by'        => session()->get('user')->id,
-=======
-  }  public function processRefund()
-  {
-    $input = $this->request->getPost();
-    $db    = \Config\Database::connect();
-
-    $data   = [
-      'user_id'             => $input['user_id'],
-      'amount'              => $input['amount'],
-      'account_holder_name' => trim($input['account_holder_name'] ?? ''),
-      'account_number'      => trim(preg_replace('/\s+/', '', (string)($input['account_number'] ?? ''))),
-      'bank_name'           => trim($input['bank_name'] ?? ''),
-      'ifsc_code'           => strtoupper(trim(preg_replace('/\s+/', '', (string)($input['ifsc_code'] ?? '')))),
-      'city'                => trim($input['city'] ?? ''),
-      'branch'              => trim($input['branch'] ?? ''),
-      'status'              => 'pending',
-      'processed_by'        => session()->get('user')->id,
-      'requested_by'        => session()->get('user')->id,
->>>>>>> origin/main
       'created_at'          => date('Y-m-d H:i:s')
     ];
     $exists = $db->table('user_refunds')

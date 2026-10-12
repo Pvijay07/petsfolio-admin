@@ -14,11 +14,7 @@ class PushNotifications {
 
     async registerServiceWorker() {
         try {
-<<<<<<< HEAD
             const registration = await navigator.serviceWorker.register('https://beta.petsfolio.in/admin/sw.js');
-=======
-            const registration = await navigator.serviceWorker.register('https://admin.petsfolio.in/sw.js');
->>>>>>> origin/main
             console.log('Service Worker registered');
             return registration;
         } catch (error) {
@@ -55,11 +51,7 @@ class PushNotifications {
 
     async sendSubscriptionToServer(subscription) {
         try {
-<<<<<<< HEAD
             const response = await fetch('https://beta.petsfolio.in/admin/notifications/subscribe', {
-=======
-            const response = await fetch('https://admin.petsfolio.in/notifications/subscribe', {
->>>>>>> origin/main
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,11 +85,7 @@ class PushNotifications {
     }
 
     // Play sound on client side
-<<<<<<< HEAD
     playNotificationSound(soundUrl = 'https://beta.petsfolio.in/admin/sounds/notification.mp3') {
-=======
-    playNotificationSound(soundUrl = 'https://admin.petsfolio.in/sounds/notification.mp3') {
->>>>>>> origin/main
         if (this.soundEnabled) {
             const audio = new Audio(soundUrl);
             audio.play().catch(error => {

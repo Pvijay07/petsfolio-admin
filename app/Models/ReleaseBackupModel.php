@@ -13,7 +13,6 @@ class ReleaseBackupModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'current_prod_version', 'current_build_number',
         'apk_aab_reference', 'ipa_reference', 'database_backup',
         'api_backup', 'config_backup', 'backup_date',
@@ -58,23 +57,4 @@ class ReleaseBackupModel extends Model
             ->first();
         return $backup !== null;
     }
-=======
-        'version_id',
-        'current_prod_version',
-        'current_build_number',
-        'apk_aab_reference',
-        'ipa_reference',
-        'database_backup',
-        'api_backup',
-        'config_backup',
-        'backup_date',
-        'verified_by',
-        'verified_at',
-        'rollback_version',
-        'notes',
-        'created_at'
-    ];
-
-    protected $useTimestamps = false;
->>>>>>> origin/main
 }

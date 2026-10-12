@@ -32,100 +32,8 @@
     color: #dc3545 !important;
     border: 1px solid rgba(220, 53, 69, 0.2) !important;
   }
-<<<<<<< HEAD
 </style>
 <?php echo $this->section('content'); ?>
-=======
-
-  /* Compact table styling */
-  .table thead th {
-    padding-top: 0.6rem !important;
-    padding-bottom: 0.6rem !important;
-    font-size: 0.75rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-    white-space: nowrap;
-  }
-
-  .table td {
-    padding: 0.5rem 0.5rem !important;
-    font-size: 0.85rem !important;
-    vertical-align: middle;
-  }
-
-  .badge {
-    padding: 0.4rem 0.6rem !important;
-    font-size: 0.7rem !important;
-  }
-
-  .btn-sm {
-    padding: 0.25rem 0.6rem !important;
-    font-size: 0.75rem !important;
-  }
-
-  /* Loader Overlay Styling */
-  #loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(4px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-    transition: all 0.3s ease;
-  }
-
-  .loader-content {
-    text-align: center;
-    background: white;
-    padding: 2.5rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-  }
-
-  .loader-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #4f46e5;
-    border-radius: 50%;
-    animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
-  }
-
-  .loader-text {
-    font-weight: 600;
-    color: #4b5563;
-    font-size: 1.1rem;
-    letter-spacing: -0.01em;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-</style>
-<?php echo $this->section('content'); ?>
-<!-- Loader Overlay -->
-<div id="loader-overlay">
-  <div class="loader-content">
-    <div class="loader-spinner"></div>
-    <div class="loader-text">Processing Request...</div>
-  </div>
-</div>
->>>>>>> origin/main
 
 <main class="main-content">
   <div class="position-relative iq-banner">
@@ -269,15 +177,6 @@
             <i class="bi bi-check-circle me-1"></i>Completed
           </button>
         </li>
-<<<<<<< HEAD
-=======
-        <li class="nav-item mb-0" role="presentation">
-          <button class="nav-link text-indigo-600 fw-bold mb-0" id="rejected-tab" data-bs-toggle="tab"
-            data-bs-target="#rejected" type="button" role="tab">
-            <i class="bi bi-x-circle me-1"></i>Rejected
-          </button>
-        </li>
->>>>>>> origin/main
       </ul>
     </div>
 
@@ -309,14 +208,10 @@
               <table class="table table-hover mb-0" id="requestsTable">
                 <thead class="" style="background: #c6d2ff !important;">
                   <tr>
-<<<<<<< HEAD
                     <th class="py-3 text-black fw-semibold border-bottom text-center"
                       style="background: #c6d2ff !important; width: 50px;">
                       <input type="checkbox" id="selectAll" class="form-check-input m-0">
                     </th>
-=======
-
->>>>>>> origin/main
                     <th class="py-3 text-black fw-semibold border-bottom text-center"
                       style="background: #c6d2ff !important;">S.No.</th>
                     <th class="py-3 text-black fw-semibold border-bottom" style="background: #c6d2ff !important;">Name
@@ -337,11 +232,7 @@
                   <?php
                   $i = 1;
                   foreach ($payments as $payment) {
-<<<<<<< HEAD
                     if ($payment->status !== 'completed' && $payment->status !== 'in_progress') {
-=======
-                    if ($payment->status !== 'completed' && $payment->status !== 'in_progress' && $payment->status !== 'rejected') {
->>>>>>> origin/main
                       $receipt = !empty($payment->receipt) ?
                         base_url('public/uploads/receipts/' . $payment->receipt) : '';
 
@@ -359,14 +250,10 @@
                         date('d M Y', strtotime($payment->requested_at)) : 'N/A';
                   ?>
                       <tr data-id="<?= $payment->id ?>">
-<<<<<<< HEAD
                         <td class="text-center py-2">
                           <input type="checkbox" class="payment-checkbox form-check-input m-0" value="<?= $payment->id ?>"
                             <?= !empty($receipt) && $receipt != base_url('public/uploads/receipts/') ? '' : 'disabled' ?>>
                         </td>
-=======
-
->>>>>>> origin/main
                         <td class="text-center py-2">
                           <span class="text-dark fw-medium"><?= $i ?></span>
                         </td>
@@ -379,11 +266,7 @@
                             <span class="text-dark"><?= htmlspecialchars($phone) ?></span>
                           </div>
                         </td>
-<<<<<<< HEAD
                         <td class="py-2">
-=======
-                        <td class="py-2" data-order="<?= strtotime($payment->requested_at) ?>">
->>>>>>> origin/main
                           <span
                             class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1 justify-content-center"
                             style="background: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important;
@@ -492,11 +375,7 @@
                             ₹<?= number_format($amount, 2) ?>
                           </div>
                         </td>
-<<<<<<< HEAD
                         <td class="py-2">
-=======
-                        <td class="py-2" data-order="<?= strtotime($payment->payout_initiated_at ?? $payment->requested_at) ?>">
->>>>>>> origin/main
                           <span class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1" style="background: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important;
                                    border: 1px solid rgba(99, 102, 241, 0.2) !important; font-weight: 600; width: max-content; margin: 0 auto;">
                             <i class="bi bi-calendar"></i>
@@ -520,7 +399,6 @@
                           <?php endif; ?>
                         </td>
                         <td class="py-2 text-center">
-<<<<<<< HEAD
                           <button class="btn btn-sm update-payout-status"
                             data-id="<?= $payment->id ?>"
                             data-current-status="<?= $payment->status ?>"
@@ -529,11 +407,6 @@
                             style="background: rgba(59, 130, 246, 0.1) !important; color: #3b82f6 !important;
                                         border: 1px solid rgba(59, 130, 246, 0.2) !important;">
                             <i class="fas fa-edit me-1"></i>Update Status
-=======
-                          <button class="btn btn-sm check-status" data-id="<?= $payment->id ?>" style="background: rgba(59, 130, 246, 0.1) !important; color: #3b82f6 !important;
-                                       border: 1px solid rgba(59, 130, 246, 0.2) !important;">
-                            <i class="fas fa-sync me-1"></i>Check Status
->>>>>>> origin/main
                           </button>
                         </td>
                       </tr>
@@ -604,22 +477,14 @@
                             ₹<?= number_format($amount, 2) ?>
                           </div>
                         </td>
-<<<<<<< HEAD
                         <td class="py-2">
-=======
-                        <td class="py-2" data-order="<?= strtotime($payment->requested_at) ?>">
->>>>>>> origin/main
                           <span class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1" style="background: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important;
                                    border: 1px solid rgba(99, 102, 241, 0.2) !important; font-weight: 600;">
                             <i class="bi bi-calendar"></i>
                             <?= $requestedDate ?>
                           </span>
                         </td>
-<<<<<<< HEAD
                         <td class="py-2">
-=======
-                        <td class="py-2" data-order="<?= strtotime($payment->processed_at) ?>">
->>>>>>> origin/main
                           <span class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1" style="background: rgba(34, 197, 94, 0.1) !important; color: #16a34a !important;
                                    border: 1px solid rgba(34, 197, 94, 0.2) !important; font-weight: 600;">
                             <i class="bi bi-check-circle"></i>
@@ -653,7 +518,6 @@
               </table>
             </div>
           </div>
-<<<<<<< HEAD
         </div>
 
         <!-- Pagination -->
@@ -671,94 +535,10 @@
             </button>
           </div>
         </div>
-=======
-
-          <!-- Rejected Tab -->
-          <div class="tab-pane fade" id="rejected" role="tabpanel">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0" id="rejectedTable">
-                <thead class="" style="background: #c6d2ff !important;">
-                  <tr>
-                    <th class="py-3 text-black fw-semibold border-bottom text-center"
-                      style="background: #c6d2ff !important;">S.No.</th>
-                    <th class="py-3 text-black fw-semibold border-bottom" style="background: #c6d2ff !important;">Name
-                    </th>
-                    <th class="py-3 text-black fw-semibold border-bottom text-center"
-                      style="background: #c6d2ff !important;">Amount</th>
-                    <th class="py-3 text-black fw-semibold border-bottom text-center" style="background: #c6d2ff !important;">
-                      Request Date</th>
-                    <th class="py-3 text-black fw-semibold border-bottom text-center" style="background: #c6d2ff !important;">
-                      Rejection Date</th>
-                    <th class="py-3 text-black fw-semibold border-bottom text-center"
-                      style="background: #c6d2ff !important;">Status</th>
-                  </tr>
-                </thead>
-                <tbody class="border-top-0">
-                  <?php
-                  $l = 1;
-                  foreach ($payments as $payment) {
-                    if ($payment->status === 'rejected') {
-                      $name = !empty($payment->name) ? $payment->name : 'N/A';
-                      $amount = !empty($payment->amount) ? $payment->amount : 0;
-                      $requestedDate = !empty($payment->requested_at) ?
-                        date('d M Y', strtotime($payment->requested_at)) : 'N/A';
-                      $rejectionDate = !empty($payment->updated_at) ?
-                        date('d M Y H:i', strtotime($payment->updated_at)) : 'N/A';
-                  ?>
-                      <tr>
-                        <td class="text-center py-2">
-                          <span class="text-dark fw-medium"><?= $l ?></span>
-                        </td>
-                        <td class="py-2">
-                          <div class="fw-bold text-dark"><?= htmlspecialchars($name) ?></div>
-                        </td>
-                        <td class="py-2 text-center">
-                          <div class="fw-bold text-danger fs-6">
-                            ₹<?= number_format($amount, 2) ?>
-                          </div>
-                        </td>
-                        <td class="py-2 text-center" data-order="<?= strtotime($payment->requested_at) ?>">
-                          <span class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1 justify-content-center" style="background: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important;
-                                   border: 1px solid rgba(99, 102, 241, 0.2) !important; font-weight: 600;">
-                            <i class="bi bi-calendar"></i>
-                            <?= $requestedDate ?>
-                          </span>
-                        </td>
-                        <td class="py-2 text-center" data-order="<?= strtotime($payment->updated_at) ?>">
-                          <span class="badge rounded-pill p-2 border-0 d-flex align-items-center gap-1 justify-content-center" style="background: rgba(239, 68, 68, 0.1) !important; color: #ef4444 !important;
-                                   border: 1px solid rgba(239, 68, 68, 0.2) !important; font-weight: 600;">
-                            <i class="bi bi-calendar-x"></i>
-                            <?= $rejectionDate ?>
-                          </span>
-                        </td>
-                        <td class="py-2 text-center">
-                          <span class="badge bg-danger">Rejected</span>
-                        </td>
-                      </tr>
-                  <?php
-                      $l++;
-                    }
-                  }
-                  ?>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
->>>>>>> origin/main
       </div>
     </div>
   </div>
 </main>
-<<<<<<< HEAD
-=======
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<!-- DataTables CSS/JS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
->>>>>>> origin/main
 
 <!-- SweetAlert CSS/JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -888,7 +668,6 @@
     document.body.classList.remove('modal-open');
   }
 
-<<<<<<< HEAD
   $(document).ready(function() {
     // Initialize DataTables with your theme styling
     // const requestsTable = $("#requestsTable").DataTable({
@@ -924,110 +703,10 @@
     //   },
     //   dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l><"d-flex"f>>rt<"d-flex justify-content-between align-items-center"<"d-flex"i><"d-flex"p>>'
     // });
-=======
-  // Loader functionality
-  function showLoader(text = 'Processing Request...') {
-    const loader = document.getElementById('loader-overlay');
-    const loaderText = loader.querySelector('.loader-text');
-    if (loaderText) loaderText.textContent = text;
-    if (loader) loader.style.display = 'flex';
-  }
-
-  function hideLoader() {
-    const loader = document.getElementById('loader-overlay');
-    if (loader) loader.style.display = 'none';
-  }
-
-  $(document).ready(function() {
-    // Initialize DataTables with your theme styling
-    const commonConfig = {
-      paging: true,
-      pageLength: 20,
-      language: {
-        search: "_INPUT_",
-        searchPlaceholder: "Search..."
-      },
-      dom: 'lrtip' // Hide default search box to use custom search
-    };
-
-    const requestsTable = $("#requestsTable").DataTable({
-      ...commonConfig,
-      order: [
-        [3, "desc"]
-      ], // Order by Request Date
-      columnDefs: [{
-        targets: [0, 5, 6], // S.No, Bank Details, Actions
-        orderable: false
-      }]
-    });
-
-    const progressTable = $("#progressTable").DataTable({
-      ...commonConfig,
-      order: [
-        [3, "desc"]
-      ], // Order by Initiated Date
-      columnDefs: [{
-        targets: [0, 4, 5, 6], // S.No, Transfer ID, UTR, Actions
-        orderable: false
-      }]
-    });
-
-    const completedTable = $("#completedTable").DataTable({
-      ...commonConfig,
-      order: [
-        [4, "desc"]
-      ], // Order by Completed Date
-      columnDefs: [{
-        targets: [0, 5, 6], // S.No, UTR, Receipt
-        orderable: false
-      }]
-    });
-
-    const rejectedTable = $("#rejectedTable").DataTable({
-      ...commonConfig,
-      order: [
-        [4, "desc"]
-      ], // Order by Rejection Date
-      columnDefs: [{
-        targets: [0, 5], // S.No, Status
-        orderable: false
-      }]
-    });
-
-    // Dynamic S.No for all tables
-    [requestsTable, progressTable, completedTable, rejectedTable].forEach(table => {
-      table.on('order.dt search.dt', function() {
-        table.column(0, {
-          search: 'applied',
-          order: 'applied'
-        }).nodes().each(function(cell, i) {
-          cell.innerHTML = i + 1;
-        });
-      }).draw();
-    });
-
-    // Custom search input integration
-    $('#searchPayments').on('keyup', function() {
-      const val = this.value;
-      requestsTable.search(val).draw();
-      progressTable.search(val).draw();
-      completedTable.search(val).draw();
-      rejectedTable.search(val).draw();
-    });
->>>>>>> origin/main
 
     // Load statistics
     loadStatistics();
 
-<<<<<<< HEAD
-=======
-    $('#refreshStatsBtn').on('click', function() {
-      showLoader('Refreshing statistics...');
-      loadStatistics();
-      setTimeout(hideLoader, 1000);
-    });
-
->>>>>>> origin/main
     // Select all checkbox
     $('#selectAll').on('change', function() {
       $('.payment-checkbox:not(:disabled)').prop('checked', $(this).is(':checked'));
@@ -1092,10 +771,6 @@
         }
       }).then((result) => {
         if (result.isConfirmed) {
-<<<<<<< HEAD
-=======
-          showLoader('Processing bulk payouts...');
->>>>>>> origin/main
           const btn = $(this);
           btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processing...');
 
@@ -1107,10 +782,6 @@
               amount: result.value.amount
             },
             success: function(response) {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               if (response.status === 'success') {
                 Swal.fire({
                   title: 'Success!',
@@ -1143,10 +814,6 @@
               }
             },
             error: function() {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               Swal.fire({
                 title: 'Error!',
                 text: 'Failed to process payouts',
@@ -1218,10 +885,6 @@
         }
       }).then((result) => {
         if (result.isConfirmed) {
-<<<<<<< HEAD
-=======
-          showLoader('Initiating payout...');
->>>>>>> origin/main
           const btn = $(this);
           btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Processing...');
 
@@ -1234,10 +897,6 @@
               provider_id: providerId
             },
             success: function(response) {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               if (response.status === 'success') {
                 Swal.fire({
                   title: 'Success!',
@@ -1270,10 +929,6 @@
               }
             },
             error: function(xhr, status, error) {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               Swal.fire({
                 title: 'Error!',
                 text: 'Failed to process payout: ' + error,
@@ -1315,10 +970,6 @@
         }
       }).then((result) => {
         if (result.isConfirmed) {
-<<<<<<< HEAD
-=======
-          showLoader('Rejecting payment...');
->>>>>>> origin/main
           $.ajax({
             type: 'POST',
             url: '<?= base_url('admin/update_status') ?>',
@@ -1329,10 +980,6 @@
               amount: amount
             },
             success: function(response) {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               if (response.status === 'success') {
                 Swal.fire({
                   title: 'Rejected!',
@@ -1364,10 +1011,6 @@
               }
             },
             error: function() {
-<<<<<<< HEAD
-=======
-              hideLoader();
->>>>>>> origin/main
               Swal.fire({
                 title: 'Error!',
                 text: 'Failed to reject payment',
@@ -1385,7 +1028,6 @@
       });
     });
 
-<<<<<<< HEAD
     // Update status manually
     $(document).on('click', '.update-payout-status', function() {
       const id = $(this).data('id');
@@ -1496,78 +1138,6 @@
                 }
               });
               btn.prop('disabled', false).html('<i class="fas fa-edit me-1"></i> Update Status');
-=======
-    // Check status
-    // Check status - Updated with better UTR handling
-    $(document).on('click', '.check-status', function() {
-      const id = $(this).data('id');
-      const btn = $(this);
-
-      showLoader('Checking transaction status...');
-      btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Checking...');
-
-      $.ajax({
-        type: 'POST',
-        url: '<?= base_url('check_status') ?>',
-        data: {
-          id: id
-        },
-        success: function(response) {
-          hideLoader();
-          btn.prop('disabled', false).html('<i class="fas fa-sync me-1"></i> Check Status');
-
-          if (response.status === 'success') {
-            // Format the UTR properly
-            let utrDisplay = '';
-            if (response.utr && response.utr !== 'undefined' && response.utr !== 'null' && response.utr.trim() !== '') {
-              utrDisplay = `<br>UTR: <code>${response.utr}</code>`;
-            }
-
-            const message = `Status: <strong>${response.payout_status || 'Unknown'}</strong>${utrDisplay}`;
-
-            Swal.fire({
-              title: 'Status Update',
-              html: message,
-              icon: 'info',
-              showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-              },
-              hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-              }
-            }).then(() => {
-              // Only reload if status changed
-              if (response.status_updated) {
-                location.reload();
-              }
-            });
-          } else {
-            Swal.fire({
-              title: 'Error!',
-              text: response.message || 'Failed to get status',
-              icon: 'error',
-              showClass: {
-                popup: 'animate__animated animate__fadeInDown'
-              },
-              hideClass: {
-                popup: 'animate__animated animate__fadeOutUp'
-              }
-            });
-          }
-        },
-        error: function(xhr, status, error) {
-          hideLoader();
-          btn.prop('disabled', false).html('<i class="fas fa-sync me-1"></i> Check Status');
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to check status: ' + error,
-            icon: 'error',
-            showClass: {
-              popup: 'animate__animated animate__fadeInDown'
-            },
-            hideClass: {
-              popup: 'animate__animated animate__fadeOutUp'
->>>>>>> origin/main
             }
           });
         }
@@ -1651,11 +1221,6 @@
         progressTable.columns.adjust().draw();
       } else if (target === '#completed') {
         completedTable.columns.adjust().draw();
-<<<<<<< HEAD
-=======
-      } else if (target === '#rejected') {
-        rejectedTable.columns.adjust().draw();
->>>>>>> origin/main
       }
     });
 
@@ -1672,11 +1237,6 @@
         progressTable.search(searchTerm).draw();
       } else if (activeTab === 'completed-tab') {
         completedTable.search(searchTerm).draw();
-<<<<<<< HEAD
-=======
-      } else if (activeTab === 'rejected-tab') {
-        rejectedTable.search(searchTerm).draw();
->>>>>>> origin/main
       }
     });
 
@@ -1691,11 +1251,6 @@
         progressTable.search(searchTerm).draw();
       } else if (activeTab === 'completed-tab') {
         completedTable.search(searchTerm).draw();
-<<<<<<< HEAD
-=======
-      } else if (activeTab === 'rejected-tab') {
-        rejectedTable.search(searchTerm).draw();
->>>>>>> origin/main
       }
     };
 
@@ -1706,10 +1261,6 @@
       requestsTable.search('').draw();
       progressTable.search('').draw();
       completedTable.search('').draw();
-<<<<<<< HEAD
-=======
-      rejectedTable.search('').draw();
->>>>>>> origin/main
     };
   });
 

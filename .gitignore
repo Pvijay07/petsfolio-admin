@@ -125,7 +125,6 @@ nb-configuration.xml
 /results/
 /phpunit*.xml
 *.json
-<<<<<<< HEAD
 public/service_account/
 .env
 app/ThirdParty/*
@@ -133,21 +132,3 @@ app/ThirdParty/*
 # Python virtual environments
 app/Python/venv/
 app/Python/.venv/
-=======
-.env*
-public/service_account/
-app/ThirdParty/*
-public/uploads/call_recordings/
-public/uploads/providers/call_records/
-scratch/
-*.docx
-*.sql
-*.wav
-*.mp3
-*.mp4
-
-
-# Python virtual environments
-app/Python/venv/
-app/Python/.venv/
->>>>>>> origin/main

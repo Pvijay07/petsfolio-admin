@@ -2,7 +2,6 @@
 <html lang="en" dir="ltr">
 
 <head>
-<<<<<<< HEAD
   <!-- Theme Early Detection (Zero-Flicker) -->
   <script>
     (function() {
@@ -23,8 +22,6 @@
       } catch (e) {}
     })();
   </script>
-=======
->>>>>>> origin/main
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Petsfolio | Login</title>
@@ -44,12 +41,9 @@
   <!-- Dark Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/dark.min.css" />
 
-<<<<<<< HEAD
   <!-- Universal Dark Mode Overrides (Global Engine) -->
   <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
 
-=======
->>>>>>> origin/main
   <!-- Customizer Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/customizer.min.css" />
 
@@ -68,7 +62,6 @@
   <script src="<?= base_url() ?>public/assets/js/jquery.min.js"></script>
 
   <style>
-<<<<<<< HEAD
     /* Dark Mode Overrides for Login */
     html.dark body, body.dark {
       background-color: #0b111e !important;
@@ -99,8 +92,6 @@
     body.dark .loader-overlay {
       background: rgba(11, 17, 30, 0.85);
     }
-=======
->>>>>>> origin/main
     .error-message {
       color: red;
       position: absolute;
@@ -139,10 +130,6 @@
       0% {
         transform: rotate(0deg);
       }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
       100% {
         transform: rotate(360deg);
       }
@@ -197,10 +184,6 @@
                           <input type="email" class="form-control" id="email" name="email"
                             placeholder="Enter your email">
                         </div>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
                         <div class="d-flex justify-content-center">
                           <input type="button" id="sendOtp" class="btn btn-primary radius-30" value="Send OTP">
                         </div>
@@ -250,15 +233,6 @@
       </div>
     </section>
   </div>
-<<<<<<< HEAD
-=======
-  <?php 
-    $siteKey = $recaptchaSiteKey ?? getenv('RECAPTCHA_SITE_KEY') ?: '';
-    if (!empty($siteKey)): 
-  ?>
-    <script src="https://www.google.com/recaptcha/api.js?render=<?= esc($siteKey); ?>"></script>
-  <?php endif; ?>
->>>>>>> origin/main
   <script src="<?= base_url() ?>public/assets/js/core/libs.min.js"></script>
 
   <!-- External Library Bundle Script -->
@@ -307,7 +281,6 @@
       const otpInput = document.getElementById("otp");
       const signInContainer = document.getElementById("signInContainer");
       const signInBtn = document.getElementById("signIn");
-<<<<<<< HEAD
 
       sendOtpBtn.addEventListener("click", function() {
         const email = emailInput.value.trim();
@@ -316,11 +289,6 @@
           return;
         }
 
-=======
-      let cooldownTimer = null;
-
-      function sendOtpRequest(email, recaptchaToken) {
->>>>>>> origin/main
         showLoader();
 
         fetch("<?= base_url('auth/send-otp'); ?>", {
@@ -329,14 +297,7 @@
               "Content-Type": "application/json",
               "X-CSRF-TOKEN": "<?= csrf_hash(); ?>"
             },
-<<<<<<< HEAD
             body: JSON.stringify({ email: email })
-=======
-            body: JSON.stringify({
-              email: email,
-              "g-recaptcha-response": recaptchaToken
-            })
->>>>>>> origin/main
           })
           .then(response => response.json())
           .then(data => {
@@ -344,68 +305,17 @@
             if (data.success) {
               Swal.fire('Success!', "OTP sent to your email.", 'success');
               emailInput.disabled = true;
-<<<<<<< HEAD
               sendOtpBtn.disabled = true;
               signInBtn.style.display = "block";
               otpField.style.display = "block";
             } else {
               Swal.fire('Error!', data.message, 'error')
-=======
-              signInBtn.style.display = "block";
-              otpField.style.display = "block";
-
-              // 60-second countdown cooldown for Send OTP button
-              let cooldown = 60;
-              sendOtpBtn.disabled = true;
-              sendOtpBtn.value = `Resend OTP (${cooldown}s)`;
-
-              if (cooldownTimer) clearInterval(cooldownTimer);
-              cooldownTimer = setInterval(() => {
-                cooldown--;
-                if (cooldown > 0) {
-                  sendOtpBtn.value = `Resend OTP (${cooldown}s)`;
-                } else {
-                  clearInterval(cooldownTimer);
-                  sendOtpBtn.disabled = false;
-                  sendOtpBtn.value = "Resend OTP";
-                }
-              }, 1000);
-            } else {
-              Swal.fire('Error!', data.message, 'error');
->>>>>>> origin/main
             }
           })
           .catch(error => {
             hideLoader();
             console.error("Error:", error);
           });
-<<<<<<< HEAD
-=======
-      }
-
-      sendOtpBtn.addEventListener("click", function() {
-        const email = emailInput.value.trim();
-        if (email === "") {
-          Swal.fire('Error!', "Please enter your email.", 'error');
-          return;
-        }
-
-        const recaptchaSiteKey = "<?= esc($siteKey); ?>";
-        if (recaptchaSiteKey && typeof grecaptcha !== 'undefined') {
-          showLoader();
-          grecaptcha.ready(function() {
-            grecaptcha.execute(recaptchaSiteKey, {action: 'send_otp'}).then(function(token) {
-              sendOtpRequest(email, token);
-            }).catch(function(err) {
-              hideLoader();
-              console.error('reCAPTCHA error:', err);
-              sendOtpRequest(email, '');
-            });
-          });
-        } else {
-          sendOtpRequest(email, '');
-        }
->>>>>>> origin/main
       });
 
       otpInput.addEventListener("input", function() {
@@ -433,24 +343,13 @@
               "Content-Type": "application/json",
               "X-CSRF-TOKEN": "<?= csrf_hash(); ?>"
             },
-<<<<<<< HEAD
             body: JSON.stringify({ email: emailInput.value, otp: otp })
-=======
-            body: JSON.stringify({
-              email: emailInput.value,
-              otp: otp
-            })
->>>>>>> origin/main
           })
           .then(response => response.json())
           .then(data => {
             hideLoader();
             if (data.success) {
-<<<<<<< HEAD
               window.location.href = "<?= base_url('dashboard'); ?>";
-=======
-              window.location.href = data.redirect;
->>>>>>> origin/main
             } else {
               Swal.fire('Error!', data.message, 'error')
             }
@@ -464,8 +363,4 @@
   </script>
 </body>
 
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> origin/main

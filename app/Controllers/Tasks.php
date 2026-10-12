@@ -9,11 +9,7 @@ class Tasks extends BaseController
     public function index()
     {
         $taskModel = new \App\Models\TaskModel();
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         $data = [
             'tasks' => $taskModel->orderBy('start_date', 'ASC')->findAll(),
             'statistics' => $taskModel->getTaskStatistics(),
@@ -39,11 +35,7 @@ class Tasks extends BaseController
             'alert_before_days' => $this->request->getPost('alert_before_days'),
             'status' => $this->request->getPost('status'),
         ];
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         $id = $this->request->getPost('id');
 
         // Validate required fields
@@ -71,10 +63,7 @@ class Tasks extends BaseController
             }
 
             return redirect()->to('/admin/tasks')->with('success', $message);
-<<<<<<< HEAD
             
-=======
->>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'Task save error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to save task: ' . $e->getMessage());
@@ -84,17 +73,10 @@ class Tasks extends BaseController
     public function resolveTask()
     {
         $taskModel = new \App\Models\TaskModel();
-<<<<<<< HEAD
         
         $id = $this->request->getPost('id');
         $resolved_comment = $this->request->getPost('resolved_comment');
         
-=======
-
-        $id = $this->request->getPost('id');
-        $resolved_comment = $this->request->getPost('resolved_comment');
-
->>>>>>> origin/main
         if (empty($resolved_comment)) {
             return redirect()->back()->with('error', 'Completion comments are required.');
         }
@@ -102,10 +84,7 @@ class Tasks extends BaseController
         try {
             $taskModel->resolveTask($id, $resolved_comment);
             return redirect()->to('/admin/tasks')->with('success', 'Task marked as completed successfully');
-<<<<<<< HEAD
             
-=======
->>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'Task resolve error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to resolve task: ' . $e->getMessage());
@@ -115,18 +94,11 @@ class Tasks extends BaseController
     public function deleteTask($id)
     {
         $taskModel = new \App\Models\TaskModel();
-<<<<<<< HEAD
         
         try {
             $taskModel->delete($id);
             return redirect()->to('/admin/tasks')->with('success', 'Task deleted successfully');
             
-=======
-
-        try {
-            $taskModel->delete($id);
-            return redirect()->to('/admin/tasks')->with('success', 'Task deleted successfully');
->>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'Task delete error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to delete task: ' . $e->getMessage());
@@ -137,11 +109,7 @@ class Tasks extends BaseController
     {
         $taskModel = new \App\Models\TaskModel();
         $allowedStatuses = ['pending', 'in_progress', 'completed', 'cancelled'];
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         if (!in_array($status, $allowedStatuses)) {
             return redirect()->back()->with('error', 'Invalid status.');
         }
@@ -149,10 +117,7 @@ class Tasks extends BaseController
         try {
             $taskModel->updateTaskStatus($id, $status);
             return redirect()->to('/admin/tasks')->with('success', 'Task status updated successfully');
-<<<<<<< HEAD
             
-=======
->>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'Task status update error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Failed to update task status: ' . $e->getMessage());
@@ -163,11 +128,7 @@ class Tasks extends BaseController
     {
         $taskModel = new \App\Models\TaskModel();
         $alerts = $taskModel->getTasksWithAlerts();
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         return $this->response->setJSON($alerts);
     }
 
@@ -175,11 +136,7 @@ class Tasks extends BaseController
     {
         $taskModel = new \App\Models\TaskModel();
         $overdue = $taskModel->getOverdueTasks();
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         return $this->response->setJSON($overdue);
     }
 
@@ -187,11 +144,7 @@ class Tasks extends BaseController
     {
         $taskModel = new \App\Models\TaskModel();
         $statistics = $taskModel->getTaskStatistics();
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         return $this->response->setJSON($statistics);
     }
 
@@ -199,18 +152,9 @@ class Tasks extends BaseController
     {
         $taskModel = new \App\Models\TaskModel();
         $keyword = $this->request->getGet('q');
-<<<<<<< HEAD
         
         $tasks = $taskModel->searchTasks($keyword);
         
         return $this->response->setJSON($tasks);
     }
 }
-=======
-
-        $tasks = $taskModel->searchTasks($keyword);
-
-        return $this->response->setJSON($tasks);
-    }
-}
->>>>>>> origin/main

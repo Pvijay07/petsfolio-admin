@@ -19,11 +19,6 @@ class DateRangeHelper
      */
     public static function resolve(string $dateRange = '30_days', ?string $startDate = null, ?string $endDate = null): array
     {
-<<<<<<< HEAD
-=======
-        date_default_timezone_set('Asia/Kolkata');
-
->>>>>>> origin/main
         // 1. Direct start_date and end_date arguments override dateRange if provided
         if (!empty($startDate) || !empty($endDate)) {
             $s = !empty($startDate) ? self::formatStart($startDate) : null;
@@ -47,22 +42,6 @@ class DateRangeHelper
             return [self::formatStart($single), self::formatEnd($single)];
         }
 
-<<<<<<< HEAD
-=======
-        // Named month and optional year e.g. "september 2026", "september_2026", "september month 2026"
-        if (preg_match('/(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)(?:[_\s]+month)?[_\s]*(\d{4})?/i', $clean, $m)) {
-            $monthStr = $m[1];
-            $yearStr  = !empty($m[2]) ? $m[2] : date('Y');
-            $timestamp = strtotime("first day of {$monthStr} {$yearStr}");
-            if ($timestamp !== false) {
-                return [
-                    date('Y-m-01 00:00:00', $timestamp),
-                    date('Y-m-t 23:59:59', $timestamp)
-                ];
-            }
-        }
-
->>>>>>> origin/main
         // 3. Named date range presets
         switch ($cleanNormalized) {
             case 'today':
@@ -193,13 +172,6 @@ class DateRangeHelper
             case 'all_time':
             case 'lifetime':
             case 'overall':
-<<<<<<< HEAD
-=======
-            case 'till_today':
-            case 'until_today':
-            case 'to_date':
-            case 'as_of_today':
->>>>>>> origin/main
                 return [null, null];
         }
 

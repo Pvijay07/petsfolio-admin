@@ -3,319 +3,11 @@
 
 <?php echo $this->section('content'); ?>
 
-<<<<<<< HEAD
-=======
-<?php
-// Compute summary stats for hero banner and status tabs
-$totalCount = count($requests ?? []);
-$statusCounts = [
-    'Requested' => 0,
-    'Assigned'  => 0,
-    'Paid'      => 0,
-    'Accepted'  => 0,
-    'Completed' => 0,
-    'Cancelled' => 0,
-];
-$totalRevenue = 0;
-$todayDateStr = date('Y-m-d');
-$dueTodayCount = 0;
-
-if (!empty($requests)) {
-    foreach ($requests as $r) {
-        $st = $r->status ?? 'Requested';
-        if (isset($statusCounts[$st])) {
-            $statusCounts[$st]++;
-        } else {
-            $statusCounts[$st] = 1;
-        }
-        $totalRevenue += (float)($r->total_price ?? 0);
-        if (!empty($r->service_start_date) && substr($r->service_start_date, 0, 10) === $todayDateStr) {
-            $dueTodayCount++;
-        }
-    }
-}
-?>
-
-<style>
-  /* Hero Banner */
-  .nl-hero-banner {
-    background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);
-    border-radius: 20px;
-    padding: 28px 32px;
-    color: #ffffff;
-    box-shadow: 0 10px 30px -5px rgba(79, 70, 229, 0.25);
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-  }
-  .nl-hero-banner::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-  .nl-live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 5px 14px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #ffffff;
-    letter-spacing: 0.03em;
-    margin-bottom: 12px;
-  }
-  .nl-stat-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 14px;
-    padding: 14px 18px;
-    min-width: 115px;
-    flex: 1;
-    transition: transform 0.15s ease, background 0.15s ease;
-  }
-  .nl-stat-card:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.12);
-  }
-  .nl-stat-card .label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.72);
-    margin-bottom: 4px;
-    display: block;
-  }
-  .nl-stat-card .value {
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.15;
-    color: #ffffff;
-  }
-
-  /* Segmented Category Tabs */
-  .nl-segmented-tabs {
-    background: #eef2f6;
-    padding: 4px;
-    border-radius: 50px;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    flex-wrap: wrap;
-  }
-  .nl-tab-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 8px 18px;
-    border-radius: 50px;
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
-    text-decoration: none;
-    transition: all 0.15s ease;
-  }
-  .nl-tab-pill:hover {
-    color: #1e293b;
-  }
-  .nl-tab-pill.active {
-    background: #ffffff;
-    color: #4338ca;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .nl-tab-badge {
-    border-radius: 50px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: 700;
-  }
-  .nl-tab-pill.active .nl-tab-badge {
-    background: #e0e7ff;
-    color: #4338ca;
-  }
-  .nl-tab-pill:not(.active) .nl-tab-badge {
-    background: rgba(0, 0, 0, 0.06);
-    color: #64748b;
-  }
-
-  /* Action Buttons */
-  .nl-btn-action {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 18px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    color: #334155;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .nl-btn-action:hover {
-    background: #f8fafc;
-    color: #0f172a;
-    border-color: #94a3b8;
-  }
-
-  /* Status Filter Tabs Bar */
-  .nl-status-tabs-container {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 6px 8px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    flex-wrap: wrap;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-  }
-  .nl-status-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #64748b;
-    border: 1px solid transparent;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .nl-status-tab:hover {
-    color: #1e293b;
-    background: #f1f5f9;
-  }
-  .nl-status-tab.active {
-    background: #ede9fe;
-    color: #4f46e5;
-    border-color: #c7d2fe;
-  }
-  .nl-status-count {
-    border-radius: 50px;
-    padding: 1px 7px;
-    font-size: 11px;
-    font-weight: 700;
-    background: rgba(0,0,0,0.06);
-    color: #64748b;
-  }
-  .nl-status-tab.active .nl-status-count {
-    background: #4f46e5;
-    color: #ffffff;
-  }
-  .status-dot-sm {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-
-  /* Filter Card */
-  .nl-filter-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-    margin-bottom: 20px;
-  }
-  .nl-search-wrap {
-    position: relative;
-    width: 100%;
-  }
-  .nl-search-wrap .search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    pointer-events: none;
-    font-size: 14px;
-  }
-  .nl-search-input {
-    width: 100%;
-    padding: 9px 14px 9px 38px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
-    font-size: 13px;
-    color: #0f172a;
-    transition: all 0.15s ease;
-  }
-  .nl-search-input:focus {
-    background: #ffffff;
-    border-color: #6366f1;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-  }
-  .nl-select {
-    padding: 8px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
-    font-size: 13px;
-    color: #334155;
-    font-weight: 500;
-    transition: all 0.15s ease;
-  }
-  .nl-select:focus {
-    border-color: #6366f1;
-    background: #ffffff;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-  }
-
-  /* Table Card & Header Override (Eliminates header.php gradient bleed) */
-  .nl-table-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 18px;
-    box-shadow: 0 2px 14px rgba(0,0,0,0.025);
-    overflow: hidden;
-  }
-  #premiumRequestsTable thead th {
-    background: #f8fafc !important;
-    color: #475569 !important;
-    border-bottom: 2px solid #e2e8f0 !important;
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.05em !important;
-    text-transform: uppercase !important;
-    padding: 14px 16px !important;
-    white-space: nowrap !important;
-  }
-  #premiumRequestsTable tbody td {
-    padding: 14px 16px !important;
-    border-bottom: 1px solid #f1f5f9;
-  }
-</style>
-
->>>>>>> origin/main
 <main class="main-content">
     <div class="position-relative iq-banner">
         <?php echo $this->include('admin/nav_bar') ?>
     </div>
 
-<<<<<<< HEAD
     <div class="conatiner-fluid content-inner pb-0" id="page_layout">
         <!-- Modern Header Section -->
         <div class="container-fluid p-0 mb-4">
@@ -403,163 +95,6 @@ if (!empty($requests)) {
                                 style="background: #c6d2ff !important;">Admin Price</th>
                             <th class="py-3 text-black fw-semibold border-bottom text-center fs-6"
                                 style="background: #c6d2ff !important;">Actions</th>
-=======
-    <div class="container-fluid px-4 content-inner pb-5" id="page_layout">
-        <!-- Modern Hero Banner Section -->
-        <div class="nl-hero-banner">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-6">
-                    <div class="nl-live-pill">
-                        <i class="bi bi-star-fill text-warning"></i>
-                        <span>Premium Tier Services</span>
-                    </div>
-                    <h2 class="fw-bold text-white mb-2" style="font-size: 28px; letter-spacing: -0.02em;">Premium Service Requests</h2>
-                    <p class="mb-0 text-white text-opacity-75" style="font-size: 13.5px; max-width: 540px; line-height: 1.55;">
-                        Manage and assign customized VIP and bespoke premium pet service requests, dispatches, and custom quotes.
-                    </p>
-                </div>
-                <div class="col-lg-6">
-                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-lg-end">
-                        <div class="nl-stat-card">
-                            <span class="label">Total Premium</span>
-                            <div class="value"><?= number_format($totalCount) ?></div>
-                        </div>
-                        <div class="nl-stat-card">
-                            <span class="label">Requested</span>
-                            <div class="value" style="color: #fde047;"><?= number_format($statusCounts['Requested'] ?? 0) ?></div>
-                        </div>
-                        <div class="nl-stat-card">
-                            <span class="label">Assigned</span>
-                            <div class="value" style="color: #6ee7b7;"><?= number_format($statusCounts['Assigned'] ?? 0) ?></div>
-                        </div>
-                        <div class="nl-stat-card">
-                            <span class="label">Est. Revenue</span>
-                            <div class="value" style="color: #93c5fd; font-size: 19px;">₹<?= number_format($totalRevenue) ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Segmented Category Tabs & Action Bar -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-            <div class="nl-segmented-tabs">
-                <a href="<?= base_url('bookingRequests') ?>" class="nl-tab-pill">
-                    <i class="bi bi-list-task"></i>
-                    <span>Normal Requests</span>
-                    <span class="nl-tab-badge"><?= $normalCount ?? 0 ?></span>
-                </a>
-                <a href="<?= base_url('premiumRequests') ?>" class="nl-tab-pill active">
-                    <i class="bi bi-star-fill text-warning"></i>
-                    <span>Premium Requests</span>
-                    <span class="nl-tab-badge"><?= $premiumCount ?? $totalCount ?></span>
-                </a>
-            </div>
-
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="nl-btn-action" onclick="exportPremiumRequestsToCSV()">
-                    <i class="bi bi-download"></i>
-                    <span>Export CSV</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Status Filter Tabs -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-            <div class="nl-status-tabs-container">
-                <button type="button" class="nl-status-tab active" data-status="all" onclick="filterByStatus('all', this)">
-                    <span>All</span>
-                    <span class="nl-status-count"><?= $totalCount ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Requested" onclick="filterByStatus('Requested', this)">
-                    <span class="status-dot-sm bg-warning"></span>
-                    <span>Requested</span>
-                    <span class="nl-status-count"><?= $statusCounts['Requested'] ?? 0 ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Assigned" onclick="filterByStatus('Assigned', this)">
-                    <span class="status-dot-sm bg-info"></span>
-                    <span>Assigned</span>
-                    <span class="nl-status-count"><?= $statusCounts['Assigned'] ?? 0 ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Paid" onclick="filterByStatus('Paid', this)">
-                    <span class="status-dot-sm bg-success"></span>
-                    <span>Paid</span>
-                    <span class="nl-status-count"><?= $statusCounts['Paid'] ?? 0 ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Accepted" onclick="filterByStatus('Accepted', this)">
-                    <span class="status-dot-sm" style="background: #10b981;"></span>
-                    <span>Accepted</span>
-                    <span class="nl-status-count"><?= $statusCounts['Accepted'] ?? 0 ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Completed" onclick="filterByStatus('Completed', this)">
-                    <span class="status-dot-sm bg-primary"></span>
-                    <span>Completed</span>
-                    <span class="nl-status-count"><?= $statusCounts['Completed'] ?? 0 ?></span>
-                </button>
-                <button type="button" class="nl-status-tab" data-status="Cancelled" onclick="filterByStatus('Cancelled', this)">
-                    <span class="status-dot-sm bg-secondary"></span>
-                    <span>Cancelled</span>
-                    <span class="nl-status-count"><?= $statusCounts['Cancelled'] ?? 0 ?></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Modern Search and Filter Toolbar -->
-        <div class="nl-filter-card">
-            <div class="row g-3 align-items-center">
-                <div class="col-lg-6 col-md-5">
-                    <div class="nl-search-wrap">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" class="nl-search-input" id="searchBookings"
-                            placeholder="Search by customer, pet, phone, package, area, ID...">
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-4">
-                    <select class="nl-select w-100" id="packageFilter" onchange="applyPackageFilter(this.value)">
-                        <option value="all">All Packages</option>
-                        <?php
-                        $uniquePackages = [];
-                        foreach ($requests ?? [] as $req) {
-                            if (!empty($req->package_name) && !in_array($req->package_name, $uniquePackages)) {
-                                $uniquePackages[] = $req->package_name;
-                            }
-                        }
-                        sort($uniquePackages);
-                        foreach ($uniquePackages as $pkg):
-                        ?>
-                            <option value="<?= htmlspecialchars($pkg) ?>"><?= htmlspecialchars($pkg) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <div class="d-flex align-items-center justify-content-md-end gap-2">
-                        <label class="text-muted small mb-0 fw-semibold">Show</label>
-                        <select class="nl-select" style="width: 80px;" id="entriesPerPage">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="all">All</option>
-                        </select>
-                        <label class="text-muted small mb-0 fw-semibold">entries</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Table Card -->
-        <div class="nl-table-card mb-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0" id="premiumRequestsTable">
-                    <thead>
-                        <tr>
-                            <th class="text-center">Customer & Pets</th>
-                            <th class="text-center">Package & Dates</th>
-                            <th class="text-center">Area</th>
-                            <th class="text-center">Status</th>
-                            <th class="text-center">Admin Price</th>
-                            <th class="text-center">Actions</th>
->>>>>>> origin/main
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
@@ -589,11 +124,7 @@ if (!empty($requests)) {
                                     </div>
                                 </td>
                                 <td class="text-center">
-<<<<<<< HEAD
                                     <div class="fw-bold text-dark"><?= $request->package_name ?></div>
-=======
-                                    <div class="fw-bold text-dark pkg-name"><?= $request->package_name ?></div>
->>>>>>> origin/main
                                     <div class="small text-muted">
                                         <i class="bi bi-calendar-event me-1"></i>
                                         <?= date('d M', strtotime($request->service_start_date)) ?> -
@@ -639,14 +170,7 @@ if (!empty($requests)) {
                 </table>
             </div>
 
-<<<<<<< HEAD
             <div class="d-flex justify-content-end align-items-center px-3 py-3 border-top">
-=======
-            <div class="d-flex flex-wrap justify-content-between align-items-center px-4 py-3 border-top bg-white gap-2">
-                <div class="text-muted small" id="paginationInfo">
-                    Showing 1 to 10 of <?= $totalCount ?> entries
-                </div>
->>>>>>> origin/main
                 <div class="btn-group mt-0 pt-0 border-0" id="paginationControls">
                     <button class="btn bg-primary btn-sm text-white" id="prevPage" disabled>
                         <i class="bi bi-chevron-left"></i> Previous
@@ -663,7 +187,6 @@ if (!empty($requests)) {
 </main>
 
 <!-- Assign Modal -->
-<<<<<<< HEAD
 <div class="modal fade" id="assignModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -672,22 +195,6 @@ if (!empty($requests)) {
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
-=======
-<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-2xl rounded-4 overflow-hidden">
-            <div class="modal-header px-4 py-3 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;">
-                <div class="d-flex align-items-center gap-2.5">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.15);">
-                        <i class="bi bi-star-fill text-warning fs-5"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title fw-bold text-white mb-0" id="assignModalLabel">Assign Premium Provider</h5>
-                        <span class="text-white-50 tiny">Manual dispatch & pricing assignment</span>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
->>>>>>> origin/main
             </div>
             <div class="modal-body p-4">
                 <form id="assignForm">
@@ -753,19 +260,11 @@ if (!empty($requests)) {
                     </div>
                 </form>
             </div>
-<<<<<<< HEAD
             <div class="modal-footer border-top-0 p-4 pt-0">
                 <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" id="submitAssignBtn" disabled
                     onclick="submitAssignment()">
                     <i class="bi bi-check-circle-fill me-2"></i>Confirm & Assign
-=======
-            <div class="modal-footer border-top bg-light p-3 px-4">
-                <button type="button" class="btn btn-sm btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm" id="submitAssignBtn" disabled
-                    onclick="submitAssignment()">
-                    <i class="bi bi-check-circle-fill me-1"></i>Confirm & Assign
->>>>>>> origin/main
                 </button>
             </div>
         </div>
@@ -773,7 +272,6 @@ if (!empty($requests)) {
 </div>
 
 <!-- Booking Details Modal -->
-<<<<<<< HEAD
 <div id="bookingDetailsModal" class="modal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow" style="height: 80vh;">
@@ -783,22 +281,6 @@ if (!empty($requests)) {
                 </h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     onclick="closeBookingDetails()"></button>
-=======
-<div id="bookingDetailsModal" class="modal fade" tabindex="-1" aria-labelledby="bookingDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-2xl rounded-4 overflow-hidden" style="max-height: 85vh;">
-            <div class="modal-header px-4 py-3 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;">
-                <div class="d-flex align-items-center gap-2.5">
-                    <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.15);">
-                        <i class="bi bi-calendar-check text-warning fs-5"></i>
-                    </div>
-                    <div>
-                        <h5 class="modal-title fw-bold text-white mb-0">Booking Details</h5>
-                        <span class="text-white-50 tiny">Detailed view of service request</span>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close" onclick="closeBookingDetails()"></button>
->>>>>>> origin/main
             </div>
             <div class="modal-body p-0"
                 style="overflow-y: auto; flex: 1; scrollbar-width: none; -ms-overflow-style: none;">
@@ -806,16 +288,7 @@ if (!empty($requests)) {
                     <div id="bookingDetailsContent"></div>
                 </div>
             </div>
-<<<<<<< HEAD
             <div class="modal-footer border-top">
-=======
-            <div class="modal-footer border-top d-flex justify-content-between align-items-center">
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold shadow-xs copy-details-btn" onclick="copyCurrentModalBooking(this)">
-                        <i class="bi bi-clipboard-check me-1"></i>Copy Booking Details
-                    </button>
-                </div>
->>>>>>> origin/main
                 <button type="button" class="btn btn-secondary" onclick="closeBookingDetails()">
                     <i class="bi bi-x-circle me-1"></i>Close
                 </button>
@@ -982,10 +455,6 @@ if (!empty($requests)) {
 
     function showBookingDetails(booking) {
         preventBodyScroll();
-<<<<<<< HEAD
-=======
-        window._currentModalBooking = booking;
->>>>>>> origin/main
 
         // Format dates
         const startDate = booking.service_start_date ? new Date(booking.service_start_date).toLocaleDateString('en-IN', {
@@ -1000,35 +469,6 @@ if (!empty($requests)) {
             year: 'numeric'
         }) : '--';
 
-<<<<<<< HEAD
-=======
-        let modalTotalDays = null;
-        if (booking.service_start_date && booking.service_end_date && booking.service_start_date !== '0000-00-00' && booking.service_end_date !== '0000-00-00') {
-            const isWeekdays = String(booking.service_days || '').toLowerCase().trim() === 'weekdays';
-            const d1 = new Date(booking.service_start_date);
-            const d2 = new Date(booking.service_end_date);
-            if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
-                if (isWeekdays) {
-                    let count = 0;
-                    const cur = new Date(d1.getTime());
-                    while (cur <= d2) {
-                        if (cur.getDay() !== 0) count++;
-                        cur.setDate(cur.getDate() + 1);
-                    }
-                    modalTotalDays = count;
-                } else {
-                    const diffTime = d2.getTime() - d1.getTime();
-                    if (diffTime >= 0) {
-                        modalTotalDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    }
-                }
-            }
-        }
-        if (!modalTotalDays && booking.days && !isNaN(parseInt(booking.days)) && parseInt(booking.days) > 0) {
-            modalTotalDays = parseInt(booking.days);
-        }
-
->>>>>>> origin/main
         // Format pet breeds
         let petBreedsHtml = '';
         if (booking.pet_breeds) {
@@ -1179,21 +619,6 @@ if (!empty($requests)) {
                                 <span class="text-secondary small">Preferable Time</span>
                                 <p class="fw-bold text-dark mb-0 mt-1"><i class="bi bi-clock me-1"></i>${booking.preferable_time || '--'}</p>
                             </div>
-<<<<<<< HEAD
-=======
-                            ${booking.duration_days ? `
-                            <div class="col-6">
-                                <span class="text-secondary small">Duration</span>
-                                <p class="fw-bold text-dark mb-0 mt-1"><i class="bi bi-hourglass-split me-1"></i>${booking.duration_days} Hours</p>
-                            </div>
-                            ` : ''}
-                            ${modalTotalDays ? `
-                            <div class="col-6">
-                                <span class="text-secondary small">Total Days</span>
-                                <p class="fw-bold text-dark mb-0 mt-1"><i class="bi bi-calendar-range me-1"></i>${modalTotalDays} Days</p>
-                            </div>
-                            ` : ''}
->>>>>>> origin/main
                             ${booking.walk_duration ? `
                             <div class="col-6">
                                 <span class="text-secondary small">Walk Duration</span>
@@ -1228,7 +653,6 @@ if (!empty($requests)) {
         </div>
 
         <style>
-<<<<<<< HEAD
             #bookingDetailsModal .modal-content {
                 border-radius: 16px;
                 overflow: hidden;
@@ -1287,30 +711,6 @@ if (!empty($requests)) {
                 width: 1px;
                 height: 40px;
                 background-color: #e2e8f0;
-=======
-            #bookingDetailsModal .modal-header {
-                border-bottom: 1px solid #e9ecef;
-            }
-            #bookingDetailsModal .modal-footer {
-                border-top: 1px solid #e9ecef;
-            }
-            #bookingDetailsModal .card {
-                transition: transform 0.2s ease-in-out;
-            }
-            #bookingDetailsModal .card:hover {
-                transform: translateY(-2px);
-            }
-            #bookingDetailsModal .badge {
-                font-size: 0.85rem;
-                letter-spacing: 0.5px;
-            }
-            #bookingDetailsModal .form-label {
-                font-size: 0.9rem;
-                font-weight: 500;
-            }
-            #bookingDetailsModal p {
-                font-size: 0.95rem;
->>>>>>> origin/main
             }
         </style>
     `;
@@ -1338,375 +738,19 @@ if (!empty($requests)) {
         }
     }
 
-<<<<<<< HEAD
-=======
-    // Function to generate customized text for copying booking details based on service type
-    function getFormattedBookingCopyText(booking) {
-        if (!booking) return '';
-
-        const formatCopyDate = (dateStr) => {
-            if (!dateStr || dateStr === '0000-00-00' || dateStr === '--') return '';
-            try {
-                if (typeof dateStr === 'string') {
-                    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                    if (match) {
-                        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-                        const day = match[3];
-                        const month = months[parseInt(match[2], 10) - 1];
-                        const year = match[1];
-                        return `${day} ${month} ${year}`;
-                    }
-                }
-                const d = new Date(dateStr);
-                if (isNaN(d.getTime())) return dateStr;
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = months[d.getMonth()];
-                const year = d.getFullYear();
-                return `${day} ${month} ${year}`;
-            } catch (e) {
-                return dateStr;
-            }
-        };
-
-        const formatPriceNumber = (val) => {
-            if (!val || isNaN(val)) return '0';
-            return Number(val).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-        };
-
-        // 1. Pet Breeds
-        let breedsList = [];
-        if (booking.pets && Array.isArray(booking.pets) && booking.pets.length > 0) {
-            breedsList = booking.pets.map(p => p.breed || p.pet_breed).filter(b => b && b !== '--' && b !== 'null');
-        }
-        if (breedsList.length === 0 && (booking.breed || booking.pet_breeds)) {
-            const raw = booking.pet_breeds || booking.breed;
-            breedsList = (Array.isArray(raw) ? raw : String(raw).split(',')).map(b => b.trim()).filter(b => b && b !== '--' && b !== 'null');
-        }
-        const breedsText = breedsList.length > 0 ? breedsList.join(', ') : (booking.type || 'Indie');
-
-        // 2. Pet Count
-        let petCount = 1;
-        if (booking.pets && Array.isArray(booking.pets) && booking.pets.length > 0) {
-            petCount = booking.pets.length;
-        } else if (booking.pet_names) {
-            const pNames = String(booking.pet_names).split(',').filter(n => n.trim().length > 0);
-            if (pNames.length > 0) petCount = pNames.length;
-        }
-
-        // 3. Dates & Days
-        const startDateStr = formatCopyDate(booking.service_start_date || booking.booking_date || booking.created_at);
-        let endDateStr = formatCopyDate(booking.service_end_date);
-
-        const parseDateOnly = (dateStr) => {
-            if (!dateStr || dateStr === '0000-00-00' || dateStr === '--') return null;
-            if (typeof dateStr === 'string') {
-                const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                if (match) {
-                    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-                }
-            }
-            const d = new Date(dateStr);
-            return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        };
-
-        let days = null;
-        const startObj = parseDateOnly(booking.service_start_date);
-        const endObj = parseDateOnly(booking.service_end_date);
-
-        // 1st priority: Calculate exact duration from service_start_date and service_end_date if both exist
-        if (startObj && endObj) {
-            const isWeekdays = String(booking.service_days || '').toLowerCase().trim() === 'weekdays';
-            if (isWeekdays) {
-                let count = 0;
-                const cur = new Date(startObj.getTime());
-                while (cur <= endObj) {
-                    if (cur.getDay() !== 0) count++;
-                    cur.setDate(cur.getDate() + 1);
-                }
-                days = count;
-            } else {
-                const diffTime = endObj.getTime() - startObj.getTime();
-                if (diffTime >= 0) {
-                    days = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                }
-            }
-        }
-
-        // 2nd priority: If days not derived from start/end dates, use explicit booking.days (e.g. Sitting / Boarding duration)
-        if (!days && booking.days && !isNaN(parseInt(booking.days)) && parseInt(booking.days) > 0) {
-            days = parseInt(booking.days);
-        }
-
-        // If end date is missing but we have start date and days, compute endDateStr
-        if (!endDateStr && startObj && days) {
-            const isWeekdays = String(booking.service_days || '').toLowerCase().trim() === 'weekdays';
-            const computedEnd = new Date(startObj.getTime());
-            if (isWeekdays) {
-                let daysAdded = 1;
-                while (daysAdded < days) {
-                    computedEnd.setDate(computedEnd.getDate() + 1);
-                    if (computedEnd.getDay() !== 0) daysAdded++;
-                }
-            } else {
-                computedEnd.setDate(computedEnd.getDate() + days - 1);
-            }
-            const year = computedEnd.getFullYear();
-            const month = String(computedEnd.getMonth() + 1).padStart(2, '0');
-            const day = String(computedEnd.getDate()).padStart(2, '0');
-            endDateStr = formatCopyDate(`${year}-${month}-${day}`);
-        }
-
-        let dateRangeText = startDateStr;
-        if (endDateStr && endDateStr !== startDateStr) {
-            dateRangeText = `${startDateStr} - ${endDateStr}`;
-        }
-        if (days) {
-            dateRangeText += ` (${days}Days)`;
-        }
-
-        // 4. Preferred Time
-        const prefTime = booking.preferable_time || booking.sp_timings || booking.booking_time || '--';
-
-        // 5. Location String
-        const rawTokens = [];
-        if (booking.landmark_areaname && booking.landmark_areaname !== '--' && booking.landmark_areaname !== 'null') {
-            rawTokens.push(...booking.landmark_areaname.split(','));
-        } else if (booking.area && booking.area !== '--' && booking.area !== 'null') {
-            rawTokens.push(...booking.area.split(','));
-        } else if (booking.houseno_floor || booking.building_blockno || booking.address || booking.formatted_address) {
-            const fullAddr = [booking.houseno_floor, booking.building_blockno, booking.address, booking.formatted_address].filter(Boolean).join(', ');
-            rawTokens.push(...fullAddr.split(','));
-        }
-
-        if (booking.city && booking.city !== '--' && booking.city !== 'null') {
-            rawTokens.push(booking.city);
-        }
-        if (booking.state && booking.state !== '--' && booking.state !== 'null' && (!booking.city || booking.city.toLowerCase() !== booking.state.toLowerCase())) {
-            rawTokens.push(booking.state);
-        }
-        const pin = booking.pincode || booking.zip_code;
-        if (pin && pin !== '--' && pin !== 'null') {
-            rawTokens.push(pin);
-        }
-
-        const seenLoc = new Set();
-        const uniqueLoc = [];
-        for (let t of rawTokens) {
-            t = String(t).trim();
-            if (!t || t === '--' || t === '0' || t === 'null') continue;
-            const lower = t.toLowerCase();
-            if (!seenLoc.has(lower)) {
-                seenLoc.add(lower);
-                uniqueLoc.push(t);
-            }
-        }
-        const locationText = uniqueLoc.join(', ') || booking.city || 'Location not specified';
-
-        // 6. Community & Footer links
-        const footerText = `For more information whatsapp - 8464825652\n\n📲 Apply here:\n👉 Android - https://play.google.com/store/apps/details?id=com.petsfolio.employee\n\n | iOS - https://apps.apple.com/in/app/petsfolio-master/id6747756338\n\nJoin community for latest update\n\nhttps://chat.whatsapp.com/CMS6gk7w3UU4wS5NJ5nx9h?mode`;
-
-        // 7. Service Type Matching
-        const sTypeLower = (booking.service_type || '').toLowerCase();
-        const sNameLower = (booking.service_name || '').toLowerCase();
-        const sId = Number(booking.service_id);
-
-        let output = '';
-
-        if (sTypeLower.includes('walk') || sNameLower.includes('walk') || sId === 4) {
-            // Walking Service
-            const frequency = booking.service_frequency || 'Twice a day';
-            const walkDuration = booking.walk_duration || '30 min walk';
-            const price = formatPriceNumber(booking.total_price || booking.final_payable || '0');
-            const paymentDays = days || (booking.days ? parseInt(booking.days) : 30);
-
-            let serviceDaysFormatted = '';
-            if (booking.service_days && booking.service_days !== '--' && booking.service_days !== 'null') {
-                const sDaysLower = String(booking.service_days).toLowerCase().trim();
-                if (sDaysLower === 'all days') {
-                    serviceDaysFormatted = 'Everyday';
-                } else if (sDaysLower === 'weekdays') {
-                    serviceDaysFormatted = 'Weekdays';
-                } else {
-                    serviceDaysFormatted = String(booking.service_days).split(',').map(d => {
-                        const tr = d.trim();
-                        return tr.charAt(0).toUpperCase() + tr.slice(1);
-                    }).join(', ');
-                }
-            }
-            const serviceDaysLine = serviceDaysFormatted ? `Service days : ${serviceDaysFormatted}\n` : '';
-
-            output = `Pet breeds : ${breedsText}\n` +
-                     `Service name : Walking\n` +
-                     `No of Dogs :${petCount}\n` +
-                     `Booking date : ${dateRangeText}\n` +
-                     serviceDaysLine +
-                     `Service frequency : ${frequency}\n` +
-                     `Walk duration : ${walkDuration}\n` +
-                     `Preferred Time : ${prefTime}\n` +
-                     `Payment : *₹${price} for ${paymentDays}days*\n` +
-                     `Location : ${locationText}\n\n` +
-                     footerText;
-
-        } else if (sTypeLower.includes('sit') || sNameLower.includes('sit') || sId === 6 || sTypeLower.includes('board') || sNameLower.includes('board') || (sId === 1 && sNameLower.includes('board'))) {
-            // Sitting / Boarding Service
-            let sittingFrequency = booking.service_frequency;
-            if (!sittingFrequency || sittingFrequency === '--' || sittingFrequency === 'null') {
-                if (booking.duration_days) {
-                    sittingFrequency = `${booking.duration_days}hrs${booking.package_name ? ` (${booking.package_name})` : ''}`;
-                } else {
-                    sittingFrequency = booking.package_name || '24hrs (Over night )';
-                }
-            }
-
-            // Show package & add-ons with hours
-            let sittingPackageAddons = [];
-            if (booking.package_name && booking.package_name !== sittingFrequency) {
-                const pkgHours = booking.duration_days ? ` (${booking.duration_days} hrs)` : '';
-                sittingPackageAddons.push(`${booking.package_name}${pkgHours}`);
-            }
-            if (booking.addons && Array.isArray(booking.addons) && booking.addons.length > 0) {
-                booking.addons.forEach(a => {
-                    const name = a.addon || a.name || 'Add-on';
-                    const hours = a.hours || a.duration || '';
-                    sittingPackageAddons.push(hours ? `${name} (${hours} hrs)` : name);
-                });
-            }
-
-            let packageAddonsLine = '';
-            if (sittingPackageAddons.length > 0) {
-                packageAddonsLine = `Package & Add-ons : ${sittingPackageAddons.join(', ')}\n`;
-            }
-
-            const price = formatPriceNumber(booking.total_price || booking.final_payable || '0');
-            const paymentDays = days || (booking.days ? parseInt(booking.days) : 10);
-
-            output = `Pet breeds : ${breedsText}\n` +
-                     `Service name : Pet sitting \n` +
-                     `No of Dogs :${petCount}\n` +
-                     `Booking date : ${dateRangeText}\n` +
-                     `Service frequency : ${sittingFrequency}\n` +
-                     packageAddonsLine +
-                     `Preferred Time : ${prefTime}\n` +
-                     `Payment : *₹${price} for ${paymentDays}days*\n` +
-                     `Location : ${locationText}\n\n` +
-                     footerText;
-
-        } else if (sTypeLower.includes('train') || sNameLower.includes('train') || sId === 1 || (sId === 3 && sNameLower.includes('train'))) {
-            // Training Service
-            let packageName = booking.package_name || 'Behaviour  Training';
-            if (booking.packages && Array.isArray(booking.packages) && booking.packages.length > 0 && (!booking.package_name || booking.package_name === '--')) {
-                packageName = booking.packages[0].package_name || packageName;
-            }
-
-            output = `Pet Breeds: ${breedsText}\n` +
-                     `Service Name: Training\n` +
-                     `Booking Date: ${startDateStr}\n` +
-                     `Package Name: ${packageName}\n` +
-                     `Preferable Time: ${prefTime}\n` +
-                     `Location : ${locationText}\n\n` +
-                     footerText;
-
-        } else if (sTypeLower.includes('groom') || sNameLower.includes('groom') || sId === 2 || (sId === 3 && sNameLower.includes('groom'))) {
-            // Grooming Service
-            output = `Pet breeds : ${breedsText}\n` +
-                     `Service name : Grooming\n` +
-                     `No of Dogs :${petCount}\n` +
-                     `Booking date : ${startDateStr}\n` +
-                     `Preferred Time : ${prefTime}\n` +
-                     `Location : ${locationText}\n\n` +
-                     footerText;
-
-        } else {
-            // Fallback
-            const serviceName = booking.service_name || 'Pet Service';
-            const price = formatPriceNumber(booking.total_price || booking.final_payable || '0');
-            const paymentDays = days || (booking.days ? parseInt(booking.days) : 1);
-
-            output = `Pet breeds : ${breedsText}\n` +
-                     `Service name : ${serviceName}\n` +
-                     `No of Dogs :${petCount}\n` +
-                     `Booking date : ${dateRangeText}\n` +
-                     `Preferred Time : ${prefTime}\n` +
-                     `Payment : *₹${price} for ${paymentDays}days*\n` +
-                     `Location : ${locationText}\n\n` +
-                     footerText;
-        }
-
-        return output;
-    }
-
-    function copyCurrentModalBooking(btn) {
-        if (!window._currentModalBooking) {
-            console.error('No current modal booking available');
-            return;
-        }
-        copyBookingDetailsFormatted(btn, window._currentModalBooking);
-    }
-
-    function copyBookingDetailsFormatted(btn, booking) {
-        if (!booking) return;
-        const textToCopy = getFormattedBookingCopyText(booking);
-
-        const copyToClipboard = (str) => {
-            if (navigator.clipboard && window.isSecureContext) {
-                return navigator.clipboard.writeText(str);
-            } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = str;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-999999px";
-                textArea.style.top = "-999999px";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                return new Promise((res, rej) => {
-                    document.execCommand('copy') ? res() : rej(new Error('Copy command failed'));
-                    textArea.remove();
-                });
-            }
-        };
-
-        copyToClipboard(textToCopy).then(() => {
-            const $btn = $(btn);
-            const origHtml = $btn.html();
-            $btn.removeClass('btn-outline-primary btn-outline-dark btn-light').addClass('btn-success text-white');
-            $btn.html('<i class="bi bi-check2-circle me-1"></i>Copied Details!');
-            setTimeout(() => {
-                $btn.html(origHtml);
-                $btn.removeClass('btn-success text-white').addClass('btn-outline-primary');
-            }, 2500);
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-            alert('Failed to copy booking details to clipboard.');
-        });
-    }
-
->>>>>>> origin/main
     class PaginationManager {
         constructor() {
             this.currentPage = 1;
             this.entriesPerPage = 10;
-<<<<<<< HEAD
             this.totalEntries = <?= count($requests) ?>;
             this.tableBody = document.querySelector('tbody');
             this.allRows = Array.from(document.querySelectorAll('.booking-row'));
             this.filteredRows = this.allRows;
-=======
-            this.totalEntries = <?= count($requests ?? []) ?>;
-            this.tableBody = document.querySelector('tbody');
-            this.allRows = Array.from(document.querySelectorAll('.booking-row'));
-            this.filteredRows = this.allRows;
-            this.currentStatus = 'all';
-            this.currentPackage = 'all';
-            this.currentQuery = '';
->>>>>>> origin/main
             this.init();
         }
 
         init() {
             this.setupEventListeners();
-<<<<<<< HEAD
             this.updateDisplay();
         }
 
@@ -1732,91 +776,15 @@ if (!empty($requests)) {
                     this.updateDisplay();
                 }
             });
-=======
-            this.applyFilters();
-        }
-
-        setupEventListeners() {
-            const entriesSelect = document.getElementById('entriesPerPage');
-            if (entriesSelect) {
-                entriesSelect.addEventListener('change', (e) => {
-                    const value = e.target.value;
-                    this.entriesPerPage = value === 'all' ? this.totalEntries : parseInt(value);
-                    this.currentPage = 1;
-                    this.updateDisplay();
-                });
-            }
-
-            const prevBtn = document.getElementById('prevPage');
-            if (prevBtn) {
-                prevBtn.addEventListener('click', () => {
-                    if (this.currentPage > 1) {
-                        this.currentPage--;
-                        this.updateDisplay();
-                    }
-                });
-            }
-
-            const nextBtn = document.getElementById('nextPage');
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    const totalPages = this.getTotalPages();
-                    if (this.currentPage < totalPages) {
-                        this.currentPage++;
-                        this.updateDisplay();
-                    }
-                });
-            }
->>>>>>> origin/main
 
             const searchInput = document.getElementById('searchBookings');
             if (searchInput) {
                 searchInput.addEventListener('input', (e) => {
-<<<<<<< HEAD
                     this.searchBookings(e.target.value);
-=======
-                    this.currentQuery = e.target.value;
-                    this.applyFilters();
->>>>>>> origin/main
                 });
             }
         }
 
-<<<<<<< HEAD
-=======
-        applyFilters() {
-            const query = (this.currentQuery || '').toLowerCase().trim();
-            const status = (this.currentStatus || 'all').toLowerCase();
-            const pkg = (this.currentPackage || 'all').toLowerCase();
-
-            this.filteredRows = this.allRows.filter(row => {
-                // Status match
-                if (status !== 'all') {
-                    const rowStatus = (row.dataset.status || '').toLowerCase();
-                    if (rowStatus !== status) return false;
-                }
-
-                // Package match
-                if (pkg !== 'all') {
-                    const pkgEl = row.querySelector('.pkg-name');
-                    const rowPkg = (pkgEl ? pkgEl.innerText : row.innerText || '').toLowerCase();
-                    if (!rowPkg.includes(pkg)) return false;
-                }
-
-                // Search query match
-                if (query) {
-                    const rowText = row.textContent.toLowerCase();
-                    if (!rowText.includes(query)) return false;
-                }
-
-                return true;
-            });
-
-            this.currentPage = 1;
-            this.updateDisplay();
-        }
-
->>>>>>> origin/main
         getTotalPages() {
             return Math.ceil(this.filteredRows.length / this.entriesPerPage);
         }
@@ -1833,18 +801,6 @@ if (!empty($requests)) {
                 }
             }
 
-<<<<<<< HEAD
-=======
-            const paginationInfo = document.getElementById('paginationInfo');
-            if (paginationInfo) {
-                if (this.filteredRows.length === 0) {
-                    paginationInfo.innerText = 'Showing 0 to 0 of 0 entries';
-                } else {
-                    paginationInfo.innerText = `Showing ${start + 1} to ${end} of ${this.filteredRows.length} entries`;
-                }
-            }
-
->>>>>>> origin/main
             this.updatePaginationControls();
         }
 
@@ -1854,15 +810,8 @@ if (!empty($requests)) {
             const nextBtn = document.getElementById('nextPage');
             const pageNumbersContainer = document.getElementById('pageNumbers');
 
-<<<<<<< HEAD
             prevBtn.disabled = this.currentPage === 1;
             nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
-=======
-            if (prevBtn) prevBtn.disabled = this.currentPage === 1;
-            if (nextBtn) nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
-
-            if (!pageNumbersContainer) return;
->>>>>>> origin/main
 
             let pageNumbersHtml = '';
             const maxVisiblePages = 5;
@@ -1909,7 +858,6 @@ if (!empty($requests)) {
             const activeClass = pageNum === this.currentPage ? 'btn-primary' : 'btn-outline-primary';
             return `<button class="btn btn-sm ${activeClass} page-btn" data-page="${pageNum}">${pageNum}</button>`;
         }
-<<<<<<< HEAD
 
         searchBookings(query) {
             query = query.toLowerCase();
@@ -1918,123 +866,23 @@ if (!empty($requests)) {
             });
             this.currentPage = 1;
             this.updateDisplay();
-=======
-    }
-
-    function filterByStatus(status, btn) {
-        document.querySelectorAll('.nl-status-tab').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-        if (window.paginationManager) {
-            window.paginationManager.currentStatus = status;
-            window.paginationManager.applyFilters();
-        }
-    }
-
-    function applyPackageFilter(pkg) {
-        if (window.paginationManager) {
-            window.paginationManager.currentPackage = pkg;
-            window.paginationManager.applyFilters();
->>>>>>> origin/main
         }
     }
 
     function applyFilters() {
-<<<<<<< HEAD
         const query = document.getElementById('searchBookings').value;
         if (window.paginationManager) {
             window.paginationManager.searchBookings(query);
-=======
-        const query = document.getElementById('searchBookings')?.value || '';
-        if (window.paginationManager) {
-            window.paginationManager.currentQuery = query;
-            window.paginationManager.applyFilters();
->>>>>>> origin/main
         }
     }
 
     function clearFilters() {
-<<<<<<< HEAD
         document.getElementById('searchBookings').value = '';
         if (window.paginationManager) {
             window.paginationManager.searchBookings('');
         }
     }
 
-=======
-        const searchInput = document.getElementById('searchBookings');
-        if (searchInput) searchInput.value = '';
-        const pkgSelect = document.getElementById('packageFilter');
-        if (pkgSelect) pkgSelect.value = 'all';
-
-        document.querySelectorAll('.nl-status-tab').forEach(b => b.classList.remove('active'));
-        const allBtn = document.querySelector('.nl-status-tab[data-status="all"]');
-        if (allBtn) allBtn.classList.add('active');
-
-        if (window.paginationManager) {
-            window.paginationManager.currentQuery = '';
-            window.paginationManager.currentStatus = 'all';
-            window.paginationManager.currentPackage = 'all';
-            window.paginationManager.applyFilters();
-        }
-    }
-
-    function exportPremiumRequestsToCSV() {
-        const table = document.getElementById('premiumRequestsTable');
-        if (!table) return;
-        const rows = Array.from(table.querySelectorAll('tbody tr.booking-row'));
-        if (!rows.length) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire('Notice', 'No premium request records to export.', 'info');
-            } else {
-                alert('No premium request records to export.');
-            }
-            return;
-        }
-
-        const headers = ['S.No.', 'Customer Name', 'Pet Details', 'Booking ID', 'Package', 'Dates', 'Days', 'Area', 'City', 'Status', 'Admin Price'];
-        const csvRows = [headers.join(',')];
-
-        let exportIndex = 1;
-        rows.forEach((row) => {
-            if (row.style.display === 'none') return;
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 6) {
-                const sNo = exportIndex++;
-                const customerName = (cells[0].querySelector('.fw-bold')?.innerText || '').replace(/"/g, '""').trim();
-                const pets = (cells[0].querySelector('.text-muted')?.innerText || '').replace(/"/g, '""').trim();
-                const bookingId = (cells[0].querySelector('.text-primary')?.innerText || '').replace(/ID:\s*/g, '').replace(/"/g, '""').trim();
-                const pkg = (cells[1].querySelector('.pkg-name')?.innerText || cells[1].querySelector('.fw-bold')?.innerText || '').replace(/"/g, '""').trim();
-                const dates = (cells[1].querySelector('.text-muted')?.innerText || '').replace(/\s+/g, ' ').replace(/"/g, '""').trim();
-                const days = (cells[1].querySelector('.badge')?.innerText || '').replace(/"/g, '""').trim();
-                const area = (cells[2].querySelector('.text-dark')?.innerText || '').replace(/"/g, '""').trim();
-                const city = (cells[2].querySelector('.text-muted')?.innerText || '').replace(/"/g, '""').trim();
-                const status = (cells[3].querySelector('.badge')?.innerText || '').replace(/"/g, '""').trim();
-                const price = (cells[4].innerText || '').replace(/[₹,]/g, '').trim();
-
-                csvRows.push(`"${sNo}","${customerName}","${pets}","${bookingId}","${pkg}","${dates}","${days}","${area}","${city}","${status}","${price}"`);
-            }
-        });
-
-        if (csvRows.length === 1) {
-            if (typeof Swal !== 'undefined') {
-                Swal.fire('Notice', 'No visible records matching current filters.', 'info');
-            } else {
-                alert('No visible records matching current filters.');
-            }
-            return;
-        }
-
-        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', `premium_requests_${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
->>>>>>> origin/main
     document.addEventListener('DOMContentLoaded', function () {
         window.paginationManager = new PaginationManager();
     });

@@ -13,7 +13,6 @@ class ReleaseCommentModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'comment_type', 'comment', 'created_by'
     ];
 
@@ -87,14 +86,4 @@ class ReleaseCommentModel extends Model
         $counts['total'] = array_sum($counts);
         return $counts;
     }
-=======
-        'version_id',
-        'comment_type',
-        'comment',
-        'created_by',
-        'created_at'
-    ];
-
-    protected $useTimestamps = false;
->>>>>>> origin/main
 }

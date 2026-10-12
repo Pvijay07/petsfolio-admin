@@ -75,12 +75,6 @@
           <p class="text-white-75 mb-0">Role-Based Access Control (RBAC), Direct User Permission Overrides, and Granular Functionality Matrix.</p>
         </div>
         <div class="d-flex gap-2">
-<<<<<<< HEAD
-=======
-          <button class="btn btn-warning text-dark fw-bold shadow-sm" onclick="syncPermissionsFromRegistry()">
-            <i class="fas fa-sync me-1"></i> Sync Permissions Registry
-          </button>
->>>>>>> origin/main
           <button class="btn btn-light text-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
             <i class="fas fa-plus-circle me-1"></i> Add New Role
           </button>
@@ -381,7 +375,6 @@
                   <?php foreach (($roles ?? []) as $r) : ?>
                     <div class="list-group-item p-3 border rounded-3 mb-2 d-flex justify-content-between align-items-center bg-light">
                       <div>
-<<<<<<< HEAD
                         <h6 class="fw-bold mb-1 text-dark"><?= esc($r['name']) ?></h6>
                         <small class="text-muted"><?= esc($r['description'] ?: 'Standard system access role') ?></small>
                       </div>
@@ -390,23 +383,6 @@
                           <i class="fas fa-edit"></i>
                         </button>
                         <?php if ($r['id'] != 1) : ?>
-=======
-                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                          <h6 class="fw-bold mb-0 text-dark"><?= esc($r['name']) ?></h6>
-                          <?php if (!empty($r['slug'])) : ?>
-                            <span class="badge bg-white text-primary border px-2 py-1 small font-monospace shadow-xs">
-                              <i class="fas fa-hashtag me-1 opacity-50"></i><?= esc($r['slug']) ?>
-                            </span>
-                          <?php endif; ?>
-                        </div>
-                        <small class="text-muted"><?= esc($r['description'] ?: 'Standard system access role') ?></small>
-                      </div>
-                      <div class="d-flex gap-1">
-                        <button class="btn btn-sm btn-icon btn-outline-primary" onclick="editRole(<?= $r['id'] ?>, '<?= esc($r['name']) ?>', '<?= esc($r['slug'] ?? '') ?>', '<?= esc($r['description'] ?? '') ?>')">
-                          <i class="fas fa-edit"></i>
-                        </button>
-                        <?php if ($r['id'] != 1 && ($r['slug'] ?? '') !== 'super_admin') : ?>
->>>>>>> origin/main
                           <button class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteRole(<?= $r['id'] ?>, '<?= esc($r['name']) ?>')">
                             <i class="fas fa-trash"></i>
                           </button>
@@ -526,20 +502,6 @@
             <input type="text" id="roleName" name="name" class="form-control" placeholder="e.g. Telecaller Manager" required>
           </div>
           <div class="mb-3">
-<<<<<<< HEAD
-=======
-            <label class="form-label fw-bold d-flex justify-content-between align-items-center mb-1">
-              <span>Role Slug</span>
-              <small class="text-muted fw-normal">Unique code identifier</small>
-            </label>
-            <div class="input-group">
-              <span class="input-group-text bg-light text-muted"><i class="fas fa-hashtag"></i></span>
-              <input type="text" id="roleSlug" name="slug" class="form-control font-monospace" placeholder="e.g. telecaller_manager">
-            </div>
-            <small class="text-muted">Lowercase letters, numbers, and underscores (auto-generated if left blank).</small>
-          </div>
-          <div class="mb-3">
->>>>>>> origin/main
             <label class="form-label small fw-semibold">Role Description</label>
             <textarea id="roleDescription" name="description" class="form-control" rows="3" placeholder="Describe the responsibilities for this role..."></textarea>
           </div>
@@ -600,27 +562,6 @@
       loadUserPermissions();
     });
 
-<<<<<<< HEAD
-=======
-    // Reset modal on New Role button click
-    $('[data-bs-target="#addRoleModal"]').on('click', function() {
-      $('#roleEditId').val('');
-      $('#roleName').val('');
-      $('#roleSlug').val('');
-      $('#roleDescription').val('');
-      $('#roleModalTitle').html('<i class="fas fa-plus-circle me-2"></i> Create New Role');
-    });
-
-    // Real-time slug auto-generation when typing role name for new role
-    $('#roleName').on('input', function() {
-      if (!$('#roleEditId').val()) {
-        let val = $(this).val();
-        let slug = val.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
-        $('#roleSlug').val(slug);
-      }
-    });
-
->>>>>>> origin/main
     // Live search filter for Role Matrix
     $('#matrixSearchInput').on('keyup', function() {
       let query = $(this).val().toLowerCase().trim();
@@ -839,16 +780,9 @@
     $('#roleMatrixForm').submit();
   }
 
-<<<<<<< HEAD
   function editRole(id, name, desc) {
     $('#roleEditId').val(id);
     $('#roleName').val(name);
-=======
-  function editRole(id, name, slug, desc) {
-    $('#roleEditId').val(id);
-    $('#roleName').val(name);
-    $('#roleSlug').val(slug || '');
->>>>>>> origin/main
     $('#roleDescription').val(desc);
     $('#roleModalTitle').html('<i class="fas fa-edit me-2"></i> Edit Role #' + id);
     new bootstrap.Modal(document.getElementById('addRoleModal')).show();
@@ -909,28 +843,6 @@
     tab.show();
   }
 
-<<<<<<< HEAD
-=======
-  function syncPermissionsFromRegistry() {
-    if (!confirm('Sync permissions from central registry? This will populate any new module permissions.')) return;
-    $.ajax({
-      url: '<?= base_url('admin/permissions/sync-permissions') ?>',
-      type: 'POST',
-      success: function(resp) {
-        if (resp.status) {
-          showToast(resp.message, 'success');
-          setTimeout(function() { location.reload(); }, 1200);
-        } else {
-          showToast(resp.message || 'Sync failed.', 'danger');
-        }
-      },
-      error: function() {
-        showToast('Server error syncing permissions.', 'danger');
-      }
-    });
-  }
-
->>>>>>> origin/main
   function showToast(message, type) {
     let bg = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-info');
     let toastId = 'toast-' + Date.now();

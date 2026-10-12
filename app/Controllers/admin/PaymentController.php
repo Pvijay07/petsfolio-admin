@@ -9,19 +9,13 @@ class PaymentController extends Controller
 {
   protected $payoutService;
   protected $db;
-<<<<<<< HEAD
   protected $booking;
-=======
->>>>>>> origin/main
 
   public function __construct()
   {
     $this->payoutService = new CashfreePayoutService();
     $this->db            = \Config\Database::connect();
-<<<<<<< HEAD
     $this->booking       = new \App\Models\Booking();
-=======
->>>>>>> origin/main
     helper(['form', 'url']);
   }
 
@@ -79,7 +73,6 @@ class PaymentController extends Controller
       $result = $this->payoutService->processWithdrawalPayout($withdrawalId);
 
       if ($result['success']) {
-<<<<<<< HEAD
         // NEW: Log transaction for payout initiation
         $withdrawal = $this->db->table('wallet_withdrawals')->where('id', $withdrawalId)->get()->getRow();
         $provider = $this->db->table('service_providers')->where('id', $withdrawal->user_id)->get()->getRow();
@@ -104,23 +97,6 @@ class PaymentController extends Controller
         return $this->response->setJSON([
           'status'      => 'success',
           'message'     => 'Payout initiated successfully and transaction recorded',
-=======
-        $this->db->transComplete();
-
-        // Send push & in-app notification to provider
-        $withdrawal = $this->db->table('wallet_withdrawals')->where('id', $withdrawalId)->get()->getRowArray();
-        if ($withdrawal) {
-          $this->payoutService->sendProviderPayoutNotification(
-            $withdrawal['user_id'],
-            $withdrawal['amount'],
-            $result['utr'] ?? ($result['transfer_id'] ?? ('PAYOUT-' . $withdrawalId))
-          );
-        }
-
-        return $this->response->setJSON([
-          'status'      => 'success',
-          'message'     => 'Payout initiated successfully',
->>>>>>> origin/main
           'transfer_id' => $result['transfer_id'] ?? null,
           'utr'         => $result['utr'] ?? null
         ]);
@@ -176,7 +152,6 @@ class PaymentController extends Controller
       $this->db->transStart();
 
       // If status is "completed", process through Cashfree
-<<<<<<< HEAD
       if ($status === 'completed' || $status === 'in_progress') {
         $result = $this->payoutService->processWithdrawalPayout($id);
 
@@ -200,12 +175,6 @@ class PaymentController extends Controller
              $result['utr'] ?? null
            );
         } else {
-=======
-      if ($status === 'completed') {
-        $result = $this->payoutService->processWithdrawalPayout($id);
-
-        if (!$result['success']) {
->>>>>>> origin/main
           $this->db->transRollback();
           return $this->response->setJSON([
             'status'  => 'error',
@@ -222,7 +191,6 @@ class PaymentController extends Controller
         if ($status === 'rejected') {
           $updateData['processed_at'] = date('Y-m-d H:i:s');
 
-<<<<<<< HEAD
           // Return amount to service provider's wallet if rejected
           $this->db->table('service_providers')
             ->where('id', $providerId)
@@ -243,13 +211,6 @@ class PaymentController extends Controller
             'Payout rejected - amount returned to wallet',
             'sp_wallet_histories'
           );
-=======
-          // Return amount to user's wallet if rejected
-          $this->db->table('users')
-            ->where('id', $providerId)
-            ->set('wallet_balance', 'wallet_balance + ' . $amount, false)
-            ->update();
->>>>>>> origin/main
         }
 
         $this->db->table('wallet_withdrawals')
@@ -266,13 +227,6 @@ class PaymentController extends Controller
         ]);
       }
 
-<<<<<<< HEAD
-=======
-      if ($status === 'completed' && $providerId && $amount) {
-        $this->payoutService->sendProviderPayoutNotification($providerId, $amount, 'MANUAL-PAYOUT-' . $id);
-      }
-
->>>>>>> origin/main
       return $this->response->setJSON([
         'status'  => 'success',
         'message' => 'Status updated successfully'
@@ -332,26 +286,9 @@ class PaymentController extends Controller
         ->where('id', $id)
         ->update([
           'receipt'    => $newName,
-<<<<<<< HEAD
           'updated_at' => date('Y-m-d H:i:s')
         ]);
 
-=======
-          'status'     => 'completed',
-          'updated_at' => date('Y-m-d H:i:s')
-        ]);
-
-      // Send push & in-app notification to provider
-      $withdrawal = $this->db->table('wallet_withdrawals')->where('id', $id)->get()->getRowArray();
-      if ($withdrawal) {
-        $this->payoutService->sendProviderPayoutNotification(
-          $withdrawal['user_id'],
-          $withdrawal['amount'],
-          $newName
-        );
-      }
-
->>>>>>> origin/main
       return $this->response->setJSON([
         'status'   => 'success',
         'message'  => 'Receipt uploaded successfully',
@@ -443,10 +380,6 @@ class PaymentController extends Controller
 
         return $this->response->setJSON([
           'status'        => 'success',
-<<<<<<< HEAD
-=======
-          'status_updated' => true,
->>>>>>> origin/main
           'payout_status' => $result['data']['status'] ?? 'UNKNOWN',
           'utr'           => $result['data']['utr'] ?? null
         ]);

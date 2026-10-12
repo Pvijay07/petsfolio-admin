@@ -48,11 +48,7 @@ class PlayStoreAPI
         // Path to your service account JSON key file.
         // It's a good practice to store this outside the public webroot.
         // $credentialsPath = WRITEPATH . 'credentials/playstore-api-key.json';
-<<<<<<< HEAD
         $credentialsPath = ROOTPATH . 'public/service_account/petsfolio-492009-878571efbf22.json';
-=======
-        $credentialsPath = ROOTPATH . 'public/service_account/petsfolio-client-app-cb99ea8f9ae6.json';
->>>>>>> origin/main
 
         // Check if the credentials file exists.
         if (!file_exists($credentialsPath)) {
@@ -75,19 +71,11 @@ class PlayStoreAPI
      */
     public function getAppStatistics()
     {
-<<<<<<< HEAD
         try {
-=======
-        // try {
->>>>>>> origin/main
             // NOTE: This is a placeholder. The real reporting API is more complex.
             // A simplified API call for getting a basic app edit would look like this,
             // but it does not return install/uninstall counts directly.
             // We use this as a valid API call to test the connection.
-<<<<<<< HEAD
-=======
-            // Library
->>>>>>> origin/main
             $service = new AndroidPublisher($this->client);
             $edit = $service->edits->insert(
                 $this->packageName,
@@ -96,11 +84,7 @@ class PlayStoreAPI
 
             // Discard the edit as we are only reading data.
             $service->edits->delete($this->packageName, $edit->getId());
-<<<<<<< HEAD
 
-=======
-            var_dump($service);
->>>>>>> origin/main
             // Since the reporting API is complex, we will return some mock data.
             // In a real implementation, you would read a report from a Cloud Storage bucket.
             return [
@@ -108,16 +92,9 @@ class PlayStoreAPI
                 'total_uninstalls' => rand(500, 5000),
                 'last_updated' => date('Y-m-d H:i:s')
             ];
-<<<<<<< HEAD
         } catch (\Exception $e) {
             log_message('error', 'Google Play API Error: ' . $e->getMessage());
             throw $e;
         }
-=======
-        // } catch (\Exception $e) {
-        //     log_message('error', 'Google Play API Error: ' . $e->getMessage());
-        //     return false;
-        // }
->>>>>>> origin/main
     }
 }

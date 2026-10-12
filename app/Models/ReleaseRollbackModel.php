@@ -13,32 +13,15 @@ class ReleaseRollbackModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'current_live_version', 'rollback_to_version',
         'rollback_reason', 'critical_issue', 'approved_by', 'approved_at',
         'started_at', 'completed_at', 'status', 'post_rollback_notes'
-=======
-        'version_id',
-        'current_live_version',
-        'rollback_to_version',
-        'rollback_reason',
-        'critical_issue',
-        'approved_by',
-        'approved_at',
-        'started_at',
-        'completed_at',
-        'status',
-        'post_rollback_notes',
-        'created_at',
-        'updated_at'
->>>>>>> origin/main
     ];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-<<<<<<< HEAD
 
     /**
      * Get rollback record for a version
@@ -157,6 +140,4 @@ class ReleaseRollbackModel extends Model
 
         return $timeline;
     }
-=======
->>>>>>> origin/main
 }

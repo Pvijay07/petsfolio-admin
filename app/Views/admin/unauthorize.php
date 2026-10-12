@@ -2,7 +2,6 @@
 <html>
 
 <head>
-<<<<<<< HEAD
     <!-- Theme Early Detection (Zero-Flicker) -->
     <script>
         (function() {
@@ -23,8 +22,6 @@
             } catch (e) {}
         })();
     </script>
-=======
->>>>>>> origin/main
     <title>403 Unauthorize</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link
@@ -32,10 +29,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url() ?>public/assets/_ui/css/styles.css">
     <link rel="stylesheet" href="<?= base_url() ?>public/assets/_ui/css/responsive.css">
-<<<<<<< HEAD
     <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>">
-=======
->>>>>>> origin/main
     <style type="text/css">
         .er_pg {
             display: flex;

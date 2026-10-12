@@ -33,17 +33,10 @@ def get_embedding(text):
             data=payload,
             headers={"Content-Type": "application/json"}
         )
-<<<<<<< HEAD
         with urllib.request.urlopen(req, timeout=0.5) as resp:
             res = json.loads(resp.read().decode('utf-8'))
             return res.get("embedding")
     except Exception:
-=======
-        with urllib.request.urlopen(req, timeout=15) as resp:
-            res = json.loads(resp.read().decode('utf-8'))
-            return res.get("embedding")
-    except Exception as e:
->>>>>>> origin/main
         return None
 
 
@@ -96,11 +89,7 @@ def chunk_client_guidelines_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
 
-<<<<<<< HEAD
     # Split by section headers e.g. "1. Document Purpose", "4. Supported Services", etc.
-=======
-    # Split by section headers e.g. "1. Document Purpose", "4.1 Walking Analysis", "13.1 Normal GST Inquiries", etc.
->>>>>>> origin/main
     raw_sections = re.split(r'\n(?=\d+(?:\.\d+)?\.\s+)', content)
     chunks = []
     
@@ -122,22 +111,7 @@ def chunk_client_guidelines_file(filepath):
         if 'sit' in sec_lower: tags.append('sitting')
         if 'payment' in sec_lower or 'off-platform' in sec_lower: tags.append('off_platform_payment')
         if 'contact' in sec_lower or 'phone' in sec_lower or 'whatsapp' in sec_lower: tags.append('contact_sharing')
-<<<<<<< HEAD
         if 'complaint' in sec_lower or 'refund' in sec_lower: tags.append('complaint')
-=======
-        if 'bypass' in sec_lower or 'skip petsfolio' in sec_lower or 'book direct' in sec_lower: tags.append('platform_bypass')
-        if 'gst' in sec_lower or 'platform charge' in sec_lower or 'platform fee' in sec_lower: tags.append('gst_platform_charges')
-        if 'false' in sec_lower or 'over-highlight' in sec_lower or 'do not highlight' in sec_lower: tags.append('false_positive_prevention')
-        if 'severity' in sec_lower or 'level 1' in sec_lower or 'level 4' in sec_lower: tags.append('severity_levels')
-        if 'complaint' in sec_lower: tags.append('complaint')
-        if 'refund' in sec_lower: tags.append('refund')
-        if 'inappropriate' in sec_lower or 'abusive' in sec_lower: tags.append('abuse_inappropriate_language')
-        if 'threat' in sec_lower or 'intimidat' in sec_lower: tags.append('threatening_communication')
-        if 'cancel' in sec_lower: tags.append('cancellation')
-        if 'reschedul' in sec_lower: tags.append('rescheduling')
-        if 'outside-service' in sec_lower or 'additional service' in sec_lower: tags.append('additional_service')
-        if 'pet' in sec_lower or 'bruno' in sec_lower or 'temperament' in sec_lower or 'nervous' in sec_lower: tags.append('pet_context')
->>>>>>> origin/main
         if 'rating' in sec_lower: tags.append('rating')
 
         chunks.append({
@@ -151,27 +125,7 @@ def chunk_client_guidelines_file(filepath):
     return chunks
 
 
-<<<<<<< HEAD
 def index_client_guidelines_to_qdrant(filepath=None, verbose=False):
-=======
-def recreate_qdrant_collection(vector_size=768):
-    """
-    Delete and recreate collection to ensure fresh indexing.
-    """
-    try:
-        req = urllib.request.Request(
-            f"{QDRANT_HOST}/collections/{COLLECTION_NAME}",
-            method="DELETE"
-        )
-        with urllib.request.urlopen(req, timeout=5) as resp:
-            pass
-    except Exception:
-        pass
-    return init_qdrant_collection(vector_size)
-
-
-def index_client_guidelines_to_qdrant(filepath=None, verbose=False, recreate=True):
->>>>>>> origin/main
     """
     Read client_provider_call_guidelines.txt, embed sections, and store in Qdrant collection.
     """
@@ -190,16 +144,7 @@ def index_client_guidelines_to_qdrant(filepath=None, verbose=False, recreate=Tru
         return False
 
     vector_size = len(first_vec)
-<<<<<<< HEAD
     if not init_qdrant_collection(vector_size):
-=======
-    if recreate:
-        if not recreate_qdrant_collection(vector_size):
-            if verbose:
-                sys.stderr.write("Could not recreate Qdrant collection.\n")
-            return False
-    elif not init_qdrant_collection(vector_size):
->>>>>>> origin/main
         if verbose:
             sys.stderr.write("Could not initialize Qdrant collection.\n")
         return False

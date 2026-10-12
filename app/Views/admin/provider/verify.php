@@ -11,7 +11,6 @@ function ratingOptions($weight, $isSimple = false, $optionsStr = '') {
     $weight = (float)$weight;
     $parsedOptions = [];
     if (!empty($optionsStr)) {
-<<<<<<< HEAD
         $parts = explode(',', $optionsStr);
         foreach ($parts as $part) {
             $subparts = explode(':', $part, 2);
@@ -22,27 +21,6 @@ function ratingOptions($weight, $isSimple = false, $optionsStr = '') {
                 $val = str_replace(["\r", "\n", "\\r", "\\n"], "", $val);
                 $parsedOptions[$key] = $val;
             }
-=======
-        if (preg_match_all('/(?:^|,\s*)(Bad|Poor|Average|Good|Excellent)\s*:\s*(.*?)(?=(?:,\s*(?:Bad|Poor|Average|Good|Excellent)\s*:|$))/s', $optionsStr, $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $m) {
-                $key = trim($m[1]);
-                $val = trim($m[2]);
-                $val = str_replace(["\r", "\n", "\\r", "\\n"], "", $val);
-                $parsedOptions[$key] = $val;
-            }
-        } else {
-            $parts = explode(',', $optionsStr);
-            foreach ($parts as $part) {
-                $subparts = explode(':', $part, 2);
-                if (count($subparts) === 2) {
-                    $key = trim($subparts[0]);
-                    $val = trim($subparts[1]);
-                    $key = str_replace(["\r", "\n", "\\r", "\\n"], "", $key);
-                    $val = str_replace(["\r", "\n", "\\r", "\\n"], "", $val);
-                    $parsedOptions[$key] = $val;
-                }
-            }
->>>>>>> origin/main
         }
     }
 
@@ -63,12 +41,9 @@ function ratingOptions($weight, $isSimple = false, $optionsStr = '') {
         echo '<option value="' . $info['val'] . '">' . htmlspecialchars($optionText) . '</option>';
     }
 }
-<<<<<<< HEAD
 if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
     echo "<!-- DEBUG SERVICE DETAILS: " . json_encode($service_details) . " -->";
 }
-=======
->>>>>>> origin/main
 ?>
 
 <div class="container-fluid py-4">
@@ -129,15 +104,9 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                         <div class="small text-muted"><?= $provider->area ?>/<?= $provider->city ?></div>
 
 
-<<<<<<< HEAD
                                          <div class="d-flex align-items-center gap-1 flex-wrap mt-1">
                                              <div class="badge bg-info-soft text-info extra-small"><?= $service_name ?></div>
                                              <?php if ($service_id == 3 && !empty($selected_types)): ?>
-=======
-                                        <div class="d-flex align-items-center gap-1 flex-wrap mt-1">
-                                            <div class="badge bg-info-soft text-info extra-small"><?= $service_name ?></div>
-                                            <?php if ($service_id == 3 && !empty($selected_types)): ?>
->>>>>>> origin/main
                                                  <?php foreach ($selected_types as $type): 
                                                      $typeLabel = '';
                                                      if ($type === 'obedience_training') $typeLabel = 'Puppy & Obedience';
@@ -161,15 +130,9 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                                      <div class="badge bg-primary-soft text-primary extra-small"><?= $typeLabel ?></div>
                                                  <?php endif; endforeach; ?>
                                              <?php endif; ?>
-<<<<<<< HEAD
                                              <?php if ($service_row->payment_paid ?? 0): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-check-circle me-1"></i>Paid</span><?php endif; ?>
                                              <?php if ($service_row->call_verified ?? 0): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-check-circle me-1"></i>Call Verified</span><?php endif; ?>
                                              <?php if ($kyc_verified): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-id-card me-1"></i>KYC Verified</span><?php endif; ?>
-=======
-                                            <?php if ($service_row->payment_paid ?? 0): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-check-circle me-1"></i>Paid</span><?php endif; ?>
-                                            <?php if ($service_row->call_verified ?? 0): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-check-circle me-1"></i>Call Verified</span><?php endif; ?>
-                                            <?php if ($kyc_verified): ?><span class="badge bg-success-soft text-success extra-small" style="font-size: 0.6rem;"><i class="fas fa-id-card me-1"></i>KYC Verified</span><?php endif; ?>
->>>>>>> origin/main
                                         </div>
                                     </div>
                                 </div>
@@ -226,17 +189,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                                   <?php endif; ?>
                                              </select>
                                         </div>
-<<<<<<< HEAD
-=======
-                                        <?php if (strpos($current_status, 'pending_verification') !== false): ?>
-                                        <div class="mb-4 form-check">
-                                            <input class="form-check-input" type="checkbox" name="not_interested" id="not_interested" value="1">
-                                            <label class="form-check-label fw-bold text-danger small" for="not_interested">
-                                                Provider Not Interested
-                                            </label>
-                                        </div>
-                                        <?php endif; ?>
->>>>>>> origin/main
                                         <div class="mb-4">
                                             <label class="form-label fw-bold text-dark small mb-2">Years of Experience</label>
                                             <input type="number" class="form-control border-0 bg-light rounded-3 py-2" name="experience" value="<?= $service_details?->experience ?? '' ?>" placeholder="e.g. 5" required>
@@ -296,10 +248,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                                                  <label class="form-label fw-bold text-dark small mb-1"><?= $q['question_text'] ?> (<?= $q['weight'] ?>%)</label>
                                                                  <div class="small text-muted mb-2 lh-sm"><?= $q['hint_text'] ?></div>
                                                                  <select class="form-select border-0 bg-light q-score" 
-<<<<<<< HEAD
-=======
-                                                                         required 
->>>>>>> origin/main
                                                                          name="<?= !empty($q['field_name']) ? $q['field_name'] : 'q_' . $q['id'] ?>" 
                                                                          id="<?= !empty($q['field_name']) ? $q['field_name'] : 'q_' . $q['id'] ?>"
                                                                          data-trigger="<?= ($q['is_trigger']) ? 'true' : 'false' ?>" data-weight="<?= $q['weight'] ?>">
@@ -313,7 +261,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                         </div>
                                     <?php endforeach; ?>
 
-<<<<<<< HEAD
                                     <!-- Mandatory Instruction Section -->
                                     <!-- <div class="alert alert-warning border-0 rounded-4 p-4 mt-4 shadow-sm">
                                         <h6 class="fw-bold d-flex align-items-center mb-3">
@@ -323,17 +270,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
                                             “Taking clients outside the Petsfolio platform is strictly not allowed. If you take clients offline, your account will be blocked, you will have to pay a penalty, and you will not receive any more leads from Petsfolio. All services must be accepted only through proper bookings in the app.”
                                         </p>
                                     </div> -->
-=======
-                                    <!-- Mandatory Statement by Verification Executive -->
-                                    <div class="alert alert-warning border-0 rounded-4 p-4 mt-4 shadow-sm" style="background: rgba(255, 193, 7, 0.12); border-left: 4px solid #ffc107 !important;">
-                                        <h6 class="fw-bold d-flex align-items-center mb-2 text-dark">
-                                            <span class="me-2" style="font-size: 1.25rem;">🗣️</span> Statement by Verification Executive
-                                        </h6>
-                                        <p class="mb-0 small fw-bold text-dark" style="font-style: italic; line-height: 1.6;">
-                                            “Taking clients outside the Petsfolio platform is strictly not allowed. If you take clients offline, your account will be blocked, you must pay a penalty, and you will not receive further leads.”
-                                        </p>
-                                    </div>
->>>>>>> origin/main
                                 </div>
                             </div>
                         </div>
@@ -446,13 +382,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
             else if (percentage >= 35) finalRating = 2;
             else if (total > 0) finalRating = 1;
 
-<<<<<<< HEAD
-=======
-            if ($('#not_interested').is(':checked')) {
-                finalRating = 1;
-            }
-
->>>>>>> origin/main
             $('#sv_rating_value').val(finalRating);
             let starsHtml = '';
             for (let i = 1; i <= 5; i++) {
@@ -466,15 +395,9 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
             if (triggerEl.length) {
                 const hasExp = parseFloat(triggerEl.val() || 0) > 0;
                 if (hasExp) {
-<<<<<<< HEAD
                     $('.exp-dependent').removeClass('d-none').find('select').prop('disabled', false).prop('required', true);
                 } else {
                     $('.exp-dependent').addClass('d-none').find('select').val(0).prop('disabled', true).prop('required', false);
-=======
-                    $('.exp-dependent').removeClass('d-none');
-                } else {
-                    $('.exp-dependent').addClass('d-none').find('select').val(0);
->>>>>>> origin/main
                 }
             }
             calculateScore();
@@ -485,22 +408,6 @@ if (isset($service_details) && ($service_id == 3 || $service_id == 2)) {
             else calculateScore();
         });
 
-<<<<<<< HEAD
-=======
-        $(document).on('change', '#not_interested', function() {
-            if ($(this).is(':checked')) {
-                $('.q-score').removeAttr('required').val(0).trigger('change');
-                $('input[name="experience"], input[name="available_time"], select[name="confidence"], textarea[name="comment"]').removeAttr('required');
-                $('#sv_status').find('option[value="approval"]').removeAttr('disabled');
-                $('#sv_status').val('approval');
-            } else {
-                $('.q-score').attr('required', true);
-                $('input[name="experience"], input[name="available_time"], select[name="confidence"], textarea[name="comment"]').attr('required', true);
-            }
-            calculateScore();
-        });
-
->>>>>>> origin/main
         $(document).on('click', '.set-satisfactory', function(e) {
             e.preventDefault();
             const target = $(this).data('target');

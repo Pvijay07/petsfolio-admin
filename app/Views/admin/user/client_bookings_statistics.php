@@ -219,11 +219,7 @@
                                 return $rate_b <=> $rate_a;
                             });
 
-<<<<<<< HEAD
                             $top_states = array_slice($sorted_states, 0, 5);
-=======
-                            $top_states = array_slice($sorted_states, 0, 4);
->>>>>>> origin/main
                             foreach ($top_states as $index => $state):
                                 $completion_rate = $state['jobs_posted'] > 0 ? round(($state['completed'] / $state['jobs_posted']) * 100, 1) : 0;
                                 ?>
@@ -355,11 +351,7 @@
                                     </td>
                                     <td class="py-3 text-center">
                                         <span
-<<<<<<< HEAD
                                             class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-1">
-=======
-                                            class="badge bg-success bg-opacity-10 text-white border border-success border-opacity-25 px-3 py-1">
->>>>>>> origin/main
                                             <?= number_format($state['completed']) ?>
                                         </span>
                                     </td>

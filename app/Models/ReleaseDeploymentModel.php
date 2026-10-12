@@ -13,30 +13,15 @@ class ReleaseDeploymentModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'deployment_status', 'started_at', 'deployed_at',
         'health_check_at', 'monitoring_started', 'completed_at',
         'deployed_by', 'notes'
-=======
-        'version_id',
-        'deployment_status',
-        'started_at',
-        'deployed_at',
-        'health_check_at',
-        'monitoring_started',
-        'completed_at',
-        'deployed_by',
-        'notes',
-        'created_at',
-        'updated_at'
->>>>>>> origin/main
     ];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
-<<<<<<< HEAD
 
     /**
      * Deployment step labels
@@ -159,6 +144,4 @@ class ReleaseDeploymentModel extends Model
 
         return $progress;
     }
-=======
->>>>>>> origin/main
 }

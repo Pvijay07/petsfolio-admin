@@ -13,7 +13,6 @@ class ReleaseEmailModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'subject', 'body_html', 'recipients',
         'sent_by', 'sent_at', 'status', 'error_message'
     ];
@@ -120,18 +119,4 @@ class ReleaseEmailModel extends Model
             'error_message' => $errorMessage,
         ]);
     }
-=======
-        'version_id',
-        'subject',
-        'body_html',
-        'recipients',
-        'sent_by',
-        'sent_at',
-        'status',
-        'error_message',
-        'created_at'
-    ];
-
-    protected $useTimestamps = false;
->>>>>>> origin/main
 }

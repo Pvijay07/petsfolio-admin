@@ -13,7 +13,6 @@ class ReleaseApprovalModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-<<<<<<< HEAD
         'version_id', 'approval_type', 'status',
         'approved_by', 'approved_at', 'comments'
     ];
@@ -143,16 +142,4 @@ class ReleaseApprovalModel extends Model
         }
         return $summary;
     }
-=======
-        'version_id',
-        'approval_type',
-        'status',
-        'approved_by',
-        'approved_at',
-        'comments',
-        'created_at'
-    ];
-
-    protected $useTimestamps = false;
->>>>>>> origin/main
 }

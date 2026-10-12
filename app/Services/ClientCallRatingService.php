@@ -16,52 +16,14 @@ class ClientCallRatingService
         $transcript        = $rawAnalysis['transcript'] ?? '';
         $summary           = $rawAnalysis['summary'] ?? '';
         $serviceType       = strtolower($rawAnalysis['service_type'] ?? $defaultService);
-<<<<<<< HEAD
         $customerSentiment = ucfirst(strtolower($rawAnalysis['customer_sentiment'] ?? 'Positive'));
         $providerSentiment = ucfirst(strtolower($rawAnalysis['provider_sentiment'] ?? 'Positive'));
-=======
-
-        // Policy violation flags
-        $offPlatformPayment    = (!empty($rawAnalysis['off_platform_payment']) || !empty($rawAnalysis['platform_bypass']) || !empty($rawAnalysis['gst_bypass'])) ? 1 : 0;
-        $contactSharing        = !empty($rawAnalysis['contact_sharing']) ? 1 : 0;
-        $outsideServiceRequest = !empty($rawAnalysis['outside_service_request']) ? 1 : 0;
-        $refundRequested       = !empty($rawAnalysis['refund_requested']) ? 1 : 0;
-        $hasComplaint          = !empty($rawAnalysis['has_complaint']) ? 1 : 0;
-        $hasAbuse              = (!empty($rawAnalysis['inappropriate_language']) || !empty($rawAnalysis['has_abuse'])) ? 1 : 0;
-
-        // Sentiments (preserve Non-Compliant for provider)
-        $rawCustSent = $rawAnalysis['customer_sentiment'] ?? '';
-        $rawProvSent = $rawAnalysis['provider_sentiment'] ?? '';
-
-        if (!empty($rawCustSent)) {
-            $customerSentiment = ucfirst(strtolower($rawCustSent));
-        } else {
-            $customerSentiment = ($hasComplaint || $hasAbuse || $refundRequested) ? 'Negative' : 'Positive';
-        }
-
-        if (!empty($rawProvSent)) {
-            if (strtolower($rawProvSent) === 'non-compliant' || strtolower($rawProvSent) === 'non_compliant') {
-                $providerSentiment = 'Non-Compliant';
-            } else {
-                $providerSentiment = ucfirst(strtolower($rawProvSent));
-            }
-        } else {
-            if ($offPlatformPayment || $contactSharing) {
-                $providerSentiment = 'Non-Compliant';
-            } elseif ($hasAbuse) {
-                $providerSentiment = 'Negative';
-            } else {
-                $providerSentiment = 'Positive';
-            }
-        }
->>>>>>> origin/main
 
         // Service relevance metrics
         $serviceRelevanceScore = isset($rawAnalysis['service_relevance_score']) ? (float)$rawAnalysis['service_relevance_score'] : 9.0;
         $serviceRelatedPct     = isset($rawAnalysis['service_related_pct']) ? (float)$rawAnalysis['service_related_pct'] : 90.0;
         $unrelatedPct          = isset($rawAnalysis['unrelated_pct']) ? (float)$rawAnalysis['unrelated_pct'] : max(0.0, 100.0 - $serviceRelatedPct);
 
-<<<<<<< HEAD
         // Policy violation flags
         $offPlatformPayment    = !empty($rawAnalysis['off_platform_payment']) ? 1 : 0;
         $contactSharing        = !empty($rawAnalysis['contact_sharing']) ? 1 : 0;
@@ -70,8 +32,6 @@ class ClientCallRatingService
         $hasComplaint          = !empty($rawAnalysis['has_complaint']) ? 1 : 0;
         $hasAbuse              = !empty($rawAnalysis['inappropriate_language']) || !empty($rawAnalysis['has_abuse']) ? 1 : 0;
 
-=======
->>>>>>> origin/main
         // Overall rating calculation & category
         if (isset($rawAnalysis['ai_rating_score'])) {
             $overallRating = (float)$rawAnalysis['ai_rating_score'];
@@ -93,7 +53,6 @@ class ClientCallRatingService
             $aiRatingCategory = 'good';
         }
 
-<<<<<<< HEAD
         if ($offPlatformPayment || $hasAbuse || ($hasComplaint && $refundRequested) || str_contains($rawCategory, 'critical')) {
             $aiRatingCategory = 'critical';
             $overallRating = min($overallRating, 3.5);
@@ -114,49 +73,6 @@ class ClientCallRatingService
         $compliance      = ($offPlatformPayment || $contactSharing) ? 2 : (int)($rawAnalysis['compliance'] ?? 9);
         $riskScore       = $aiRatingCategory === 'critical' ? 9 : ($aiRatingCategory === 'review_recommended' ? 5 : 1);
 
-=======
-        $isDropped = str_starts_with($transcript, '[CALL_TOO_SHORT]');
-
-        // Level 4 Critical Policy Violations strictly force Critical category and low score
-        if ($isDropped) {
-            $aiRatingCategory   = 'review_recommended';
-            $overallRating      = 0.0;
-            $adminAlertRequired = 0;
-            $riskScore          = 0;
-            $communication      = 0;
-            $professionalism    = 0;
-            $empathy            = 0;
-            $compliance         = 0;
-        } elseif ($offPlatformPayment || $contactSharing || $hasAbuse || ($hasComplaint && $refundRequested) || str_contains($rawCategory, 'critical')) {
-            $aiRatingCategory = 'critical';
-            $overallRating = min($overallRating, 3.5);
-            $adminAlertRequired = 1;
-            $riskScore = 9;
-            $communication   = $hasAbuse ? 2 : ($hasComplaint ? 5 : (int)($rawAnalysis['communication'] ?? 8));
-            $professionalism = ($offPlatformPayment || $contactSharing) ? 2 : ($hasAbuse ? 2 : (int)($rawAnalysis['professionalism'] ?? 8));
-            $empathy         = $hasComplaint ? 4 : (int)($rawAnalysis['empathy'] ?? 8);
-            $compliance      = ($offPlatformPayment || $contactSharing) ? 1 : (int)($rawAnalysis['compliance'] ?? 9);
-        } elseif ($hasComplaint || $refundRequested || $outsideServiceRequest || $unrelatedPct > 15.0 || str_contains($rawCategory, 'review') || $overallRating < 8.0) {
-            $aiRatingCategory = 'review_recommended';
-            $overallRating = max(4.0, min($overallRating, 6.8));
-            $adminAlertRequired = 1;
-            $riskScore = 5;
-            $communication   = $hasAbuse ? 2 : ($hasComplaint ? 5 : (int)($rawAnalysis['communication'] ?? 8));
-            $professionalism = ($offPlatformPayment || $contactSharing) ? 2 : ($hasAbuse ? 2 : (int)($rawAnalysis['professionalism'] ?? 8));
-            $empathy         = $hasComplaint ? 4 : (int)($rawAnalysis['empathy'] ?? 8);
-            $compliance      = ($offPlatformPayment || $contactSharing) ? 1 : (int)($rawAnalysis['compliance'] ?? 9);
-        } else {
-            $aiRatingCategory = 'good';
-            $overallRating = max(8.0, $overallRating);
-            $adminAlertRequired = !empty($rawAnalysis['admin_alert_required']) ? 1 : 0;
-            $riskScore = 1;
-            $communication   = (int)($rawAnalysis['communication'] ?? 8);
-            $professionalism = (int)($rawAnalysis['professionalism'] ?? 8);
-            $empathy         = (int)($rawAnalysis['empathy'] ?? 8);
-            $compliance      = (int)($rawAnalysis['compliance'] ?? 9);
-        }
-
->>>>>>> origin/main
         // Lists & JSON fields
         $serviceTopics           = is_array($rawAnalysis['service_topics'] ?? null) ? $rawAnalysis['service_topics'] : [];
         $importantStatements     = is_array($rawAnalysis['important_statements'] ?? null) ? $rawAnalysis['important_statements'] : [];

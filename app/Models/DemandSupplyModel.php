@@ -71,11 +71,7 @@ class DemandSupplyModel extends Model
     {
         $todayDate = date('Y-m-d');
         
-<<<<<<< HEAD
         // Sum bookings created today across all 4 tables
-=======
-        // Count active / confirmed status bookings and today's bookings across all 4 service tables
->>>>>>> origin/main
         $tables = [
             'walking_service_bookings',
             'grooming_service_bookings',
@@ -83,7 +79,6 @@ class DemandSupplyModel extends Model
             'sitting_service_bookings'
         ];
         $totalBookings = 0;
-<<<<<<< HEAD
         foreach ($tables as $table) {
             $count = $this->db->table($table)
                 ->where('service_start_date', $todayDate)
@@ -106,52 +101,11 @@ class DemandSupplyModel extends Model
         ];
     }
 
-=======
-        $activeConfirmedJobs = 0;
-
-        foreach ($tables as $table) {
-            $count = $this->db->table($table)
-                ->groupStart()
-                    ->like('service_start_date', $todayDate)
-                    ->orLike('created_at', $todayDate)
-                ->groupEnd()
-                ->countAllResults();
-            $totalBookings += $count;
-
-            $activeCount = $this->db->table($table)
-                ->whereIn('LOWER(status)', ['accepted', 'confirmed', 'in progress', 'in-progress', 'assigned', 'active', 'pending'])
-                ->countAllResults();
-            $activeConfirmedJobs += $activeCount;
-        }
-            
-        // Unsuccessful bookings (cancelled with "no provider available" reason or status cancelled)
-        $unsuccessful = $this->db->table('booking_pets')
-            ->select('COUNT(id) as total')
-            ->where('created_at >=', $todayDate . ' 00:00:00')
-            ->groupStart()
-                ->like('cancel_reason', 'no provider')
-                ->orWhere('status', 'cancelled')
-            ->groupEnd()
-            ->get()->getRowArray();
-
-        return [
-            'daily_bookings'          => $totalBookings > 0 ? $totalBookings : $activeConfirmedJobs,
-            'active_jobs_at_moment'   => $activeConfirmedJobs,
-            'unsuccessful_searches'   => (int)($unsuccessful['total'] ?? 0),
-            'peak_hours'              => '6 AM - 8 AM, 5 PM - 7 PM',
-            'cancellations_due_to_sp' => (int)($unsuccessful['total'] ?? 0)
-        ];
-    }
-
-    private static array $resolvedPincodeCache = [];
-
->>>>>>> origin/main
     /**
      * Aggregates live supply (provider statistics).
      */
     public function getLiveSupplyStats(): array
     {
-<<<<<<< HEAD
         // Total active providers
         $activeSp = $this->db->table('service_providers')
             ->where('status', 'active')
@@ -159,74 +113,10 @@ class DemandSupplyModel extends Model
 
         // Count of SPs with Genuine Score > 70
         // We link sp_stats with ranking_score > 70
-=======
-        $statusCounts = $this->db->table('service_providers')
-            ->select('status, COUNT(*) as cnt')
-            ->groupBy('status')
-            ->get()->getResultArray();
-
-        $totalRegistered = 0;
-        $activeSp = 0;
-        $inactiveSp = 0;
-        $kycPending = 0;
-
-        foreach ($statusCounts as $sc) {
-            $cnt = (int)$sc['cnt'];
-            $totalRegistered += $cnt;
-            $st = strtolower(trim((string)($sc['status'] ?? '')));
-            if (in_array($st, ['active', 'approved', '1'], true)) {
-                $activeSp += $cnt;
-            } elseif (in_array($st, ['inactive', '0', 'disabled', 'blocked', 'suspended', 'rejected'], true)) {
-                $inactiveSp += $cnt;
-            } elseif ($st === 'pending_kyc') {
-                $kycPending += $cnt;
-            }
-        }
-
-        // 2. Fee Pending (service_providers joining sp_services where registration fee is unpaid)
-        $feePendingRow = $this->db->table('service_providers sp')
-            ->join('sp_services ss', 'ss.provider_id = sp.id', 'left')
-            ->groupStart()
-                ->where('ss.id IS NULL')
-                ->orWhere('ss.payment_paid', 0)
-                ->orWhere('ss.payment_paid IS NULL')
-            ->groupEnd()
-            ->whereNotIn('sp.status', ['rejected', 'disabled', 'blocked', 'pending_kyc'])
-            ->select('COUNT(DISTINCT sp.id) as cnt')
-            ->get()->getRowArray();
-        $feePending = (int)($feePendingRow['cnt'] ?? 0);
-
-        // 3. Call Verification Pending (service_providers with payment_paid = 1 but call_verified = 0 or null)
-        $callPendingRow = $this->db->table('service_providers sp')
-            ->join('sp_services ss', 'ss.provider_id = sp.id', 'inner')
-            ->where('ss.payment_paid', 1)
-            ->groupStart()
-                ->where('ss.call_verified', 0)
-                ->orWhere('ss.call_verified IS NULL')
-            ->groupEnd()
-            ->whereNotIn('sp.status', ['rejected', 'disabled', 'blocked'])
-            ->select('COUNT(DISTINCT sp.id) as cnt')
-            ->get()->getRowArray();
-        $callPending = (int)($callPendingRow['cnt'] ?? 0);
-
-        // 4. KYC Pending (service_providers with pending_kyc or unverified Aadhar)
-        $kycPendingRow = $this->db->table('service_providers sp')
-            ->groupStart()
-                ->where('sp.status', 'pending_kyc')
-                ->orWhere('sp.aadhar_verified', '0')
-                ->orWhere('sp.aadhar_verified IS NULL')
-            ->groupEnd()
-            ->whereNotIn('sp.status', ['rejected','pending_verification','active'])
-            ->select('COUNT(DISTINCT sp.id) as cnt')
-            ->get()->getRowArray();
-        $totalKycPending = (int)($kycPendingRow['cnt'] ?? 0);
-
->>>>>>> origin/main
         $genuineSp = $this->db->table('sp_stats')
             ->where('ranking_score >=', 70.0)
             ->countAllResults();
 
-<<<<<<< HEAD
         // Calculate drop-off rate (inactive providers / total ever registered)
         $totalRegistered = $this->db->table('service_providers')->countAllResults();
         $inactiveSp = $this->db->table('service_providers')->where('status', 'inactive')->countAllResults();
@@ -237,20 +127,6 @@ class DemandSupplyModel extends Model
             'genuine_sps' => $genuineSp,
             'drop_off_rate_percent' => $dropOffRate,
             'sp_to_job_ratio' => $activeSp > 0 ? round($activeSp / 100, 2) : 0 // placeholder
-=======
-        $dropOffRate = $totalRegistered > 0 ? round(($inactiveSp / $totalRegistered) * 100, 1) : 0;
-
-        return [
-            'total_registered'          => $totalRegistered,
-            'active_sps'                => $activeSp,
-            'inactive_sps'              => $inactiveSp,
-            'genuine_sps'               => $genuineSp,
-            'fee_pending'               => $feePending,
-            'call_verification_pending' => $callPending,
-            'kyc_pending'               => $totalKycPending,
-            'drop_off_rate_percent'     => $dropOffRate,
-            'sp_to_job_ratio'           => $activeSp > 0 ? round($activeSp / 100, 2) : 0
->>>>>>> origin/main
         ];
     }
 
@@ -260,23 +136,11 @@ class DemandSupplyModel extends Model
     public function resolveAreaName(string $pincode): string
     {
         $pincode = trim($pincode);
-<<<<<<< HEAD
-=======
-        if (empty($pincode)) {
-            return 'Unknown Zone';
-        }
-
-        if (isset(self::$resolvedPincodeCache[$pincode])) {
-            return self::$resolvedPincodeCache[$pincode];
-        }
-
->>>>>>> origin/main
         $pincodeToArea = [
             '500081' => 'Hitec City',
             '500032' => 'Gachibowli',
             '500003' => 'Secunderabad',
             '500072' => 'Kukatpally',
-<<<<<<< HEAD
             '500084' => 'Kondapur'
         ];
 
@@ -297,37 +161,6 @@ class DemandSupplyModel extends Model
         }
 
         return 'Zone ' . $pincode;
-=======
-            '500084' => 'Kondapur',
-            '500033' => 'Jubilee Hills',
-            '500034' => 'Banjara Hills'
-        ];
-
-        if (isset($pincodeToArea[$pincode])) {
-            self::$resolvedPincodeCache[$pincode] = $pincodeToArea[$pincode];
-            return $pincodeToArea[$pincode];
-        }
-
-        $sp = $this->db->table('service_providers')
-            ->select('area')
-            ->groupStart()
-                ->like('service_address', $pincode)
-                ->orLike('area', $pincode)
-            ->groupEnd()
-            ->where("area != '' AND area NOT REGEXP '^[0-9]+$'")
-            ->limit(1)
-            ->get()->getRowArray();
-
-        if (!empty($sp) && !empty($sp['area']) && !is_numeric($sp['area'])) {
-            $resolved = ucwords(strtolower(trim($sp['area'])));
-            self::$resolvedPincodeCache[$pincode] = $resolved;
-            return $resolved;
-        }
-
-        $fallback = 'Zone ' . $pincode;
-        self::$resolvedPincodeCache[$pincode] = $fallback;
-        return $fallback;
->>>>>>> origin/main
     }
 
     /**

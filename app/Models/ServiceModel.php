@@ -7,17 +7,11 @@ use CodeIgniter\Model;
 class ServiceModel extends Model
 {
     protected $table = 'services';
-<<<<<<< HEAD
     protected $returnType = 'array';
     protected $db;
     public function __construct()
     {
         parent::__construct();
-=======
-    protected $db;
-    public function __construct()
-    {
->>>>>>> origin/main
         $this->db = \Config\Database::connect();
     }
     public function getServices()
@@ -175,7 +169,6 @@ class ServiceModel extends Model
             // Concatenate addresses with a newline
             $user['addresses'] = implode("\n", array_column($addresses, 'address'));
             $pets = $this->db->table('user_pets')
-<<<<<<< HEAD
             ->select('name, type')
             ->where('user_id', $user['id'])
             ->get()
@@ -186,18 +179,6 @@ class ServiceModel extends Model
             $petStrings[] = "{$pet['name']} ({$pet['type']})";
         }
         $user['pets'] = implode("\n", $petStrings);
-=======
-                ->select('name, type')
-                ->where('user_id', $user['id'])
-                ->get()
-                ->getResultArray();
-
-            $petStrings = [];
-            foreach ($pets as $pet) {
-                $petStrings[] = "{$pet['name']} ({$pet['type']})";
-            }
-            $user['pets'] = implode("\n", $petStrings);
->>>>>>> origin/main
         }
 
         return $users;
@@ -229,7 +210,6 @@ class ServiceModel extends Model
             ->where('id', $queryId)
             ->update(['status' => 'completed']);
     }
-<<<<<<< HEAD
     public function getAllProviders($selectedIds, $status)
     {
         $builder = $this->db->table('service_providers');
@@ -244,28 +224,6 @@ class ServiceModel extends Model
             ->whereIn('id', $selectedIds)
             ->where('status', $status)
             ->orderBy('id', 'DESC')
-=======
-    public function getAllProviders($selectedIds, $status = null)
-    {
-        $builder = $this->db->table('service_providers');
-        $builder->select('service_providers.name,service_providers.phone,service_providers.area,service_providers.city');
-        $builder->whereIn('id', $selectedIds);
-        if (!empty($status)) {
-            $builder->where('status', $status);
-        }
-        $data = $builder->orderBy('service_providers.id', 'DESC')->get()->getResultArray();
-        return $data;
-    }
-    public function getAllUsers($selectedIds, $status = null)
-    {
-        $builder = $this->db->table('users')
-            ->select('users.id, users.name, users.phone, users.email')
-            ->whereIn('id', $selectedIds);
-        if (!empty($status)) {
-            $builder->where('status', $status);
-        }
-        $users = $builder->orderBy('id', 'DESC')
->>>>>>> origin/main
             ->get()
             ->getResultArray();
 
@@ -300,18 +258,13 @@ class ServiceModel extends Model
         return $this->db->table('banners')->orderBy('id', 'DESC')->get()->getResult();
     }
 
-<<<<<<< HEAD
     public function getBanner($id)
-=======
-    public function getBannerById($id)
->>>>>>> origin/main
     {
         return $this->db->table('banners')->where('id', $id)->get()->getRow();
     }
 
     public function addBanner($data)
     {
-<<<<<<< HEAD
         $this->db->table('banners')->insert($data);
         return $this->db->insertID();
     }
@@ -319,9 +272,6 @@ class ServiceModel extends Model
     public function updateBanner($id, $data)
     {
         return $this->db->table('banners')->where('id', $id)->update($data);
-=======
-        return $this->db->table('banners')->insert($data);
->>>>>>> origin/main
     }
 
     public function deleteBanner($id)
@@ -331,7 +281,6 @@ class ServiceModel extends Model
 
     public function updateBannerStatus($id, $status)
     {
-<<<<<<< HEAD
         $isActive = ($status === 'active' || $status === '1' || $status === 1) ? 1 : 0;
         $updateData = ['is_active' => $isActive];
         if ($this->db->fieldExists('status', 'banners')) {
@@ -344,17 +293,6 @@ class ServiceModel extends Model
         if($data){
             return true;
         }else{
-=======
-        $isActive = ($status === 'active' || $status == 1 || $status === '1') ? 1 : 0;
-        return $this->db->table('banners')->where('id', $id)->update(['is_active' => $isActive]);
-    }
-    public function checkProviderJobStatus($provider_id)
-    {
-        $data = $this->db->table('quotations')->where('provider_id', $provider_id)->where('status', 'Accepted')->get()->getRow();
-        if ($data) {
-            return true;
-        } else {
->>>>>>> origin/main
             return false;
         }
     }

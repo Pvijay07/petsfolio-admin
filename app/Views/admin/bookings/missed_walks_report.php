@@ -11,7 +11,6 @@
     <div class="conatiner-fluid content-inner pb-0" id="page_layout">
         <!-- Modern Header Section -->
         <div class="container-fluid p-0 mb-4">
-<<<<<<< HEAD
             <div class="bg-gradient-primary text-white p-5 rounded-3 shadow position-relative overflow-hidden">
                 <div class="position-relative z-1">
                     <h1 class="h2 fw-bold mb-2 text-white">Missed / Not Done Dog Walks Report</h1>
@@ -19,30 +18,6 @@
                 </div>
                 <i class="bi bi-watch position-absolute end-0 bottom-0 opacity-10"
                     style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
-=======
-            <div class="p-4 p-md-5 rounded-4 shadow-lg position-relative overflow-hidden text-white"
-                style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);">
-                
-                <!-- Subtle glass background circles -->
-                <div class="position-absolute" style="top: -60px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
-                <div class="position-absolute" style="bottom: -50px; left: 30%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
-                
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-2.5">
-                            <span class="badge rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-2"
-                                style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: #fecdd3; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem;">
-                                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-                                Walk Exception Tracking
-                            </span>
-                        </div>
-                        <h1 class="h2 fw-bold text-white mb-2 tracking-tight">Missed / Incomplete Walks</h1>
-                        <p class="text-white-50 mb-0 fs-6">
-                            Monitor, categorize, and log root-cause reason codes for incomplete or skipped dog walks.
-                        </p>
-                    </div>
-                </div>
->>>>>>> origin/main
             </div>
         </div>
 
@@ -50,11 +25,7 @@
         <div class="card border-0 shadow-sm mb-2 rounded-3">
             <div class="card-body p-3">
                 <div class="row g-3 align-items-center">
-<<<<<<< HEAD
                     <div class="col-md-5">
-=======
-                    <div class="col-md-10">
->>>>>>> origin/main
                         <div class="input-group">
                             <span class="input-group-text bg-black border-end-0 text-white">
                                 <i class="bi bi-search"></i>
@@ -62,11 +33,7 @@
                             <input type="text" class="form-control border-start-0" placeholder="Search walks..." id="searchWalks">
                         </div>
                     </div>
-<<<<<<< HEAD
                     <div class="col-md-3">
-=======
-                    <div class="col-md-2">
->>>>>>> origin/main
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             <label class="text-muted small me-2">Show</label>
                             <select class="form-select form-select-sm" style="width: auto;" id="entriesPerPage">
@@ -79,11 +46,7 @@
                             <label class="text-muted small ms-2">entries</label>
                         </div>
                     </div>
-<<<<<<< HEAD
                     <div class="col-md-2">
-=======
-                    <!-- <div class="col-md-2">
->>>>>>> origin/main
                         <button class="btn btn-black bg-black p-2 text-white w-100" onclick="applyFilters()">
                             <i class="bi bi-funnel me-1"></i>Filter
                         </button>
@@ -92,11 +55,7 @@
                         <button class="btn btn-black bg-black p-2 text-white w-100" onclick="clearFilters()">
                             <i class="bi bi-x-circle me-1"></i>Clear
                         </button>
-<<<<<<< HEAD
                     </div>
-=======
-                    </div> -->
->>>>>>> origin/main
                 </div>
             </div>
         </div>
@@ -104,7 +63,6 @@
         <!-- Table Card -->
         <div class="card border-0 shadow-sm overflow-hidden rounded-3">
             <div class="table-responsive">
-<<<<<<< HEAD
                 <table class="table table-hover mb-0" id="walksTable">
                     <thead class="" style="background: #c6d2ff !important;">
                         <tr>
@@ -115,19 +73,6 @@
                             <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="pet">Pet <i class="bi bi-arrow-down-up ms-1"></i></th>
                             <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important;" data-sort="provider">Provider <i class="bi bi-arrow-down-up ms-1"></i></th>
                             <th class="py-3 text-black fw-semibold border-bottom text-center fs-6" style="background: #c6d2ff !important; width: 250px;">Reason</th>
-=======
-                <table class="table table-hover align-middle mb-0" id="walksTable">
-                    <thead style="background: #f8fafc !important; border-bottom: 2px solid #e2e8f0;">
-                        <tr>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="date">#</th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="date">Date <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="times">Times</th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="status">Status <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="client">Client <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="pet">Pet <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;" data-sort="provider">Provider <i class="bi bi-arrow-down-up ms-1"></i></th>
-                            <th class="py-3 px-3 text-muted fw-bold text-center" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; width: 250px;">Reason</th>
->>>>>>> origin/main
                         </tr>
                     </thead>
                     <tbody class="border-top-0" id="tableBody">
@@ -151,7 +96,6 @@
     </div>
 
     <!-- Reason Modal -->
-<<<<<<< HEAD
     <div id="reasonModal" class="modal" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow p-0">
@@ -160,31 +104,11 @@
                         <i class="bi bi-pencil-square me-2"></i>Add/Edit Reason
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeReasonModal()"></button>
-=======
-    <div id="reasonModal" class="modal fade" tabindex="-1" aria-labelledby="reasonModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-2xl rounded-4 overflow-hidden p-0">
-                <div class="modal-header px-4 py-3 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;">
-                    <div class="d-flex align-items-center gap-2.5">
-                        <div class="rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.15);">
-                            <i class="bi bi-pencil-square text-warning fs-5"></i>
-                        </div>
-                        <div>
-                            <h5 class="modal-title text-white fw-bold fs-6 mb-0" id="reasonModalLabel">Log Exception Reason</h5>
-                            <span class="text-white-50 tiny">Provide root cause for missed or uncompleted walk</span>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white opacity-75 hover-opacity-100" data-bs-dismiss="modal" aria-label="Close" onclick="closeReasonModal()"></button>
->>>>>>> origin/main
                 </div>
                 <div class="modal-body p-4">
                     <input type="hidden" id="modalTrackId">
                     <input type="hidden" id="modalServiceId">
-<<<<<<< HEAD
                     
-=======
-
->>>>>>> origin/main
                     <div class="mb-3">
                         <label for="modalReason" class="form-label fw-medium text-dark mb-2">Select Reason</label>
                         <select id="modalReason" class="reason-select w-100">
@@ -195,20 +119,12 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
-<<<<<<< HEAD
                     
-=======
-
->>>>>>> origin/main
                     <div class="mb-3" id="modalOtherReasonContainer" style="display: none;">
                         <label for="modalOtherReason" class="form-label fw-medium text-dark mb-2">Enter Reason</label>
                         <input type="text" id="modalOtherReason" class="other-reason-input w-100" placeholder="Enter reason...">
                     </div>
-<<<<<<< HEAD
                     
-=======
-
->>>>>>> origin/main
                     <div id="modalStatus" class="status-message mb-3" style="display: none;"></div>
                 </div>
                 <div class="modal-footer border-top">
@@ -229,11 +145,7 @@
 <style>
     /* Modern Color Variables - Matching bookings management */
     :root {
-<<<<<<< HEAD
         --primary-light: #c6d2ff;
-=======
-        --primary-light: #e0e7ff;
->>>>>>> origin/main
         --primary-main: #3f30e3;
         --primary-dark: #2b1fb3;
         --primary-gradient: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%);
@@ -566,10 +478,6 @@
             transform: translateY(-30px) scale(0.95);
             opacity: 0;
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
         to {
             transform: translateY(0) scale(1);
             opacity: 1;
@@ -706,21 +614,13 @@
                     sortColumn = column;
                     sortDirection = 'asc';
                 }
-<<<<<<< HEAD
                 
-=======
-
->>>>>>> origin/main
                 // Update sort icons
                 document.querySelectorAll('#walksTable thead th i').forEach(icon => {
                     icon.className = 'bi bi-arrow-down-up ms-1';
                 });
                 this.querySelector('i').className = sortDirection === 'asc' ? 'bi bi-arrow-up ms-1' : 'bi bi-arrow-down ms-1';
-<<<<<<< HEAD
                 
-=======
-
->>>>>>> origin/main
                 filterData();
             });
         });
@@ -740,24 +640,15 @@
                 ${walk.status || ''}
                 ${getReasonDisplayText(walk.reason)}
             `.toLowerCase();
-<<<<<<< HEAD
             
-=======
-
->>>>>>> origin/main
             return searchableText.includes(searchTerm);
         });
 
         // Apply sorting
         filteredData.sort((a, b) => {
             let valA, valB;
-<<<<<<< HEAD
             
             switch(sortColumn) {
-=======
-
-            switch (sortColumn) {
->>>>>>> origin/main
                 case 'date':
                     valA = new Date(a.tracking_date || '1970-01-01');
                     valB = new Date(b.tracking_date || '1970-01-01');
@@ -781,11 +672,7 @@
                 default:
                     return 0;
             }
-<<<<<<< HEAD
             
-=======
-
->>>>>>> origin/main
             if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
             if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
             return 0;
@@ -797,22 +684,14 @@
     // Helper function to get reason display text
     function getReasonDisplayText(reason) {
         if (!reason) return '';
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         const reasonMap = {
             'not_available': 'Client Not Available',
             'skip': 'Client asked to skip',
             'emergency': 'Emergency',
             'other': 'Other'
         };
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         return reasonMap[reason] || reason;
     }
 
@@ -821,7 +700,6 @@
         const start = (currentPage - 1) * entriesPerPage;
         const end = Math.min(start + entriesPerPage, filteredData.length);
         const pageData = filteredData.slice(start, end);
-<<<<<<< HEAD
         
         let html = '';
         
@@ -841,36 +719,6 @@
                 ? new Date(walk.end_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
                 : null;
             
-=======
-
-        let html = '';
-        let i = 1;
-
-        pageData.forEach((walk) => {
-            const statusClass = (walk.status == 'Untracked') ? 'badge-status-notdone' : 'badge-status-completed';
-            const statusText = (walk.status == 'Untracked') ? 'Not Done' : walk.status;
-            const statusIcon = (walk.status == 'Untracked') ? 'bi-exclamation-triangle' : 'bi-check-circle';
-
-            const clientInitials = (walk.user_name || 'C').charAt(0).toUpperCase();
-            const providerInitials = (walk.provider_name || 'P').charAt(0).toUpperCase();
-
-            const startTime = walk.start_time && walk.start_time != '0000-00-00 00:00:00' ?
-                new Date(walk.start_time).toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                }) :
-                null;
-
-            const endTime = walk.end_time && walk.end_time != '0000-00-00 00:00:00' ?
-                new Date(walk.end_time).toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                }) :
-                null;
-
->>>>>>> origin/main
             // Generate reason HTML based on whether reason exists
             let reasonHtml = '';
             if (walk.reason) {
@@ -890,17 +738,9 @@
                     </div>
                 `;
             }
-<<<<<<< HEAD
             
             html += `
                 <tr class="walk-row">
-=======
-
-            html += `
-                <tr class="walk-row">
-                <td>${i}</td>
-
->>>>>>> origin/main
                     <td class="text-center align-middle">
                         <div class="d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-calendar3 text-primary"></i>
@@ -965,14 +805,8 @@
                     </td>
                 </tr>
             `;
-<<<<<<< HEAD
         });
         
-=======
-            i++;
-        });
-
->>>>>>> origin/main
         tableBody.innerHTML = html;
         updatePaginationControls();
     }
@@ -980,7 +814,6 @@
     // Update pagination controls
     function updatePaginationControls() {
         const totalPages = Math.ceil(filteredData.length / entriesPerPage);
-<<<<<<< HEAD
         
         prevBtn.disabled = currentPage === 1;
         nextBtn.disabled = currentPage === totalPages || totalPages === 0;
@@ -988,15 +821,6 @@
         let pageNumbersHtml = '';
         const maxVisiblePages = 5;
         
-=======
-
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-
-        let pageNumbersHtml = '';
-        const maxVisiblePages = 5;
-
->>>>>>> origin/main
         if (totalPages <= maxVisiblePages) {
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbersHtml += getPageButtonHtml(i);
@@ -1024,15 +848,9 @@
                 pageNumbersHtml += getPageButtonHtml(totalPages);
             }
         }
-<<<<<<< HEAD
         
         pageNumbersDiv.innerHTML = pageNumbersHtml;
         
-=======
-
-        pageNumbersDiv.innerHTML = pageNumbersHtml;
-
->>>>>>> origin/main
         document.querySelectorAll('.page-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 currentPage = parseInt(this.dataset.page);
@@ -1050,22 +868,14 @@
     function openReasonModal(trackId, serviceId, currentReason, reasonText) {
         modalTrackId.value = trackId;
         modalServiceId.value = serviceId;
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         // Reset modal
         modalReason.value = currentReason || '';
         modalOtherReason.value = '';
         modalOtherReasonContainer.style.display = 'none';
         modalStatus.style.display = 'none';
         modalStatus.className = 'status-message';
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         // Show other reason input if current reason is 'other' or custom
         if (currentReason && !['not_available', 'skip', 'emergency', 'other'].includes(currentReason)) {
             modalReason.value = 'other';
@@ -1074,11 +884,7 @@
         } else if (currentReason === 'other') {
             modalOtherReasonContainer.style.display = 'block';
         }
-<<<<<<< HEAD
         
-=======
-
->>>>>>> origin/main
         reasonModal.classList.add('show');
         document.body.classList.add('modal-open');
     }
@@ -1112,24 +918,14 @@
             const serviceId = modalServiceId.value;
             const selectedReason = modalReason.value;
             const customReason = modalOtherReason.value.trim();
-<<<<<<< HEAD
             
             let finalReason = '';
             
-=======
-
-            let finalReason = '';
-
->>>>>>> origin/main
             if (!selectedReason) {
                 showModalStatus('Please select a reason', 'danger');
                 return;
             }
-<<<<<<< HEAD
             
-=======
-
->>>>>>> origin/main
             if (selectedReason === 'other') {
                 if (!customReason) {
                     showModalStatus('Please enter a reason', 'danger');
@@ -1139,11 +935,7 @@
             } else {
                 finalReason = selectedReason;
             }
-<<<<<<< HEAD
             
-=======
-
->>>>>>> origin/main
             saveReasonFromModal(trackId, finalReason, serviceId);
         });
 
@@ -1163,7 +955,6 @@
 
     function saveReasonFromModal(trackId, reason, serviceId) {
         showModalStatus('Saving...', 'info');
-<<<<<<< HEAD
         
         fetch('<?= base_url() ?>updateReason', {
             method: 'POST',
@@ -1204,48 +995,6 @@
         .catch(error => {
             showModalStatus('Request failed', 'danger');
         });
-=======
-
-        fetch('<?= base_url() ?>updateReason', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    track_id: trackId,
-                    reason: reason,
-                    service_id: serviceId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === true) {
-                    showModalStatus('Saved successfully!', 'success');
-
-
-                    // Update the walk data
-                    const walkIndex = walksData.findIndex(w => w.track_id == trackId);
-                    if (walkIndex !== -1) {
-                        walksData[walkIndex].reason = reason;
-                    }
-
-                    // Re-filter and re-render
-                    filterData();
-
-                    setTimeout(() => {
-                        closeReasonModal();
-                        location.reload();
-
-                    }, 1000);
-                } else {
-                    showModalStatus(data.message || 'Error saving reason', 'danger');
-                }
-            })
-            .catch(error => {
-                showModalStatus('Request failed', 'danger');
-            });
->>>>>>> origin/main
     }
 
     function applyFilters() {

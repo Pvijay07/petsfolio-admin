@@ -1,27 +1,18 @@
 #!/usr/bin/env python3
 """
 Petsfolio Support AI Knowledge Base & RAG Engine
-<<<<<<< HEAD
 Ingests 'Petsfolio Client Application Rag Application.docx',
 chunks it into semantically coherent knowledge records,
 indexes into Qdrant Vector Store with Ollama nomic-embed-text (768-dim),
 and exports a structured JSON KB for instant PHP retrieval.
-=======
-Separates and manages two distinct Knowledge Bases:
-1. Client Knowledge Base ('client_support_kb.json' & Qdrant collection 'petsfolio_client_kb')
-2. Service Provider Knowledge Base ('sp_support_kb.json' & Qdrant collection 'petsfolio_sp_kb')
->>>>>>> origin/main
 """
 
 import os
 import sys
 import json
 import re
-<<<<<<< HEAD
 import zipfile
 import xml.etree.ElementTree as ET
-=======
->>>>>>> origin/main
 import urllib.request
 import urllib.error
 import argparse
@@ -30,7 +21,6 @@ import argparse
 QDRANT_HOST = os.getenv("QDRANT_HOST", "http://127.0.0.1:6333")
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
-<<<<<<< HEAD
 COLLECTION_NAME = "petsfolio_support_kb"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -59,17 +49,6 @@ def extract_docx_paragraphs(docx_path):
                 if clean:
                     paragraphs.append(clean)
     return paragraphs
-=======
-
-CLIENT_COLLECTION = "petsfolio_client_kb"
-SP_COLLECTION = "petsfolio_sp_kb"
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ADMIN_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
-CLIENT_JSON_PATH = os.path.join(ADMIN_DIR, "app", "Libraries", "AIAnalyst", "client_support_kb.json")
-SP_JSON_PATH = os.path.join(ADMIN_DIR, "app", "Libraries", "AIAnalyst", "sp_support_kb.json")
-COMBINED_JSON_PATH = os.path.join(ADMIN_DIR, "app", "Libraries", "AIAnalyst", "support_kb.json")
->>>>>>> origin/main
 
 
 def generate_embedding(text):
@@ -95,7 +74,6 @@ def generate_embedding(text):
         return None
 
 
-<<<<<<< HEAD
 def init_qdrant_collection(vector_size=768):
     """
     Ensure Qdrant collection exists for petsfolio_support_kb.
@@ -103,15 +81,6 @@ def init_qdrant_collection(vector_size=768):
     try:
         # Check existing collection
         req = urllib.request.Request(f"{QDRANT_HOST}/collections/{COLLECTION_NAME}")
-=======
-def init_qdrant_collection(collection_name, vector_size=768):
-    """
-    Ensure Qdrant collection exists for specified collection name.
-    """
-    try:
-        # Check existing collection
-        req = urllib.request.Request(f"{QDRANT_HOST}/collections/{collection_name}")
->>>>>>> origin/main
         try:
             with urllib.request.urlopen(req, timeout=5) as resp:
                 data = json.loads(resp.read().decode('utf-8'))
@@ -119,11 +88,7 @@ def init_qdrant_collection(collection_name, vector_size=768):
                     return True
         except urllib.error.HTTPError as he:
             if he.code != 404:
-<<<<<<< HEAD
                 sys.stderr.write(f"Qdrant check error: {he}\n")
-=======
-                sys.stderr.write(f"Qdrant check error for '{collection_name}': {he}\n")
->>>>>>> origin/main
 
         # Create collection
         payload = json.dumps({
@@ -134,11 +99,7 @@ def init_qdrant_collection(collection_name, vector_size=768):
         }).encode('utf-8')
 
         req = urllib.request.Request(
-<<<<<<< HEAD
             f"{QDRANT_HOST}/collections/{COLLECTION_NAME}",
-=======
-            f"{QDRANT_HOST}/collections/{collection_name}",
->>>>>>> origin/main
             data=payload,
             headers={"Content-Type": "application/json"},
             method="PUT"
@@ -147,7 +108,6 @@ def init_qdrant_collection(collection_name, vector_size=768):
             res = json.loads(resp.read().decode('utf-8'))
             return res.get("result", False)
     except Exception as e:
-<<<<<<< HEAD
         sys.stderr.write(f"Qdrant collection creation error: {e}\n")
         return False
 
@@ -556,40 +516,12 @@ def index_knowledge_to_qdrant(chunks, verbose=True):
     if not init_qdrant_collection(768):
         if verbose:
             sys.stderr.write("Failed to initialize Qdrant collection.\n")
-=======
-        sys.stderr.write(f"Qdrant collection creation error for '{collection_name}': {e}\n")
-        return False
-
-
-def load_kb_chunks(json_path):
-    """
-    Load chunks directly from a JSON KB file.
-    """
-    if not os.path.exists(json_path):
-        raise FileNotFoundError(f"Knowledge Base JSON not found at: {json_path}")
-    with open(json_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-    return data.get("chunks", [])
-
-
-def index_chunks_to_qdrant(chunks, collection_name, verbose=True):
-    """
-    Generates embeddings for chunks and upserts points into specified Qdrant collection.
-    """
-    if not init_qdrant_collection(collection_name, 768):
-        if verbose:
-            sys.stderr.write(f"Failed to initialize Qdrant collection '{collection_name}'.\n")
->>>>>>> origin/main
         return False
 
     points = []
     for i, chunk in enumerate(chunks):
-<<<<<<< HEAD
         # Create rich prompt for embedding
         embed_text = f"Title: {chunk['title']}\nCategory: {chunk['category']} > {chunk['subcategory']}\nKeywords: {', '.join(chunk['keywords'])}\nContent: {chunk['content']}"
-=======
-        embed_text = f"Title: {chunk['title']}\nCategory: {chunk['category']} > {chunk.get('subcategory', '')}\nKeywords: {', '.join(chunk.get('keywords', []))}\nContent: {chunk['content']}"
->>>>>>> origin/main
         vec = generate_embedding(embed_text)
         if vec:
             points.append({
@@ -599,44 +531,25 @@ def index_chunks_to_qdrant(chunks, collection_name, verbose=True):
                     "chunk_id": chunk["id"],
                     "title": chunk["title"],
                     "category": chunk["category"],
-<<<<<<< HEAD
                     "subcategory": chunk["subcategory"],
                     "user_type": chunk["user_type"],
                     "keywords": chunk["keywords"],
-=======
-                    "subcategory": chunk.get("subcategory", ""),
-                    "user_type": chunk.get("user_type", "both"),
-                    "priority": chunk.get("priority", "Medium"),
-                    "keywords": chunk.get("keywords", []),
->>>>>>> origin/main
                     "key_facts": chunk.get("key_facts", {}),
                     "content": chunk["content"]
                 }
             })
         else:
             if verbose:
-<<<<<<< HEAD
                 sys.stderr.write(f"Failed to generate embedding for chunk {chunk['id']}\n")
 
     if not points:
         if verbose:
             sys.stderr.write("No points generated for indexing.\n")
-=======
-                sys.stderr.write(f"Failed to generate embedding for chunk '{chunk['id']}'\n")
-
-    if not points:
-        if verbose:
-            sys.stderr.write(f"No points generated for indexing into '{collection_name}'.\n")
->>>>>>> origin/main
         return False
 
     payload = json.dumps({"points": points}).encode('utf-8')
     req = urllib.request.Request(
-<<<<<<< HEAD
         f"{QDRANT_HOST}/collections/{COLLECTION_NAME}/points",
-=======
-        f"{QDRANT_HOST}/collections/{collection_name}/points",
->>>>>>> origin/main
         data=payload,
         headers={"Content-Type": "application/json"},
         method="PUT"
@@ -646,7 +559,6 @@ def index_chunks_to_qdrant(chunks, collection_name, verbose=True):
         with urllib.request.urlopen(req, timeout=20) as resp:
             res = json.loads(resp.read().decode('utf-8'))
             if verbose:
-<<<<<<< HEAD
                 print(f"Successfully indexed {len(points)} knowledge chunks into Qdrant '{COLLECTION_NAME}'!")
             return True
     except Exception as e:
@@ -675,21 +587,6 @@ def query_qdrant_kb(query_text, top_k=3, user_type=None):
     """
     Semantic search in Qdrant for top matching knowledge chunks.
     """
-=======
-                print(f"Successfully indexed {len(points)} knowledge chunks into Qdrant collection '{collection_name}'!")
-            return True
-    except Exception as e:
-        if verbose:
-            sys.stderr.write(f"Error upserting points to Qdrant '{collection_name}': {e}\n")
-        return False
-
-
-def query_qdrant_kb(query_text, user_type='client', top_k=3):
-    """
-    Semantic search in Qdrant for top matching knowledge chunks in dedicated collection.
-    """
-    collection_name = SP_COLLECTION if (user_type in ['provider', 'service_provider']) else CLIENT_COLLECTION
->>>>>>> origin/main
     query_vec = generate_embedding(query_text)
     if not query_vec:
         return []
@@ -700,7 +597,6 @@ def query_qdrant_kb(query_text, user_type='client', top_k=3):
         "with_payload": True
     }
 
-<<<<<<< HEAD
     if user_type and user_type in ['client', 'provider']:
         # Optional filter by user_type
         search_payload["filter"] = {
@@ -713,11 +609,6 @@ def query_qdrant_kb(query_text, user_type='client', top_k=3):
     payload = json.dumps(search_payload).encode('utf-8')
     req = urllib.request.Request(
         f"{QDRANT_HOST}/collections/{COLLECTION_NAME}/points/search",
-=======
-    payload = json.dumps(search_payload).encode('utf-8')
-    req = urllib.request.Request(
-        f"{QDRANT_HOST}/collections/{collection_name}/points/search",
->>>>>>> origin/main
         data=payload,
         headers={"Content-Type": "application/json"}
     )
@@ -733,17 +624,12 @@ def query_qdrant_kb(query_text, user_type='client', top_k=3):
                     "title": payload_data.get("title", ""),
                     "category": payload_data.get("category", ""),
                     "subcategory": payload_data.get("subcategory", ""),
-<<<<<<< HEAD
-=======
-                    "priority": payload_data.get("priority", "Medium"),
->>>>>>> origin/main
                     "content": payload_data.get("content", ""),
                     "key_facts": payload_data.get("key_facts", {}),
                     "score": item.get("score", 0)
                 })
             return matches
     except Exception as e:
-<<<<<<< HEAD
         sys.stderr.write(f"Search query error: {e}\n")
         return []
 
@@ -778,70 +664,12 @@ def main():
     if args.query:
         print(f"\nSearching Knowledge Base for: '{args.query}' (User Type: {args.user_type}, Top: {args.top_k})\n")
         results = query_qdrant_kb(args.query, top_k=args.top_k, user_type=args.user_type)
-=======
-        sys.stderr.write(f"Search query error on '{collection_name}': {e}\n")
-        return []
-
-
-def sync_combined_kb():
-    """
-    Combines Client and SP KBs into support_kb.json for backward compatibility.
-    """
-    client_chunks = load_kb_chunks(CLIENT_JSON_PATH) if os.path.exists(CLIENT_JSON_PATH) else []
-    sp_chunks = load_kb_chunks(SP_JSON_PATH) if os.path.exists(SP_JSON_PATH) else []
-    
-    combined = {
-        "version": "1.0.0",
-        "description": "Unified Petsfolio Knowledge Base (Client + Service Provider)",
-        "total_chunks": len(client_chunks) + len(sp_chunks),
-        "client_chunks_count": len(client_chunks),
-        "sp_chunks_count": len(sp_chunks),
-        "chunks": client_chunks + sp_chunks
-    }
-    
-    with open(COMBINED_JSON_PATH, 'w', encoding='utf-8') as f:
-        json.dump(combined, f, indent=2, ensure_ascii=False)
-    print(f"Synced unified Knowledge Base to: {COMBINED_JSON_PATH}")
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Petsfolio Support AI Knowledge Base Ingester & RAG Search")
-    parser.add_argument("--kb", type=str, default="all", choices=["client", "provider", "all"], help="Which Knowledge Base to index or query")
-    parser.add_argument("--index", action="store_true", help="Index selected Knowledge Base(s) into Qdrant")
-    parser.add_argument("--query", type=str, help="Run semantic query search against knowledge base")
-    parser.add_argument("--top-k", type=int, default=3, help="Number of results to retrieve")
-    args = parser.parse_args()
-
-    # Always sync combined JSON
-    sync_combined_kb()
-
-    if args.index:
-        if args.kb in ["client", "all"]:
-            print(f"\nIndexing Client KB ({CLIENT_JSON_PATH}) into '{CLIENT_COLLECTION}'...")
-            client_chunks = load_kb_chunks(CLIENT_JSON_PATH)
-            index_chunks_to_qdrant(client_chunks, CLIENT_COLLECTION, verbose=True)
-
-        if args.kb in ["provider", "all"]:
-            print(f"\nIndexing Service Provider KB ({SP_JSON_PATH}) into '{SP_COLLECTION}'...")
-            sp_chunks = load_kb_chunks(SP_JSON_PATH)
-            index_chunks_to_qdrant(sp_chunks, SP_COLLECTION, verbose=True)
-
-    if args.query:
-        user_type = "provider" if args.kb == "provider" else "client"
-        print(f"\nSearching Knowledge Base for: '{args.query}' (KB Target: {user_type.upper()}, Top: {args.top_k})\n")
-        results = query_qdrant_kb(args.query, user_type=user_type, top_k=args.top_k)
->>>>>>> origin/main
         if not results:
             print("No matching knowledge base chunks found.")
         else:
             for idx, r in enumerate(results, 1):
                 print(f"--- [Result {idx}] (Score: {r['score']:.4f}) ---")
-<<<<<<< HEAD
                 print(f"Title: {r['title']} [{r['category']} > {r['subcategory']}]")
-=======
-                print(f"Title: {r['title']} [{r['category']} > {r.get('subcategory', '')}]")
-                print(f"Priority: {r.get('priority', 'Medium')}")
->>>>>>> origin/main
                 print(f"Content Preview:\n{r['content'][:250]}...\n")
 
 

@@ -12,11 +12,7 @@ class RefundModel extends Model
         'user_id',
         'amount',
         'reason',
-<<<<<<< HEAD
         'attachment',
-=======
-        'attachment', 
->>>>>>> origin/main
         'receipt',
         'transaction_id',
         'admin_comments',
@@ -26,11 +22,7 @@ class RefundModel extends Model
         'created_at',
         'updated_at'
     ];
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> origin/main
     protected $useTimestamps = false;
 
     public function pendingRefunds()
@@ -55,8 +47,4 @@ class RefundModel extends Model
             ->orderBy('user_refunds.updated_at', 'DESC')
             ->get()->getResult();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/main
