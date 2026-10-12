@@ -44,12 +44,15 @@
                 <div class="menu-title">Service Providers</div>
             </a>
         </li>
+<<<<<<< HEAD
         <li>
             <a href="<?= base_url('index.php/admin/verification-questions'); ?>">
                 <div class="parent-icon"><i class="bi bi-question-circle"></i></div>
                 <div class="menu-title">Interview Questions</div>
             </a>
         </li>
+=======
+>>>>>>> origin/main
         
         <li>
             <a href="<?= base_url('index.php/admin/bookings/boardingbookings'); ?>">

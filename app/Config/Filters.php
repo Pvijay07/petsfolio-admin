@@ -34,8 +34,14 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+<<<<<<< HEAD
         'auth'             => \App\Filters\Auth::class,
         'permission'    => \App\Filters\PermissionFilter::class
+=======
+        'auth'          => \App\Filters\Auth::class,
+        'permission'    => \App\Filters\PermissionFilter::class,
+        'activitylog'   => \App\Filters\ActivityLogFilter::class,
+>>>>>>> origin/main
     ];
 
     /**
@@ -78,6 +84,10 @@ class Filters extends BaseFilters
         'after' => [
             // 'honeypot',
             // 'secureheaders',
+<<<<<<< HEAD
+=======
+            'activitylog',
+>>>>>>> origin/main
         ],
     ];
 

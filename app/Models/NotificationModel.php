@@ -70,4 +70,25 @@ class NotificationModel extends Model
     {
         return $this->where('endpoint', $endpoint)->first();
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Auto delete notifications from specified table after a retention period in days.
+     *
+     * @param int    $days     Retention threshold in days (default: 30)
+     * @param string $table    Table to purge (default: 'notifications')
+     * @param bool   $readOnly Only purge read notifications
+     * @return array Purge results summary
+     */
+    public function purgeOldNotifications($days = 30, $table = 'notifications', $readOnly = false)
+    {
+        $purgeService = new \App\Libraries\NotificationPurgeService();
+        return $purgeService->purge([
+            'days'      => $days,
+            'table'     => $table,
+            'read_only' => $readOnly
+        ]);
+    }
+>>>>>>> origin/main
 }

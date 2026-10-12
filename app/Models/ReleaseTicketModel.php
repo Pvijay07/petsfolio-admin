@@ -13,6 +13,7 @@ class ReleaseTicketModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
+<<<<<<< HEAD
         'version_id', 'ticket_id', 'description', 'status',
         'priority', 'assigned_to'
     ];
@@ -54,4 +55,16 @@ class ReleaseTicketModel extends Model
         $stats['total'] = array_sum($stats);
         return $stats;
     }
+=======
+        'version_id',
+        'ticket_id',
+        'description',
+        'status',
+        'priority',
+        'assigned_to',
+        'created_at'
+    ];
+
+    protected $useTimestamps = false;
+>>>>>>> origin/main
 }

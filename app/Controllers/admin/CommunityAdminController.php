@@ -71,7 +71,11 @@ class CommunityAdminController extends BaseController
         $post['dislikes_count'] = $this->postDislikeModel->where('post_id', $id)->countAllResults();
 
         $data['post']  = $post;
+<<<<<<< HEAD
         $data['media'] = $this->mediaModel->where('post_id', $id)->findAll();
+=======
+        $data['media'] = $this->normalizeMediaList($this->mediaModel->where('post_id', $id)->findAll());
+>>>>>>> origin/main
 
         $query       = $this->commentModel->select('community_post_comments.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown User") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile')
             ->join('users', "users.id = community_post_comments.user_id AND (community_post_comments.user_type = 'user' OR community_post_comments.user_type = 'client' OR community_post_comments.user_type IS NULL)", 'left')
@@ -118,7 +122,12 @@ class CommunityAdminController extends BaseController
         }
 
         $data['post']    = $post;
+<<<<<<< HEAD
         $data['media']   = $this->mediaModel->where('post_id', $id)->first();
+=======
+        $mediaRow        = $this->mediaModel->where('post_id', $id)->first();
+        $data['media']   = $mediaRow ? $this->normalizeMediaList([$mediaRow])[0] : null;
+>>>>>>> origin/main
         $data['reports'] = $this->reportModel->select('community_post_reports.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown Reporter") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_post_reports.user_type')
             ->join('users', "users.id = community_post_reports.user_id AND (community_post_reports.user_type = 'user' OR community_post_reports.user_type = 'client' OR community_post_reports.user_type IS NULL)", 'left')
             ->join('service_providers', "service_providers.id = community_post_reports.user_id AND community_post_reports.user_type = 'provider'", 'left')
@@ -192,7 +201,11 @@ class CommunityAdminController extends BaseController
         $data['request'] = $this->request;
 
         foreach ($data['posts'] as &$post) {
+<<<<<<< HEAD
             $post['media'] = $this->mediaModel->where('post_id', $post['id'])->findAll();
+=======
+            $post['media'] = $this->normalizeMediaList($this->mediaModel->where('post_id', $post['id'])->findAll());
+>>>>>>> origin/main
         }
 
         return view('admin/community/community_channel_view', $data);
@@ -272,7 +285,11 @@ class CommunityAdminController extends BaseController
         $data['user']     = (array) $userModel->getUserById($post['user_id']);
         $data['post']     = $post;
         $data['channels'] = $this->channelModel->findAll();
+<<<<<<< HEAD
         $data['media']    = $this->mediaModel->where('post_id', $id)->findAll();
+=======
+        $data['media']    = $this->normalizeMediaList($this->mediaModel->where('post_id', $id)->findAll());
+>>>>>>> origin/main
         $data['title']    = 'Edit Community Post';
 
         return view('admin/community/community_post_form', $data);
@@ -318,8 +335,15 @@ class CommunityAdminController extends BaseController
         if (!empty($allFiles)) {
             foreach ($allFiles as $img) {
                 if ($img && $img->isValid() && !$img->hasMoved()) {
+<<<<<<< HEAD
                     $mimeType  = $img->getMimeType();
                     $mediaType = strpos($mimeType, 'video') !== false ? 'video' : 'image';
+=======
+                    $mimeType  = $img->getMimeType() ?: $img->getClientMimeType();
+                    $clientExt = strtolower($img->getClientExtension() ?: pathinfo($img->getName(), PATHINFO_EXTENSION));
+                    $isVideo   = (strpos($mimeType, 'video') !== false) || in_array($clientExt, ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v']);
+                    $mediaType = $isVideo ? 'video' : 'image';
+>>>>>>> origin/main
                     $newName   = $img->getRandomName();
 
                     $img->move(FCPATH . 'public/uploads/community/media', $newName);
@@ -383,13 +407,39 @@ class CommunityAdminController extends BaseController
                 $fcmTokens = array_unique(array_filter($fcmTokens));
 
                 if (!empty($fcmTokens)) {
+<<<<<<< HEAD
                     $this->pushNotify->sendMulticast(
+=======
+                    $results = $this->pushNotify->sendMulticast(
+>>>>>>> origin/main
                         $fcmTokens,
                         $title,
                         $message,
                         'PostDetailScreen',
                         ['postId' => $postId]
                     );
+<<<<<<< HEAD
+=======
+
+                    $logModel = new \App\Models\NotificationLogModel();
+                    $batchLogs = [];
+                    foreach ($results as $res) {
+                        $isSent = (($res['status'] ?? '') === 'sent');
+                        $batchLogs[] = [
+                            'channel'       => 'push',
+                            'title'         => $title,
+                            'body'          => $message,
+                            'status'        => $isSent ? 'sent' : 'failed',
+                            'error_message' => $isSent ? null : ($res['error'] ?? 'Push failed'),
+                            'device_token'  => $res['token'] ?? null,
+                            'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+                            'created_at'    => date('Y-m-d H:i:s'),
+                        ];
+                    }
+                    if (!empty($batchLogs)) {
+                        $logModel->createBatchLogs($batchLogs);
+                    }
+>>>>>>> origin/main
                 }
             }
         } catch (Exception $e) {
@@ -458,8 +508,15 @@ class CommunityAdminController extends BaseController
         if (!empty($allFiles)) {
             foreach ($allFiles as $img) {
                 if ($img && $img->isValid() && !$img->hasMoved()) {
+<<<<<<< HEAD
                     $mimeType  = $img->getMimeType();
                     $mediaType = strpos($mimeType, 'video') !== false ? 'video' : 'image';
+=======
+                    $mimeType  = $img->getMimeType() ?: $img->getClientMimeType();
+                    $clientExt = strtolower($img->getClientExtension() ?: pathinfo($img->getName(), PATHINFO_EXTENSION));
+                    $isVideo   = (strpos($mimeType, 'video') !== false) || in_array($clientExt, ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v']);
+                    $mediaType = $isVideo ? 'video' : 'image';
+>>>>>>> origin/main
                     $newName   = $img->getRandomName();
 
                     $img->move(FCPATH . 'public/uploads/community/media', $newName);
@@ -521,12 +578,20 @@ class CommunityAdminController extends BaseController
         $data['posts']    = $query->orderBy('community_posts.id', 'DESC')->findAll();
         $data['channels'] = $this->channelModel->findAll();
         foreach ($data['posts'] as &$post) {
+<<<<<<< HEAD
             $post['media']          = $this->mediaModel->where('post_id', $post['id'])->findAll();
             $post['likes_count']    = $this->likeModel->where('post_id', $post['id'])->countAllResults();
             $post['comments_count'] = $this->commentModel->where('post_id', $post['id'])->countAllResults();
         }
 
         // Calculate counts for tabs independently with fresh instances to avoid builder pollution
+=======
+            $post['media']          = $this->normalizeMediaList($this->mediaModel->where('post_id', $post['id'])->findAll());
+            $post['comments_count'] = $this->commentModel->where('post_id', $post['id'])->countAllResults();
+            $post['likes_count']    = $this->likeModel->where('post_id', $post['id'])->countAllResults();
+            $post['dislikes_count'] = $this->postDislikeModel->where('post_id', $post['id'])->countAllResults();
+        }
+>>>>>>> origin/main
         $adminCountBuilder = new CommunityPostModel();
         $adminCountBuilder->where('status', 'active')->where('user_type', 'admin');
         if ($search) $adminCountBuilder->groupStart()->like('post_text', $search)->groupEnd();
@@ -723,13 +788,36 @@ class CommunityAdminController extends BaseController
                 }
 
                 if (!empty($deviceToken)) {
+<<<<<<< HEAD
                     $this->pushNotify->sendMulticast(
+=======
+                    $results = $this->pushNotify->sendMulticast(
+>>>>>>> origin/main
                         [$deviceToken],
                         "Petsfolio replied to your comment",
                         "Petsfolio just replied to your comment in the community.",
                         'PostDetailScreen',
                         ['postId' => $parentComment['post_id']]
                     );
+<<<<<<< HEAD
+=======
+
+                    $res = reset($results);
+                    $isSent = (($res['status'] ?? '') === 'sent');
+                    $logModel = new \App\Models\NotificationLogModel();
+                    $logModel->createLog([
+                        'user_id'       => $parentComment['user_id'] ?? null,
+                        'user_type'     => 'user',
+                        'channel'       => 'push',
+                        'title'         => "Petsfolio replied to your comment",
+                        'body'          => "Petsfolio just replied to your comment in the community.",
+                        'status'        => $isSent ? 'sent' : 'failed',
+                        'error_message' => $isSent ? null : ($res['error'] ?? 'Push failed'),
+                        'device_token'  => $deviceToken,
+                        'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+                        'created_at'    => date('Y-m-d H:i:s'),
+                    ]);
+>>>>>>> origin/main
                 }
             } catch (Exception $e) {
                 \log_message('error', 'Push Notify Error (Admin Reply): ' . $e->getMessage());
@@ -757,7 +845,12 @@ class CommunityAdminController extends BaseController
         }
 
         $data['post']    = $post;
+<<<<<<< HEAD
         $data['media']   = $this->mediaModel->where('post_id', $id)->first();
+=======
+        $mediaRow        = $this->mediaModel->where('post_id', $id)->first();
+        $data['media']   = $mediaRow ? $this->normalizeMediaList([$mediaRow])[0] : null;
+>>>>>>> origin/main
         $data['reports'] = $this->reportModel->select('community_post_reports.*, COALESCE(employees.name, service_providers.name, users.name, "Unknown Reporter") as name, COALESCE(employees.profile, service_providers.profile, users.profile) as profile, community_post_reports.user_type')
             ->join('users', "users.id = community_post_reports.user_id AND (community_post_reports.user_type = 'user' OR community_post_reports.user_type = 'client' OR community_post_reports.user_type IS NULL)", 'left')
             ->join('service_providers', "service_providers.id = community_post_reports.user_id AND community_post_reports.user_type = 'provider'", 'left')
@@ -901,4 +994,25 @@ class CommunityAdminController extends BaseController
 
         return "Successfully processed and published {$count} scheduled posts.";
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Normalize media items to ensure media_type is accurately identified as 'video' or 'image'
+     */
+    protected function normalizeMediaList(array $media): array
+    {
+        $videoExts = ['mp4', 'mov', 'webm', 'ogg', 'mkv', 'avi', 'm4v'];
+        foreach ($media as &$m) {
+            $url = $m['media_url'] ?? '';
+            $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+            if (in_array($ext, $videoExts)) {
+                $m['media_type'] = 'video';
+            } elseif (empty($m['media_type'])) {
+                $m['media_type'] = 'image';
+            }
+        }
+        return $media;
+    }
+>>>>>>> origin/main
 }

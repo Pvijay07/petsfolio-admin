@@ -36,11 +36,44 @@ class AIService
      * Run Python analyze.py CLI tool on the audio file path and parse returned JSON result.
      *
      * @param string $audioFilePath Absolute path to the audio file
+<<<<<<< HEAD
      * @return array Decoded JSON result from Python script
      */
     public function analyzeRecording(string $audioFilePath): array
     {
         return $this->executePythonScript($this->scriptPath, [$audioFilePath]);
+=======
+     * @param string|null $service Service type or ID (walking, grooming, training, sitting)
+     * @param int|null $providerId Provider ID to fetch specific training types
+     * @param array|null $questions Optional pre-filtered verification questions array from VerificationQuestionModel
+     * @return array Decoded JSON result from Python script
+     */
+    public function analyzeRecording(string $audioFilePath, ?string $service = null, ?int $providerId = null, ?array $questions = null): array
+    {
+        $args = [$audioFilePath];
+        if ($service !== null && $service !== '') {
+            $args[] = $service;
+        }
+        if ($providerId !== null && $providerId > 0) {
+            $args[] = (string)$providerId;
+        }
+
+        $tempQFile = null;
+        if (!empty($questions)) {
+            $tempQFile = sys_get_temp_dir() . '/pf_q_' . md5(uniqid('pf', true)) . '.json';
+            file_put_contents($tempQFile, json_encode(array_values($questions), JSON_UNESCAPED_UNICODE));
+            $args[] = '--questions-file';
+            $args[] = $tempQFile;
+        }
+
+        try {
+            return $this->executePythonScript($this->scriptPath, $args);
+        } finally {
+            if ($tempQFile && file_exists($tempQFile)) {
+                @unlink($tempQFile);
+            }
+        }
+>>>>>>> origin/main
     }
 
     /**
@@ -71,7 +104,11 @@ class AIService
 
         $argStrings = array_map('escapeshellarg', $arguments);
         $command = sprintf(
+<<<<<<< HEAD
             '%s %s %s 2>&1',
+=======
+            '%s %s %s',
+>>>>>>> origin/main
             escapeshellcmd($this->pythonPath),
             escapeshellarg($scriptPath),
             implode(' ', $argStrings)
@@ -83,7 +120,22 @@ class AIService
             2 => ['pipe', 'w'],
         ];
 
+<<<<<<< HEAD
         $process = proc_open($command, $descriptorSpec, $pipes);
+=======
+        @mkdir('/tmp/huggingface', 0777, true);
+        @mkdir('/tmp/torch', 0777, true);
+
+        $env = array_merge($_ENV, [
+            'HOME' => '/tmp',
+            'HF_HOME' => '/tmp/huggingface',
+            'TORCH_HOME' => '/tmp/torch',
+            'PYTHONUNBUFFERED' => '1',
+            'PATH' => getenv('PATH') ?: '/usr/local/bin:/usr/bin:/bin',
+        ]);
+
+        $process = proc_open($command, $descriptorSpec, $pipes, null, $env);
+>>>>>>> origin/main
 
         if (!is_resource($process)) {
             throw new \RuntimeException("Failed to execute process: {$command}");
@@ -105,6 +157,7 @@ class AIService
 
         $trimmedStdout = trim($stdout);
 
+<<<<<<< HEAD
         if (strspn($trimmedStdout, '{') !== 0 || strrpos($trimmedStdout, '}') !== strlen($trimmedStdout) - 1) {
             $firstBrace = strpos($trimmedStdout, '{');
             $lastBrace  = strrpos($trimmedStdout, '}');
@@ -114,6 +167,35 @@ class AIService
         }
 
         $result = json_decode($trimmedStdout, true);
+=======
+        // 1. Try direct decode
+        $result = json_decode($trimmedStdout, true);
+
+        // 2. Try extracting from first to last brace
+        if (!is_array($result)) {
+            $firstBrace = strpos($trimmedStdout, '{');
+            $lastBrace  = strrpos($trimmedStdout, '}');
+            if ($firstBrace !== false && $lastBrace !== false && $lastBrace > $firstBrace) {
+                $sub = substr($trimmedStdout, $firstBrace, ($lastBrace - $firstBrace + 1));
+                $result = json_decode($sub, true);
+            }
+        }
+
+        // 3. Try parsing line-by-line from bottom (where print(json.dumps) outputs)
+        if (!is_array($result)) {
+            $lines = explode("\n", $trimmedStdout);
+            for ($i = count($lines) - 1; $i >= 0; $i--) {
+                $line = trim($lines[$i]);
+                if (strpos($line, '{') === 0 && substr($line, -1) === '}') {
+                    $test = json_decode($line, true);
+                    if (is_array($test)) {
+                        $result = $test;
+                        break;
+                    }
+                }
+            }
+        }
+>>>>>>> origin/main
 
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($result)) {
             throw new \RuntimeException("Invalid JSON output from Python script. Output was: " . substr($stdout, 0, 500) . "... Error: " . json_last_error_msg());

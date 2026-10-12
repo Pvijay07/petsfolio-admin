@@ -18,6 +18,7 @@
         <i class="bi bi-graph-up position-absolute end-0 bottom-0 opacity-10"
           style="font-size: 12rem; transform: rotate(12deg); margin-right: -2rem; margin-bottom: -2rem;"></i>
       </div>
+<<<<<<< HEAD
       <div class="p-3">
         <div class="card border-0 shadow-sm mb-0">
           <div class="card-body p-3">
@@ -50,6 +51,10 @@
     <!-- Search Bar and Actions -->
 
 
+=======
+    </div>
+
+>>>>>>> origin/main
     <!-- Summary Cards -->
     <div class="row g-4 mb-4">
       <div class="col-md-4 col-lg-3">
@@ -127,7 +132,35 @@
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Spendings Table -->
+=======
+    <div class="card border-0 shadow-sm ">
+      <div class="card-body p-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+          <!-- Search and Export -->
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-3 w-100 w-md-auto">
+            <div class="input-group flex-grow-1 flex-md-grow-0">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" class="form-control border-start-0 ps-0"
+                placeholder="Search by client name or phone..." id="searchInput">
+            </div>
+
+            <!-- Refresh Button -->
+            <button type="button" onclick="refreshData()"
+              class="btn bg-primary text-white d-flex align-items-center justify-content-center gap-1">
+              <i class="bi bi-arrow-clockwise"></i>
+              <span class="d-none d-md-inline">Refresh</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+>>>>>>> origin/main
     <div class="card border-0 shadow-sm overflow-hidden">
       <div class="table-responsive">
         <table class="table table-hover mb-0" id="spendingsTable">
@@ -207,6 +240,7 @@
 
     <!-- Pagination -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 px-2 gap-3">
+<<<<<<< HEAD
       <div class="text-muted small">
         Showing <?= count($spendings) ?> entries
       </div>
@@ -214,6 +248,12 @@
         <button class="btn btn-outline-primary btn-sm">Previous</button>
         <button class="btn btn-primary btn-sm">1</button>
         <button class="btn btn-outline-primary btn-sm">Next</button>
+=======
+      <div class="text-muted small showing-text">
+        Showing <?= count($spendings) ?> entries
+      </div>
+      <div class="btn-group pagination-container pt-0 mt-0 border-top-0">
+>>>>>>> origin/main
       </div>
     </div>
   </div>
@@ -349,6 +389,7 @@
 </style>
 
 <script>
+<<<<<<< HEAD
   // Search functionality
   document.getElementById('searchInput').addEventListener('input', function (e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -370,6 +411,90 @@
   document.addEventListener('DOMContentLoaded', function () {
     console.log('Client Spendings page loaded');
   });
+=======
+  document.addEventListener('DOMContentLoaded', function () {
+    const table = document.getElementById('spendingsTable');
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const rowsPerPage = 10;
+    let currentPage = 1;
+    let filteredRows = [...rows]; 
+
+    const searchInput = document.getElementById('searchInput');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const showingText = document.querySelector('.showing-text');
+
+    function renderTable() {
+      rows.forEach(row => {
+        row.style.display = 'none';
+        row.style.setProperty('display', 'none', 'important');
+      });
+
+      const start = (currentPage - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+
+      const currentRows = filteredRows.slice(start, end);
+      currentRows.forEach(row => {
+        row.style.display = '';
+        row.style.removeProperty('display');
+      });
+
+      updatePagination();
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+      
+      const start = filteredRows.length === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
+      const end = Math.min(currentPage * rowsPerPage, filteredRows.length);
+      if(showingText) showingText.innerHTML = `Showing ${start} to ${end} of ${filteredRows.length} entries`;
+
+      if(!paginationContainer) return;
+      
+      let html = `<button class="btn btn-outline-primary btn-sm" id="btn-prev" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>`;
+      
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="btn ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'} btn-sm page-btn" data-page="${i}">${i}</button>`;
+      }
+      
+      html += `<button class="btn btn-outline-primary btn-sm" id="btn-next" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next</button>`;
+      
+      paginationContainer.innerHTML = html;
+
+      document.getElementById('btn-prev')?.addEventListener('click', () => {
+        if (currentPage > 1) { currentPage--; renderTable(); }
+      });
+      document.getElementById('btn-next')?.addEventListener('click', () => {
+        if (currentPage < totalPages) { currentPage++; renderTable(); }
+      });
+      document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentPage = parseInt(e.target.getAttribute('data-page'));
+          renderTable();
+        });
+      });
+    }
+
+    if(searchInput) {
+      searchInput.addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        filteredRows = rows.filter(row => row.textContent.toLowerCase().includes(searchTerm));
+        currentPage = 1; 
+        renderTable();
+      });
+    }
+
+    renderTable();
+  });
+
+  function refreshData() {
+    location.reload();
+  }
+>>>>>>> origin/main
 </script>
 
 <?= $this->include('admin/footer') ?>

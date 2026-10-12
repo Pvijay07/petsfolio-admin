@@ -20,7 +20,11 @@ class TicketModel extends Model
       ->select('COALESCE(users.phone, service_providers.phone) as phone')
       ->select('COALESCE(users.profile, service_providers.profile) as profile')
 
+<<<<<<< HEAD
       ->join('users', 'users.id = tickets.user_id AND (tickets.user_type = "client" OR tickets.user_type = "user")', 'left')
+=======
+      ->join('users', 'users.id = tickets.user_id AND tickets.user_type = "client"', 'left')
+>>>>>>> origin/main
       ->join('service_providers', 'service_providers.id = tickets.user_id AND tickets.user_type = "provider"', 'left')
       ->where('tickets.id', $ticketId)
       ->get()
@@ -38,4 +42,88 @@ class TicketModel extends Model
       ->get()
       ->getResult();
   }
+<<<<<<< HEAD
+=======
+  public function getCategories()
+  {
+
+    return $this->db->table('ticket_categories')
+      ->select('id,name,description')
+      ->where('is_active', true)
+      // ->orderBy('created_at', 'asc')
+      ->get()
+      ->getResult();
+  }
+  public function getCategoryTickets($userId, $categoryId, $userType = 'user')
+  {
+    return $this->db->table('tickets')
+      ->select('*')
+      ->where('status', 'open')
+      ->where('user_id', $userId)
+      ->where('user_type', $userType)
+      ->where('category', $categoryId)
+      ->orderBy('created_at', 'desc')
+      ->get()
+      ->getResult();
+  }
+  public function findUser($senderId, $senderType = 'user')
+  {
+    $table = ($senderType === 'provider') ? 'service_providers' : 'users';
+    return $this->db->table($table)
+      ->select('name')
+      ->where('id', $senderId)
+      ->get()
+      ->getRow();
+  }
+  public function findChatReceiver($chatId, $excludeUserId)
+  {
+    $ticket = $this->db->table('tickets')->select('user_type')->where('id', $chatId)->get()->getRow();
+    if (!$ticket) return null;
+
+    $table = ($ticket->user_type === 'provider') ? 'service_providers' : 'users';
+
+    return $this->db->table('tickets')
+      ->select("$table.id, $table.device_token as fcm_token, $table.name")
+      ->join($table, "tickets.user_id = $table.id")
+      ->where('tickets.id', $chatId)
+      ->where("$table.id !=", $excludeUserId)
+      ->get()
+      ->getRow();
+  }
+  public function addFeedback($data)
+  {
+    return $this->db->table('ticket_feedback')
+      ->insert($data);
+  }
+  public function checkFeedback($data)
+  {
+    return $this->db->table('ticket_feedback')
+      ->where('ticket_id', $data['ticket_id'])
+      ->where('user_id', $data['user_id'])
+      ->where('user_type', $data['user_type'] ?? 'user')
+      ->countAllResults();
+  }
+  public function updateRatingTrack($ticketId, $rateRequest)
+  {
+    return $this->db->table('tickets')
+      ->set('is_rating_requested', $rateRequest)
+      ->where('tickets.id', $ticketId)
+      ->update();
+  }
+  public function updateBankTrack($ticketId, $bankRequest)
+  {
+    return $this->db->table('tickets')
+      ->set('is_bank_requested', $bankRequest)
+      ->where('tickets.id', $ticketId)
+      ->update();
+  }
+  public function findSupportUser($senderId)
+  {
+    return $this->db->table('employees')
+      ->select('name')
+      ->where('id', $senderId)
+      ->get()
+      ->getRow();
+  }
+>>>>>>> origin/main
 }

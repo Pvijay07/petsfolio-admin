@@ -13,6 +13,12 @@ class CallRecordingModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
+<<<<<<< HEAD
+=======
+        'call_id',
+        'storage_path',
+        'downloaded_at',
+>>>>>>> origin/main
         'booking_id',
         'provider_id',
         'customer_id',

@@ -106,7 +106,11 @@ class Notifications extends Controller
           'image' => $this->request->getVar('image'),
           'url' => $this->request->getVar('url'),
           'sound' => $this->request->getVar('sound') ?? true,
+<<<<<<< HEAD
           'soundUrl' => $this->request->getVar('sound_url') ?? 'https://beta.petsfolio.in/admin/public/assets/sounds/bark.mp3',
+=======
+          'soundUrl' => $this->request->getVar('sound_url') ?? 'https://staging-api.petsfolio.in/admin/public/assets/sounds/bark.mp3',
+>>>>>>> origin/main
           'tag' => $this->request->getVar('tag') ?? 'general',
           'requireInteraction' => $this->request->getVar('require_interaction') ?? false,
           'silent' => $this->request->getVar('silent') ?? false
@@ -142,11 +146,19 @@ class Notifications extends Controller
     ]);
   }
 
+<<<<<<< HEAD
   public function sendChatNotification($data = null)
   {
     log_message('debug', '=== SEND CHAT NOTIFICATION CALLED ===');
 
     $input = $data ?? $this->request->getJSON(true) ?? $this->request->getPost();
+=======
+  public function sendChatNotification()
+  {
+    log_message('debug', '=== SEND CHAT NOTIFICATION CALLED ===');
+
+    $input = $this->request->getJSON(true) ?? $this->request->getPost();
+>>>>>>> origin/main
     log_message('debug', 'Raw input data: ' . print_r($input, true));
 
     $chatId = $input['chat_id'] ?? 'unknown_chat';
@@ -188,8 +200,14 @@ class Notifications extends Controller
       'body' => $notificationBody,
       'icon' => base_url('public/assets/images/icons/Petsfolio.png'),
       'badge' => base_url('public/assets/images/icons/Petsfolio.png'),
+<<<<<<< HEAD
       'url' => base_url($senderType === 'provider' ? "sp-supportticket/{$chatId}" : "supportticket/{$chatId}"), // FIXED URL PATH
       'tag' => "chat-{$chatId}",
+=======
+      'url' => base_url("admin/supportticket/{$chatId}"), // FIXED URL PATH
+      'tag' => "chat-{$chatId}",
+      'requireInteraction' => true,
+>>>>>>> origin/main
       'chat_id' => $chatId,
       'message_id' => $messageId,
       'sender_type' => $senderType,
@@ -305,4 +323,36 @@ class Notifications extends Controller
       return $this->response->setJSON(['valid' => false, 'error' => $e->getMessage()]);
     }
   }
+<<<<<<< HEAD
+=======
+
+  /**
+   * Purge old notifications via API / admin request.
+   */
+  public function purgeOld()
+  {
+    $days = (int)($this->request->getVar('days') ?? 30);
+    $table = (string)($this->request->getVar('table') ?? 'notifications');
+    $readOnly = (bool)($this->request->getVar('read_only') ?? false);
+    $dryRun = (bool)($this->request->getVar('dry_run') ?? false);
+
+    try {
+      $purgeService = new \App\Libraries\NotificationPurgeService();
+      $result = $purgeService->purge([
+        'days'      => $days,
+        'table'     => $table,
+        'read_only' => $readOnly,
+        'dry_run'   => $dryRun
+      ]);
+
+      return $this->response->setJSON($result);
+    } catch (\Exception $e) {
+      log_message('error', 'Purge error: ' . $e->getMessage());
+      return $this->response->setStatusCode(500)->setJSON([
+        'success' => false,
+        'error'   => $e->getMessage()
+      ]);
+    }
+  }
+>>>>>>> origin/main
 }

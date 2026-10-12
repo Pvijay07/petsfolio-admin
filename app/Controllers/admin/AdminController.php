@@ -43,12 +43,30 @@ class AdminController extends BaseController
     {
         $rules = [
             'name'    => 'required',
+<<<<<<< HEAD
             'email'   => 'required|valid_email',
+=======
+            'email'   => [
+                'rules'  => 'required|valid_email|is_unique[employees.email]',
+                'errors' => [
+                    'is_unique' => 'The email address is already registered.'
+                ]
+            ],
+>>>>>>> origin/main
             'status'  => 'required',
             'role_id' => 'required',
         ];
         if (!$this->validate($rules)) {
+<<<<<<< HEAD
             return $this->response->setJSON(['status' => false, 'errors', $this->validator->getErrors()]);
+=======
+            $errors = $this->validator->getErrors();
+            return $this->response->setJSON([
+                'status'  => false,
+                'errors'  => $errors,
+                'message' => implode('<br>', $errors)
+            ]);
+>>>>>>> origin/main
         }
         $data   = [
             'name'    => $this->request->getPost('name'),
@@ -56,16 +74,33 @@ class AdminController extends BaseController
             'status'  => $this->request->getPost('status') ? 1 : 0,
             'role_id' => $this->request->getPost('role_id'),
         ];
+<<<<<<< HEAD
         $result = $this->model->insertEmployee($data);
         if ($result) {
             return $this->response->setJSON(['status' => true, 'message' => 'created successfully']);
         } else {
             return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+=======
+        try {
+            $result = $this->model->insertEmployee($data);
+            if ($result) {
+                return $this->response->setJSON(['status' => true, 'message' => 'Employee created successfully']);
+            } else {
+                return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error adding employee: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'An employee with this email already exists or a database error occurred.'
+            ]);
+>>>>>>> origin/main
         }
     }
 
     public function updateEmployee()
     {
+<<<<<<< HEAD
         $rules = [
             'name'    => 'required',
             'email'   => 'required|valid_email',
@@ -75,12 +110,35 @@ class AdminController extends BaseController
         ];
         if (!$this->validate($rules)) {
             return $this->response->setJSON(['status' => false, 'errors', $this->validator->getErrors()]);
+=======
+        $id = $this->request->getPost('id');
+        $rules = [
+            'name'    => 'required',
+            'email'   => [
+                'rules'  => "required|valid_email|is_unique[employees.email,id,{$id}]",
+                'errors' => [
+                    'is_unique' => 'The email address is already registered to another employee.'
+                ]
+            ],
+            'status'  => 'required',
+            'role_id' => 'required',
+            'id'      => 'required'
+        ];
+        if (!$this->validate($rules)) {
+            $errors = $this->validator->getErrors();
+            return $this->response->setJSON([
+                'status'  => false,
+                'errors'  => $errors,
+                'message' => implode('<br>', $errors)
+            ]);
+>>>>>>> origin/main
         }
         $data   = [
             'name'    => $this->request->getPost('name'),
             'email'   => $this->request->getPost('email'),
             'status'  => $this->request->getPost('status') ? 1 : 0,
             'role_id' => $this->request->getPost('role_id'),
+<<<<<<< HEAD
             'id' => $this->request->getPost('id'),
 
         ];
@@ -89,6 +147,23 @@ class AdminController extends BaseController
             return $this->response->setJSON(['status' => true, 'message' => 'created successfully']);
         } else {
             return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+=======
+            'id'      => $id,
+        ];
+        try {
+            $result = $this->model->updateEmployee($data);
+            if ($result) {
+                return $this->response->setJSON(['status' => true, 'message' => 'Employee updated successfully']);
+            } else {
+                return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error updating employee: ' . $e->getMessage());
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'An employee with this email already exists or a database error occurred.'
+            ]);
+>>>>>>> origin/main
         }
     }
     public function deleteEmployee()
@@ -97,6 +172,7 @@ class AdminController extends BaseController
             'id' => 'required',
         ];
         if (!$this->validate($rules)) {
+<<<<<<< HEAD
             return $this->response->setJSON(['status' => false, 'errors', $this->validator->getErrors()]);
         }
         $userId = $this->request->getPost('id');
@@ -107,6 +183,28 @@ class AdminController extends BaseController
             return $this->response->setJSON(['status' => true, 'message' => 'created successfully']);
         } else {
             return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+=======
+            $errors = $this->validator->getErrors();
+            return $this->response->setJSON([
+                'status'  => false,
+                'errors'  => $errors,
+                'message' => implode('<br>', $errors)
+            ]);
+        }
+        $userId = $this->request->getPost('id');
+
+        try {
+            $result = $this->model->deleteEmployee($userId);
+
+            if ($result) {
+                return $this->response->setJSON(['status' => true, 'message' => 'Employee deleted successfully']);
+            } else {
+                return $this->response->setJSON(['status' => false, 'message' => 'Please try again']);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Error deleting employee: ' . $e->getMessage());
+            return $this->response->setJSON(['status' => false, 'message' => 'Failed to delete employee.']);
+>>>>>>> origin/main
         }
     }
     public function profile()
@@ -172,12 +270,24 @@ class AdminController extends BaseController
         $boarding                         = $this->booking->getCompletedBoardings();
         $grooming                         = $this->booking->getCompletedGroomings();
         $training                         = $this->booking->getCompletedTrainings();
+<<<<<<< HEAD
+=======
+        $sitting                          = $this->booking->getCompletedSittings();
+
+>>>>>>> origin/main
         $pendingwalking                   = $this->booking->getPendingWalkings();
         $pendingboarding                  = $this->booking->getPendingBoardings();
         $pendinggrooming                  = $this->booking->getPendingGroomings();
         $pendingtraining                  = $this->booking->getPendingTrainings();
+<<<<<<< HEAD
         $data['total_completed_bookings'] = $walking + $boarding + $grooming + $training;
         $data['total_pending_bookings']   = $pendingwalking + $pendingboarding + $pendinggrooming + $pendingtraining;
+=======
+        $pendingsitting                   = $this->booking->getPendingSittings();
+
+        $data['total_completed_bookings'] = $walking + $boarding + $grooming + $training + $sitting;
+        $data['total_pending_bookings']   = $pendingwalking + $pendingboarding + $pendinggrooming + $pendingtraining + $pendingsitting;
+>>>>>>> origin/main
         $data['revenue']                  = $this->booking->getRevenue();
         $data['profit']                   = $this->booking->getProfit();
         $data['recent_bookings']          = $this->booking->getrecentBookings();
@@ -203,6 +313,7 @@ class AdminController extends BaseController
 
         $data['payout_balance'] = $payoutBalance;
         $data['insurance_stats'] = $this->insuranceModel->getInsuranceStats();
+<<<<<<< HEAD
 
         $db = \Config\Database::connect();
         $data['suspicious_visits_count'] = $db->tableExists('suspicious_visits') ? $db->table('suspicious_visits')->countAllResults() : 0;
@@ -234,12 +345,232 @@ class AdminController extends BaseController
                 ->countAllResults();
         }
         $data['verification_executives'] = $verification_executives;
+=======
+>>>>>>> origin/main
         $data['active_customers_count'] = $this->booking->getActiveCustomersCount();
         $revenue = max($data['revenue'] ?? 0, 1);
         $data['margin'] = round(($data['profit'] / $revenue) * 100, 1);
         $data['revenue_by_service'] = $this->booking->getRevenueByService();
         $data['monthly_revenue'] = $this->booking->getMonthlyRevenue();
 
+<<<<<<< HEAD
+=======
+        $data['cancelled_services'] = 0;
+        $db = \Config\Database::connect();
+        $data['suspicious_visits_count'] = $db->tableExists('suspicious_visits') ? $db->table('suspicious_visits')->countAllResults() : 0;
+        $data['recent_suspicious_visits'] = $db->tableExists('suspicious_visits') ? $db->table('suspicious_visits')->orderBy('created_at', 'DESC')->limit(5)->get()->getResult() : [];
+        $verification_executives = $db->table('employees')
+            ->whereIn('role_id', [10])
+            ->where('status', 1)
+            ->get()->getResult();
+
+        foreach ($verification_executives as $exec) {
+            // Call Verifications Count
+            $walks = $db->table('sp_walking_details')->where('verifier_id', $exec->id)->countAllResults();
+            $trains = $db->table('sp_training_details')->where('verifier_id', $exec->id)->countAllResults();
+            $grooms = $db->table('sp_grooming_details')->where('verifier_id', $exec->id)->countAllResults();
+            $boards = $db->table('sp_boarding_details')->where('verifier_id', $exec->id)->countAllResults();
+            $sits = $db->table('sp_sitting_details')->where('verifier_id', $exec->id)->countAllResults();
+            
+            $exec->call_verification_count = $walks + $trains + $grooms + $boards + $sits;
+            
+            // Manager Approvals Count (services verified by this exec that are now approved/active)
+            $walks_app = $db->table('sp_walking_details')
+                ->join('sp_services', 'sp_services.provider_id = sp_walking_details.provider_id AND sp_services.service_id = 4')
+                ->where('sp_walking_details.verifier_id', $exec->id)
+                ->whereIn('sp_services.status', ['approved', 'active'])
+                ->where('sp_services.is_verified', 1)
+                
+                ->countAllResults();
+            $trains_app = $db->table('sp_training_details')
+                ->join('sp_services', 'sp_services.provider_id = sp_training_details.provider_id AND sp_services.service_id = 3')
+                ->where('sp_training_details.verifier_id', $exec->id)
+                ->whereIn('sp_services.status', ['approved', 'active'])
+                ->where('sp_services.is_verified', 1)
+                
+                ->countAllResults();
+            $grooms_app = $db->table('sp_grooming_details')
+                ->join('sp_services', 'sp_services.provider_id = sp_grooming_details.provider_id AND sp_services.service_id = 2')
+                ->where('sp_grooming_details.verifier_id', $exec->id)
+                ->whereIn('sp_services.status', ['approved', 'active'])
+                ->where('sp_services.is_verified', 1)
+                
+                ->countAllResults();
+            $boards_app = $db->table('sp_boarding_details')
+                ->join('sp_services', 'sp_services.provider_id = sp_boarding_details.provider_id AND sp_services.service_id = 1')
+                ->where('sp_boarding_details.verifier_id', $exec->id)
+                ->whereIn('sp_services.status', ['approved', 'active'])
+                ->where('sp_services.is_verified', 1)
+                
+                ->countAllResults();
+            $sits_app = $db->table('sp_sitting_details')
+                ->join('sp_services', 'sp_services.provider_id = sp_sitting_details.provider_id AND sp_services.service_id = 6')
+                ->where('sp_sitting_details.verifier_id', $exec->id)
+                ->whereIn('sp_services.status', ['approved', 'active'])
+                ->where('sp_services.is_verified', 1)
+                
+                ->countAllResults();
+                
+            $exec->manager_approval_count = $walks_app + $trains_app + $grooms_app + $boards_app + $sits_app;
+                
+            // Total distinct SPs handled by this executive
+            $providers_query = $db->query("
+                SELECT COUNT(DISTINCT provider_id) as total FROM (
+                    SELECT provider_id FROM sp_walking_details WHERE verifier_id = ?
+                    UNION
+                    SELECT provider_id FROM sp_training_details WHERE verifier_id = ?
+                    UNION
+                    SELECT provider_id FROM sp_grooming_details WHERE verifier_id = ?
+                    UNION
+                    SELECT provider_id FROM sp_boarding_details WHERE verifier_id = ?
+                    UNION
+                    SELECT provider_id FROM sp_sitting_details WHERE verifier_id = ?
+                ) as temp
+            ", [$exec->id, $exec->id, $exec->id, $exec->id, $exec->id])->getRow();
+            
+            $exec->total_sp_count = $providers_query->total ?? 0;
+        }
+        $data['verification_executives'] = $verification_executives;
+        $data['active_customers_count'] = $this->booking->getActiveCustomersCount();
+
+        // Dynamic Top Performing Service Providers (Schema-safe)
+        $topPerformingProviders = [];
+        try {
+            $topPerformingProviders = $db->query("
+                SELECT 
+                    sp.id,
+                    sp.name,
+                    sp.phone,
+                    sp.email,
+                    sp.city,
+                    sp.status,
+                    COALESCE(w.amount, 0) as wallet_amount,
+                    COALESCE(r.avg_rating, 4.8) as stat_avg_rating,
+                    COALESCE(q.completed_cnt, 0) as stat_completed_bookings,
+                    (
+                        SELECT s.name 
+                        FROM sp_services ss 
+                        JOIN services s ON s.id = ss.service_id 
+                        WHERE ss.provider_id = sp.id 
+                        LIMIT 1
+                    ) as primary_service
+                FROM service_providers sp
+                LEFT JOIN sp_withdrawal_wallet w ON w.provider_id = sp.id
+                LEFT JOIN (
+                    SELECT provider_id, AVG(rating) as avg_rating 
+                    FROM sp_reviews 
+                    GROUP BY provider_id
+                ) r ON r.provider_id = sp.id
+                LEFT JOIN (
+                    SELECT provider_id, COUNT(*) as completed_cnt 
+                    FROM quotations 
+                    WHERE LOWER(status) IN ('accepted', 'completed') 
+                    GROUP BY provider_id
+                ) q ON q.provider_id = sp.id
+                ORDER BY stat_completed_bookings DESC, stat_avg_rating DESC, sp.id DESC
+                LIMIT 10
+            ")->getResultArray();
+        } catch (\Throwable $e) {
+            log_message('error', 'Dashboard Top Providers Fetch Error: ' . $e->getMessage());
+        }
+        $data['top_performing_providers'] = $topPerformingProviders;
+
+        // Dynamic Provider Statistics Summary (Schema-safe)
+        $providerStatsDynamic = [
+            'total'                => 0,
+            'active'               => 0,
+            'verified'             => 0,
+            'pending_verification' => 0,
+            'avg_rating'           => 4.8,
+            'satisfaction_rate'    => 95,
+        ];
+        try {
+            $providerStatsDynamic['total']  = $db->table('service_providers')->countAllResults();
+            $providerStatsDynamic['active'] = $db->table('service_providers')
+                ->groupStart()
+                    ->where('status', 'active')
+                    ->orWhere('status', 1)
+                    ->orWhere('status', 'Approved')
+                ->groupEnd()
+                ->countAllResults();
+
+            if ($db->tableExists('sp_reviews')) {
+                $avgRatingRow = $db->query("SELECT AVG(rating) as avg_r FROM sp_reviews WHERE rating > 0")->getRow();
+                if ($avgRatingRow && $avgRatingRow->avg_r) {
+                    $providerStatsDynamic['avg_rating'] = round((float)$avgRatingRow->avg_r, 1);
+                }
+            }
+
+            if ($db->tableExists('reviews')) {
+                $satisfactionRow = $db->query("SELECT COUNT(*) as total_ratings, SUM(CASE WHEN rating >= 4 THEN 1 ELSE 0 END) as positive_ratings FROM reviews")->getRow();
+                if ($satisfactionRow && $satisfactionRow->total_ratings > 0) {
+                    $providerStatsDynamic['satisfaction_rate'] = round(($satisfactionRow->positive_ratings / $satisfactionRow->total_ratings) * 100);
+                }
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Dashboard Provider Stats Fetch Error: ' . $e->getMessage());
+        }
+        $data['provider_stats_dynamic'] = $providerStatsDynamic;
+
+        // Provider Service Category Distribution
+        $serviceDist = [
+            'Walking'  => 0,
+            'Grooming' => 0,
+            'Training' => 0,
+            'Boarding' => 0,
+            'Sitting'  => 0,
+        ];
+        try {
+            if ($db->tableExists('sp_walking_details'))  $serviceDist['Walking']  = $db->table('sp_walking_details')->countAllResults();
+            if ($db->tableExists('sp_grooming_details')) $serviceDist['Grooming'] = $db->table('sp_grooming_details')->countAllResults();
+            if ($db->tableExists('sp_training_details')) $serviceDist['Training'] = $db->table('sp_training_details')->countAllResults();
+            if ($db->tableExists('sp_boarding_details')) $serviceDist['Boarding'] = $db->table('sp_boarding_details')->countAllResults();
+            if ($db->tableExists('sp_sitting_details'))  $serviceDist['Sitting']  = $db->table('sp_sitting_details')->countAllResults();
+        } catch (\Throwable $e) {
+            log_message('error', 'Dashboard Provider Service Distribution Error: ' . $e->getMessage());
+        }
+        $data['provider_service_distribution'] = $serviceDist;
+
+        // AI Call Recording Analysis Metrics (Schema-safe)
+        $callStats = [
+            'total_recordings'   => 0,
+            'completed_analysis' => 0,
+            'avg_score'          => 0,
+            'positive_sentiment' => 0,
+            'flagged_calls'      => 0
+        ];
+        try {
+            if ($db->tableExists('call_recordings')) {
+                $callStats['total_recordings'] = $db->table('call_recordings')->countAllResults();
+            }
+            if ($db->tableExists('call_analysis')) {
+                $callStats['completed_analysis'] = $db->table('call_analysis')->countAllResults();
+
+                $hasOverallScore = $db->fieldExists('overall_score', 'call_analysis');
+                $scoreCol = $hasOverallScore ? 'overall_score' : ($db->fieldExists('overall_rating', 'call_analysis') ? 'overall_rating' : ($db->fieldExists('qa_score', 'call_analysis') ? 'qa_score' : 'id'));
+
+                $avgRow = $db->query("SELECT AVG({$scoreCol}) as avg_s FROM call_analysis")->getRow();
+                $callStats['avg_score'] = round((float)($avgRow->avg_s ?? 0), 1);
+                
+                $hasSentimentLabel = $db->fieldExists('sentiment_label', 'call_analysis');
+                $sentimentCol = $hasSentimentLabel ? 'sentiment_label' : ($db->fieldExists('customer_sentiment', 'call_analysis') ? 'customer_sentiment' : null);
+
+                if ($sentimentCol) {
+                    $posRow = $db->query("SELECT COUNT(*) as pos FROM call_analysis WHERE {$sentimentCol} IN ('Positive', 'positive')")->getRow();
+                    $callStats['positive_sentiment'] = (int)($posRow->pos ?? 0);
+                }
+
+                $hasEscalated = $db->fieldExists('is_escalated', 'call_analysis');
+                $escalatedCondition = $hasEscalated ? "OR is_escalated = 1" : "";
+                $flagRow = $db->query("SELECT COUNT(*) as flg FROM call_analysis WHERE {$scoreCol} < 60 {$escalatedCondition}")->getRow();
+                $callStats['flagged_calls'] = (int)($flagRow->flg ?? 0);
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'Dashboard Call Analysis Stats Fetch Error: ' . $e->getMessage());
+        }
+        $data['call_stats'] = $callStats;
+
+>>>>>>> origin/main
         return $this->loadView('admin/dashboard', $data);
     }
     public function getMonthlyRevenue()
@@ -250,6 +581,7 @@ class AdminController extends BaseController
 
     public function getSidebarCounts()
     {
+<<<<<<< HEAD
         $this->booking = new \App\Models\Booking();
 
         $supports = $this->booking->getSupport('service_provider');
@@ -283,6 +615,71 @@ class AdminController extends BaseController
             'pending_rewards' => $this->booking->getPendingRewardOrdersCount(),
             'delivered_rewards' => $this->booking->getDeliveredRewardOrdersCount()
         ];
+=======
+        $cache = \Config\Services::cache();
+        $cacheKey = 'admin_sidebar_counts';
+        $counts = $cache->get($cacheKey);
+
+        if ($counts === null) {
+            $this->booking = new \App\Models\Booking();
+            $db = \Config\Database::connect();
+
+            $supportCount = $db->table('tickets')
+                ->groupStart()
+                    ->where('user_type', 'provider')
+                    ->orWhere('user_type', 'service_provider')
+                ->groupEnd()
+                ->where('status !=', 'resolved')
+                ->countAllResults();
+
+            $clsupportCount = $db->table('tickets')
+                ->groupStart()
+                    ->where('user_type', 'client')
+                    ->orWhere('user_type', 'user')
+                ->groupEnd()
+                ->where('status !=', 'resolved')
+                ->countAllResults();
+
+            $missedCount = method_exists($this->booking, 'getUntrackedWalksCount')
+                ? $this->booking->getUntrackedWalksCount()
+                : count($this->booking->getUntrackedWalks());
+
+            $pendingVerificationPayouts = 0;
+            if ($db->tableExists('executive_payouts')) {
+                $pendingVerificationPayouts = $db->table('executive_payouts')
+                    ->where('status', 'pending')
+                    ->countAllResults();
+            }
+
+            $totalAgreementsCount = 0;
+            if ($db->tableExists('provider_agreements')) {
+                $totalAgreementsCount += $db->table('provider_agreements')->countAllResults();
+            }
+            if ($db->tableExists('client_agreements')) {
+                $totalAgreementsCount += $db->table('client_agreements')->countAllResults();
+            }
+
+            $counts = [
+                'bookingRequests'          => $this->booking->getBookingStatusCount('New'),
+                'Confirmedbookings'        => $this->booking->getBookingStatusCount('Confirmed'),
+                'Haltedbookings'           => $this->booking->getBookingStatusCount('Halted'),
+                'Cancelledbookings'        => $this->booking->getBookingStatusCount('Cancelled'),
+                'Deletedbookings'          => $this->booking->getBookingStatusCount('deleted'),
+                'Completedbookings'        => $this->booking->getBookingStatusCount('Completed'),
+                'missedwalks'              => $missedCount,
+                'providerPayouts'          => $this->booking->getPaymentRequests(),
+                'callVerificationPayouts'  => $pendingVerificationPayouts,
+                'agreementsCount'          => $totalAgreementsCount,
+                'refundRequests'           => $this->booking->getRefundRequestsCount(),
+                'clsupports'               => $clsupportCount,
+                'spsupports'               => $supportCount,
+                'pending_rewards'          => $this->booking->getPendingRewardOrdersCount(),
+                'delivered_rewards'        => $this->booking->getDeliveredRewardOrdersCount()
+            ];
+
+            $cache->save($cacheKey, $counts, 20);
+        }
+>>>>>>> origin/main
 
         return $this->response->setJSON($counts);
     }
@@ -325,7 +722,11 @@ class AdminController extends BaseController
     }
     public function permissions()
     {
+<<<<<<< HEAD
         $permModel = new \App\Models\PermissionModel();
+=======
+       $permModel = new \App\Models\PermissionModel();
+>>>>>>> origin/main
         $data['permissions']        = $permModel->getPermissions();
         $data['groupedPermissions'] = $permModel->getPermissionsGroupedByModule();
         $data['roles']              = $permModel->getRoles();
@@ -333,6 +734,7 @@ class AdminController extends BaseController
 
         return $this->loadView('admin/services/permissions', $data);
     }
+<<<<<<< HEAD
 
     public function getPermissions()
     {
@@ -352,6 +754,37 @@ class AdminController extends BaseController
     }
 
     public function getRolePermissions()
+=======
+    public function addPermission()
+    {
+
+        $data = [
+            'name'   => $this->request->getPost('name'),
+            'module' => $this->request->getPost('module'),
+        ];
+
+        $this->model->insertPermission($data);
+        return redirect()->back()->with('success', 'Permission added successfully');
+    }
+    public function getPermissions()
+    {
+        if ($this->request->isAJAX()) {
+            $userId = $this->request->getPost('user_id');
+
+            $permissions = $this->model->getPermissionsByUserId($userId);
+            return $this->response->setJSON($permissions);
+        }
+    }
+    public function getAllPermissions()
+    {
+        if ($this->request->isAJAX()) {
+            $permissions = $this->model->getPermissions();
+
+            return $this->response->setJSON($permissions);
+        }
+    }
+        public function getRolePermissions()
+>>>>>>> origin/main
     {
         $roleId = (int)$this->request->getPost('role_id');
         $permModel = new \App\Models\PermissionModel();
@@ -363,8 +796,12 @@ class AdminController extends BaseController
             'permission_ids'  => $assignedIds
         ]);
     }
+<<<<<<< HEAD
 
     public function getUserPermissions()
+=======
+  public function getUserPermissions()
+>>>>>>> origin/main
     {
         $userId = (int)$this->request->getPost('user_id');
         $permModel = new \App\Models\PermissionModel();
@@ -375,6 +812,32 @@ class AdminController extends BaseController
             'data'   => $data
         ]);
     }
+<<<<<<< HEAD
+=======
+    
+    public function toggleRolePermission()
+    {
+        $roleId       = (int)$this->request->getPost('role_id');
+        $permissionId = (int)$this->request->getPost('permission_id');
+        $enable       = (bool)$this->request->getPost('enable');
+
+        if (!$roleId || !$permissionId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Invalid parameters.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->toggleRolePermission($roleId, $permissionId, $enable);
+
+        if (function_exists('clearPermissionCache')) {
+            clearPermissionCache();
+        }
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Permission toggled.' : 'Failed to toggle permission.'
+        ]);
+    }
+>>>>>>> origin/main
 
     public function saveRolePermissions()
     {
@@ -388,6 +851,7 @@ class AdminController extends BaseController
         $permModel = new \App\Models\PermissionModel();
         $success   = $permModel->assignRolePermissions($roleId, $permissions);
 
+<<<<<<< HEAD
         if ($this->request->isAJAX()) {
             return $this->response->setJSON([
                 'status'  => $success,
@@ -414,6 +878,31 @@ class AdminController extends BaseController
         return $this->response->setJSON([
             'status'  => $success,
             'message' => $success ? 'Permission toggled.' : 'Failed to toggle permission.'
+=======
+        if (function_exists('clearPermissionCache')) {
+            clearPermissionCache();
+        }
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Role permissions updated successfully.' : 'Failed to update role permissions.'
+        ]);
+    }
+
+    public function syncPermissions()
+    {
+        $permModel = new \App\Models\PermissionModel();
+        $result    = $permModel->syncFromRegistry();
+
+        if (function_exists('clearPermissionCache')) {
+            clearPermissionCache();
+        }
+
+        return $this->response->setJSON([
+            'status'   => true,
+            'message'  => "Permissions synced: {$result['added']} added, {$result['updated']} updated.",
+            'orphaned' => $result['orphaned']
+>>>>>>> origin/main
         ]);
     }
 
@@ -429,6 +918,13 @@ class AdminController extends BaseController
         $permModel = new \App\Models\PermissionModel();
         $success   = $permModel->assignUserPermissions($userId, $permissions);
 
+<<<<<<< HEAD
+=======
+        if (function_exists('clearPermissionCache')) {
+            clearPermissionCache();
+        }
+
+>>>>>>> origin/main
         return $this->response->setJSON([
             'status'  => $success,
             'message' => $success ? 'Direct user permissions & overrides updated successfully.' : 'Failed to update user permissions.'
@@ -457,8 +953,14 @@ class AdminController extends BaseController
     public function saveRole()
     {
         $roleId      = (int)$this->request->getPost('role_id');
+<<<<<<< HEAD
         $name        = trim($this->request->getPost('name'));
         $description = trim($this->request->getPost('description'));
+=======
+        $name        = trim($this->request->getPost('name') ?? '');
+        $slug        = trim($this->request->getPost('slug') ?? '');
+        $description = trim($this->request->getPost('description') ?? '');
+>>>>>>> origin/main
 
         if (empty($name)) {
             return $this->response->setJSON(['status' => false, 'message' => 'Role name is required.']);
@@ -466,11 +968,28 @@ class AdminController extends BaseController
 
         $permModel = new \App\Models\PermissionModel();
 
+<<<<<<< HEAD
         if ($roleId > 0) {
             $success = $permModel->updateRole($roleId, ['name' => $name, 'description' => $description]);
             $msg = 'Role updated successfully.';
         } else {
             $newId = $permModel->createRole(['name' => $name, 'description' => $description]);
+=======
+        $roleData = [
+            'name'        => $name,
+            'description' => $description
+        ];
+
+        if (!empty($slug)) {
+            $roleData['slug'] = $slug;
+        }
+
+        if ($roleId > 0) {
+            $success = $permModel->updateRole($roleId, $roleData);
+            $msg = 'Role updated successfully.';
+        } else {
+            $newId = $permModel->createRole($roleData);
+>>>>>>> origin/main
             $success = $newId > 0;
             $msg = 'New role created successfully.';
         }
@@ -486,6 +1005,14 @@ class AdminController extends BaseController
         }
 
         $permModel = new \App\Models\PermissionModel();
+<<<<<<< HEAD
+=======
+        $role = $permModel->getRole($roleId);
+        if ($role && ($role['slug'] ?? '') === 'super_admin') {
+            return $this->response->setJSON(['status' => false, 'message' => 'Super Admin role cannot be deleted.']);
+        }
+
+>>>>>>> origin/main
         $success   = $permModel->deleteRole($roleId);
 
         return $this->response->setJSON([
@@ -494,6 +1021,7 @@ class AdminController extends BaseController
         ]);
     }
 
+<<<<<<< HEAD
     public function addPermission()
     {
         $name   = trim($this->request->getPost('name'));
@@ -508,6 +1036,9 @@ class AdminController extends BaseController
 
         return redirect()->back()->with('success', 'New permission added successfully.');
     }
+=======
+  
+>>>>>>> origin/main
 
     public function deletePermission()
     {
@@ -538,6 +1069,27 @@ class AdminController extends BaseController
             'message' => $success ? 'User role updated successfully.' : 'Failed to update user role.'
         ]);
     }
+<<<<<<< HEAD
+=======
+    public function updatePermissions()
+    {
+        if ($this->request->isAJAX()) {
+            $roleId      = $this->request->getPost('role_id');
+            $permissions = $this->request->getPost('permissions');
+            $this->model->assignPermissions($roleId, $permissions);
+
+            return $this->response->setJSON(['success' => true]);
+        }
+    }
+    public function assignPermissions()
+    {
+        $roleId      = $this->request->getPost('role_id');
+        $permissions = $this->request->getPost('permissions');
+        $this->model->assignPermissions($roleId, $permissions);
+
+        return redirect()->back()->with('success', 'Permissions assigned successfully');
+    }
+>>>>>>> origin/main
     public function pets()
     {
         $data['pets'] = $this->model->getPets();
@@ -1288,6 +1840,60 @@ class AdminController extends BaseController
         return $this->loadView('admin/sp_support_chat', $data);
     }
 
+<<<<<<< HEAD
+=======
+    public function updateTicketStatus()
+    {
+        $ticketId = $this->request->getPost('chat_id') ?: $this->request->getPost('ticket_id');
+        $status = strtolower(trim((string) ($this->request->getPost('status') ?: 'resolved')));
+
+        if (!$ticketId) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Missing ticket ID']);
+        }
+
+        $db = \Config\Database::connect();
+        $oldTicket = $db->table('tickets')->where('id', $ticketId)->get()->getRow();
+
+        $updateData = [
+            'status'     => $status,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+        $db->table('tickets')->where('id', $ticketId)->update($updateData);
+
+        // Forward to API if needed so Pusher/client notifications still fire
+        try {
+            $client = \Config\Services::curlrequest();
+            $client->post('https://api.petsfolio.in/api/supportticket/updateStatus', [
+                'form_params' => [
+                    'chat_id' => $ticketId,
+                    'status'  => $status,
+                ],
+                'http_errors' => false,
+                'timeout'     => 3,
+            ]);
+        } catch (\Throwable $e) {
+            // Ignore API forwarding errors
+        }
+
+        $statusLabel = ucfirst($status);
+        $actionDesc = ($status === 'resolved')
+            ? "Marked Support Ticket #{$ticketId} as Resolved"
+            : (($status === 'closed') ? "Closed Support Ticket #{$ticketId}" : "Updated Support Ticket #{$ticketId} to {$statusLabel}");
+
+        \App\Libraries\ActivityLogger::log(
+            'update',
+            $actionDesc,
+            'support',
+            $ticketId,
+            $oldTicket ? ['status' => $oldTicket->status] : null,
+            ['status' => $status],
+            ['ticket_id' => $ticketId, 'status' => $status]
+        );
+
+        return $this->response->setJSON(['status' => 'ok', 'message' => 'Ticket status updated successfully']);
+    }
+
+>>>>>>> origin/main
 
     public function unupdatedPaidBookings()
     {
@@ -1451,6 +2057,596 @@ class AdminController extends BaseController
             $this->booking->updateWalletAmount($providerWallet, $serviceType, 'sp_service_wallet');
         }
     }
+<<<<<<< HEAD
+=======
+
+    public function recoinciliation()
+    {
+        $data['summary']               = $this->booking->getServiceWalletSummary();
+        $client_transactions           = $this->booking->getWalletSummary2('client');
+        $walker_transactions           = $this->booking->getWalletSummary2('walker');
+        $data['platform_transactions'] = $this->booking->getWalletSummary2('platform');
+        $mismatch_alerts               = [];
+        $checkedClients                = [];
+        $checkedWalkers                = [];
+
+        $data['total_bookings']    = $this->booking->getTotalBookings()->total_amount ?? 0;
+        $data['walker_payouts']    = $this->booking->getTotalWalkerPayouts()->total_earnings ?? 0;
+        $data['client_refunds']    = $this->booking->getTotalClientRefunds()->total_refunds ?? 0;
+        $data['platform_earnings'] = $this->booking->getTotalPlatformEarings()->total_platform_earnings ?? 0;
+
+        /**
+         * 1. Service Booking mismatches
+         */
+        foreach ($data['summary'] as $sum) {
+            if ($sum['status'] === 'Mismatch') {
+                $expected_amount = round($sum['net_booking_amt'] * 0.90, 2);
+                $actual_amount   = round($sum['walker_payouts'], 2);
+                $difference      = round($actual_amount - $expected_amount, 2);
+
+                $mismatch_alerts[] = [
+                    'type'            => 'booking',
+                    'service_id'      => $sum['booking_id'],
+                    'expected_amount' => $expected_amount,
+                    'actual_amount'   => $actual_amount,
+                    'difference'      => $difference,
+                    'date'            => date('Y-m-d', strtotime($sum['created_at'] ?? 'now')),
+                    'status'          => $sum['status'],
+                    'user_type'       => 'Client',
+                    'user_name'       => $sum['client_name'],
+                ];
+            }
+        }
+
+        /**
+         * 2. Client Wallet mismatches (grouped by client_id)
+         */
+        foreach ($client_transactions as $txn) {
+            $clientId = $txn['client_id'];
+            if (!$clientId) continue;
+
+            if (!isset($checkedClients[$clientId])) {
+                $checkedClients[$clientId] = true;
+
+                // --- Refund Wallet ---
+                $expected_refund = (float) $this->booking->getBalanceFromHistory($clientId);
+                $actual_refund   = (float) $this->booking->getRefundAmount($clientId);
+
+                if (abs(round($expected_refund, 2) - round($actual_refund, 2)) > 1.00) {
+                    $mismatch_alerts[] = [
+                        'type'            => 'refund_wallet',
+                        'client_id'       => $clientId,
+                        'client_name'     => $txn['client_name'],
+                        'expected_amount' => $expected_refund,
+                        'actual_amount'   => $actual_refund,
+                        'difference'      => round($actual_refund - $expected_refund, 2),
+                        'date'            => date('Y-m-d'),
+                        'status'          => 'Mismatch',
+                        'user_type'       => 'Client',
+                        'user_name'       => $txn['client_name'],
+                        'service_id'      => ''
+                    ];
+                }
+
+                // --- Service Wallet ---
+                $expected_service = (float) $this->booking->getExpectedServiceWalletBalance($clientId);
+                $actual_service   = (float) $this->booking->getActualServiceWalletBalance($clientId);
+                if (abs(round($expected_service, 2) - round($actual_service, 2)) > 1.00) {
+                    $mismatch_alerts[] = [
+                        'type'            => 'service_wallet',
+                        'client_id'       => $clientId,
+                        'client_name'     => $txn['client_name'],
+                        'expected_amount' => $expected_service,
+                        'actual_amount'   => $actual_service,
+                        'difference'      => round($actual_service - $expected_service, 2),
+                        'date'            => date('Y-m-d'),
+                        'status'          => 'Mismatch',
+                        'user_type'       => 'Client',
+                        'user_name'       => $txn['client_name'],
+                        'service_id'      => ''
+                    ];
+                }
+            }
+        }
+
+
+        /**
+         * 3. Walker Wallet mismatches (grouped by walker_id)
+         */
+        foreach ($walker_transactions as $txn) {
+            $walkerId = $txn['walker_id'];
+            if (!$walkerId) continue;
+
+            if (!isset($checkedWalkers[$walkerId])) {  // prevent duplicates
+                $checkedWalkers[$walkerId] = true;
+
+                $expected_balance = (float) $this->booking->getSPBalanceFromHistory($walkerId);
+                $actual_balance   = (float) ($this->booking->getTotalWithdrawalAmount($walkerId)->amount ?? 0);
+
+                if (abs(round($expected_balance, 2) - round($actual_balance, 2)) > 1.00) {
+                    $mismatch_alerts[] = [
+                        'type'            => 'walker_wallet',
+                        'walker_id'       => $walkerId,
+                        'walker_name'     => $txn['walker_name'],
+                        'expected_amount' => $expected_balance,
+                        'actual_amount'   => $actual_balance,
+                        'difference'      => round($actual_balance - $expected_balance, 2),
+                        'date'            => date('Y-m-d'),
+                        'status'          => 'Mismatch',
+                        'service_id'      => 0,
+                        'user_type'       => 'Service Provider',
+                        'user_name'       => $txn['walker_name'],
+                    ];
+                }
+
+                // --- Service Wallet ---
+                $expected_service = (float) $this->booking->getSPExpectedServiceWalletBalance($walkerId);
+                $actual_service   = (float) $this->booking->getSPActualServiceWalletBalance($walkerId);
+
+                if (abs(round($expected_service, 2) - round($actual_service, 2)) > 1.00) {
+                    $mismatch_alerts[] = [
+                        'type'            => 'walker_service_wallet',
+                        'walker_id'       => $walkerId,
+                        'walker_name'     => $txn['walker_name'],
+                        'expected_amount' => $expected_service,
+                        'actual_amount'   => $actual_service,
+                        'difference'      => round($actual_service - $expected_service, 2),
+                        'date'            => date('Y-m-d'),
+                        'status'          => 'Mismatch',
+                        'service_id'      => 0,
+                        'user_type'       => 'Service Provider',
+                        'user_name'       => $txn['walker_name'],
+                    ];
+                }
+            }
+        }
+
+
+        // Group clients
+        $clients = [];
+        foreach ($client_transactions as $txn) {
+            $clientId = $txn['client_id'];
+            if (!$clientId) continue;
+            if (!isset($clients[$clientId])) {
+                $clients[$clientId] = [
+                    'client_name'  => $txn['client_name'],
+                    'client_phone' => $txn['client_phone'],
+                    'transactions' => []
+                ];
+            }
+            $clients[$clientId]['transactions'][] = $txn;
+        }
+
+        // Group walkers
+        $walkers = [];
+        foreach ($walker_transactions as $txn) {
+            $walkerId = $txn['walker_id'];
+            if (!$walkerId) continue;
+            if (!isset($walkers[$walkerId])) {
+                $walkers[$walkerId] = [
+                    'walker_name'  => $txn['walker_name'],
+                    'walker_phone' => $txn['walker_phone'],
+                    'transactions' => []
+                ];
+            }
+            $walkers[$walkerId]['transactions'][] = $txn;
+        }
+
+        // Send to view
+        $data['clients']         = $clients;
+        $data['walkers']         = $walkers;
+        $data['mismatch_alerts'] = $mismatch_alerts;
+
+        return $this->loadView('admin/recoinciliation', $data);
+    }
+
+    public function walletHistory()
+    {
+        $userId = $this->request->getGet('user_id');
+        $type   = $this->request->getGet('type');
+
+        $expected_balance = 0;
+        $actual_balance   = 0;
+
+        if ($type === 'client_wallet') {
+            $history          = $this->booking->getWalletSummary('client', $userId);
+            $expected_balance = $this->booking->getBalanceFromHistory($userId);
+            $actual_balance   = $this->booking->getRefundAmount($userId);
+        } elseif ($type === 'walker_wallet') {
+            $history = $this->booking->getWalletSummary('walker', $userId);
+
+            $expected_balance = $this->booking->getSPBalanceFromHistory($userId);
+            $actual_balance   = $this->booking->getTotalWithdrawalAmount($userId)->amount ?? 0;
+        } else {
+            $history = []; // later: $this->booking->getBookingHistory($userId);
+        }
+        foreach ($history as &$hist) {
+            $hist['expected_balance'] = $expected_balance;
+            $hist['actual_balance']   = $actual_balance;
+            $hist['difference']       = $actual_balance - $expected_balance;
+        }
+        return $this->response->setJSON($history);
+    }
+    private function getSMSCredits()
+    {
+        $cache = \Config\Services::cache();
+        $cacheKey = 'sms_credits_cache';
+
+        // Manual cache clear for debugging
+        if ($this->request->getGet('clear_sms_cache') == '1') {
+            $cache->delete($cacheKey);
+        }
+
+        $cachedCredits = $cache->get($cacheKey);
+
+        if ($cachedCredits !== null) {
+            return $cachedCredits;
+        }
+
+        // Try Bulk SMS Gateway first
+        $credits = $this->fetchSMSCreditsFromAPI();
+
+        // If Bulk SMS fails or returns 0, try Fast2SMS as fallback
+        if ($credits['status'] === 'error' || $credits['remaining'] <= 0) {
+            $f2sCredits = $this->fetchSMSCredits();
+            if ($f2sCredits['status'] === 'success') {
+                $credits = $f2sCredits;
+            } else if ($credits['status'] === 'error') {
+                // If both failed, combine error messages
+                $credits['message'] = "BulkSMS: " . $credits['message'] . " | Fast2SMS: " . $f2sCredits['message'];
+            }
+        }
+
+        // Send alert if credits are low (< 50)
+        if ($credits['status'] === 'success' && $credits['remaining'] < 50) {
+            $alertSentKey = 'sms_low_alert_sent';
+            if (!$cache->get($alertSentKey)) {
+                // $this->sendLowCreditAlert($credits);
+                // Mark as sent for 24 hours to avoid spamming
+                $cache->save($alertSentKey, true, 86400);
+            }
+        }
+
+        // Cache success for 1 hour, but errors for only 5 minutes
+        $ttl = ($credits['status'] === 'success') ? 3600 : 300;
+        $cache->save($cacheKey, $credits, $ttl);
+
+        return $credits;
+    }
+    /**
+     * Get SMS credits from bulk SMS gateway
+     * @return array SMS credit information
+     */
+    private function fetchSMSCreditsFromAPI()
+    {
+        $user = getenv('bulkSmsUser') ?: 'infasta';
+        $password = getenv('bulkSmsPassword') ?: '7660966660';
+        $type = '3';
+
+        $url = "http://api.bulksmsgateway.in/userbalance.php?user={$user}&password={$password}&type={$type}";
+
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && !empty($response)) {
+                // Check if response is just an error message (common in some gateways)
+                if (stripos($response, 'invalid') !== false || stripos($response, 'error') !== false || stripos($response, 'fail') !== false) {
+                    return [
+                        'remaining' => 0,
+                        'validity' => null,
+                        'route' => null,
+                        'status' => 'error',
+                        'message' => 'BulkSMS Gateway Error: ' . strip_tags($response)
+                    ];
+                }
+
+                $data = json_decode($response, true);
+
+                // Handle both JSON and plain text responses
+                if (is_array($data)) {
+                    return [
+                        'remaining' => isset($data['remainingcredits']) ? (int)$data['remainingcredits'] : 0,
+                        'validity' => $data['validity'] ?? 'Unlimited',
+                        'route' => $data['selectedRoute'] ?? 'Transactional',
+                        'status' => 'success'
+                    ];
+                } else if (is_numeric(trim($response))) {
+                    return [
+                        'remaining' => (int)trim($response),
+                        'validity' => 'Unlimited',
+                        'route' => 'Transactional',
+                        'status' => 'success'
+                    ];
+                }
+            }
+
+            $errorMsg = $curlError ?: "HTTP Status $httpCode";
+            log_message('error', "BulkSMS Credit Fetch Failed: $errorMsg, Response: $response");
+
+            return [
+                'remaining' => 0,
+                'validity' => null,
+                'route' => null,
+                'status' => 'error',
+                'message' => "Failed to fetch Bulk SMS credits ($errorMsg)"
+            ];
+        } catch (\Exception $e) {
+            log_message('error', "BulkSMS Credit Fetch Exception: " . $e->getMessage());
+            return [
+                'remaining' => 0,
+                'validity' => null,
+                'route' => null,
+                'status' => 'error',
+                'message' => "BulkSMS Exception: " . $e->getMessage()
+            ];
+        }
+    }
+
+
+    private function fetchSMSCredits()
+    {
+        // Using cURL to fetch data from Fast2SMS
+        try {
+            $apiKey = getenv('F2S_KEY');
+            $url = "https://www.fast2sms.com/dev/wallet?authorization=$apiKey";
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                "Content-Type: application/json",
+                "cache-control: no-cache"
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            if ($httpCode === 200 && !empty($response)) {
+                $data = json_decode($response, true);
+
+                if ((isset($data['status']) && $data['status'] === true) || (isset($data['return']) && $data['return'] === true)) {
+                    return [
+                        'remaining' => isset($data['wallet']) ? $data['wallet'] : 0,
+                        'sms_count' => isset($data['sms_count']) ? (int)$data['sms_count'] : 0,
+                        'validity'  => $data['validity'] ?? 'Lifetime',
+                        'route'     => $data['route'] ?? 'Transaction',
+                        'status'    => 'success'
+                    ];
+                }
+            }
+
+            log_message('error', "Fast2SMS Credit Fetch Failed: HTTP $httpCode, Error: $curlError, Response: $response");
+
+            return [
+                'remaining' => 0,
+                'sms_count' => 0,
+                'validity' => null,
+                'route' => null,
+                'status' => 'error',
+                'message' => 'Failed to fetch SMS credits from Fast2SMS'
+            ];
+        } catch (\Exception $e) {
+            log_message('error', "Fast2SMS Credit Fetch Exception: " . $e->getMessage());
+            return [
+                'remaining' => 0,
+                'sms_count' => 0,
+                'validity' => null,
+                'route' => null,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+    /**
+     * Send low credit alert email
+     * @param array $smsCredits SMS credit information
+     */
+    private function sendLowCreditAlert($smsCredits)
+    {
+        try {
+            // Get email service
+            $email = \Config\Services::email();
+
+            // SMTP Configuration from environment
+            $config = [
+                'protocol'   => getenv('email.protocol'),
+                'SMTPHost'   => getenv('email.SMTPHost'),
+                'SMTPPort'   => getenv('email.SMTPPort'),
+                'SMTPUser'   => getenv('email.SMTPUser'),
+                'SMTPPass'   => getenv('email.SMTPPass'),
+                'SMTPCrypto' => getenv('email.SMTPCrypto'),
+                'mailType'   => 'html',
+                'charset'    => 'utf-8',
+                'newline'    => "\r\n",
+                'wordWrap'   => true
+            ];
+
+            // Initialize with config
+            $email->initialize($config);
+
+            // Set email details
+            $email->setFrom('support@petsfolio.in', 'System Alert - Petsfolio');
+            $email->setTo('vijay.infasta@gmail.com');
+            $email->setCC('sahil.infasta@gmail.com');
+            $email->setCC('mahesh.acedezines@gmail.com');
+            $email->setCC('shiva@acedezines.com');
+
+            $email->setSubject('⚠️ Low SMS Credits Alert - Petsfolio');
+
+            // Create HTML email template
+            $htmlMessage = view('emails/low_sms_alert', [
+                'remaining' => $smsCredits['remaining'],
+                'validity'  => $smsCredits['validity'],
+                'route'     => $smsCredits['route'],
+                'status'    => $smsCredits['status'] ?? 'active'
+            ]);
+
+            $email->setMessage($htmlMessage);
+
+            // Send email
+            if ($email->send()) {
+                log_message('info', 'Low SMS credit alert sent successfully. Remaining: ' . $smsCredits['remaining']);
+                return true;
+            } else {
+                log_message('error', 'Failed to send low SMS credit alert: ' . $email->printDebugger(['headers']));
+                return false;
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Error sending low credit alert: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get Payout balance with caching
+     */
+    private function getPayoutBalance()
+    {
+        $cache = Services::cache();
+        $cacheKey = 'cf_payout_balance_cache';
+        $lastGoodKey = 'cf_payout_balance_last_good';
+
+        $cachedBalance = null;
+        try {
+            $cachedBalance = $cache->get($cacheKey);
+        } catch (\Throwable $e) {
+            log_message('warning', 'Payout balance cache get failed: ' . $e->getMessage());
+        }
+
+        if ($cachedBalance !== null) {
+            return $cachedBalance;
+        }
+
+        $balanceData = $this->fetchPayoutBalanceFromAPI();
+
+        if (isset($balanceData['status']) && $balanceData['status'] === 'success') {
+            // Save both as current (15m) and last known good (24h)
+            try {
+                $cache->save($cacheKey, $balanceData, 900);
+                $cache->save($lastGoodKey, $balanceData, 86400);
+            } catch (\Throwable $e) {
+                log_message('warning', 'Payout balance cache save failed: ' . $e->getMessage());
+            }
+            return $balanceData;
+        } else {
+            // API Failed! Try to fallback to last known good balance
+            $lastGood = null;
+            try {
+                $lastGood = $cache->get($lastGoodKey);
+            } catch (\Throwable $e) {
+                log_message('warning', 'Last good payout balance cache get failed: ' . $e->getMessage());
+            }
+
+            if ($lastGood !== null) {
+                // Use previous balance but preserve the error message for visibility
+                $lastGood['status'] = 'error'; // Keep as error to show warning if UI supports it
+                $lastGood['message'] = $balanceData['message'] ?? 'Using stale data';
+                $lastGood['is_stale'] = true;
+
+                // Cache this fallback for 1 minute to avoid hammering the API
+                try {
+                    $cache->save($cacheKey, $lastGood, 60);
+                } catch (\Throwable $e) {
+                    // Ignore
+                }
+                return $lastGood;
+            }
+
+            // No previous balance available, show the error/0
+            try {
+                $cache->save($cacheKey, $balanceData, 60);
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+            return $balanceData;
+        }
+    }
+
+    /**
+     * Fetch balance from Cashfree API
+     */
+    private function fetchPayoutBalanceFromAPI()
+    {
+        try {
+            $payoutService = new CashfreePayoutService();
+            $result = $payoutService->getBalance();
+
+            if ($result['success']) {
+                $data = $result['data'] ?? [];
+
+                // Format 1: Nested data object (V1 Style)
+                if (isset($data['status']) && $data['status'] === 'SUCCESS' && isset($data['data'])) {
+                    $balanceInfo = $data['data'];
+                    return [
+                        'available' => (float)($balanceInfo['availableBalance'] ?? ($balanceInfo['available_balance'] ?? 0)),
+                        'ledger'    => (float)($balanceInfo['balance'] ?? ($balanceInfo['ledger_balance'] ?? 0)),
+                        'status'    => 'success'
+                    ];
+                }
+
+                // Format 2: Direct properties (V2 Style)
+                if (isset($data['available_balance']) || isset($data['availableBalance'])) {
+                    return [
+                        'available' => (float)($data['availableBalance'] ?? ($data['available_balance'] ?? 0)),
+                        'ledger'    => (float)($data['balance'] ?? ($data['ledger_balance'] ?? ($data['balance'] ?? 0))),
+                        'status'    => 'success'
+                    ];
+                }
+
+                // Special case for some V1 responses where data is top level
+                if (isset($data['status']) && $data['status'] === 'SUCCESS') {
+                    return [
+                        'available' => (float)($data['availableBalance'] ?? ($data['available_balance'] ?? 0)),
+                        'ledger'    => (float)($data['balance'] ?? ($data['ledger_balance'] ?? 0)),
+                        'status'    => 'success'
+                    ];
+                }
+
+                // Handle Error responses from Cashfree to show specific message (e.g. "Token is not valid")
+                if (isset($data['status']) && $data['status'] === 'ERROR') {
+                    return [
+                        'available' => 0,
+                        'ledger'    => 0,
+                        'status'    => 'error',
+                        'message'   => $data['message'] ?? 'Cashfree API Error'
+                    ];
+                }
+
+                log_message('error', 'Cashfree balance fetch: Unknown response format: ' . json_encode($data));
+            } else {
+                log_message('error', 'Cashfree balance fetch failed: ' . ($result['error'] ?? 'Unknown error'));
+            }
+
+            return [
+                'available' => 0,
+                'ledger' => 0,
+                'status' => 'error',
+                'message' => $result['error'] ?? 'Failed to fetch balance'
+            ];
+        } catch (\Exception $e) {
+            log_message('error', 'Cashfree balance fetch exception: ' . $e->getMessage());
+            return [
+                'available' => 0,
+                'ledger' => 0,
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+>>>>>>> origin/main
     public function userDetails($type, $id)
     {
         $db = \Config\Database::connect();
@@ -1547,6 +2743,7 @@ class AdminController extends BaseController
 
         return $this->loadView('admin/user_details', $data);
     }
+<<<<<<< HEAD
     public function recoinciliation()
     {
         $data['summary']               = $this->booking->getServiceWalletSummary();
@@ -2236,6 +3433,8 @@ class AdminController extends BaseController
             ];
         }
     }
+=======
+>>>>>>> origin/main
 
     public function suspiciousVisits()
     {
@@ -2253,6 +3452,7 @@ class AdminController extends BaseController
 
             $visits = $builder->get()->getResult();
 
+<<<<<<< HEAD
             $validStatuses = ['Completed', 'Cancelled', 'completed', 'cancelled'];
             $bookingByIdMap = [];
             $bookingByPairMap = [];
@@ -2260,6 +3460,36 @@ class AdminController extends BaseController
             $registerBooking = function ($b) use (&$bookingByIdMap, &$bookingByPairMap) {
                 if (!empty($b->booking_id)) {
                     $statusNormalized = ucfirst(strtolower(trim($b->booking_status ?? $b->status ?? '')));
+=======
+            $bookingByIdMap = [];
+            $bookingByPairMap = [];
+            $activeBookingByPairMap = [];
+
+            // Standard Petsfolio booking statuses: New, Confirmed, Cancelled, Completed
+            $mapToStandardBookingStatus = function ($status) {
+                $s = strtoupper(trim((string)$status));
+                if (in_array($s, ['ACCEPTED', 'CONFIRMED', 'ACTIVE', 'IN PROGRESS', 'STARTED'])) {
+                    return 'Confirmed';
+                } elseif ($s === 'COMPLETED') {
+                    return 'Completed';
+                } elseif (in_array($s, ['CANCELLED', 'CANCELED', 'REJECTED'])) {
+                    return 'Cancelled';
+                } elseif ($s === 'HALTED') {
+                    return 'Halted';
+                } elseif ($s === 'NEW') {
+                    return 'New';
+                } else {
+                    return !empty($status) ? ucfirst(strtolower(trim($status))) : 'New';
+                }
+            };
+
+            $activeStatuses = ['Confirmed'];
+
+            $registerBooking = function ($b) use (&$bookingByIdMap, &$bookingByPairMap, &$activeBookingByPairMap, $activeStatuses, $mapToStandardBookingStatus) {
+                if (!empty($b->booking_id)) {
+                    $rawStatus = $b->booking_status ?? $b->status ?? '';
+                    $statusNormalized = $mapToStandardBookingStatus($rawStatus);
+>>>>>>> origin/main
                     $b->booking_status = $statusNormalized;
                     $bookingByIdMap[(string)$b->booking_id] = $b;
 
@@ -2269,10 +3499,21 @@ class AdminController extends BaseController
                             $bookingByPairMap[$pairKey] = [];
                         }
                         $bookingByPairMap[$pairKey][] = $b;
+<<<<<<< HEAD
+=======
+
+                        if (in_array($statusNormalized, $activeStatuses)) {
+                            if (!isset($activeBookingByPairMap[$pairKey])) {
+                                $activeBookingByPairMap[$pairKey] = [];
+                            }
+                            $activeBookingByPairMap[$pairKey][] = $b;
+                        }
+>>>>>>> origin/main
                     }
                 }
             };
 
+<<<<<<< HEAD
             // Query walking_service_bookings with Completed/Cancelled status
             if ($db->tableExists('walking_service_bookings')) {
                 try {
@@ -2284,6 +3525,22 @@ class AdminController extends BaseController
                         ->whereIn('w.status', $validStatuses)
                         ->orderBy('w.id', 'DESC')
                         ->get()->getResult();
+=======
+            $custIds = array_filter(array_unique(array_map(function($v) { return $v->customer_id ?? null; }, $visits)));
+
+            // Query walking_service_bookings (both active and past bookings)
+            if ($db->tableExists('walking_service_bookings')) {
+                try {
+                    $wBuilder = $db->table('walking_service_bookings w')
+                        ->select("'walking' as service_type, w.id as booking_id, w.user_id as customer_id, q.provider_id, w.status as booking_status, COALESCE(w.final_payable, w.total_price, 0) as total_amount, w.service_start_date, w.service_end_date, s.name as service_name, ua.city, w.created_at")
+                        ->join('quotations q', 'q.booking_id = w.id', 'left')
+                        ->join('services s', 's.id = w.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = w.address_id', 'left');
+                    if (!empty($custIds)) {
+                        $wBuilder->whereIn('w.user_id', $custIds);
+                    }
+                    $walkingRows = $wBuilder->orderBy('w.id', 'DESC')->get()->getResult();
+>>>>>>> origin/main
                     foreach ($walkingRows as $row) {
                         $registerBooking($row);
                     }
@@ -2292,6 +3549,7 @@ class AdminController extends BaseController
                 }
             }
 
+<<<<<<< HEAD
             // Query grooming_service_bookings with Completed/Cancelled status
             if ($db->tableExists('grooming_service_bookings')) {
                 try {
@@ -2303,6 +3561,20 @@ class AdminController extends BaseController
                         ->whereIn('g.status', $validStatuses)
                         ->orderBy('g.id', 'DESC')
                         ->get()->getResult();
+=======
+            // Query grooming_service_bookings (both active and past bookings)
+            if ($db->tableExists('grooming_service_bookings')) {
+                try {
+                    $gBuilder = $db->table('grooming_service_bookings g')
+                        ->select("'grooming' as service_type, g.id as booking_id, g.user_id as customer_id, q.provider_id, g.status as booking_status, COALESCE(g.final_payable, g.total_price, 0) as total_amount, g.service_start_date, NULL as service_end_date, s.name as service_name, ua.city, g.created_at")
+                        ->join('quotations q', 'q.booking_id = g.id', 'left')
+                        ->join('services s', 's.id = g.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = g.address_id', 'left');
+                    if (!empty($custIds)) {
+                        $gBuilder->whereIn('g.user_id', $custIds);
+                    }
+                    $groomingRows = $gBuilder->orderBy('g.id', 'DESC')->get()->getResult();
+>>>>>>> origin/main
                     foreach ($groomingRows as $row) {
                         $registerBooking($row);
                     }
@@ -2311,6 +3583,7 @@ class AdminController extends BaseController
                 }
             }
 
+<<<<<<< HEAD
             // Query training_service_bookings with Completed/Cancelled status
             if ($db->tableExists('training_service_bookings')) {
                 try {
@@ -2322,6 +3595,20 @@ class AdminController extends BaseController
                         ->whereIn('t.status', $validStatuses)
                         ->orderBy('t.id', 'DESC')
                         ->get()->getResult();
+=======
+            // Query training_service_bookings (both active and past bookings)
+            if ($db->tableExists('training_service_bookings')) {
+                try {
+                    $tBuilder = $db->table('training_service_bookings t')
+                        ->select("'training' as service_type, t.id as booking_id, t.user_id as customer_id, q.provider_id, t.status as booking_status, COALESCE(t.final_payable, t.total_price, 0) as total_amount, t.service_start_date, NULL as service_end_date, s.name as service_name, ua.city, t.created_at")
+                        ->join('quotations q', 'q.booking_id = t.id', 'left')
+                        ->join('services s', 's.id = t.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = t.address_id', 'left');
+                    if (!empty($custIds)) {
+                        $tBuilder->whereIn('t.user_id', $custIds);
+                    }
+                    $trainingRows = $tBuilder->orderBy('t.id', 'DESC')->get()->getResult();
+>>>>>>> origin/main
                     foreach ($trainingRows as $row) {
                         $registerBooking($row);
                     }
@@ -2330,6 +3617,7 @@ class AdminController extends BaseController
                 }
             }
 
+<<<<<<< HEAD
             // Also supplement from v_bookings_overview for any other services
             if ($db->tableExists('v_bookings_overview')) {
                 try {
@@ -2337,6 +3625,17 @@ class AdminController extends BaseController
                         ->select('booking_id, service_type, user_id as customer_id, status as booking_status, total_amount, service_start_date, service_end_date, service_name, city')
                         ->whereIn('status', $validStatuses)
                         ->get()->getResult();
+=======
+            // Supplement from v_bookings_overview for any other services
+            if ($db->tableExists('v_bookings_overview')) {
+                try {
+                    $vBuilder = $db->table('v_bookings_overview')
+                        ->select('booking_id, service_type, user_id as customer_id, status as booking_status, total_amount, service_start_date, service_end_date, service_name, city');
+                    if (!empty($custIds)) {
+                        $vBuilder->whereIn('user_id', $custIds);
+                    }
+                    $vRows = $vBuilder->get()->getResult();
+>>>>>>> origin/main
                     foreach ($vRows as $vRow) {
                         if (!isset($bookingByIdMap[(string)$vRow->booking_id])) {
                             $registerBooking($vRow);
@@ -2347,6 +3646,52 @@ class AdminController extends BaseController
                 }
             }
 
+<<<<<<< HEAD
+=======
+            // Supplement directly from quotations & sp_bookings for any associated_booking_id
+            $associatedBookingIds = array_filter(array_unique(array_map(function($v) { return $v->associated_booking_id ?? null; }, $visits)));
+            if (!empty($associatedBookingIds) && $db->tableExists('quotations')) {
+                try {
+                    $qBuilder = $db->table('quotations q')
+                        ->select("q.booking_id, COALESCE(s.name, 'Walking') as service_type, COALESCE(t.user_id, q.user_id) as customer_id, q.provider_id, q.status as booking_status, COALESCE(q.total_amount, q.actual_amount, t.amount, 0) as total_amount, NULL as service_start_date, NULL as service_end_date, COALESCE(s.name, 'Walking') as service_name")
+                        ->join('services s', 's.id = q.service_id', 'left')
+                        ->join('transactions t', 't.booking_id = q.booking_id', 'left')
+                        ->whereIn('q.booking_id', $associatedBookingIds)
+                        ->groupBy('q.booking_id');
+                    $qRows = $qBuilder->get()->getResult();
+                    foreach ($qRows as $qRow) {
+                        if (!isset($bookingByIdMap[(string)$qRow->booking_id]) || empty($bookingByIdMap[(string)$qRow->booking_id]->service_type)) {
+                            $registerBooking($qRow);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query quotations fallback in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+            // Query customer addresses to map Client Home (Point A) vs Provider Ping (Point B)
+            $customerAddresses = [];
+            if ($db->tableExists('user_addresses')) {
+                try {
+                    $custIds = array_filter(array_unique(array_map(function($v) { return $v->customer_id ?? null; }, $visits)));
+                    if (!empty($custIds)) {
+                        $addrRows = $db->table('user_addresses')
+                            ->select('id, user_id, latitude, longitude, address, landmark_areaname, area, city, zip_code')
+                            ->whereIn('user_id', $custIds)
+                            ->orderBy('id', 'DESC')
+                            ->get()->getResult();
+                        foreach ($addrRows as $ar) {
+                            if (!isset($customerAddresses[(string)$ar->user_id])) {
+                                $customerAddresses[(string)$ar->user_id] = $ar;
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query user_addresses in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+>>>>>>> origin/main
             // Process and enrich visit objects
             $enrichedVisits = [];
             foreach ($visits as $visit) {
@@ -2362,6 +3707,7 @@ class AdminController extends BaseController
                     }
                 }
                 $visit->telemetry_data = $telemetry;
+<<<<<<< HEAD
                 $visit->lat = $telemetry['latitude'] ?? $telemetry['lat'] ?? $telemetry['location']['latitude'] ?? $telemetry['location']['lat'] ?? ($telemetry['coords']['latitude'] ?? null);
                 $visit->lng = $telemetry['longitude'] ?? $telemetry['lng'] ?? $telemetry['lon'] ?? $telemetry['location']['longitude'] ?? $telemetry['location']['lng'] ?? ($telemetry['coords']['longitude'] ?? null);
                 $visit->accuracy = $telemetry['accuracy'] ?? $telemetry['acc'] ?? ($telemetry['coords']['accuracy'] ?? null);
@@ -2370,12 +3716,25 @@ class AdminController extends BaseController
                 $visit->speed = $telemetry['speed'] ?? ($telemetry['coords']['speed'] ?? null);
                 $visit->battery = $telemetry['battery'] ?? $telemetry['battery_level'] ?? ($telemetry['device']['battery'] ?? null);
                 $visit->device_info = $telemetry['device_info'] ?? $telemetry['device'] ?? $telemetry['model'] ?? null;
+=======
+                $visit->lat = $visit->lat ?? ($visit->latitude ?? ($telemetry['latitude'] ?? ($telemetry['lat'] ?? ($telemetry['location']['latitude'] ?? ($telemetry['location']['lat'] ?? ($telemetry['coords']['latitude'] ?? null))))));
+                $visit->lng = $visit->lng ?? ($visit->longitude ?? ($telemetry['longitude'] ?? ($telemetry['lng'] ?? ($telemetry['lon'] ?? ($telemetry['location']['longitude'] ?? ($telemetry['location']['lng'] ?? ($telemetry['coords']['longitude'] ?? null)))))));
+                $visit->accuracy = $visit->accuracy ?? ($telemetry['accuracy'] ?? ($telemetry['acc'] ?? ($telemetry['coords']['accuracy'] ?? null)));
+                $visit->dwell_time = $visit->dwell_time ?? ($visit->dwell_duration ?? ($telemetry['dwell_duration_seconds'] ?? ($telemetry['dwell_time'] ?? ($telemetry['duration_minutes'] ?? ($telemetry['stay_duration'] ?? ($telemetry['duration'] ?? null))))));
+                $visit->distance = $visit->distance ?? ($visit->distance_meters ?? ($telemetry['distance_meters'] ?? ($telemetry['distance'] ?? ($telemetry['displacement'] ?? null))));
+                $visit->speed = $telemetry['speed'] ?? ($telemetry['coords']['speed'] ?? null);
+                $visit->battery = $visit->battery ?? ($telemetry['battery'] ?? ($telemetry['battery_level'] ?? ($telemetry['device']['battery'] ?? null)));
+                $visit->device_info = $telemetry['device_info'] ?? ($telemetry['device'] ?? ($telemetry['model'] ?? null));
+
+                $pairKey = (!empty($visit->provider_id) && !empty($visit->customer_id)) ? (string)$visit->provider_id . '_' . (string)$visit->customer_id : null;
+>>>>>>> origin/main
 
                 $matchedBooking = null;
                 if (!empty($visit->associated_booking_id) && isset($bookingByIdMap[(string)$visit->associated_booking_id])) {
                     $matchedBooking = $bookingByIdMap[(string)$visit->associated_booking_id];
                 }
 
+<<<<<<< HEAD
                 if (!$matchedBooking && !empty($visit->provider_id) && !empty($visit->customer_id)) {
                     $pairKey = (string)$visit->provider_id . '_' . (string)$visit->customer_id;
                     if (!empty($bookingByPairMap[$pairKey])) {
@@ -2390,6 +3749,109 @@ class AdminController extends BaseController
 
             $data['visits'] = $enrichedVisits;
             $data['total']  = count($enrichedVisits);
+=======
+                $activeBooking = null;
+                if ($pairKey && !empty($activeBookingByPairMap[$pairKey])) {
+                    $activeBooking = $activeBookingByPairMap[$pairKey][0];
+                }
+
+                // If active booking exists between this provider and customer, mark as authorized and prioritize active booking:
+                if ($activeBooking) {
+                    $visit->has_active_booking = true;
+                    $visit->active_booking = $activeBooking;
+                    $visit->is_authorized = true;
+                    
+                    // Prioritize active booking over old completed or cancelled bookings
+                    if (!$matchedBooking || in_array($matchedBooking->booking_status, ['Completed', 'Cancelled', 'Rejected'])) {
+                        $matchedBooking = $activeBooking;
+                        $visit->associated_booking_id = $activeBooking->booking_id;
+                    }
+                } else {
+                    $visit->has_active_booking = false;
+                    $visit->active_booking = null;
+                    $bStatusNorm = !empty($matchedBooking->booking_status) ? $mapToStandardBookingStatus($matchedBooking->booking_status) : '';
+                    $visit->is_authorized = ($bStatusNorm === 'Confirmed');
+                }
+
+                if (!$matchedBooking && $pairKey && !empty($bookingByPairMap[$pairKey])) {
+                    $matchedBooking = $bookingByPairMap[$pairKey][0];
+                    $visit->associated_booking_id = $matchedBooking->booking_id;
+                }
+
+                // Infer and normalize service type and booking status so view always displays accurate details
+                $bid = (string)($visit->associated_booking_id ?? '');
+                $inferredService = 'Walking';
+                if (str_ends_with($bid, 'WLK') || str_ends_with($bid, 'WLKP')) $inferredService = 'Walking';
+                elseif (str_ends_with($bid, 'GRM')) $inferredService = 'Grooming';
+                elseif (str_ends_with($bid, 'TRN')) $inferredService = 'Training';
+                elseif (str_ends_with($bid, 'BRD')) $inferredService = 'Boarding';
+                elseif (str_ends_with($bid, 'SIT')) $inferredService = 'Sitting';
+
+                if ($matchedBooking) {
+                    if (empty($matchedBooking->service_type) || strtolower($matchedBooking->service_type) === 'pet service') {
+                        $matchedBooking->service_type = $inferredService;
+                    }
+                    if (empty($matchedBooking->service_name)) {
+                        $matchedBooking->service_name = $matchedBooking->service_type;
+                    }
+                    $matchedBooking->booking_status = $mapToStandardBookingStatus($matchedBooking->booking_status ?? '');
+                } elseif (!empty($bid)) {
+                    $matchedBooking = (object)[
+                        'booking_id'     => $bid,
+                        'service_type'   => $inferredService,
+                        'service_name'   => $inferredService,
+                        'booking_status' => 'New',
+                        'total_amount'   => 0,
+                    ];
+                }
+
+                $visit->booking_details = $matchedBooking;
+
+                // Resolve Customer Registered Coordinates (Point A)
+                $custAddr = null;
+                if (!empty($visit->customer_id) && isset($customerAddresses[(string)$visit->customer_id])) {
+                    $custAddr = $customerAddresses[(string)$visit->customer_id];
+                }
+
+                $custLat = $telemetry['target_latitude'] ?? $telemetry['target_lat'] ?? $telemetry['customer_lat'] ?? $telemetry['customer_latitude'] ?? $telemetry['geofence_latitude'] ?? $telemetry['geofence_lat'] ?? ($custAddr->latitude ?? ($visit->customer_latitude ?? null));
+                $custLng = $telemetry['target_longitude'] ?? $telemetry['target_lng'] ?? $telemetry['customer_lng'] ?? $telemetry['customer_longitude'] ?? $telemetry['geofence_longitude'] ?? $telemetry['geofence_lng'] ?? ($custAddr->longitude ?? ($visit->customer_longitude ?? null));
+
+                // If both coordinates exist and distance is not provided, calculate exact Haversine distance
+                if (!empty($custLat) && !empty($custLng) && !empty($visit->lat) && !empty($visit->lng)) {
+                    $dLat = deg2rad((float)$visit->lat - (float)$custLat);
+                    $dLng = deg2rad((float)$visit->lng - (float)$custLng);
+                    $a = sin($dLat / 2) * sin($dLat / 2) +
+                         cos(deg2rad((float)$custLat)) * cos(deg2rad((float)$visit->lat)) *
+                         sin($dLng / 2) * sin($dLng / 2);
+                    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+                    $calcDistance = round(6371000 * $c);
+                    if (empty($visit->distance) || (float)$visit->distance <= 0) {
+                        $visit->distance = $calcDistance;
+                    }
+                }
+
+                $visit->customer_lat = $custLat;
+                $visit->customer_lng = $custLng;
+                $visit->customer_address = $custAddr->address ?? ($visit->customer_address ?? null);
+                $visit->customer_area = $custAddr->area ?? ($custAddr->landmark_areaname ?? ($visit->customer_area ?? null));
+
+                // Extract breadcrumbs/path if available
+                $visit->breadcrumbs = $telemetry['breadcrumbs'] ?? $telemetry['path'] ?? $telemetry['history'] ?? $telemetry['locations'] ?? [];
+
+                $enrichedVisits[] = $visit;
+            }
+
+            // Filter out authorized visits (do not show authorized visits in the unauthorized visits dashboard)
+            $unauthorizedVisits = [];
+            foreach ($enrichedVisits as $ev) {
+                if (empty($ev->is_authorized)) {
+                    $unauthorizedVisits[] = $ev;
+                }
+            }
+
+            $data['visits'] = $unauthorizedVisits;
+            $data['total']  = count($unauthorizedVisits);
+>>>>>>> origin/main
         } else {
             $data['visits'] = [];
             $data['total']  = 0;
@@ -2397,4 +3859,203 @@ class AdminController extends BaseController
 
         return $this->loadView('admin/suspicious_visits', $data);
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Safely backup unwanted assets to writable/backups/ and remove them.
+     */
+    public function cleanUnwantedAssets()
+    {
+        $rootPath = ROOTPATH;
+        $backupBaseDir = WRITEPATH . 'backups/';
+        $timestamp = date('Ymd_His');
+        $backupDir = $backupBaseDir . 'assets_backup_' . $timestamp . '/';
+        $zipFile   = $backupBaseDir . 'assets_backup_' . $timestamp . '.zip';
+
+        $targets = [
+            'assets1' => [
+                'type' => 'dir',
+                'path' => $rootPath . 'public/assets1',
+                'desc' => 'Legacy unused admin template assets',
+            ],
+            'responsive1_css' => [
+                'type' => 'file',
+                'path' => $rootPath . 'public/assets/css/responsive1.css',
+                'desc' => 'Junk CSS file',
+            ],
+            'fields_txt' => [
+                'type' => 'file',
+                'path' => $rootPath . 'public/fields.txt',
+                'desc' => 'Legacy debug JSON dump file in public root',
+            ],
+            'root_uploads' => [
+                'type' => 'dir',
+                'path' => $rootPath . 'uploads',
+                'desc' => 'Duplicate empty/unused root uploads directory',
+            ],
+        ];
+
+        $foundTargets = [];
+        $totalFiles = 0;
+        $totalBytes = 0;
+
+        foreach ($targets as $key => $target) {
+            $path = $target['path'];
+            if (file_exists($path)) {
+                $count = 0;
+                $size = 0;
+                if (is_file($path)) {
+                    $count = 1;
+                    $size = filesize($path) ?: 0;
+                } elseif (is_dir($path)) {
+                    $it = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+                        \RecursiveIteratorIterator::SELF_FIRST
+                    );
+                    foreach ($it as $item) {
+                        if ($item->isFile()) {
+                            $count++;
+                            $size += $item->getSize();
+                        }
+                    }
+                }
+                $foundTargets[$key] = array_merge($target, ['count' => $count, 'size' => $size]);
+                $totalFiles += $count;
+                $totalBytes += $size;
+            }
+        }
+
+        if (empty($foundTargets)) {
+            return $this->response->setJSON([
+                'status'  => true,
+                'message' => 'No unwanted assets found. The system is already clean!',
+                'cleared' => 0,
+            ]);
+        }
+
+        // Backup Phase
+        if (!is_dir($backupBaseDir)) {
+            mkdir($backupBaseDir, 0755, true);
+        }
+        if (!is_dir($backupDir)) {
+            mkdir($backupDir, 0755, true);
+        }
+
+        $backedUpFiles = 0;
+        $backedUpBytes = 0;
+        $manifest = [
+            'created_at'  => date('c'),
+            'total_files' => $totalFiles,
+            'total_bytes' => $totalBytes,
+            'targets'     => [],
+        ];
+
+        foreach ($foundTargets as $key => $target) {
+            $destSub = $backupDir . $key . '/';
+            if ($target['type'] === 'dir') {
+                if (!is_dir($destSub)) {
+                    mkdir($destSub, 0755, true);
+                }
+                $it = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($target['path'], \FilesystemIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::SELF_FIRST
+                );
+                $sourceLen = strlen(rtrim($target['path'], '/\\'));
+                foreach ($it as $item) {
+                    $subPath = ltrim(substr($item->getPathname(), $sourceLen), '/\\');
+                    $tPath = $destSub . DIRECTORY_SEPARATOR . $subPath;
+                    if ($item->isDir()) {
+                        if (!is_dir($tPath)) mkdir($tPath, 0755, true);
+                    } elseif ($item->isFile()) {
+                        $dir = dirname($tPath);
+                        if (!is_dir($dir)) mkdir($dir, 0755, true);
+                        copy($item->getPathname(), $tPath);
+                        $backedUpFiles++;
+                        $backedUpBytes += filesize($tPath);
+                    }
+                }
+            } else {
+                if (!is_dir($destSub)) mkdir($destSub, 0755, true);
+                $destFile = $destSub . basename($target['path']);
+                copy($target['path'], $destFile);
+                $backedUpFiles++;
+                $backedUpBytes += filesize($destFile);
+            }
+            $manifest['targets'][$key] = $target;
+        }
+
+        file_put_contents($backupDir . 'manifest.json', json_encode($manifest, JSON_PRETTY_PRINT));
+
+        // Zip archive if ZipArchive available
+        $zipCreated = false;
+        if (class_exists('\ZipArchive')) {
+            $zip = new \ZipArchive();
+            if ($zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+                $dirIt = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($backupDir, \FilesystemIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::SELF_FIRST
+                );
+                $bLen = strlen($backupDir);
+                foreach ($dirIt as $item) {
+                    $rPath = substr($item->getPathname(), $bLen);
+                    if ($item->isFile()) {
+                        $zip->addFile($item->getPathname(), $rPath);
+                    } elseif ($item->isDir()) {
+                        $zip->addEmptyDir($rPath);
+                    }
+                }
+                $zip->close();
+                $zipCreated = file_exists($zipFile) && filesize($zipFile) > 0;
+            }
+        }
+
+        // Verify integrity before removal
+        if ($backedUpFiles < $totalFiles || $backedUpBytes < $totalBytes) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => false,
+                'message' => 'Backup integrity check failed. Aborting removal.',
+            ]);
+        }
+
+        // Removal Phase
+        $removed = [];
+        foreach ($foundTargets as $key => $target) {
+            $p = $target['path'];
+            if ($target['type'] === 'dir') {
+                if (is_dir($p)) {
+                    $it = new \RecursiveIteratorIterator(
+                        new \RecursiveDirectoryIterator($p, \FilesystemIterator::SKIP_DOTS),
+                        \RecursiveIteratorIterator::CHILD_FIRST
+                    );
+                    foreach ($it as $item) {
+                        if ($item->isDir()) {
+                            @rmdir($item->getPathname());
+                        } else {
+                            @unlink($item->getPathname());
+                        }
+                    }
+                    @rmdir($p);
+                }
+            } else {
+                if (is_file($p)) {
+                    @unlink($p);
+                }
+            }
+            if (!file_exists($p)) {
+                $removed[] = $p;
+            }
+        }
+
+        return $this->response->setJSON([
+            'status'          => true,
+            'message'         => 'Unwanted assets successfully backed up and removed.',
+            'backup_dir'      => $backupDir,
+            'zip_archive'     => $zipCreated ? $zipFile : null,
+            'backed_up_files' => $backedUpFiles,
+            'bytes_freed'     => $totalBytes,
+            'removed_paths'   => $removed,
+        ]);
+    }
+>>>>>>> origin/main
 }

@@ -101,10 +101,24 @@
                         </td>
                         <td>
                           <?php
+<<<<<<< HEAD
                           $typeColors = ['promotional' => 'primary', 'reminder' => 'info', 'engagement' => 'warning', 'transactional' => 'dark'];
                           ?>
                           <span class="badge bg-<?= $typeColors[$campaign->type] ?? 'secondary' ?> bg-opacity-10 text-<?= $typeColors[$campaign->type] ?? 'secondary' ?> rounded-pill">
                             <?= ucfirst($campaign->type) ?>
+=======
+                          $campType   = !empty($campaign->type) ? strtolower($campaign->type) : 'promotional';
+                          $typeBadges = [
+                            'promotional'   => 'bg-primary text-white',
+                            'reminder'      => 'bg-info text-dark',
+                            'engagement'    => 'bg-warning text-dark',
+                            'transactional' => 'bg-dark text-white',
+                          ];
+                          $badgeStyle = $typeBadges[$campType] ?? 'bg-secondary text-white';
+                          ?>
+                          <span class="badge <?= $badgeStyle ?> rounded-pill px-2 py-1">
+                            <?= ucfirst($campType) ?>
+>>>>>>> origin/main
                           </span>
                         </td>
                         <td>
@@ -143,6 +157,7 @@
                             'sent' => 'success', 'cancelled' => 'dark', 'failed' => 'danger',
                           ];
                           ?>
+<<<<<<< HEAD
                           <span class="badge bg-<?= $statusColors[$campaign->status] ?? 'secondary' ?> rounded-pill"><?= ucfirst($campaign->status) ?></span>
                         </td>
                         <td>
@@ -158,6 +173,25 @@
                             <?php if ($campaign->status === 'sent'): ?>
                               <a href="<?= base_url('notification-manager/logs?campaign_id=' . $campaign->id) ?>" class="btn btn-sm btn-outline-primary rounded-pill" title="View Logs">
                                 <i class="bi bi-list-ul"></i>
+=======
+                          <span class="badge bg-<?= $statusColors[$campaign->status] ?? 'secondary' ?> rounded-pill px-2 py-1"><?= ucfirst($campaign->status) ?></span>
+                        </td>
+                        <td>
+                          <div class="d-flex gap-1 align-items-center">
+                            <?php if (in_array($campaign->status, ['draft', 'scheduled', 'failed'])): ?>
+                              <button class="btn btn-sm btn-success rounded-pill send-campaign" data-id="<?= $campaign->id ?>" data-name="<?= esc($campaign->name) ?>" title="<?= $campaign->status === 'failed' ? 'Retry Send' : 'Send Now' ?>">
+                                <i class="bi bi-send me-1"></i><?= $campaign->status === 'failed' ? 'Retry' : 'Send' ?>
+                              </button>
+                              <?php if ($campaign->status !== 'failed'): ?>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill cancel-campaign" data-id="<?= $campaign->id ?>" title="Cancel">
+                                  <i class="bi bi-x-circle"></i>
+                                </button>
+                              <?php endif; ?>
+                            <?php endif; ?>
+                            <?php if (in_array($campaign->status, ['sent', 'failed', 'sending'])): ?>
+                              <a href="<?= base_url('notification-manager/logs?campaign_id=' . $campaign->id) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-2" title="View Logs">
+                                <i class="bi bi-list-ul me-1"></i>Logs
+>>>>>>> origin/main
                               </a>
                             <?php endif; ?>
                           </div>
@@ -455,11 +489,19 @@ $(document).ready(function() {
             $.post(baseUrl + 'notification-manager/campaigns/send', { id: res.id }, function(sendRes) {
               Swal.fire({
                 icon: sendRes.status ? 'success' : 'error',
+<<<<<<< HEAD
                 title: sendRes.status ? 'Campaign Sent!' : 'Send Failed',
                 text: sendRes.message,
                 timer: 3000,
               });
               setTimeout(() => location.reload(), 2000);
+=======
+                title: sendRes.status ? 'Campaign Queued!' : 'Queue Failed',
+                text: sendRes.message,
+                timer: 2500,
+              });
+              setTimeout(() => location.reload(), 1800);
+>>>>>>> origin/main
             });
           } else {
             Swal.fire({ icon: 'success', title: 'Saved!', text: res.message, timer: 1500, showConfirmButton: false });
@@ -474,11 +516,16 @@ $(document).ready(function() {
     });
   }
 
+<<<<<<< HEAD
   // Send campaign
+=======
+  // Send campaign (Queue background execution)
+>>>>>>> origin/main
   $(document).on('click', '.send-campaign', function() {
     const id = $(this).data('id');
     const name = $(this).data('name');
     Swal.fire({
+<<<<<<< HEAD
       title: 'Send Campaign?',
       html: 'Send <strong>' + name + '</strong> to all matching users now?',
       icon: 'question',
@@ -491,6 +538,20 @@ $(document).ready(function() {
         $.post(baseUrl + 'notification-manager/campaigns/send', { id: id }, function(res) {
           Swal.fire({ icon: res.status ? 'success' : 'error', title: res.status ? 'Sent!' : 'Failed', text: res.message });
           if (res.status) setTimeout(() => location.reload(), 2000);
+=======
+      title: 'Queue Campaign?',
+      html: 'Queue <strong>' + name + '</strong> for immediate background dispatch to all matching recipients?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      confirmButtonText: 'Queue & Send Now',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({ title: 'Queueing...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        $.post(baseUrl + 'notification-manager/campaigns/send', { id: id }, function(res) {
+          Swal.fire({ icon: res.status ? 'success' : 'error', title: res.status ? 'Queued for Dispatch!' : 'Failed', text: res.message });
+          if (res.status) setTimeout(() => location.reload(), 1800);
+>>>>>>> origin/main
         });
       }
     });

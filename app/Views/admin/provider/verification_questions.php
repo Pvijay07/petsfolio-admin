@@ -36,6 +36,7 @@
 
   <!-- Service Tabs -->
   <ul class="nav nav-tabs nav-fill mb-4 bg-white rounded-3 shadow-sm p-2 border-0" id="serviceTabs" role="tablist">
+<<<<<<< HEAD
     <?php 
 
     foreach ($services as $index => $service): ?>
@@ -47,6 +48,19 @@
                 data-toggle="tab"
                 data-target="#service-pane-<?= $service['id'] ?>"
                 type="button" role="tab">
+=======
+    <?php
+
+    foreach ($services as $index => $service): ?>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link <?= $index === 0 ? 'active' : '' ?> rounded-3 fw-bold py-3"
+          id="service-tab-<?= $service['id'] ?>"
+          data-bs-toggle="tab"
+          data-bs-target="#service-pane-<?= $service['id'] ?>"
+          data-toggle="tab"
+          data-target="#service-pane-<?= $service['id'] ?>"
+          type="button" role="tab">
+>>>>>>> origin/main
           <i class="<?= $service['id'] == 4 ? 'bi bi-person-walking' : ($service['id'] == 2 ? 'bi bi-scissors' : 'bi bi-mortarboard') ?> me-2"></i>
           <?= $service['name'] ?>
         </button>
@@ -56,10 +70,17 @@
 
   <div class="tab-content" id="serviceTabsContent">
     <?php foreach ($services as $index => $service): ?>
+<<<<<<< HEAD
       <div class="tab-pane fade <?= $index === 0 ? 'show active' : '' ?>" 
            id="service-pane-<?= $service['id'] ?>" 
            role="tabpanel">
         
+=======
+      <div class="tab-pane fade <?= $index === 0 ? 'show active' : '' ?>"
+        id="service-pane-<?= $service['id'] ?>"
+        role="tabpanel">
+
+>>>>>>> origin/main
         <?php if (isset($groupedQuestions[$service['id']])): ?>
           <?php foreach ($groupedQuestions[$service['id']] as $categoryName => $catQuestions): ?>
             <div class="card border-0 shadow-sm mb-4">
@@ -109,18 +130,25 @@
                           </div>
                         </td>
                         <td class="py-3 text-center">
+<<<<<<< HEAD
                           <div class="d-flex gap-1 justify-content-center flex-wrap">
+=======
+                          <div class="d-flex gap-1 justify-content-center">
+>>>>>>> origin/main
                             <?php if ($q['is_trigger']): ?>
                               <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25" title="Experience Trigger">Trigger</span>
                             <?php endif; ?>
                             <?php if ($q['is_dependent']): ?>
                               <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" title="Dependent Question">Dep</span>
                             <?php endif; ?>
+<<<<<<< HEAD
                             <?php if (!empty($q['training_type'])): ?>
                               <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25" title="Training Type: <?= htmlspecialchars($q['training_type']) ?>">
                                 <?= ucfirst(str_replace('_', ' ', $q['training_type'])) ?>
                               </span>
                             <?php endif; ?>
+=======
+>>>>>>> origin/main
                           </div>
                         </td>
                         <td class="py-3 text-center">
@@ -164,6 +192,7 @@
 </div>
 
 <!-- Question Admin Modal -->
+<<<<<<< HEAD
 <div id="question-admin-container" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
     <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 transform transition-all duration-300 scale-95 opacity-0" id="question-admin-modal">
         <div class="p-6 border-bottom bg-light">
@@ -251,10 +280,172 @@
             </div>
         </form>
     </div>
+=======
+<div id="question-admin-container" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden" style="z-index: 9999;">
+  <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-gray-100 transform transition-all duration-300 scale-95 opacity-0" id="question-admin-modal">
+    <!-- Modal Header with Gradient -->
+    <div class="modal-gradient-header p-4 text-white position-relative">
+      <div class="d-flex justify-content-between align-items-center position-relative z-1">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-white bg-opacity-20 p-2 rounded-2xl">
+            <i class="bi bi-pencil-square fs-4"></i>
+          </div>
+          <div>
+            <h3 class="h5 mb-0 fw-bold" id="modal-title">Add Interview Question</h3>
+            <p class="small mb-0 opacity-75">Configure question details and weights</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" onclick="closeQuestionAdminModal()"></button>
+      </div>
+      <!-- Decorative circle -->
+      <div class="position-absolute end-0 top-0 translate-middle-y mt-4 me-n4 bg-white bg-opacity-10 rounded-circle" style="width: 100px; height: 100px;"></div>
+    </div>
+
+    <form id="question-form" class="mb-0">
+      <input type="hidden" name="id" id="question-id">
+
+      <!-- Scrollable Body Area -->
+      <div class="modal-body-scroll p-4 p-md-5" style="max-height: 60vh; overflow-y: auto;">
+        <div class="row g-4">
+          <!-- Section: Basic Info -->
+          <div class="col-12 mt-0">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="badge bg-primary-subtle text-primary rounded-circle p-1">1</span>
+              <h6 class="mb-0 fw-bold text-dark">Basic Information</h6>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Service Association</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-layers"></i></span>
+              <select name="service_id" id="q-service-id" class="form-select modern-input" required>
+                <?php foreach ($services as $service): ?>
+                  <option value="<?= $service['id'] ?>"><?= $service['name'] ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Display Sort Order</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-sort-numeric-down"></i></span>
+              <input type="number" name="sort_order" id="q-sort-order" class="form-control modern-input" value="0">
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Category Name</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-tag"></i></span>
+              <input type="text" name="category_name" id="q-category-name" class="form-control modern-input" placeholder="e.g. Behavioural Assessment" required>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Cat. Weight (%)</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-percent"></i></span>
+              <input type="number" step="0.1" name="category_weight" id="q-category-weight" class="form-control modern-input" placeholder="30.0" required>
+            </div>
+          </div>
+
+          <!-- Section: Question Content -->
+          <div class="col-12 mt-5">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="badge bg-primary-subtle text-primary rounded-circle p-1">2</span>
+              <h6 class="mb-0 fw-bold text-dark">Question Content & Options</h6>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Question Text</label>
+            <textarea name="question_text" id="q-text" class="form-control modern-input" rows="3" placeholder="Type your question here..." required></textarea>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Hint / Expected Answer</label>
+            <textarea name="hint_text" id="q-hint" class="form-control modern-input" rows="2" placeholder="Briefly describe what a good answer looks like..."></textarea>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Dropdown Options (Comma Separated)</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-list-check"></i></span>
+              <input type="text" name="options" id="q-options" class="form-control modern-input" placeholder="Excellent, Good, Fair, Poor">
+            </div>
+          </div>
+
+          <!-- Section: Scoring & Logic -->
+          <div class="col-12 mt-5">
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <span class="badge bg-primary-subtle text-primary rounded-circle p-1">3</span>
+              <h6 class="mb-0 fw-bold text-dark">Scoring & Logic</h6>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Question Weight (%)</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-calculator"></i></span>
+              <input type="number" step="0.1" name="weight" id="q-weight" class="form-control modern-input" placeholder="5.0" required>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <div class="row g-3">
+              <div class="col-6">
+                <div class="form-check form-switch custom-switch p-3 border rounded-3 bg-light bg-opacity-50 transition-all w-100">
+                  <input class="form-check-input ms-0 me-2" type="checkbox" name="is_trigger" id="q-is-trigger">
+                  <label class="form-check-label fw-bold text-dark small cursor-pointer" for="q-is-trigger">Exp. Trigger</label>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-check form-switch custom-switch p-3 border rounded-3 bg-light bg-opacity-50 transition-all w-100">
+                  <input class="form-check-input ms-0 me-2" type="checkbox" name="is_dependent" id="q-is-dependent">
+                  <label class="form-check-label fw-bold text-dark small cursor-pointer" for="q-is-dependent">Dependent</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">System Field Name (Optional)</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-code-slash"></i></span>
+              <input type="text" name="field_name" id="q-field-name" class="form-control modern-input" placeholder="e.g. q_pet_experience">
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Question Status</label>
+            <div class="input-group-modern">
+              <span class="input-icon"><i class="bi bi-toggle-on"></i></span>
+              <select name="status" id="q-status" class="form-select modern-input">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fixed Footer with Actions -->
+      <div class="p-4 bg-light border-top d-flex gap-3">
+        <button type="button" class="btn btn-light px-4 py-3 rounded-2xl fw-bold text-muted flex-fill border" onclick="closeQuestionAdminModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary px-4 py-3 rounded-2xl fw-bold shadow-lg flex-fill" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none;">
+          Save Question
+        </button>
+      </div>
+    </form>
+  </div>
+>>>>>>> origin/main
 </div>
 
 <style>
   .bg-gradient-info {
+<<<<<<< HEAD
     background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%) !important;
   }
   .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
@@ -266,6 +457,151 @@
   .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
   .z-50 { z-index: 50; }
   .hidden { display: none; }
+=======
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  }
+
+  .bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.1);
+  }
+
+  .bg-black\/60 {
+    background-color: rgba(15, 23, 42, 0.7);
+  }
+
+  .backdrop-blur-sm {
+    backdrop-filter: blur(8px);
+  }
+
+  .rounded-3xl {
+    border-radius: 2rem;
+  }
+
+  .rounded-2xl {
+    border-radius: 1.25rem;
+  }
+
+  .shadow-2xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .fixed {
+    position: fixed;
+  }
+
+  .inset-0 {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .z-50 {
+    z-index: 50;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .tiny {
+    font-size: 0.7rem;
+  }
+
+  .modal-gradient-header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Modern Input Styling */
+  .input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    color: #94a3b8;
+    z-index: 10;
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  .modern-input {
+    border-radius: 1rem !important;
+    padding: 0.75rem 1rem 0.75rem 2.75rem !important;
+    border: 2px solid #f1f5f9 !important;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    color: #1e293b;
+  }
+
+  textarea.modern-input {
+    padding-left: 1rem !important;
+    /* No icon for textareas typically */
+  }
+
+  .modern-input:focus {
+    background-color: #ffffff !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+    outline: none;
+  }
+
+  /* Custom Switch Styling */
+  .custom-switch {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0 !important;
+  }
+
+  .custom-switch:hover {
+    background-color: rgba(99, 102, 241, 0.05) !important;
+    border-color: rgba(99, 102, 241, 0.2) !important;
+  }
+
+  .custom-switch .form-check-input {
+    width: 2.5rem;
+    height: 1.25rem;
+    margin-top: 0;
+    cursor: pointer;
+  }
+
+  .custom-switch .form-check-input:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+  }
+
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  /* Custom Scrollbar */
+  .modal-body-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .modal-body-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+
+  .modal-body-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+
+  .modal-body-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+>>>>>>> origin/main
 </style>
 
 <script>
@@ -273,9 +609,14 @@
     $('#question-form')[0].reset();
     $('#question-id').val('');
     $('#q-options').val('');
+<<<<<<< HEAD
     $('#q-training-type').val('');
     if (serviceId) {
         $('#q-service-id').val(serviceId);
+=======
+    if (serviceId) {
+      $('#q-service-id').val(serviceId);
+>>>>>>> origin/main
     }
     $('#modal-title').text('Add Interview Question');
     showModal();
@@ -283,6 +624,7 @@
 
   function editQuestion(id) {
     $.get('<?= base_url('verification-questions/get-data/') ?>' + id, function(res) {
+<<<<<<< HEAD
         $('#question-id').val(res.id);
         $('#q-service-id').val(res.service_id);
         $('#q-category-name').val(res.category_name);
@@ -300,6 +642,24 @@
         
         $('#modal-title').text('Edit Interview Question');
         showModal();
+=======
+      $('#question-id').val(res.id);
+      $('#q-service-id').val(res.service_id);
+      $('#q-category-name').val(res.category_name);
+      $('#q-category-weight').val(res.category_weight);
+      $('#q-text').val(res.question_text);
+      $('#q-hint').val(res.hint_text);
+      $('#q-options').val(res.options);
+      $('#q-weight').val(res.weight);
+      $('#q-sort-order').val(res.sort_order);
+      $('#q-field-name').val(res.field_name);
+      $('#q-is-trigger').prop('checked', res.is_trigger == 1);
+      $('#q-is-dependent').prop('checked', res.is_dependent == 1);
+      $('#q-status').val(res.status);
+
+      $('#modal-title').text('Edit Interview Question');
+      showModal();
+>>>>>>> origin/main
     });
   }
 
@@ -327,11 +687,19 @@
     $('#question-form').on('submit', function(e) {
       e.preventDefault();
       $.post('<?= base_url('verification-questions/save') ?>', $(this).serialize(), function(res) {
+<<<<<<< HEAD
           if (res.status == 'success') {
               location.reload();
           } else {
               alert('Error saving question');
           }
+=======
+        if (res.status == 'success') {
+          location.reload();
+        } else {
+          alert('Error saving question');
+        }
+>>>>>>> origin/main
       });
     });
 
@@ -344,4 +712,8 @@
   });
 </script>
 
+<<<<<<< HEAD
 <?php echo $this->endSection() ?>
+=======
+<?php echo $this->endSection() ?>
+>>>>>>> origin/main

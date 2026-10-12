@@ -185,9 +185,13 @@
                       <td class="py-2">
                         <div>
                           <div class="fw-bold text-dark">
+<<<<<<< HEAD
                             <a href="<?= base_url('admin/client/' . $wallet->user_id) ?>" class="text-decoration-none">
                               <div class="fw-bold text-dark"><?= htmlspecialchars($name) ?></div>
                             </a>
+=======
+                            <div class="fw-bold text-dark"><?= htmlspecialchars($name) ?></div>
+>>>>>>> origin/main
                           </div>
                           <div class="d-flex align-items-center text-muted">
                             <i class="bi bi-telephone me-1"></i>
@@ -333,9 +337,13 @@
                       <td class="py-2">
                         <div>
                           <div class="fw-bold text-dark">
+<<<<<<< HEAD
                             <a href="<?= base_url('admin/client/' . $r->user_id) ?>" class="text-decoration-none">
                               <div class="fw-bold text-dark"><?= htmlspecialchars($name) ?></div>
                             </a>
+=======
+                            <div class="fw-bold text-dark"><?= htmlspecialchars($name) ?></div>
+>>>>>>> origin/main
                           </div>
                           <div class="d-flex align-items-center text-muted">
                             <i class="bi bi-telephone me-1"></i>
@@ -657,6 +665,7 @@
                                       color: #16a34a !important;
                                       border: 1px solid rgba(34, 197, 94, 0.2) !important;">
           </div>
+<<<<<<< HEAD
           <div class="mb-3">
             <label class="form-label fw-medium text-dark">
               <i class="bi bi-chat-left-text me-1"></i>Notes / Comments (Optional)
@@ -666,6 +675,34 @@
           </div>
           <div class="alert alert-info py-2 small mb-0 border-0" style="background: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important;">
             <i class="bi bi-info-circle me-1"></i> This refund will be processed automatically via <strong>Cashfree Payouts</strong> using the banking details provided by the client.
+=======
+
+          <div class="mb-3">
+            <label class="form-label fw-medium text-dark">
+              <i class="bi bi-receipt me-1"></i>Upload Payment Receipt
+            </label>
+            <input type="file" name="receipt" id="pr_receipt" class="form-control"
+              accept=".jpg,.jpeg,.png,.pdf">
+            <small class="text-muted mt-1 d-block">
+              Upload proof of payment (JPG, PNG, PDF)
+            </small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-medium text-dark">
+              <i class="bi bi-credit-card me-1"></i>Transaction ID
+            </label>
+            <input type="text" name="transaction_id" class="form-control"
+              placeholder="Enter transaction ID or reference number">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-medium text-dark">
+              <i class="bi bi-chat-left-text me-1"></i>Admin Comments
+            </label>
+            <textarea name="admin_comments" class="form-control" placeholder="Enter any comments or notes"
+              rows="3"></textarea>
+>>>>>>> origin/main
           </div>
         </form>
       </div>
@@ -673,8 +710,13 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
           <i class="bi bi-x-circle me-1"></i>Cancel
         </button>
+<<<<<<< HEAD
         <button id="confirmProcessRefund" class="btn bg-success text-white">
           <i class="bi bi-lightning-charge-fill me-1"></i>Process via Cashfree
+=======
+        <button id="confirmProcessRefund" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i>Confirm Refund
+>>>>>>> origin/main
         </button>
       </div>
     </div>
@@ -1119,17 +1161,28 @@
     // Process refund
     $('#confirmProcessRefund').on('click', function() {
       let formData = new FormData($('#processRefundForm')[0]);
+<<<<<<< HEAD
       let clientName = $('#processClientName').text();
       let amount = $('#pr_amount').val();
 
       Swal.fire({
         title: 'Process Automated Refund?',
         html: `This will initiate an automated transfer of <strong>${amount}</strong> to <strong>${clientName}</strong> via Cashfree Payouts.<br/><br/><span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i> Please ensure you have sufficient balance in your Cashfree Payout account.</span>`,
+=======
+
+      Swal.fire({
+        title: 'Process Refund?',
+        text: 'This will mark the refund as completed and update the wallet balance',
+>>>>>>> origin/main
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#22c55e',
         cancelButtonColor: '#6c757d',
+<<<<<<< HEAD
         confirmButtonText: '<i class="bi bi-lightning-charge-fill me-1"></i> Initiate Transfer',
+=======
+        confirmButtonText: '<i class="bi bi-check-circle me-1"></i> Yes, Process',
+>>>>>>> origin/main
         cancelButtonText: '<i class="bi bi-x-circle me-1"></i> Cancel',
         showClass: {
           popup: 'animate__animated animate__fadeInDown'
@@ -1139,11 +1192,14 @@
         }
       }).then((result) => {
         if (result.isConfirmed) {
+<<<<<<< HEAD
           // Disable button and show loading
           let btn = $(this);
           let btnOldHtml = btn.html();
           btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Processing...');
 
+=======
+>>>>>>> origin/main
           $.ajax({
             url: '<?= base_url("admin/process-refund") ?>',
             method: 'POST',

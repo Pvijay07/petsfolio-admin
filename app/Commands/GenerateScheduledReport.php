@@ -6,6 +6,10 @@ use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use App\Libraries\AIAnalyst\MySQLMetrics;
 use App\Libraries\AIAnalyst\CRMMetrics;
+<<<<<<< HEAD
+=======
+use App\Libraries\AIAnalyst\MongoDBClient;
+>>>>>>> origin/main
 use App\Libraries\AIAnalyst\GeminiAnalyst;
 use Config\Database;
 
@@ -27,11 +31,35 @@ class GenerateScheduledReport extends BaseCommand
         $mysqlMetrics = new MySQLMetrics();
         $crmMetrics   = new CRMMetrics();
         $analyst      = new GeminiAnalyst();
+<<<<<<< HEAD
+=======
+        $mongoClient  = new MongoDBClient();
+>>>>>>> origin/main
         $db           = Database::connect();
 
         $dateRange = '30_days';
 
+<<<<<<< HEAD
         CLI::write('1. Fetching pre-approved KPI metrics (MySQL + MongoDB CRM)...', 'cyan');
+=======
+        CLI::write('1. Checking Database Views & MongoDB Client status...', 'cyan');
+        
+        // Ensure database views exist
+        $mysqlMetrics->ensureViewExists();
+        CLI::write('   ✓ MySQL view `v_bookings_overview` verified and ready.', 'green');
+
+        // Check MongoDB client driver and database connection status
+        $mongoStatus = $mongoClient->isClientAvailable();
+        if (!$mongoStatus['driver_installed']) {
+            CLI::write('   ℹ MongoDB PHP extension (MongoDB\Client) is NOT installed. CRM metrics using fallback handling.', 'yellow');
+        } elseif (!$mongoStatus['connected']) {
+            CLI::write('   ℹ MongoDB Client initialized, but live database connection is inactive.', 'yellow');
+        } else {
+            CLI::write('   ✓ MongoDB Client connected to `' . $mongoStatus['database'] . '`', 'green');
+        }
+
+        CLI::write('2. Fetching pre-approved KPI metrics (MySQL + MongoDB CRM)...', 'cyan');
+>>>>>>> origin/main
 
         // Execute key business metrics
         $bookingsSummary   = $mysqlMetrics->bookings_summary($dateRange);
@@ -53,7 +81,11 @@ class GenerateScheduledReport extends BaseCommand
             'cross_sell'       => $crossSellRate,
         ];
 
+<<<<<<< HEAD
         CLI::write('2. Sending metrics payload to Gemini for executive narrative summary...', 'cyan');
+=======
+        CLI::write('3. Sending metrics payload to Gemini for executive narrative summary...', 'cyan');
+>>>>>>> origin/main
 
         $prompt = "The following is a automated 30-day KPI dataset for Petsfolio business operations:\n\n" . 
                   json_encode($aggregatedMetrics, JSON_PRETTY_PRINT) . "\n\n" .
@@ -62,7 +94,11 @@ class GenerateScheduledReport extends BaseCommand
         $response = $analyst->ask($prompt);
         $summaryText = $response['reply'] ?? 'Report summary could not be generated.';
 
+<<<<<<< HEAD
         CLI::write('3. Storing report snapshot in database (ai_analyst_reports)...', 'cyan');
+=======
+        CLI::write('4. Storing report snapshot in database (ai_analyst_reports)...', 'cyan');
+>>>>>>> origin/main
 
         try {
             $periodStart = date('Y-m-d', strtotime('-30 days'));

@@ -35,6 +35,7 @@
 <!-- ✅ Load jQuery & jQuery UI first -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<<<<<<< HEAD
 <script src="https://petsfolio.in/admin/public/assets/js/core/libs.min.js"></script>
 <script src="https://petsfolio.in/admin/public/assets/js/core/external.min.js"></script>
 <script src="https://petsfolio.in/admin/public/assets/js/charts/widgetcharts.js"></script>
@@ -46,15 +47,39 @@
 <script src="https://petsfolio.in/admin/public/assets/js/plugins/form-wizard.js"></script>
 <script src="https://petsfolio.in/admin/public/assets/vendor/aos/dist/aos.js"></script>
 <script src="https://petsfolio.in/admin/public/assets/js/hope-ui.js" defer></script>
+=======
+<script src="https://admin.petsfolio.in/public/assets/js/core/libs.min.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/core/external.min.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/charts/widgetcharts.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/charts/vectore-chart.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/charts/dashboard.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/plugins/fslightbox.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/plugins/setting.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/plugins/slider-tabs.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/plugins/form-wizard.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/vendor/aos/dist/aos.js"></script>
+<script src="https://admin.petsfolio.in/public/assets/js/hope-ui.js" defer></script>
+>>>>>>> origin/main
 <!-- Fix jQuery UI conflict -->
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 
 <!-- SweetAlert2 -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<<<<<<< HEAD
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="<?= base_url('public/assets/js/backend.js?v=' . time()) ?>"></script>
 
 <!-- Universal Dark Mode Overrides (Applied last to guarantee precedence over all modals, SweetAlert, jQuery UI & dynamic popups) -->
 <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>">
 
+=======
+<style>
+    .swal2-container {
+        z-index: 99999 !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="<?= base_url('public/assets/js/backend.js?v=' . time()) ?>"></script>
+
+>>>>>>> origin/main

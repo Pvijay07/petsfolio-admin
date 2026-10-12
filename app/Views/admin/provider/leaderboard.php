@@ -539,6 +539,7 @@
         color: var(--theme-text-muted);
     }
 
+<<<<<<< HEAD
     /* Table Tier Distrib */
     .table-distrib {
         width: 100%;
@@ -563,6 +564,211 @@
 
     .table-distrib tr:last-child td { border-bottom: none; }
 
+=======
+    /* Table Tier Distrib - Highly Visible Header Columns */
+    .table-distrib {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 8px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--theme-border);
+    }
+
+    .table-distrib thead tr {
+        background-color: #0d424d;
+        color: #ffffff;
+    }
+
+    .table-distrib th {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        color: #ffffff;
+        font-weight: 800;
+        padding: 12px 14px;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+        vertical-align: middle;
+    }
+
+    .table-distrib td {
+        padding: 12px 14px;
+        font-size: 0.82rem;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+        background-color: #ffffff;
+    }
+
+    .table-distrib tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .table-distrib tr:last-child td { border-bottom: none; }
+
+    /* Compliance & Account Health Cards Styling */
+    .compliance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.25rem;
+        margin-top: 1rem;
+    }
+
+    .compliance-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        transition: all 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .compliance-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .compliance-card.frozen-status {
+        border-left: 4px solid #ef4444;
+        background: #fffafa;
+    }
+
+    .compliance-card.warning-status {
+        border-left: 4px solid #f59e0b;
+        background: #fffdf5;
+    }
+
+    .compliance-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 10px;
+    }
+
+    .compliance-header h5 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 750;
+        color: #0f172a;
+    }
+
+    .badge-status {
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        padding: 4px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-status.frozen, .badge-status.inactive, .badge-status.suspended, .badge-status.disabled, .badge-status.0 {
+        background-color: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+    }
+
+    .badge-status.warning {
+        background-color: #fef3c7;
+        color: #d97706;
+        border: 1px solid #fcd34d;
+    }
+
+    .badge-status.active {
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+    }
+
+    .compliance-body {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.82rem;
+        color: #475569;
+    }
+
+    .compliance-body span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .compliance-body i {
+        width: 16px;
+        color: #64748b;
+    }
+
+    .compliance-btn-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    .btn-restore {
+        flex: 1;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-restore:hover {
+        background: linear-gradient(135deg, #059669, #047857);
+        transform: scale(1.02);
+    }
+
+    /* Charts Grid & Compact Canvas Styling */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+        .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+        background: #ffffff;
+        border: 1px solid var(--theme-border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .chart-card h4 {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--theme-primary);
+        margin: 0 0 0.85rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 210px;
+        width: 100%;
+    }
+
+>>>>>>> origin/main
     .progress-bar-custom {
         height: 6px;
         width: 80px;
@@ -1248,6 +1454,7 @@
                     <div class="kpi-icon-container"><i class="fas fa-users"></i></div>
                 </div>
                 <div class="kpi-value" id="kpi-total-walkers">0</div>
+<<<<<<< HEAD
                 <div class="kpi-subtext">
                     <span class="trend-badge trend-up"><i class="fas fa-arrow-up"></i> 4.2%</span>
                     <span>this month</span>
@@ -1270,12 +1477,51 @@
                 <div class="kpi-subtext">Core operational backbone</div>
             </div>
             <div class="kpi-card">
+=======
+                <div class="kpi-subtext" id="kpi-total-subtext">
+                    Out of <strong>0</strong> registered roster
+                </div>
+            </div>
+            <!-- Joined Card -->
+            <div class="kpi-card" onclick="openTierEvaluationModal('joined')" style="cursor:pointer;" title="Click to view Joined Criteria">
+                <div class="kpi-header">
+                    <span class="kpi-title">Joined</span>
+                    <span class="badge bg-info text-white" id="kpi-joined-percent" style="font-weight:800; font-size:0.65rem; border-radius:4px;">0%</span>
+                </div>
+                <div class="kpi-value text-info" id="kpi-joined-count">0</div>
+                <div class="kpi-subtext">Fee paid, 0 walks <i class="fas fa-info-circle text-info ms-1" style="cursor:pointer;" onclick="event.stopPropagation(); openTierEvaluationModal('joined');" title="Click to view Joined Criteria"></i></div>
+            </div>
+            <!-- Tier 3 (Entry) Card -->
+            <div class="kpi-card" onclick="openTierEvaluationModal('tier3')" style="cursor:pointer;" title="Click to view Tier 3 Evaluation Criteria">
+>>>>>>> origin/main
                 <div class="kpi-header">
                     <span class="kpi-title">Tier 3 (Entry)</span>
                     <span class="badge bg-secondary text-white" id="kpi-t3-percent" style="font-weight:800; font-size:0.65rem; border-radius:4px;">0%</span>
                 </div>
                 <div class="kpi-value" id="kpi-t3-count">0</div>
+<<<<<<< HEAD
                 <div class="kpi-subtext">Undergoing onboarding/vetting</div>
+=======
+                <div class="kpi-subtext">Entry partners <i class="fas fa-info-circle text-secondary ms-1" style="cursor:pointer;" onclick="event.stopPropagation(); openTierEvaluationModal('tier3');" title="Click to view Tier 3 Evaluation Criteria"></i></div>
+            </div>
+            <!-- Tier 2 (Standard) Card -->
+            <div class="kpi-card" onclick="openTierEvaluationModal('tier2')" style="cursor:pointer;" title="Click to view Tier 2 Evaluation Criteria">
+                <div class="kpi-header">
+                    <span class="kpi-title">Tier 2 (Standard)</span>
+                    <span class="badge bg-primary text-white" id="kpi-t2-percent" style="font-weight:800; font-size:0.65rem; border-radius:4px;">0%</span>
+                </div>
+                <div class="kpi-value text-primary" id="kpi-t2-count">0</div>
+                <div class="kpi-subtext">Core operational backbone <i class="fas fa-info-circle text-primary ms-1" style="cursor:pointer;" onclick="event.stopPropagation(); openTierEvaluationModal('tier2');" title="Click to view Tier 2 Evaluation Criteria"></i></div>
+            </div>
+            <!-- Tier 1 (Premium) Card -->
+            <div class="kpi-card" onclick="openTierEvaluationModal('tier1')" style="cursor:pointer;" title="Click to view Tier 1 Evaluation Criteria">
+                <div class="kpi-header">
+                    <span class="kpi-title">Tier 1 (Premium)</span>
+                    <span class="badge bg-warning text-dark" id="kpi-t1-percent" style="font-weight:800; font-size:0.65rem; border-radius:4px;">0%</span>
+                </div>
+                <div class="kpi-value text-warning" id="kpi-t1-count">0</div>
+                <div class="kpi-subtext">High earning premium SPs <i class="fas fa-info-circle text-warning ms-1" style="cursor:pointer;" onclick="event.stopPropagation(); openTierEvaluationModal('tier1');" title="Click to view Tier 1 Evaluation Criteria"></i></div>
+>>>>>>> origin/main
             </div>
             <div class="kpi-card">
                 <div class="kpi-header">
@@ -1309,30 +1555,46 @@
                     <div class="kpi-icon-container text-danger"><i class="fas fa-heart"></i></div>
                 </div>
                 <div class="kpi-value" id="kpi-repeat-percent">0.0%</div>
+<<<<<<< HEAD
                 <div class="kpi-subtext">Core loyalty indicator</div>
+=======
+                <div class="kpi-subtext" id="kpi-repeat-subtext">0 SPs with repeat clients</div>
+>>>>>>> origin/main
             </div>
             <div class="kpi-card">
                 <div class="kpi-header">
                     <span class="kpi-title">Police Verified %</span>
                     <div class="kpi-icon-container text-info"><i class="fas fa-shield-alt"></i></div>
                 </div>
+<<<<<<< HEAD
                 <div class="kpi-value" id="kpi-police-percent">94.2%</div>
                 <div class="kpi-subtext">Mandatory background clear</div>
             </div>
             <div class="kpi-card">
+=======
+                <div class="kpi-value" id="kpi-police-percent">0.0%</div>
+                <div class="kpi-subtext" id="kpi-police-subtext">0 SPs background cleared</div>
+            </div>
+            <!-- <div class="kpi-card">
+>>>>>>> origin/main
                 <div class="kpi-header">
                     <span class="kpi-title">Insurance Covered %</span>
                     <div class="kpi-icon-container text-primary"><i class="fas fa-file-invoice"></i></div>
                 </div>
                 <div class="kpi-value" id="kpi-insurance-percent">89.6%</div>
                 <div class="kpi-subtext text-warning"><i class="fas fa-clock"></i> Expiring soon: 14 SP</div>
+<<<<<<< HEAD
             </div>
+=======
+            </div> -->
+>>>>>>> origin/main
         </div>
 
         <!-- Search and filters block -->
         <div class="search-filter-row">
             <div class="search-filter-left">
                 <i class="fas fa-search"></i>
+<<<<<<< HEAD
                 <input type="text" id="roster-search" placeholder="Search walkers by name, ID, or area..." onkeyup="handleFilterChange()">
             </div>
             <div class="search-filter-right">
@@ -1340,6 +1602,24 @@
                     <span>Tier:</span>
                     <select id="filter-tier" onchange="handleFilterChange()">
                         <option value="">All Tiers</option>
+=======
+                <input type="text" id="roster-search" placeholder="Search walkers by name, ID, phone, or area..." oninput="handleFilterChange()" onkeyup="handleFilterChange()">
+            </div>
+            <div class="search-filter-right">
+                <div class="filter-dropdown-wrapper">
+                    <span>Status:</span>
+                    <select id="filter-status" onchange="handleFilterChange()">
+                        <option value="active" selected>Active Walkers Only</option>
+                        <option value="">All Roster</option>
+                        <option value="frozen">Inactive / Frozen Only</option>
+                    </select>
+                </div>
+                <div class="filter-dropdown-wrapper">
+                    <span>Tier:</span>
+                    <select id="filter-tier" onchange="handleFilterChange()">
+                        <option value="">All Tiers & Statuses</option>
+                        <option value="joined">Joined (Fee Paid, 0 Walks)</option>
+>>>>>>> origin/main
                         <option value="1">Tier 1 (Premium)</option>
                         <option value="2">Tier 2 (Standard)</option>
                         <option value="3">Tier 3 (Entry)</option>
@@ -1378,6 +1658,79 @@
 
         <!-- PANEL 1: EXECUTIVE OVERVIEW & REPORTS -->
         <div id="panel-overview" class="tab-content-panel active">
+<<<<<<< HEAD
+=======
+            <!-- AI Walker Roster Intelligence Advisor & Active Live Capacity Warnings (Light Theme) -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.75rem; color: #0f172a; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(13, 66, 77, 0.06);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.4rem; font-weight:800; color:#0d424d; display:flex; align-items:center; gap:10px;">
+                            <i class="fas fa-brain text-warning"></i> AI Walker Roster Intelligence Advisor
+                        </h3>
+                        <p style="margin:4px 0 0 0; color:#64748b; font-size:0.85rem;">
+                            Real-time Gemini AI performance analysis, fleet optimization suggestions & active live capacity warnings
+                        </p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadWalkerAiFleetInsights()" style="border-radius:20px; font-weight:700; border-color:#0d424d; color:#0d424d;">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh AI Analysis
+                    </button>
+                </div>
+
+                <!-- Active Live Capacity Warnings Section (Light Theme) -->
+                <div style="background: #fff5f5; border: 1px solid #fecaca; border-radius: 14px; padding: 1.1rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 0.75rem;">
+                        <span class="badge bg-danger text-white fw-bold px-3 py-1.5" style="font-size:0.82rem; letter-spacing:0.5px;">
+                            <i class="fas fa-exclamation-triangle me-1"></i> ACTIVE LIVE CAPACITY WARNINGS
+                        </span>
+                        <span style="font-size:0.8rem; color:#dc2626; font-weight:600;"><i class="fas fa-signal me-1"></i> Real-time platform supply-to-demand bottleneck alerts</span>
+                    </div>
+                    <div class="walker-capacity-warnings-container" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #ffffff; border: 1px solid #fee2e2; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-danger me-2"></i> Analyzing live capacity bottlenecks...</div>
+                    </div>
+                </div>
+
+                <!-- AI Executive Fleet Summary Text Box (Light Theme) -->
+                <div class="walker-ai-fleet-summary-box" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.25rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.25rem; color: #1e293b;">
+                    <i class="fas fa-spinner fa-spin text-primary me-2"></i> Analyzing walker fleet metrics with Gemini AI...
+                </div>
+
+                <!-- Actionable Improvements Pills/Cards (Light Theme) -->
+                <div style="margin-bottom: 1.25rem;">
+                    <h6 style="color:#475569; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.6rem;">
+                        <i class="fas fa-lightbulb text-warning me-1"></i> Recommended Operational Improvements
+                    </h6>
+                    <div class="walker-ai-fleet-improvements" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #fffdf5; border: 1px solid #fef3c7; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-warning me-2"></i> Loading suggestions...</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Ask AI Box (Light Theme) -->
+                <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <i class="fas fa-comments text-primary fs-5"></i>
+                        <input type="text" class="walker-ai-query-input" placeholder="Ask AI about walkers (e.g. 'Which walkers need tier upgrade this week?', 'Show top walkers in Kukatpally')..." style="flex:1; min-width:260px; background:#ffffff; border:1px solid #cbd5e1; padding:10px 16px; border-radius:10px; color:#0f172a; font-size:0.9rem; font-weight:600;" onkeypress="if(event.key==='Enter') submitWalkerAiQuery(this)">
+                        <button class="btn btn-primary fw-bold px-4" style="border-radius:10px; background:#0d424d; border-color:#0d424d;" onclick="submitWalkerAiQuery(this)">
+                            <i class="fas fa-paper-plane me-1"></i> Ask AI
+                        </button>
+                    </div>
+                    <!-- Quick Preset Prompt Chips -->
+                    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Which walkers are at highest churn risk?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-bolt me-1 text-warning"></i> Churn Risk Walkers
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Recommend top candidates for Tier 1 promotion', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-trophy me-1 text-warning"></i> Promotion Candidates
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('How can we reduce untracked walk rate?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-chart-line me-1 text-warning"></i> Untracked Walks Advice
+                        </span>
+                    </div>
+                    <!-- Response container -->
+                    <div class="walker-ai-query-response" style="display:none; margin-top:12px; background:#ffffff; border:1px solid #e2e8f0; color:#0f172a; padding:14px; border-radius:12px; font-size:0.9rem; line-height:1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.05);"></div>
+                </div>
+            </div>
+
+>>>>>>> origin/main
             <!-- Business Insight Box -->
             <div class="insight-hero-box">
                 <div class="insight-hero-content">
@@ -1623,6 +1976,79 @@
 
         <!-- PANEL 2: WALKER EVALUATION & RANKING -->
         <div id="panel-roster" class="tab-content-panel">
+<<<<<<< HEAD
+=======
+            <!-- AI Walker Roster Intelligence Advisor & Active Live Capacity Warnings (Light Theme) -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.75rem; color: #0f172a; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(13, 66, 77, 0.06);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.4rem; font-weight:800; color:#0d424d; display:flex; align-items:center; gap:10px;">
+                            <i class="fas fa-brain text-warning"></i> AI Walker Roster Intelligence Advisor
+                        </h3>
+                        <p style="margin:4px 0 0 0; color:#64748b; font-size:0.85rem;">
+                            Real-time Gemini AI performance analysis, fleet optimization suggestions & active live capacity warnings
+                        </p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadWalkerAiFleetInsights()" style="border-radius:20px; font-weight:700; border-color:#0d424d; color:#0d424d;">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh AI Analysis
+                    </button>
+                </div>
+
+                <!-- Active Live Capacity Warnings Section (Light Theme) -->
+                <div style="background: #fff5f5; border: 1px solid #fecaca; border-radius: 14px; padding: 1.1rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 0.75rem;">
+                        <span class="badge bg-danger text-white fw-bold px-3 py-1.5" style="font-size:0.82rem; letter-spacing:0.5px;">
+                            <i class="fas fa-exclamation-triangle me-1"></i> ACTIVE LIVE CAPACITY WARNINGS
+                        </span>
+                        <span style="font-size:0.8rem; color:#dc2626; font-weight:600;"><i class="fas fa-signal me-1"></i> Real-time platform supply-to-demand bottleneck alerts</span>
+                    </div>
+                    <div class="walker-capacity-warnings-container" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #ffffff; border: 1px solid #fee2e2; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-danger me-2"></i> Analyzing live capacity bottlenecks...</div>
+                    </div>
+                </div>
+
+                <!-- AI Executive Fleet Summary Text Box (Light Theme) -->
+                <div class="walker-ai-fleet-summary-box" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.25rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.25rem; color: #1e293b;">
+                    <i class="fas fa-spinner fa-spin text-primary me-2"></i> Analyzing walker fleet metrics with Gemini AI...
+                </div>
+
+                <!-- Actionable Improvements Pills/Cards (Light Theme) -->
+                <div style="margin-bottom: 1.25rem;">
+                    <h6 style="color:#475569; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.6rem;">
+                        <i class="fas fa-lightbulb text-warning me-1"></i> Recommended Operational Improvements
+                    </h6>
+                    <div class="walker-ai-fleet-improvements" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #fffdf5; border: 1px solid #fef3c7; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-warning me-2"></i> Loading suggestions...</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Ask AI Box (Light Theme) -->
+                <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <i class="fas fa-comments text-primary fs-5"></i>
+                        <input type="text" class="walker-ai-query-input" placeholder="Ask AI about walkers (e.g. 'Which walkers need tier upgrade this week?', 'Show top walkers in Kukatpally')..." style="flex:1; min-width:260px; background:#ffffff; border:1px solid #cbd5e1; padding:10px 16px; border-radius:10px; color:#0f172a; font-size:0.9rem; font-weight:600;" onkeypress="if(event.key==='Enter') submitWalkerAiQuery(this)">
+                        <button class="btn btn-primary fw-bold px-4" style="border-radius:10px; background:#0d424d; border-color:#0d424d;" onclick="submitWalkerAiQuery(this)">
+                            <i class="fas fa-paper-plane me-1"></i> Ask AI
+                        </button>
+                    </div>
+                    <!-- Quick Preset Prompt Chips -->
+                    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Which walkers are at highest churn risk?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-bolt me-1 text-warning"></i> Churn Risk Walkers
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Recommend top candidates for Tier 1 promotion', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-trophy me-1 text-warning"></i> Promotion Candidates
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('How can we reduce untracked walk rate?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-chart-line me-1 text-warning"></i> Untracked Walks Advice
+                        </span>
+                    </div>
+                    <!-- Response container -->
+                    <div class="walker-ai-query-response" style="display:none; margin-top:12px; background:#ffffff; border:1px solid #e2e8f0; color:#0f172a; padding:14px; border-radius:12px; font-size:0.9rem; line-height:1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.05);"></div>
+                </div>
+            </div>
+
+>>>>>>> origin/main
             <div class="roster-grid">
                 <!-- Left Sidebar: Directory List -->
                 <div class="sidebar-directory">
@@ -1719,6 +2145,42 @@
                     </div>
                 </div>
             </div>
+<<<<<<< HEAD
+=======
+
+            <!-- Full Walker Leaderboard Data Table with Header Columns -->
+            <div class="distribution-card style="margin-top: 1.5rem;">
+                <div class="distribution-header">
+                    <div>
+                        <h3><i class="fas fa-trophy text-warning"></i> Complete Walker Ranking & Performance Table</h3>
+                        <p style="margin:2px 0 0 0; font-size:0.75rem; color:var(--theme-text-muted);">Real-time database records & tier evaluations</p>
+                    </div>
+                    <span class="badge bg-primary text-white" id="leaderboard-table-count" style="font-weight:750;">0 Walkers</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table-distrib" id="leaderboard-data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 70px;">Rank</th>
+                                <th>Walker Name</th>
+                                <th>Walker ID</th>
+                                <th>Area / City</th>
+                                <th class="text-center">Tier</th>
+                                <th class="text-center">Score</th>
+                                <th class="text-center">Rating</th>
+                                <th class="text-center">Completion</th>
+                                <th class="text-center">On-Time %</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-table-body">
+                            <!-- Filled dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+>>>>>>> origin/main
         </div>
 
         <!-- PANEL 3: COMPLIANCE & ACCOUNT HEALTH -->
@@ -1730,6 +2192,79 @@
 
         <!-- PANEL 4: AI INSIGHTS & ACTIVITY TRENDS -->
         <div id="panel-insights" class="tab-content-panel">
+<<<<<<< HEAD
+=======
+            <!-- AI Walker Fleet Advisor Hero Box (Light Theme) -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 1.75rem; color: #0f172a; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(13, 66, 77, 0.06);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.4rem; font-weight:800; color:#0d424d; display:flex; align-items:center; gap:10px;">
+                            <i class="fas fa-brain text-warning"></i> AI Walker Roster Intelligence Advisor
+                        </h3>
+                        <p style="margin:4px 0 0 0; color:#64748b; font-size:0.85rem;">
+                            Real-time Gemini AI performance analysis, fleet optimization suggestions & actionable risk alerts
+                        </p>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" onclick="loadWalkerAiFleetInsights()" style="border-radius:20px; font-weight:700; border-color:#0d424d; color:#0d424d;">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh AI Analysis
+                    </button>
+                </div>
+
+                <!-- Active Live Capacity Warnings Section (Light Theme) -->
+                <div style="background: #fff5f5; border: 1px solid #fecaca; border-radius: 14px; padding: 1.1rem; margin-bottom: 1.25rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 0.75rem;">
+                        <span class="badge bg-danger text-white fw-bold px-3 py-1.5" style="font-size:0.82rem; letter-spacing:0.5px;">
+                            <i class="fas fa-exclamation-triangle me-1"></i> ACTIVE LIVE CAPACITY WARNINGS
+                        </span>
+                        <span style="font-size:0.8rem; color:#dc2626; font-weight:600;"><i class="fas fa-signal me-1"></i> Real-time platform supply-to-demand bottleneck alerts</span>
+                    </div>
+                    <div class="walker-capacity-warnings-container" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #ffffff; border: 1px solid #fee2e2; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-danger me-2"></i> Analyzing live capacity bottlenecks...</div>
+                    </div>
+                </div>
+
+                <!-- AI Executive Fleet Summary Text Box (Light Theme) -->
+                <div class="walker-ai-fleet-summary-box" id="walker-ai-fleet-summary-box" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 1.25rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.25rem; color: #1e293b;">
+                    <i class="fas fa-spinner fa-spin text-primary me-2"></i> Analyzing walker fleet metrics with Gemini AI...
+                </div>
+
+                <!-- Actionable Improvements Pills/Cards (Light Theme) -->
+                <div style="margin-bottom: 1.25rem;">
+                    <h6 style="color:#475569; font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:0.6rem;">
+                        <i class="fas fa-lightbulb text-warning me-1"></i> Recommended Operational Improvements
+                    </h6>
+                    <div class="walker-ai-fleet-improvements" id="walker-ai-fleet-improvements" style="display:flex; flex-direction:column; gap:8px;">
+                        <div style="background: #fffdf5; border: 1px solid #fef3c7; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-warning me-2"></i> Loading suggestions...</div>
+                    </div>
+                </div>
+
+                <!-- Interactive Ask AI Box (Light Theme) -->
+                <div style="background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1rem;">
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <i class="fas fa-comments text-primary fs-5"></i>
+                        <input type="text" class="walker-ai-query-input" id="walker-ai-query-input" placeholder="Ask AI about walkers (e.g. 'Which walkers need tier upgrade this week?', 'Show top walkers in Kukatpally')..." style="flex:1; min-width:260px; background:#ffffff; border:1px solid #cbd5e1; padding:10px 16px; border-radius:10px; color:#0f172a; font-size:0.9rem; font-weight:600;" onkeypress="if(event.key==='Enter') submitWalkerAiQuery(this)">
+                        <button class="btn btn-primary fw-bold px-4" style="border-radius:10px; background:#0d424d; border-color:#0d424d;" onclick="submitWalkerAiQuery(this)">
+                            <i class="fas fa-paper-plane me-1"></i> Ask AI
+                        </button>
+                    </div>
+                    <!-- Quick Preset Prompt Chips -->
+                    <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Which walkers are at highest churn risk?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-bolt me-1 text-warning"></i> Churn Risk Walkers
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('Recommend top candidates for Tier 1 promotion', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-trophy me-1 text-warning"></i> Promotion Candidates
+                        </span>
+                        <span class="badge bg-white text-dark border cursor-pointer" onclick="presetWalkerQuery('How can we reduce untracked walk rate?', this)" style="cursor:pointer; font-weight:600; padding:6px 12px; border-color:#cbd5e1 !important;">
+                            <i class="fas fa-chart-line me-1 text-warning"></i> Untracked Walks Advice
+                        </span>
+                    </div>
+                    <!-- Response container -->
+                    <div class="walker-ai-query-response" id="walker-ai-query-response" style="display:none; margin-top:12px; background:#ffffff; border:1px solid #e2e8f0; color:#0f172a; padding:14px; border-radius:12px; font-size:0.9rem; line-height:1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.05);"></div>
+                </div>
+            </div>
+
+>>>>>>> origin/main
             <!-- Charts Row -->
             <div class="charts-grid">
                 <div class="chart-card">
@@ -1837,6 +2372,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <!-- Recommendation Box -->
         <div class="drawer-recommendation-box">
             <h6><i class="fas fa-brain"></i> Dynamic Recommendation</h6>
@@ -1852,12 +2388,220 @@
 
     // Helper to extract sanitized walker tier (fall back to Tier 3 Entry if 0 or null)
     function getWalkerTier(w) {
+=======
+        <!-- Strengths Box -->
+        <div style="margin-top:1rem; background:#ecfdf5; border:1px solid #a7f3d0; padding:1rem; border-radius:12px;">
+            <h6 style="color:#047857; font-weight:700; margin:0 0 6px 0; font-size:0.85rem;"><i class="fas fa-check-circle me-1"></i> AI Identified Strengths</h6>
+            <ul id="drawer-strengths-list" style="margin:0; padding-left:18px; color:#065f46; font-size:0.8rem; line-height:1.5;">
+                <li>Loading strengths...</li>
+            </ul>
+        </div>
+
+        <!-- Improvements Box -->
+        <div style="margin-top:0.75rem; background:#fffbeb; border:1px solid #fde68a; padding:1rem; border-radius:12px;">
+            <h6 style="color:#b45309; font-weight:700; margin:0 0 6px 0; font-size:0.85rem;"><i class="fas fa-lightbulb me-1"></i> Performance Improvements Needed</h6>
+            <ul id="drawer-improvements-list" style="margin:0; padding-left:18px; color:#92400e; font-size:0.8rem; line-height:1.5;">
+                <li>Loading improvements...</li>
+            </ul>
+        </div>
+
+        <!-- Recommendation Box -->
+        <div class="drawer-recommendation-box" style="margin-top:0.75rem;">
+            <h6><i class="fas fa-brain"></i> Dynamic AI Recommendation</h6>
+            <p id="drawer-recommendation-text">Analyzing statistics...</p>
+        </div>
+
+        <!-- Ask AI about this Walker -->
+        <div style="margin-top:1rem; background:#f8fafc; border:1px solid var(--theme-border); padding:1rem; border-radius:12px;">
+            <h6 style="font-weight:700; color:var(--theme-primary); margin:0 0 8px 0; font-size:0.85rem;"><i class="fas fa-robot me-1"></i> Ask AI about this Walker</h6>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="drawer-ask-ai-input" placeholder="e.g. How can this walker reach Tier 1?" style="flex:1; padding:6px 12px; font-size:0.8rem; border-radius:6px; border:1px solid var(--theme-border);" onkeypress="if(event.key==='Enter') submitDrawerWalkerAiQuery()">
+                <button class="btn btn-sm btn-primary" onclick="submitDrawerWalkerAiQuery()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div id="drawer-ask-ai-reply" style="display:none; margin-top:8px; background:#ffffff; border:1px solid var(--theme-border); padding:8px 12px; border-radius:6px; font-size:0.8rem; color:#334155; line-height:1.4;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Walker Tier Evaluation Criteria Modal -->
+<div class="modal fade" id="tierEvaluationModal" tabindex="-1" aria-labelledby="tierEvaluationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #0d424d 0%, #0f172a 100%); color: #ffffff; padding: 1.25rem 1.75rem; border: none;">
+        <div class="d-flex align-items-center gap-3">
+          <div style="background: rgba(255, 255, 255, 0.15); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+            <i class="fas fa-layer-group fs-4 text-warning"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-white mb-0" id="tierEvaluationModalLabel" style="letter-spacing: -0.3px; font-size:1.1rem;">Walker Tier Evaluation Matrix &amp; Criteria</h5>
+            <small class="text-white-50" style="font-size: 0.8rem;">Official Evaluation Engine Rules • Command: <code>walker:evaluate-tiers</code></small>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="$('#tierEvaluationModal').modal('hide');"></button>
+      </div>
+
+      <div class="modal-body p-4" style="background: #f8fafc;">
+        
+        <!-- 4 Tier Cards Grid -->
+        <div class="row g-3 mb-4">
+          <!-- Joined Card -->
+          <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-top: 4px solid #06b6d4 !important;">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-info text-white font-weight-bold px-2 py-1 rounded-2"><i class="fas fa-user-plus me-1"></i> Joined Status</span>
+                </div>
+                <p class="text-muted mb-3" style="font-size: 0.76rem;">Newly joined partners who paid verification fee but haven't completed services.</p>
+                
+                <ul class="list-unstyled mb-0 text-dark" style="font-size: 0.78rem; line-height: 1.9;">
+                  <li><i class="fas fa-check-circle text-info me-2"></i><strong>Fee Paid:</strong> Verification Complete</li>
+                  <li><i class="fas fa-check-circle text-info me-2"></i><strong>Total Walks:</strong> 0 Walks</li>
+                  <li><i class="fas fa-arrow-circle-right text-primary me-2"></i><strong>Next Step:</strong> Complete at least 1 service to automatically move to Tier 3 Entry</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 3 Card -->
+          <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-top: 4px solid #64748b !important;">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-secondary text-white font-weight-bold px-2 py-1 rounded-2"><i class="fas fa-user-circle me-1"></i> Tier 3 (Entry)</span>
+                </div>
+                <p class="text-muted mb-3" style="font-size: 0.76rem;">Initial entry tier for active walkers completing service walks.</p>
+                
+                <ul class="list-unstyled mb-0 text-dark" style="font-size: 0.78rem; line-height: 1.9;">
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>Effective Exp:</strong> ≥ 0.5 Year</li>
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>Avg Rating:</strong> ≥ 3.0 Stars</li>
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>Total Walks:</strong> ≥ 5 Walks</li>
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>Last 30 Days:</strong> ≥ 3 Walks</li>
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>On-Time Arrival:</strong> ≥ 70%</li>
+                  <li><i class="fas fa-check-circle text-secondary me-2"></i><strong>Cancel Rate:</strong> ≤ 15%</li>
+                  <li><i class="fas fa-user-shield text-info me-2"></i><strong>Account Health:</strong> &lt; 10 Strikes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 2 Card -->
+          <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-top: 4px solid #3b82f6 !important;">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-primary text-white font-weight-bold px-2 py-1 rounded-2"><i class="fas fa-shield-alt me-1"></i> Tier 2 (Standard)</span>
+                </div>
+                <p class="text-muted mb-3" style="font-size: 0.76rem;">Consistent operational backbone with proven track record.</p>
+                
+                <ul class="list-unstyled mb-0 text-dark" style="font-size: 0.78rem; line-height: 1.9;">
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>Effective Exp:</strong> ≥ 1.0 Year</li>
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>Avg Rating:</strong> ≥ 4.0 Stars</li>
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>Total Walks:</strong> ≥ 10 Walks</li>
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>Last 30 Days:</strong> ≥ 5 Walks</li>
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>On-Time Arrival:</strong> ≥ 80%</li>
+                  <li><i class="fas fa-check-circle text-primary me-2"></i><strong>Cancel Rate:</strong> ≤ 10%</li>
+                  <li><i class="fas fa-user-shield text-info me-2"></i><strong>Account Health:</strong> &lt; 8 Strikes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tier 1 Card -->
+          <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden" style="background: #ffffff; border-top: 4px solid #f59e0b !important;">
+              <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-warning text-dark font-weight-bold px-2 py-1 rounded-2"><i class="fas fa-crown me-1"></i> Tier 1 (Premium)</span>
+                </div>
+                <p class="text-muted mb-3" style="font-size: 0.76rem;">High earning premium service providers delivering top SLA quality.</p>
+                
+                <ul class="list-unstyled mb-0 text-dark" style="font-size: 0.78rem; line-height: 1.9;">
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Effective Exp:</strong> ≥ 2.0 Years</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Avg Rating:</strong> ≥ 4.5 Stars</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Total Walks:</strong> ≥ 30 Walks</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Last 30 Days:</strong> ≥ 10 Walks</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>On-Time Arrival:</strong> ≥ 90%</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Completion Rate:</strong> ≥ 85%</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Cancel Rate:</strong> ≤ 5%</li>
+                  <li><i class="fas fa-check-circle text-warning me-2"></i><strong>Complaint Rate:</strong> &lt; 2%</li>
+                  <li><i class="fas fa-shield-alt text-success me-2"></i><strong>Police Verified:</strong> Mandatory</li>
+                  <li><i class="fas fa-user-shield text-info me-2"></i><strong>Account Health:</strong> &lt; 5 Strikes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Special Business Rules Summary -->
+        <div class="p-3 rounded-4 bg-white border shadow-sm">
+          <h6 class="fw-bold text-dark mb-2" style="font-size:0.88rem;"><i class="fas fa-balance-scale text-primary me-2"></i>Special Business Rules &amp; Ranking Formula</h6>
+          <div class="row g-2 text-muted" style="font-size: 0.76rem;">
+            <div class="col-md-4">
+              <div class="p-2 rounded-3 bg-light border">
+                <strong class="text-dark"><i class="fas fa-shield-virus text-warning me-1"></i> Downgrade Protection</strong>
+                <p class="mb-0 mt-1">1-time grace period before tier demotion to protect loyal walkers during bad months.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-2 rounded-3 bg-light border">
+                <strong class="text-dark"><i class="fas fa-snowflake text-danger me-1"></i> Account Freezing</strong>
+                <p class="mb-0 mt-1">Reaching 8 strikes automatically freezes account for 7 days &amp; locks tier promotion.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="p-2 rounded-3 bg-light border">
+                <strong class="text-dark"><i class="fas fa-calculator text-success me-1"></i> Ranking Score (0-100)</strong>
+                <p class="mb-0 mt-1">40% Rating + 20% On-Time + 15% Completion + 15% Activity + 10% Loyalty.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer bg-light p-2 px-4 border-top-0 d-flex justify-content-between">
+        <span class="text-muted small" style="font-size:0.75rem;"><i class="fas fa-sync text-primary me-1"></i> Evaluated automatically via Cron CLI</span>
+        <button type="button" class="btn btn-primary btn-sm px-4 rounded-pill font-weight-bold" onclick="$('#tierEvaluationModal').modal('hide');">Close Matrix</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    function openTierEvaluationModal(tier) {
+        $('#tierEvaluationModal').modal('show');
+    }
+
+    // 1. Client side data state initialized from database PHP payload
+    let walkers = <?= json_encode($walkers) ?>;
+    const totalRegisteredWalkers = <?= (int)$totalRegisteredWalkers ?>;
+    let selectedWalkerId = null;
+
+    // Helper to extract sanitized walker tier directly from EvaluateWalkerTiers database calculation
+    function getWalkerTier(w) {
+        if (!w) return 3;
+>>>>>>> origin/main
         const t = parseInt(w.tier);
         if (t === 1) return 1;
         if (t === 2) return 2;
         return 3;
     }
 
+<<<<<<< HEAD
+=======
+    // Helper to check if walker account is frozen, inactive, or suspended
+    function isWalkerFrozen(w) {
+        if (!w) return false;
+        const status = (w.account_status || '').toString().toLowerCase().trim();
+        const strikes = parseInt(w.strike_count || 0);
+
+        if (strikes >= 8) return true;
+        if (status === 'frozen' || status === 'inactive' || status === 'suspended' || status === 'disabled' || status === '0' || status === 'blocked') {
+            return true;
+        }
+        return false;
+    }
+
+>>>>>>> origin/main
     // Log helper
     function logEvent(action, message) {
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -1878,6 +2622,7 @@
         $(`#tab-btn-${tabName}`).addClass('active');
         $(`#panel-${tabName}`).addClass('active');
 
+<<<<<<< HEAD
         // Render tab specific components
         if (tabName === 'overview') {
             updateOverviewStats();
@@ -1887,6 +2632,19 @@
             renderComplianceCards();
         } else if (tabName === 'insights') {
             renderInsightsTab();
+=======
+        const filtered = getFilteredWalkers();
+
+        // Render tab specific components
+        if (tabName === 'overview') {
+            updateOverviewStats(filtered);
+        } else if (tabName === 'roster') {
+            renderRosterTabComponents();
+        } else if (tabName === 'compliance') {
+            renderComplianceCards(filtered);
+        } else if (tabName === 'insights') {
+            renderInsightsTab(filtered);
+>>>>>>> origin/main
         }
     }
 
@@ -1909,6 +2667,13 @@
 
     // Extract Walker Area
     function getWalkerArea(w) {
+<<<<<<< HEAD
+=======
+        if (!w) return 'N/A';
+        if (w.city) return w.city;
+        if (w.area) return w.area;
+        if (w.address) return w.address;
+>>>>>>> origin/main
         const areas = ['Gachibowli', 'Kondapur', 'Madhapur', 'Jubilee Hills'];
         const index = parseInt(w.provider_id || 0) % areas.length;
         return areas[index];
@@ -1916,12 +2681,23 @@
 
     // Extract Walker Display ID
     function getWalkerDisplayId(w) {
+<<<<<<< HEAD
         return 'WLK-' + (100 + parseInt(w.provider_id || 0));
     }
 
     // Compute dynamic stats per tier
     function getTierStats(tierNum) {
         const list = walkers.filter(w => getWalkerTier(w) === tierNum);
+=======
+        if (!w) return 'WLK-000';
+        return 'WLK-' + (w.provider_id || w.id || 0);
+    }
+
+    // Compute dynamic stats per tier
+    function getTierStats(tierNum, targetList) {
+        const listToUse = targetList || walkers;
+        const list = listToUse.filter(w => getWalkerTier(w) === tierNum);
+>>>>>>> origin/main
         const count = list.length;
         if (count === 0) return { csat: '0.00', repeat: '0%', completion: '0.0%' };
         const csat = (list.reduce((sum, w) => sum + parseFloat(w.weighted_rating || w.avg_rating || 0), 0) / count).toFixed(2);
@@ -1934,6 +2710,7 @@
     }
 
     // Update Overview Stats and 10 KPI Cards
+<<<<<<< HEAD
     function updateOverviewStats() {
         const total = walkers.length;
         const frozen = walkers.filter(w => (w.account_status || '').toLowerCase() === 'frozen').length;
@@ -1965,6 +2742,74 @@
 
         // Set KPI card values
         $('#kpi-total-walkers').text(total);
+=======
+    function updateOverviewStats(targetWalkers) {
+        const listToUse = targetWalkers || walkers;
+        const total = listToUse.length;
+        const frozen = listToUse.filter(w => isWalkerFrozen(w)).length;
+        const activeCount = Math.max(0, total - frozen);
+
+        const joinedCount = listToUse.filter(w => !isWalkerFrozen(w) && parseInt(w.completed_walks || 0) === 0).length;
+        const t1Count = listToUse.filter(w => !isWalkerFrozen(w) && getWalkerTier(w) === 1 && parseInt(w.completed_walks || 0) > 0).length;
+        const t2Count = listToUse.filter(w => !isWalkerFrozen(w) && getWalkerTier(w) === 2 && parseInt(w.completed_walks || 0) > 0).length;
+        const t3Count = listToUse.filter(w => !isWalkerFrozen(w) && getWalkerTier(w) === 3 && parseInt(w.completed_walks || 0) > 0).length;
+
+        // Percentages of active roster
+        const joinedPct = activeCount > 0 ? Math.round((joinedCount / activeCount) * 100) : 0;
+        const t1Pct = activeCount > 0 ? Math.round((t1Count / activeCount) * 100) : 0;
+        const t2Pct = activeCount > 0 ? Math.round((t2Count / activeCount) * 100) : 0;
+        const t3Pct = activeCount > 0 ? Math.round((t3Count / activeCount) * 100) : 0;
+
+        // Accurate Averages (strictly evaluating active/rated providers)
+        let sumRating = 0;
+        let ratedCount = 0;
+        let sumCompletion = 0;
+        let compCount = 0;
+        let verifiedCount = 0;
+        let sumWalks = 0;
+        let sumRepeats = 0;
+
+        listToUse.forEach(w => {
+            // Rating
+            const r = parseFloat(w.weighted_rating || w.avg_rating || 0);
+            if (r > 0) {
+                sumRating += r;
+                ratedCount++;
+            }
+
+            // Completion Rate (from live database quotations & walking_service_bookings subquery)
+            const cr = parseFloat(w.completion_rate || 0);
+            if (cr > 0) {
+                sumCompletion += cr;
+                compCount++;
+            }
+
+            // Repeat Clients (using live database subquery result from quotations & walking_service_bookings)
+            const rc = parseInt(w.repeat_client_count || 0);
+            if (rc > 0) {
+                sumRepeats += rc;
+                sumWalks += 1;
+            }
+
+            // Verification (strict evaluation of sp.is_verified column from DB)
+            const isVerified = (w.is_verified == 1 || w.is_verified === "1" || w.verified == 1);
+            if (isVerified) {
+                verifiedCount++;
+            }
+        });
+
+        const avgRating = ratedCount > 0 ? (sumRating / ratedCount) : 0.0;
+        const avgCompletion = compCount > 0 ? Math.min(100.0, sumCompletion / compCount) : 0.0;
+
+        const repeatPct = activeCount > 0 ? ((sumWalks / activeCount) * 100) : (total > 0 ? (sumWalks / total * 100) : 0.0);
+        const policePct = total > 0 ? (verifiedCount / total * 100) : 0.0;
+
+        // Set KPI card values
+        $('#kpi-total-walkers').text(activeCount);
+        $('#kpi-total-subtext').html(`Out of <strong>${totalRegisteredWalkers}</strong> registered roster`);
+        $('#kpi-joined-count').text(joinedCount);
+        $('#kpi-joined-percent').text(joinedPct + '%');
+>>>>>>> origin/main
         $('#kpi-t1-count').text(t1Count);
         $('#kpi-t1-percent').text(t1Pct + '%');
         $('#kpi-t2-count').text(t2Count);
@@ -1976,9 +2821,16 @@
         
         $('#kpi-avg-rating').text(avgRating.toFixed(2));
         $('#kpi-avg-completion').text(avgCompletion.toFixed(1) + '%');
+<<<<<<< HEAD
         
         const displayRepeatPct = total > 0 ? 78.5 + (total % 5) * 0.2 : 78.5;
         $('#kpi-repeat-percent').text(displayRepeatPct.toFixed(1) + '%');
+=======
+        $('#kpi-repeat-percent').text(repeatPct.toFixed(1) + '%');
+        $('#kpi-repeat-subtext').text(`${sumWalks} SP${sumWalks === 1 ? '' : 's'} with repeat clients`);
+        $('#kpi-police-percent').text(policePct.toFixed(1) + '%');
+        $('#kpi-police-subtext').text(`${verifiedCount} SP${verifiedCount === 1 ? '' : 's'} background cleared`);
+>>>>>>> origin/main
 
         // Distribution Panel
         $('#distrib-total-badge').text('Total SPs: ' + total);
@@ -1996,10 +2848,17 @@
 
         // 1. Dynamic Insight Hero Box Calculations
         const conversionRate = total > 0 ? ((t1Count + t2Count) / total * 100).toFixed(1) : '0.0';
+<<<<<<< HEAD
         const recruitmentQuality = total > 0 ? Math.round(walkers.filter(w => parseFloat(w.avg_rating) >= 4.0).length / total * 100) : 80;
         const trainingQuality = total > 0 ? Math.round(walkers.reduce((sum, w) => sum + parseFloat(w.completion_rate || 90), 0) / total) : 90;
         const operationsQuality = total > 0 ? Math.round(walkers.reduce((sum, w) => sum + parseFloat(w.last_30d_on_time_pct || 90), 0) / total) : 90;
         const retentionQuality = total > 0 ? Math.round(walkers.filter(w => parseInt(w.repeat_client_count) > 0).length / total * 100) : 85;
+=======
+        const recruitmentQuality = total > 0 ? Math.round(listToUse.filter(w => parseFloat(w.avg_rating || 0) >= 4.0).length / total * 100) : 80;
+        const trainingQuality = total > 0 ? Math.round(listToUse.reduce((sum, w) => sum + parseFloat(w.completion_rate || 90), 0) / total) : 90;
+        const operationsQuality = total > 0 ? Math.round(listToUse.reduce((sum, w) => sum + parseFloat(w.last_30d_on_time_pct || 90), 0) / total) : 90;
+        const retentionQuality = total > 0 ? Math.round(listToUse.filter(w => parseInt(w.repeat_client_count || 0) > 0).length / total * 100) : 85;
+>>>>>>> origin/main
 
         $('#hero-conversion-val').text(conversionRate + '%');
         $('#hero-recruitment-val').text(recruitmentQuality + '%');
@@ -2009,7 +2868,11 @@
 
         // 2. Dynamic Revenue Calculations
         let t1Walks = 0, t2Walks = 0, t3Walks = 0;
+<<<<<<< HEAD
         walkers.forEach(w => {
+=======
+        listToUse.forEach(w => {
+>>>>>>> origin/main
             const tier = getWalkerTier(w);
             const walks = parseInt(w.total_walks) || 0;
             if (tier === 1) t1Walks += walks;
@@ -2047,9 +2910,15 @@
         $('#rev-t3-earnings').text('₹' + t3MonthlyEarn.toLocaleString());
 
         // 3. Dynamic SLA & CSAT Card Updates
+<<<<<<< HEAD
         const t1Stats = getTierStats(1);
         const t2Stats = getTierStats(2);
         const t3Stats = getTierStats(3);
+=======
+        const t1Stats = getTierStats(1, listToUse);
+        const t2Stats = getTierStats(2, listToUse);
+        const t3Stats = getTierStats(3, listToUse);
+>>>>>>> origin/main
 
         $('#sla-t1-csat').text('CSAT: ' + t1Stats.csat + ' / 5.0');
         $('#sla-t2-csat').text('CSAT: ' + t2Stats.csat + ' / 5.0');
@@ -2064,12 +2933,18 @@
         $('#sla-t3-completion').text(t3Stats.completion);
 
         // 4. Dynamic Monthly Promotions & Downgrades Counts
+<<<<<<< HEAD
         const promoCount = walkers.filter(w => getWalkerTier(w) > 1 && parseFloat(w.ranking_score) >= 70).length;
         const downCount = walkers.filter(w => parseFloat(w.ranking_score) < 40).length;
+=======
+        const promoCount = listToUse.filter(w => getWalkerTier(w) > 1 && parseFloat(w.ranking_score || 0) >= 70).length;
+        const downCount = listToUse.filter(w => parseFloat(w.ranking_score || 0) < 40).length;
+>>>>>>> origin/main
 
         $('#insight-promotions-count').text('+' + promoCount + ' Walkers');
         $('#insight-downgrades-count').text('-' + downCount + ' Walkers');
 
+<<<<<<< HEAD
         renderAreaIntelligence();
     }
 
@@ -2095,11 +2970,111 @@
                 suggestion = `Tier 2 walkers performing exceptionally well in Kondapur. ${t2} ready for upgrade.`;
             } else {
                 suggestion = `Low premium coverage in Madhapur. Recommend routing top Tier 2s here.`;
+=======
+        renderAreaIntelligence(listToUse);
+    }
+
+    // Render Area Intelligence Section (100% Dynamic & AI Dictated)
+    function renderAreaIntelligence(targetList) {
+        const listToUse = targetList || walkers;
+        const container = $('#areas-intelligence-container');
+        container.empty();
+
+        if (!listToUse || listToUse.length === 0) {
+            container.append('<div class="col-12 text-center text-muted py-4"><i class="fas fa-info-circle me-1"></i> No area intelligence records available for current filter.</div>');
+            return;
+        }
+
+        // Group walkers dynamically by their area/city
+        const areaMap = {};
+        listToUse.forEach(w => {
+            const areaName = getWalkerArea(w) || 'Other Areas';
+            if (!areaMap[areaName]) {
+                areaMap[areaName] = [];
+            }
+            areaMap[areaName].push(w);
+        });
+
+        // Extract area keys and sort by walker density descending
+        const areaKeys = Object.keys(areaMap).sort((a, b) => areaMap[b].length - areaMap[a].length);
+
+        areaKeys.forEach(area => {
+            const areaWalkers = areaMap[area];
+            const total = areaWalkers.length;
+
+            let t1 = 0, t2 = 0, t3 = 0, joined = 0;
+            let sumRating = 0, ratedCount = 0;
+
+            areaWalkers.forEach(w => {
+                const completed = parseInt(w.completed_walks || 0);
+                const tier = getWalkerTier(w);
+                const r = parseFloat(w.weighted_rating || w.avg_rating || 0);
+
+                if (completed === 0) {
+                    joined++;
+                } else if (tier === 1) {
+                    t1++;
+                } else if (tier === 2) {
+                    t2++;
+                } else {
+                    t3++;
+                }
+
+                if (r > 0) {
+                    sumRating += r;
+                    ratedCount++;
+                }
+            });
+
+            const avgRating = ratedCount > 0 ? (sumRating / ratedCount).toFixed(2) : '3.50';
+
+            // Check if backend AI Analyst provided area intelligence for this region
+            let aiData = null;
+            if (window.lastAiAreaIntelligence && Array.isArray(window.lastAiAreaIntelligence)) {
+                aiData = window.lastAiAreaIntelligence.find(a => (a.area || '').toLowerCase() === area.toLowerCase());
+            }
+
+            // Dynamic Demand Badge & Badge Style (AI Dictated if available)
+            let demandText = aiData ? aiData.demand_status : 'Active Coverage';
+            let badgeClass = aiData ? aiData.badge_class : 'bg-info text-white';
+
+            if (!aiData) {
+                if (t1 === 0 && total >= 5) {
+                    demandText = 'Critical Supply Deficit';
+                    badgeClass = 'bg-danger text-white fw-bold';
+                } else if (total >= 15) {
+                    demandText = 'Very High Demand Zone';
+                    badgeClass = 'bg-warning text-dark fw-bold';
+                } else if (total >= 8) {
+                    demandText = 'High Demand Zone';
+                    badgeClass = 'bg-primary text-white fw-bold';
+                } else if (joined > total * 0.7) {
+                    demandText = 'High Onboarding Backlog';
+                    badgeClass = 'bg-warning text-dark fw-bold';
+                }
+            }
+
+            // Dynamic AI Recommendation Suggestion (AI Dictated)
+            let suggestion = aiData ? aiData.ai_suggestion : '';
+            if (!suggestion) {
+                if (t1 === 0 && t2 > 0) {
+                    suggestion = `AI Analysis: No Tier 1 walkers in ${area}. Recommend upgrading ${t2} top-performing Tier 2 walker(s) to expand VIP fulfillment.`;
+                } else if (t1 === 0 && t2 === 0) {
+                    suggestion = `AI Analysis: High capacity gap in ${area} (${total} total walkers). Needs immediate first-walk activation calls for ${joined} joined signups.`;
+                } else if (t1 >= 2) {
+                    suggestion = `AI Analysis: Strong premium coverage in ${area} (${t1} Tier 1, ${t2} Tier 2). Fleet capacity fully meets daily client booking demand.`;
+                } else if (parseFloat(avgRating) < 3.8) {
+                    suggestion = `AI Analysis: Service rating alert in ${area} (${avgRating}/5.00 avg). Require mandatory quality & punctuality review for local walkers.`;
+                } else {
+                    suggestion = `AI Analysis: Stable operational performance in ${area} with ${total} active providers and ${avgRating}/5.00 CSAT rating.`;
+                }
+>>>>>>> origin/main
             }
 
             container.append(`
                 <div class="area-card">
                     <div class="area-card-header">
+<<<<<<< HEAD
                         <strong>${area}</strong>
                         <span class="badge ${badges[index]}">${demand[index]}</span>
                     </div>
@@ -2119,12 +3094,44 @@
                     </div>
                     <div class="area-ai-suggestion">
                         <i class="fas fa-lightbulb"></i> <strong>AI Suggestion:</strong> ${suggestion}
+=======
+                        <strong style="color: var(--theme-primary); font-size:1.05rem;">
+                            <i class="fas fa-map-marker-alt me-1 text-danger"></i>${area}
+                        </strong>
+                        <span class="badge ${badgeClass}">${demandText}</span>
+                    </div>
+                    <div class="area-counts">
+                        <div class="area-count-item">
+                            <strong style="color:#F59E0B;">${t1}</strong>
+                            <span>Tier 1</span>
+                        </div>
+                        <div class="area-count-item">
+                            <strong style="color:#3B82F6;">${t2}</strong>
+                            <span>Tier 2</span>
+                        </div>
+                        <div class="area-count-item">
+                            <strong style="color:#64748b;">${t3}</strong>
+                            <span>Tier 3</span>
+                        </div>
+                        <div class="area-count-item">
+                            <strong style="color:#0ea5e9;">${joined}</strong>
+                            <span>Joined</span>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: #64748b; margin: 8px 0; font-weight:600; display:flex; justify-content:space-between; border-top: 1px solid #f1f5f9; padding-top: 6px;">
+                        <span><i class="fas fa-users text-primary me-1"></i> Total Walkers: <strong>${total}</strong></span>
+                        <span><i class="fas fa-star text-warning me-1"></i> Avg CSAT: <strong>${avgRating}/5.0</strong></span>
+                    </div>
+                    <div class="area-ai-suggestion">
+                        <i class="fas fa-brain text-warning me-1"></i> <strong>AI Advisor Directive:</strong> ${suggestion}
+>>>>>>> origin/main
                     </div>
                 </div>
             `);
         });
     }
 
+<<<<<<< HEAD
     // Filter Logic combining Search + Tier + City
     function handleFilterChange() {
         const query = $('#roster-search').val().toLowerCase();
@@ -2147,6 +3154,82 @@
 
         if ($('#panel-roster').hasClass('active')) {
             renderRosterDirectoryList(filtered);
+=======
+    // Filter Logic combining Search + Status + Tier + City
+    function getFilteredWalkers() {
+        const rawQuery = ($('#roster-search').val() || '').toString().toLowerCase().trim();
+        const statusFilter = $('#filter-status').val();
+        const tierFilter = $('#filter-tier').val();
+        const cityFilter = $('#filter-city').val();
+
+        return walkers.filter(w => {
+            if (!w) return false;
+
+            const status = (w.account_status || 'active').toLowerCase();
+            const frozen = isWalkerFrozen(w);
+
+            let matchesStatus = true;
+            if (statusFilter === 'active') {
+                matchesStatus = status === 'active' && !frozen;
+            } else if (statusFilter === 'frozen') {
+                matchesStatus = frozen || status === 'inactive' || status === 'frozen' || status === 'suspended' || status === 'disabled' || status === '0';
+            }
+
+            let matchesQuery = true;
+            if (rawQuery) {
+                const name = (w.provider_name || '').toLowerCase();
+                const phone = (w.phone || '').toString().toLowerCase();
+                const email = (w.email || '').toLowerCase();
+                const displayId = getWalkerDisplayId(w).toLowerCase();
+                const cleanDisplayId = displayId.replace(/[^a-z0-9]/g, '');
+                const rawId = (w.provider_id || '').toString().toLowerCase();
+                const area = getWalkerArea(w).toLowerCase();
+                const tierVal = getWalkerTier(w);
+                const tierStr = 'tier ' + tierVal;
+                const tStr = 't' + tierVal;
+                const cleanQuery = rawQuery.replace(/[^a-z0-9]/g, '');
+
+                matchesQuery = name.includes(rawQuery) ||
+                    phone.includes(rawQuery) ||
+                    email.includes(rawQuery) ||
+                    displayId.includes(rawQuery) ||
+                    (cleanQuery.length > 0 && cleanDisplayId.includes(cleanQuery)) ||
+                    rawId.includes(rawQuery) ||
+                    area.includes(rawQuery) ||
+                    tierStr.includes(rawQuery) ||
+                    tStr === rawQuery;
+            }
+
+            let matchesTier = true;
+            if (tierFilter === 'joined') {
+                matchesTier = (parseInt(w.completed_walks || 0) === 0);
+            } else if (tierFilter === 'frozen') {
+                matchesTier = isWalkerFrozen(w);
+            } else if (tierFilter) {
+                matchesTier = (!isWalkerFrozen(w) && parseInt(w.completed_walks || 0) > 0 && getWalkerTier(w) === parseInt(tierFilter));
+            }
+            const matchesCity = !cityFilter || getWalkerArea(w) === cityFilter;
+
+            return matchesStatus && matchesQuery && matchesTier && matchesCity;
+        });
+    }
+
+    function handleFilterChange() {
+        const filtered = getFilteredWalkers();
+
+        $('#found-walkers-count').text(`Found: ${filtered.length} Walker${filtered.length === 1 ? '' : 's'}`);
+
+        const activeTabBtn = $('.tab-item-btn.active').attr('id');
+        if (activeTabBtn === 'tab-btn-overview') {
+            updateOverviewStats(filtered);
+        } else if (activeTabBtn === 'tab-btn-roster') {
+            renderRosterDirectoryList(filtered);
+            renderLeaderboardTable(filtered);
+        } else if (activeTabBtn === 'tab-btn-compliance') {
+            renderComplianceCards(filtered);
+        } else if (activeTabBtn === 'tab-btn-insights') {
+            renderInsightsTab(filtered);
+>>>>>>> origin/main
         }
     }
 
@@ -2159,19 +3242,37 @@
         const container = $('#directory-list-container');
         container.empty();
 
+<<<<<<< HEAD
         $('#directory-count-badge').text(filteredList.length);
 
         if (filteredList.length === 0) {
             container.append('<div class="text-center text-muted py-4">No walkers found.</div>');
+=======
+        const listToUse = filteredList || getFilteredWalkers();
+
+        $('#directory-count-badge').text(listToUse.length);
+
+        if (listToUse.length === 0) {
+            container.append('<div class="text-center text-muted py-4">No walkers found matching your search.</div>');
+>>>>>>> origin/main
             clearDetailsCard();
             return;
         }
 
+<<<<<<< HEAD
         filteredList.sort((a, b) => parseFloat(b.ranking_score || 0) - parseFloat(a.ranking_score || 0));
 
         filteredList.forEach(w => {
             const area = getWalkerArea(w);
             const activeClass = (selectedWalkerId && parseInt(selectedWalkerId) === parseInt(w.provider_id)) ? 'active' : '';
+=======
+        listToUse.sort((a, b) => parseFloat(b.ranking_score || 0) - parseFloat(a.ranking_score || 0));
+
+        listToUse.forEach(w => {
+            const area = getWalkerArea(w);
+            const activeClass = (selectedWalkerId && parseInt(selectedWalkerId) === parseInt(w.provider_id)) ? 'active' : '';
+            const frozen = isWalkerFrozen(w);
+>>>>>>> origin/main
 
             const rating = parseFloat(w.weighted_rating || w.avg_rating || 0).toFixed(2);
             let stars = '';
@@ -2181,14 +3282,23 @@
             }
 
             container.append(`
+<<<<<<< HEAD
                 <div class="directory-item ${activeClass}" data-provider-id="${w.provider_id}" onclick="selectWalker(${w.provider_id})">
+=======
+                <div class="directory-item ${activeClass} ${frozen ? 'border-danger' : ''}" data-provider-id="${w.provider_id}" onclick="selectWalker(${w.provider_id})">
+>>>>>>> origin/main
                     <div class="directory-item-left">
                         <img src="${w.provider_profile ? 'https://petsfolio.in/public/uploads/providers/' + w.provider_profile : 'https://placehold.co/44'}" 
                              class="walker-avatar" style="width:38px; height:38px;" 
                              onerror="this.src='https://placehold.co/44'">
                         <div class="directory-item-details">
+<<<<<<< HEAD
                             <h5>${w.provider_name}</h5>
                             <p>Tier ${getWalkerTier(w)} • ${area}</p>
+=======
+                            <h5>${w.provider_name || 'Walker'} ${frozen ? '<span class="badge bg-danger" style="font-size:0.6rem;">FROZEN</span>' : ''}</h5>
+                            <p>${parseInt(w.completed_walks || 0) === 0 ? '<span class="badge bg-info text-white me-1">Joined</span>' : 'Tier ' + getWalkerTier(w)} • ${area}</p>
+>>>>>>> origin/main
                         </div>
                     </div>
                     <div class="directory-item-right">
@@ -2200,16 +3310,95 @@
         });
 
         // Set default selection if none active
+<<<<<<< HEAD
         if (filteredList.length > 0) {
             const stillExists = filteredList.some(w => parseInt(w.provider_id) === parseInt(selectedWalkerId));
             if (!stillExists) {
                 selectWalker(filteredList[0].provider_id);
+=======
+        if (listToUse.length > 0) {
+            const stillExists = listToUse.some(w => parseInt(w.provider_id) === parseInt(selectedWalkerId));
+            if (!stillExists) {
+                selectWalker(listToUse[0].provider_id);
+>>>>>>> origin/main
             } else {
                 renderSelectedWalkerDetails();
             }
         }
     }
 
+<<<<<<< HEAD
+=======
+    // Render Complete Leaderboard Data Table
+    function renderLeaderboardTable(filteredList) {
+        const listToUse = filteredList || getFilteredWalkers();
+        const tbody = $('#leaderboard-table-body');
+        tbody.empty();
+
+        $('#leaderboard-table-count').text(`${listToUse.length} Walker${listToUse.length === 1 ? '' : 's'}`);
+
+        if (listToUse.length === 0) {
+            tbody.append('<tr><td colspan="11" class="text-center text-muted py-4">No walker records found matching your search.</td></tr>');
+            return;
+        }
+
+        const sorted = [...listToUse].sort((a, b) => {
+            const tierA = getWalkerTier(a);
+            const tierB = getWalkerTier(b);
+            if (tierA !== tierB) return tierA - tierB;
+            return parseFloat(b.ranking_score || 0) - parseFloat(a.ranking_score || 0);
+        });
+
+        sorted.forEach((w, index) => {
+            const frozen = isWalkerFrozen(w);
+            const statusBadge = frozen 
+                ? '<span class="badge bg-danger text-white">Frozen / Inactive</span>' 
+                : '<span class="badge bg-success text-white">Active</span>';
+            
+            const isGrace = parseInt(w.in_grace_period || 0) === 1;
+            const graceBadge = isGrace ? ' <span class="badge bg-warning text-dark" title="Downgrade Grace Protection Active"><i class="fas fa-shield-virus"></i> Grace</span>' : '';
+
+            let tierBadge = '';
+            const completed = parseInt(w.completed_walks || 0);
+            if (completed === 0) {
+                tierBadge = '<span class="badge bg-info text-white" style="font-weight:750; font-size:0.7rem; padding:4px 8px;"><i class="fas fa-user-plus me-1"></i>Joined</span>';
+            } else if (getWalkerTier(w) === 1) {
+                tierBadge = '<span class="badge bg-warning text-dark" style="font-weight:750; font-size:0.7rem; padding:4px 8px;"><i class="fas fa-crown me-1"></i>Tier 1</span>';
+            } else if (getWalkerTier(w) === 2) {
+                tierBadge = '<span class="badge bg-primary text-white" style="font-weight:750; font-size:0.7rem; padding:4px 8px;"><i class="fas fa-shield-alt me-1"></i>Tier 2</span>';
+            } else {
+                tierBadge = '<span class="badge bg-secondary text-white" style="font-weight:750; font-size:0.7rem; padding:4px 8px;"><i class="fas fa-user-circle me-1"></i>Tier 3</span>';
+            }
+            tierBadge += graceBadge;
+
+            tbody.append(`
+                <tr style="${frozen ? 'background-color: #fff5f5;' : ''}">
+                    <td style="font-weight: 800; color: var(--theme-primary);">#${index + 1}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <img src="${w.provider_profile ? 'https://petsfolio.in/public/uploads/providers/' + w.provider_profile : 'https://placehold.co/32'}" 
+                                 style="width:32px; height:32px; border-radius:50%; object-fit:cover;" 
+                                 onerror="this.src='https://placehold.co/32'">
+                            <strong>${w.provider_name || 'Walker'}</strong>
+                        </div>
+                    </td>
+                    <td style="font-family:monospace; font-weight:700;">${getWalkerDisplayId(w)}</td>
+                    <td>${getWalkerArea(w)}</td>
+                    <td class="text-center">${tierBadge}</td>
+                    <td class="text-center" style="font-weight:800; color:var(--theme-primary);">${parseFloat(w.ranking_score || 0).toFixed(1)}</td>
+                    <td class="text-center" style="font-weight:700;"><i class="fas fa-star text-warning" style="font-size:0.75rem;"></i> ${parseFloat(w.weighted_rating || w.avg_rating || 0).toFixed(2)}</td>
+                    <td class="text-center">${parseFloat(w.completion_rate || 0).toFixed(1)}%</td>
+                    <td class="text-center">${parseFloat(w.last_30d_on_time_pct || 0).toFixed(1)}%</td>
+                    <td class="text-center">${statusBadge}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary" style="padding: 2px 8px; font-size: 0.75rem;" onclick="selectWalker(${w.provider_id}); switchTab('roster');">View</button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+>>>>>>> origin/main
     function selectWalker(providerId) {
         selectedWalkerId = providerId;
         $('.directory-item').removeClass('active');
@@ -2253,24 +3442,49 @@
         $('.directory-item').removeClass('active');
         $(`.directory-item[data-provider-id="${selectedWalkerId}"]`).addClass('active');
 
+<<<<<<< HEAD
         $('#detail-name').text(w.provider_name);
+=======
+        $('#detail-name').text(w.provider_name || 'Walker');
+>>>>>>> origin/main
         $('#detail-id').text(getWalkerDisplayId(w));
         $('#detail-phone').text(w.phone || 'N/A');
         $('#detail-area').text(getWalkerArea(w));
 
+<<<<<<< HEAD
         const expMonths = Math.round(parseFloat(w.experience || 0) * 12);
         $('#detail-exp').text(expMonths + ' mos');
 
         const sorted = [...walkers].sort((a,b) => parseFloat(b.ranking_score) - parseFloat(a.ranking_score));
+=======
+        const expYears = parseFloat(w.effective_experience || w.experience || 0);
+        const expMonths = Math.round(expYears * 12);
+        $('#detail-exp').text(expMonths >= 12 ? (expYears.toFixed(1) + ' yrs') : (expMonths + ' mos'));
+
+        const sorted = [...walkers].sort((a, b) => {
+            const tA = getWalkerTier(a);
+            const tB = getWalkerTier(b);
+            if (tA !== tB) return tA - tB;
+            return parseFloat(b.ranking_score || 0) - parseFloat(a.ranking_score || 0);
+        });
+>>>>>>> origin/main
         const rank = sorted.findIndex(x => parseInt(x.provider_id) === parseInt(w.provider_id)) + 1;
         $('#detail-rank').text('#' + rank);
 
         $('#detail-avatar').attr('src', w.provider_profile ? 'https://petsfolio.in/public/uploads/providers/' + w.provider_profile : 'https://placehold.co/72');
 
+<<<<<<< HEAD
         $('#metric-rating').text(parseFloat(w.weighted_rating || w.avg_rating || 0).toFixed(2));
         $('#metric-completion').text(parseFloat(w.completion_rate || 96).toFixed(1) + '%');
         $('#metric-ontime').text(parseFloat(w.last_30d_on_time_pct || 94).toFixed(1) + '%');
         $('#metric-cancellation').text(parseFloat(w.last_30d_cancellation_rate || 2.4).toFixed(1) + '%');
+=======
+        const ratingVal = parseFloat(w.weighted_rating || w.avg_rating || 0);
+        $('#metric-rating').text(ratingVal.toFixed(2));
+        $('#metric-completion').text((w.completion_rate !== undefined && w.completion_rate !== null ? parseFloat(w.completion_rate) : 0).toFixed(1) + '%');
+        $('#metric-ontime').text((w.last_30d_on_time_pct !== undefined && w.last_30d_on_time_pct !== null ? parseFloat(w.last_30d_on_time_pct) : 0).toFixed(1) + '%');
+        $('#metric-cancellation').text((w.last_30d_cancellation_rate !== undefined && w.last_30d_cancellation_rate !== null ? parseFloat(w.last_30d_cancellation_rate) : 0).toFixed(1) + '%');
+>>>>>>> origin/main
         
         const compRate = w.complaint_count ? ((parseInt(w.complaint_count) / parseInt(w.total_walks || 100)) * 100) : 0;
         $('#metric-complaint').text(compRate.toFixed(1) + '%');
@@ -2279,16 +3493,26 @@
         $('#metric-last-30d').text((w.last_30d_walks || 0) + ' walks');
         $('#metric-repeat-clients').text(w.repeat_client_count || 0);
 
+<<<<<<< HEAD
         const status = (w.account_status || 'active').toLowerCase();
+=======
+        const frozen = isWalkerFrozen(w);
+>>>>>>> origin/main
         const strikes = parseInt(w.strike_count || 0);
         const banner = $('#detail-alert-banner');
         
         banner.removeClass('detail-alert-success detail-alert-warning detail-alert-danger');
         $('#btn-restore').hide();
 
+<<<<<<< HEAD
         if (status === 'frozen') {
             banner.addClass('detail-alert-danger');
             $('#detail-alert-text').text(`ACCOUNT SUSPENDED: Walker has accumulated ${strikes}+ strikes. All walks disabled.`);
+=======
+        if (frozen) {
+            banner.addClass('detail-alert-danger');
+            $('#detail-alert-text').text(`ACCOUNT SUSPENDED / INACTIVE: Account is frozen or inactive. All walks disabled.`);
+>>>>>>> origin/main
             $('#btn-restore').show();
         } else if (strikes > 0) {
             banner.addClass('detail-alert-warning');
@@ -2299,7 +3523,11 @@
             $('#detail-alert-text').text('EXCELLENT PERFORMANCE: Qualified for Tier 1 premium client matching.');
         } else {
             banner.addClass('detail-alert-success');
+<<<<<<< HEAD
             $('#detail-alert-text').text('DOWNGRADE GRACE PERIOD ACTIVE: Protected from tier demotion. Next evaluation: 2026-10-01.');
+=======
+            $('#detail-alert-text').text('DOWNGRADE GRACE PERIOD ACTIVE: Protected from tier demotion.');
+>>>>>>> origin/main
         }
 
         $('.detail-actions-buttons button').prop('disabled', false);
@@ -2331,6 +3559,7 @@
     }
 
     // Render Tab 3: Compliance & Health
+<<<<<<< HEAD
     function renderComplianceCards() {
         const container = $('#compliance-cards-container');
         container.empty();
@@ -2338,6 +3567,20 @@
         const atRiskWalkers = walkers.filter(w => {
             const status = (w.account_status || 'active').toLowerCase();
             return status === 'frozen' || status === 'warning' || parseInt(w.strike_count || 0) > 0;
+=======
+    let complianceLimit = 36;
+
+    function renderComplianceCards(targetList) {
+        // Evaluate over full roster `walkers` so all 387+ inactive/frozen profiles are included
+        const listToUse = targetList || walkers;
+        const container = $('#compliance-cards-container');
+        container.empty();
+
+        const atRiskWalkers = listToUse.filter(w => {
+            const status = (w.account_status || 'active').toString().toLowerCase().trim();
+            const strikes = parseInt(w.strike_count || 0);
+            return status !== 'active' || isWalkerFrozen(w) || status === 'warning' || strikes > 0;
+>>>>>>> origin/main
         });
 
         if (atRiskWalkers.length === 0) {
@@ -2345,12 +3588,17 @@
                 <div style="grid-column: 1/-1; background: white; border: 1px solid var(--theme-border); border-radius:12px; padding:3rem; text-align:center;">
                     <i class="fas fa-shield-alt text-success" style="font-size:3rem; margin-bottom:1rem;"></i>
                     <h5 style="margin:0; font-weight:750;">Roster Health: Excellent</h5>
+<<<<<<< HEAD
                     <p class="text-muted mt-2 mb-0">No providers are currently under freeze, warning, or holding active compliance violations.</p>
+=======
+                    <p class="text-muted mt-2 mb-0">No providers match the filter or hold active compliance violations.</p>
+>>>>>>> origin/main
                 </div>
             `);
             return;
         }
 
+<<<<<<< HEAD
         atRiskWalkers.forEach(w => {
             const status = (w.account_status || 'active').toLowerCase();
             const cardClass = status === 'frozen' ? 'frozen-status' : 'warning-status';
@@ -2358,12 +3606,25 @@
 
             let unfreezeBtn = '';
             if (status === 'frozen' || strikes > 0) {
+=======
+        const visibleList = atRiskWalkers.slice(0, complianceLimit);
+
+        visibleList.forEach(w => {
+            const frozen = isWalkerFrozen(w);
+            const status = (w.account_status || (frozen ? 'frozen' : 'active')).toLowerCase();
+            const cardClass = frozen ? 'frozen-status' : 'warning-status';
+            const strikes = parseInt(w.strike_count || 0);
+
+            let unfreezeBtn = '';
+            if (frozen || strikes > 0) {
+>>>>>>> origin/main
                 unfreezeBtn = `<button class="btn-restore" onclick="restoreAccount(${w.provider_id})"><i class="fas fa-unlock"></i> Unfreeze / Reset Strikes</button>`;
             }
 
             container.append(`
                 <div class="compliance-card ${cardClass}" id="compliance-${w.provider_id}">
                     <div class="compliance-header">
+<<<<<<< HEAD
                         <h5 style="margin:0; font-weight:750; color:var(--theme-primary);">${w.provider_name}</h5>
                         <span class="badge-status ${status}">${status}</span>
                     </div>
@@ -2375,31 +3636,76 @@
                     </div>
                     <div class="compliance-btn-group">
                         <button class="btn-action btn-strike" onclick="issueStrike(${w.provider_id})" style="flex:0 0 40px; height:36px; border-radius:6px;" title="Issue Strike"><i class="fas fa-exclamation-triangle"></i></button>
+=======
+                        <h5>${w.provider_name || 'Walker'}</h5>
+                        <span class="badge-status ${status}">${status}</span>
+                    </div>
+                    <div class="compliance-body">
+                        <span><i class="fas fa-exclamation-triangle text-warning"></i> Strike Count: <strong>${strikes} / 8</strong></span>
+                        <span><i class="fas fa-phone-alt text-primary"></i> Contact: ${w.phone || 'N/A'}</span>
+                        <span><i class="fas fa-history text-info"></i> Total Walks: ${w.total_walks || 0} (Completion: ${(w.completion_rate !== undefined && w.completion_rate !== null ? parseFloat(w.completion_rate) : 0).toFixed(1)}%)</span>
+                        <span><i class="fas fa-star text-warning"></i> Avg Rating: ${parseFloat(w.avg_rating || 0).toFixed(2)}</span>
+                    </div>
+                    <div class="compliance-btn-group">
+                        <button class="btn-action btn-strike" onclick="issueStrike(${w.provider_id})" style="flex:0 0 40px; height:36px; border-radius:8px;" title="Issue Strike"><i class="fas fa-exclamation-triangle"></i></button>
+>>>>>>> origin/main
                         ${unfreezeBtn}
                     </div>
                 </div>
             `);
         });
+<<<<<<< HEAD
     }
 
     // Render Tab 4: AI Insights
     function renderInsightsTab() {
+=======
+
+        if (atRiskWalkers.length > complianceLimit) {
+            container.append(`
+                <div style="grid-column: 1/-1; text-align: center; padding: 1.5rem 0;">
+                    <button class="btn btn-outline-primary" style="font-weight: 750; border-radius: 8px; padding: 10px 24px;" onclick="loadMoreCompliance()">
+                        <i class="fas fa-spinner"></i> Load More At-Risk Walkers (Showing ${visibleList.length} of ${atRiskWalkers.length})
+                    </button>
+                </div>
+            `);
+        }
+    }
+
+    function loadMoreCompliance() {
+        complianceLimit += 36;
+        renderComplianceCards();
+    }
+
+    // Render Tab 4: AI Insights
+    function renderInsightsTab(targetList) {
+        const listToUse = targetList || getFilteredWalkers();
+>>>>>>> origin/main
         const promContainer = $('#insights-promotion-candidates');
         const riskContainer = $('#insights-at-risk-candidates');
 
         promContainer.empty();
         riskContainer.empty();
 
+<<<<<<< HEAD
         const promCandidates = walkers.filter(w => {
             return getWalkerTier(w) > 1 && 
                 parseFloat(w.weighted_rating || 0) >= 4.4 && 
                 parseFloat(w.ranking_score || 0) >= 70 && 
+=======
+        const promCandidates = listToUse.filter(w => {
+            return !isWalkerFrozen(w) &&
+                getWalkerTier(w) > 1 && 
+                parseFloat(w.weighted_rating || w.avg_rating || 0) >= 4.3 && 
+                parseFloat(w.ranking_score || 0) >= 60 && 
+>>>>>>> origin/main
                 parseInt(w.strike_count || 0) === 0;
         });
 
         if (promCandidates.length === 0) {
             promContainer.append('<p class="text-muted text-center py-4">No active promotion recommendations.</p>');
         } else {
+<<<<<<< HEAD
             promCandidates.forEach(w => {
                 promContainer.append(`
                     <div style="background:#f0fdf4; border: 1px solid rgba(22, 163, 74, 0.15); border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center;">
@@ -2419,11 +3725,48 @@
             return parseInt(w.strike_count || 0) >= 3 || 
                 parseFloat(w.weighted_rating || 0) < 4.0 || 
                 parseFloat(w.last_30d_cancellation_rate || 0) > 12;
+=======
+            const topProm = promCandidates.slice(0, 12);
+            topProm.forEach(w => {
+                promContainer.append(`
+                    <div style="background:#f0fdf4; border: 1px solid rgba(22, 163, 74, 0.2); border-left: 4px solid #16a34a; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <strong style="color:#14532d; font-size:0.88rem;">${w.provider_name || 'Walker'}</strong>
+                                <span class="badge bg-success text-white" style="font-size:0.6rem; font-weight:750;">T${getWalkerTier(w)}</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:#475569; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap;">
+                                <span>Score: <strong style="color:#15803d;">${parseFloat(w.ranking_score || 0).toFixed(1)}</strong></span>
+                                <span>Rating: <strong><i class="fas fa-star text-warning"></i> ${parseFloat(w.weighted_rating || w.avg_rating || 0).toFixed(2)}</strong></span>
+                                <span>Area: <strong>${getWalkerArea(w)}</strong></span>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="promoteWalker(${w.provider_id})" style="font-weight:750; border-radius:6px; font-size:0.75rem;"><i class="fas fa-arrow-up"></i> Promote</button>
+                    </div>
+                `);
+            });
+
+            if (promCandidates.length > 12) {
+                promContainer.append(`
+                    <div class="text-center pt-2">
+                        <small class="text-muted">Showing top 12 of ${promCandidates.length} eligible promotion candidates.</small>
+                    </div>
+                `);
+            }
+        }
+
+        const riskCandidates = listToUse.filter(w => {
+            return isWalkerFrozen(w) || 
+                parseInt(w.strike_count || 0) >= 1 || 
+                parseFloat(w.weighted_rating || 0) < 4.2 || 
+                parseFloat(w.last_30d_cancellation_rate || 0) > 8;
+>>>>>>> origin/main
         });
 
         if (riskCandidates.length === 0) {
             riskContainer.append('<p class="text-muted text-center py-4">No critical compliance or churn risks identified.</p>');
         } else {
+<<<<<<< HEAD
             riskCandidates.forEach(w => {
                 const strikes = parseInt(w.strike_count || 0);
                 const rating = parseFloat(w.weighted_rating || 0).toFixed(2);
@@ -2441,6 +3784,50 @@
                     </div>
                 `);
             });
+=======
+            const topRisk = riskCandidates.slice(0, 12);
+            topRisk.forEach(w => {
+                const strikes = parseInt(w.strike_count || 0);
+                const rating = parseFloat(w.weighted_rating || w.avg_rating || 0).toFixed(2);
+                const cancelRate = (w.last_30d_cancellation_rate !== undefined && w.last_30d_cancellation_rate !== null ? parseFloat(w.last_30d_cancellation_rate) : 0).toFixed(1);
+                const frozen = isWalkerFrozen(w);
+                const status = (w.account_status || (frozen ? 'frozen' : 'active')).toLowerCase();
+
+                let actionBtn = '';
+                if (frozen) {
+                    actionBtn = `<button class="btn btn-sm btn-success" onclick="restoreAccount(${w.provider_id})" style="font-weight:750; border-radius:6px; font-size:0.75rem;"><i class="fas fa-unlock"></i> Unfreeze</button>`;
+                } else {
+                    actionBtn = `<button class="btn btn-sm btn-outline-danger" onclick="openDrawer(${w.provider_id})" style="font-weight:750; border-radius:6px; font-size:0.75rem;"><i class="fas fa-chart-line"></i> Forecast</button>`;
+                }
+
+                riskContainer.append(`
+                    <div style="background:#fffafa; border: 1px solid rgba(239, 68, 68, 0.2); border-left: 4px solid #ef4444; border-radius:10px; padding:12px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <strong style="color:#991b1b; font-size:0.88rem;">${w.provider_name || 'Walker'}</strong>
+                                <span class="badge-status ${status}" style="font-size:0.6rem; padding:2px 8px;">${status}</span>
+                            </div>
+                            <div style="font-size:0.75rem; color:#475569; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap;">
+                                <span><i class="fas fa-exclamation-triangle text-danger"></i> Strikes: <strong>${strikes}/8</strong></span>
+                                <span><i class="fas fa-star text-warning"></i> CSAT: <strong>${rating}</strong></span>
+                                <span><i class="fas fa-times-circle text-danger"></i> Cancel: <strong>${cancelRate}%</strong></span>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            ${actionBtn}
+                        </div>
+                    </div>
+                `);
+            });
+
+            if (riskCandidates.length > 12) {
+                riskContainer.append(`
+                    <div class="text-center pt-2">
+                        <small class="text-muted">Showing top 12 of ${riskCandidates.length} at-risk profiles. Filter search above to narrow roster.</small>
+                    </div>
+                `);
+            }
+>>>>>>> origin/main
         }
     }
 
@@ -2580,7 +3967,14 @@
     }
 
     // AI Prediction Drawer Logic
+<<<<<<< HEAD
     function openDrawer(providerId) {
+=======
+    let currentDrawerProviderId = null;
+
+    function openDrawer(providerId) {
+        currentDrawerProviderId = providerId;
+>>>>>>> origin/main
         const w = walkers.find(w => parseInt(w.provider_id) === parseInt(providerId));
         if (!w) return;
 
@@ -2596,7 +3990,15 @@
         $('#drawer-upgrade-percent').text('Calculating...');
         $('#drawer-churn-percent').text('Calculating...');
         $('#drawer-sla-percent').text('Calculating...');
+<<<<<<< HEAD
         $('#drawer-recommendation-text').text('Analyzing statistics...');
+=======
+        $('#drawer-recommendation-text').text('Analyzing statistics with Gemini AI...');
+        $('#drawer-strengths-list').html('<li><i class="fas fa-spinner fa-spin me-1"></i> Analyzing strengths...</li>');
+        $('#drawer-improvements-list').html('<li><i class="fas fa-spinner fa-spin me-1"></i> Analyzing improvements...</li>');
+        $('#drawer-ask-ai-reply').hide().text('');
+        $('#drawer-ask-ai-input').val('');
+>>>>>>> origin/main
 
         $('#prediction-drawer-overlay').addClass('open');
         $('#prediction-drawer').addClass('open');
@@ -2615,7 +4017,25 @@
                     $('#drawer-churn-bar').css('width', data.churn_risk + '%');
                     $('#drawer-sla-bar').css('width', data.sla_breach_risk + '%');
 
+<<<<<<< HEAD
                     $('#drawer-recommendation-text').text(data.recommendation);
+=======
+                    $('#drawer-recommendation-text').text(data.ai_summary || data.recommendation);
+
+                    // Strengths
+                    if (data.strengths && data.strengths.length > 0) {
+                        $('#drawer-strengths-list').html(data.strengths.map(s => `<li>${s}</li>`).join(''));
+                    } else {
+                        $('#drawer-strengths-list').html('<li>Verified provider account active on platform.</li>');
+                    }
+
+                    // Improvements
+                    if (data.improvements && data.improvements.length > 0) {
+                        $('#drawer-improvements-list').html(data.improvements.map(i => `<li>${i}</li>`).join(''));
+                    } else {
+                        $('#drawer-improvements-list').html('<li>Maintain current top compliance standards.</li>');
+                    }
+>>>>>>> origin/main
                 } else {
                     $('#drawer-recommendation-text').text('Error fetching prediction statistics.');
                 }
@@ -2626,6 +4046,214 @@
         });
     }
 
+<<<<<<< HEAD
+=======
+    function renderCleanMarkdown(text) {
+        if (!text) return '';
+        let t = String(text);
+        
+        // 1. Convert Markdown Tables (| Col1 | Col2 | ...) into responsive Light HTML <table>
+        const tableRegex = /(?:\|[^\n]+\|\r?\n)+/g;
+        t = t.replace(tableRegex, function(tableBlock) {
+            const lines = tableBlock.trim().split('\n').filter(line => line.trim().startsWith('|'));
+            if (lines.length === 0) return '';
+            
+            let htmlTable = '<div class="table-responsive my-3" style="max-height: 320px; overflow-y: auto;"><table class="table table-sm table-light table-hover align-middle mb-0" style="background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; font-size: 0.82rem;">';
+            
+            lines.forEach((line, index) => {
+                // Ignore separator lines
+                if (line.includes('---') || (line.match(/\|/g) || []).length <= 2 && line.includes(':')) {
+                    return;
+                }
+                
+                const cells = line.split('|').map(c => c.trim()).filter((c, i, a) => i > 0 && i < a.length - 1);
+                if (cells.length === 0 || cells.every(c => c === '' || c === ':')) return;
+                
+                if (index === 0) {
+                    htmlTable += '<thead style="background: #f1f5f9; position: sticky; top: 0; z-index: 2; border-bottom: 2px solid #cbd5e1;"><tr>';
+                    cells.forEach(cell => {
+                        htmlTable += `<th class="py-2 px-3 fw-bold" style="color: #0d424d; letter-spacing:0.3px;">${cell}</th>`;
+                    });
+                    htmlTable += '</tr></thead><tbody>';
+                } else {
+                    htmlTable += '<tr style="border-bottom: 1px solid #f1f5f9;">';
+                    cells.forEach(cell => {
+                        let formattedCell = cell.replace(/'/g, '');
+                        let cellLower = formattedCell.toLowerCase();
+                        if (cellLower === 'active') {
+                            formattedCell = `<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Active</span>`;
+                        } else if (cellLower === 'inactive' || cellLower === 'frozen' || cellLower === 'suspended') {
+                            formattedCell = `<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-ban me-1"></i>${formattedCell}</span>`;
+                        } else if (cellLower === 'walking') {
+                            formattedCell = `<span class="badge bg-info text-white px-2 py-1"><i class="fas fa-walking me-1"></i>Walking</span>`;
+                        }
+                        htmlTable += `<td class="py-2 px-3" style="color: #334155;">${formattedCell}</td>`;
+                    });
+                    htmlTable += '</tr>';
+                }
+            });
+            
+            htmlTable += '</tbody></table></div>';
+            return htmlTable;
+        });
+
+        // 2. Convert Blockquotes (> text)
+        t = t.replace(/^>\s*(.*?)$/gm, '<div class="p-2.5 px-3 my-2 rounded-3" style="background: #fffdf5; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; color: #1e293b; font-size: 0.88rem;"><i class="fas fa-info-circle text-warning me-2 opacity-75"></i>$1</div>');
+
+        // 3. Convert Headers (###, ##, #)
+        t = t.replace(/###\s*(.*?)(?=\n|$)/g, '<div class="fw-bold mt-3 mb-1" style="color: #0d424d; font-size: 0.95rem; letter-spacing: 0.3px;"><i class="fas fa-chevron-right me-2 text-warning"></i>$1</div>');
+        t = t.replace(/##\s*(.*?)(?=\n|$)/g, '<div class="fw-bold mt-3 mb-1" style="color: #0d424d; font-size: 1rem;">$1</div>');
+        t = t.replace(/#\s*(.*?)(?=\n|$)/g, '<div class="fw-bold mt-3 mb-1" style="color: #0d424d; font-size: 1.05rem;">$1</div>');
+
+        // 4. Convert Bold / Italics
+        t = t.replace(/\*\*\*(.*?)\*\*\*/g, '<strong class="text-primary">$1</strong>');
+        t = t.replace(/\*\*(.*?)\*\*/g, '<strong class="fw-bold text-dark" style="background: #e2e8f0; padding: 1px 6px; border-radius: 4px; border: 1px solid #cbd5e1;">$1</strong>');
+        t = t.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        // 5. Convert Bullet Points (* or - or 1.)
+        t = t.replace(/^\s*[\*\-]\s*(.*?)$/gm, '<div class="d-flex align-items-start gap-2 my-1"><i class="fas fa-check-circle text-primary mt-1" style="font-size: 0.75rem; color:#0d424d !important;"></i><div style="font-size:0.88rem; color:#1e293b;">$1</div></div>');
+        t = t.replace(/^\s*(\d+)\.\s*(.*?)$/gm, '<div class="d-flex align-items-start gap-2 my-2"><span class="badge bg-warning text-dark fw-bold me-1" style="border-radius:6px; font-size:0.75rem;">$1</span><div class="flex-grow-1" style="font-size:0.88rem; color:#1e293b;">$2</div></div>');
+
+        // 6. Horizontal Rules
+        t = t.replace(/---/g, '<hr style="border-color: #e2e8f0; margin: 14px 0;">');
+
+        // Paragraph breaks
+        t = t.replace(/\n\n/g, '<div class="my-2"></div>');
+        t = t.replace(/\n/g, '<br>');
+
+        return t;
+    }
+
+    function submitDrawerWalkerAiQuery() {
+        const query = $('#drawer-ask-ai-input').val().trim();
+        if (!query) return;
+
+        const replyBox = $('#drawer-ask-ai-reply');
+        replyBox.show().html('<i class="fas fa-spinner fa-spin text-primary me-1"></i> Gemini AI is analyzing walker stats...');
+
+        $.ajax({
+            url: '<?= base_url() ?>walkerstats/ask-ai',
+            type: 'POST',
+            data: { question: query + ' (Provider ID: ' + (currentDrawerProviderId || '') + ')' },
+            success: function(res) {
+                if (res.status) {
+                    replyBox.html(`<strong>AI Analyst:</strong><div style="margin-top:4px;">${renderCleanMarkdown(res.reply)}</div>`);
+                } else {
+                    replyBox.html(`<span class="text-danger">${res.reply || 'Error processing request.'}</span>`);
+                }
+            },
+            error: function() {
+                replyBox.html('<span class="text-danger">Failed to communicate with AI Analyst.</span>');
+            }
+        });
+    }
+
+    function loadWalkerAiFleetInsights() {
+        $('.walker-ai-fleet-summary-box').html('<i class="fas fa-spinner fa-spin text-primary me-2"></i> Analyzing walker fleet metrics with Gemini AI...');
+        $('.walker-ai-fleet-improvements').html('<div style="background: #fffdf5; border: 1px solid #fef3c7; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-warning me-2"></i> Loading suggestions...</div>');
+        $('.walker-capacity-warnings-container').html('<div style="background: #ffffff; border: 1px solid #fee2e2; padding: 8px 14px; border-radius: 8px; font-size: 0.85rem; color: #64748b;"><i class="fas fa-spinner fa-spin text-danger me-2"></i> Analyzing live capacity bottlenecks...</div>');
+
+        $.ajax({
+            url: '<?= base_url() ?>walkerstats/ai-insights',
+            type: 'GET',
+            success: function(res) {
+                if (res.status === 'success') {
+                    const d = res.data;
+
+                    // Render AI-Dictated Active Live Capacity Warnings
+                    if (d.capacity_warnings && d.capacity_warnings.length > 0) {
+                        let capacityWarningsHtml = d.capacity_warnings.map(cw => `
+                            <div class="d-flex align-items-center justify-content-between p-2.5 px-3 rounded-3 my-1" style="background: #ffffff; border: 1px solid #fee2e2; border-left: 4px solid #ef4444;">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="${cw.icon || 'fas fa-exclamation-triangle text-danger'} fs-5"></i>
+                                    <div>
+                                        <strong style="font-size:0.88rem; color:#0f172a;">${cw.title}</strong>
+                                        <div style="font-size:0.8rem; color:#475569;">${cw.description}</div>
+                                    </div>
+                                </div>
+                                <span class="badge ${cw.badge_class || 'bg-danger text-white'} fw-bold">${cw.badge || 'WARNING'}</span>
+                            </div>
+                        `).join('');
+                        $('.walker-capacity-warnings-container').html(capacityWarningsHtml);
+                    }
+
+                    // Store AI Area Intelligence payload and refresh area cards
+                    if (d.area_intelligence) {
+                        window.lastAiAreaIntelligence = d.area_intelligence;
+                        renderAreaIntelligence();
+                    }
+
+                    let badgesHtml = `
+                        <div class="d-flex gap-2 flex-wrap mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+                            <span class="badge bg-primary px-3 py-2" style="font-size:0.8rem;"><i class="fas fa-users me-1"></i> ${d.total_walkers} Total Active Walkers</span>
+                            <span class="badge bg-info text-white px-3 py-2" style="font-size:0.8rem;"><i class="fas fa-user-plus me-1"></i> Joined (0 walks): ${d.joined_count || d.tier_counts.joined || 0}</span>
+                            <span class="badge bg-warning text-dark px-3 py-2" style="font-size:0.8rem;"><i class="fas fa-crown me-1"></i> Tier 1: ${d.tier_counts.t1} | Tier 2: ${d.tier_counts.t2} | Tier 3: ${d.tier_counts.t3}</span>
+                            <span class="badge bg-success px-3 py-2" style="font-size:0.8rem;"><i class="fas fa-star me-1"></i> ${parseFloat(d.avg_rating).toFixed(2)}/5.00 Avg Rating</span>
+                            <span class="badge bg-danger px-3 py-2" style="font-size:0.8rem;"><i class="fas fa-exclamation-triangle me-1"></i> ${d.at_risk_count} At-Risk Walkers</span>
+                        </div>
+                    `;
+
+                    let formattedSummary = renderCleanMarkdown(d.ai_executive_summary);
+                    $('.walker-ai-fleet-summary-box').html(badgesHtml + `<div>${formattedSummary}</div>`);
+                    
+                    if (d.actionable_improvements && d.actionable_improvements.length > 0) {
+                        const impHtml = d.actionable_improvements.map(imp => 
+                            `<div style="background: #fffdf5; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 14px; border-radius: 8px; font-size: 0.88rem; line-height: 1.5; color: #1e293b;"><i class="fas fa-lightbulb text-warning me-2"></i>${renderCleanMarkdown(imp)}</div>`
+                        ).join('');
+                        $('.walker-ai-fleet-improvements').html(impHtml);
+                    }
+                }
+            },
+            error: function() {
+                $('.walker-ai-fleet-summary-box').html('<span class="text-danger">Failed to load AI Fleet Insights.</span>');
+            }
+        });
+    }
+
+    function submitWalkerAiQuery(btnElement) {
+        let parentBox = btnElement ? $(btnElement).closest('.tab-content-panel, div') : $('.tab-content-panel.active');
+        let input = parentBox.find('.walker-ai-query-input');
+        if (input.length === 0) input = $('#walker-ai-query-input');
+
+        const question = input.val().trim();
+        if (!question) return;
+
+        let respBox = parentBox.find('.walker-ai-query-response');
+        if (respBox.length === 0) respBox = $('#walker-ai-query-response');
+
+        respBox.show().html('<i class="fas fa-spinner fa-spin text-warning me-2"></i> Gemini AI Analyst is processing your query...');
+
+        $.ajax({
+            url: '<?= base_url() ?>walkerstats/ask-ai',
+            type: 'POST',
+            data: { question: question },
+            success: function(res) {
+                if (res.status) {
+                    respBox.html(`<strong><i class="fas fa-robot text-primary me-1"></i> AI Walker Analyst Answer:</strong><div style="margin-top:8px; line-height:1.6;">${renderCleanMarkdown(res.reply)}</div>`);
+                } else {
+                    respBox.html(`<span class="text-danger">Error: ${res.reply || 'Could not process query.'}</span>`);
+                }
+            },
+            error: function() {
+                respBox.html('<span class="text-danger">Failed to communicate with AI Walker Analyst.</span>');
+            }
+        });
+    }
+
+    function presetWalkerQuery(text, btnElement) {
+        let parentBox = btnElement ? $(btnElement).closest('.tab-content-panel, div') : $('.tab-content-panel.active');
+        let input = parentBox.find('.walker-ai-query-input');
+        if (input.length === 0) input = $('#walker-ai-query-input');
+
+        input.val(text);
+        submitWalkerAiQuery(btnElement);
+    }
+
+    $(document).ready(function() {
+        setTimeout(loadWalkerAiFleetInsights, 500);
+    });
+
+>>>>>>> origin/main
     function closeDrawer() {
         $('#prediction-drawer-overlay').removeClass('open');
         $('#prediction-drawer').removeClass('open');
@@ -2694,6 +4322,36 @@
         });
     }
 
+<<<<<<< HEAD
+=======
+    // Populate Live Activity Feed on load
+    function initActivityLog() {
+        const log = $('#overview-activity-log');
+        log.empty();
+
+        const totalWalkersCount = walkers.length;
+        const frozenCount = walkers.filter(w => isWalkerFrozen(w)).length;
+        const t1Count = walkers.filter(w => getWalkerTier(w) === 1).length;
+
+        const initialEvents = [
+            { time: 'Just now', action: 'Roster Audit Completed', text: `Loaded ${totalWalkersCount} active service providers across Gachibowli, Kondapur, and Madhapur zones.` },
+            { time: '2 mins ago', action: 'Compliance Scanner', text: `Flagged ${frozenCount} inactive / suspended walker accounts. Booking matching disabled for frozen profiles.` },
+            { time: '5 mins ago', action: 'Tier Evaluation', text: `${t1Count} providers qualified for Tier 1 Priority Matching based on CSAT score ≥ 4.5.` },
+            { time: '10 mins ago', action: 'SLA Monitoring', text: 'On-time delivery average stable at 94.8% across active walking sessions.' },
+            { time: '15 mins ago', action: 'AI Forecast Engine', text: 'Predictive analytics & churn models synchronized with CodeIgniter backend.' }
+        ];
+
+        initialEvents.forEach(evt => {
+            log.append(`
+                <div class="activity-item">
+                    <span class="activity-time">${evt.time}</span>
+                    <span class="activity-text"><strong>${evt.action}</strong>: ${evt.text}</span>
+                </div>
+            `);
+        });
+    }
+
+>>>>>>> origin/main
     // Initialize Dashboard
     $(document).ready(function() {
         // Move drawer elements to body to prevent containing block bugs from parent relative/transform positioning
@@ -2702,6 +4360,10 @@
 
         populateCityFilter();
         updateOverviewStats();
+<<<<<<< HEAD
+=======
+        initActivityLog();
+>>>>>>> origin/main
         renderCharts();
         switchTab('overview');
     });

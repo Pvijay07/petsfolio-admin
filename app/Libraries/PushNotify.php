@@ -127,10 +127,16 @@ class PushNotify
 
     public function notifyMultipleParallel($tokens, $title, $message, $routeName = null, array $data = [], $batchSize = 50)
     {
+<<<<<<< HEAD
         $client    = new Client();
         $responses = [];
 
         // Split tokens into batches
+=======
+        $client  = new Client();
+        $results = [];
+
+>>>>>>> origin/main
         $tokenBatches = array_chunk($tokens, $batchSize);
 
         foreach ($tokenBatches as $batch) {
@@ -142,6 +148,7 @@ class PushNotify
                     "notification" => [
                         "title" => $title,
                         "body"  => $message,
+<<<<<<< HEAD
                     ],
                     "android"      => [
                         "priority" => "HIGH"
@@ -176,16 +183,95 @@ class PushNotify
             $responses      = array_merge($responses, $batchResponses);
 
             // Free up memory
+=======
+                        "image" => "https://staging-api.petsfolio.in/public/uploads/icons/ic_launcher.png"
+                    ],
+                    "android"      => [
+                        "priority" => "HIGH",
+                        "notification" => [
+                            "sound"      => "default",
+                            "icon"       => "ic_launcher",
+                            "color"      => "#FF6F00",
+                            "channel_id" => "custom_sound_channel",
+                        ],
+                    ],
+                    "apns"         => [
+                        "headers" => ["apns-priority" => "10"],
+                        "payload" => ["aps" => ["sound" => "notification_sound"]]
+                    ]
+                ];
+
+                if (!empty($routeName)) {
+                    $messagePayload["android"]["data"] = [
+                        "route_name" => (string) $routeName
+                    ];
+                }
+
+                if (!empty($data)) {
+                    $messagePayload["data"] = array_map('strval', $data);
+                }
+
+                $body = ["message" => $messagePayload];
+
+                $promises[$token] = $client->postAsync(
+                    'https://fcm.googleapis.com/v1/projects/petsfolio-2204f/messages:send',
+                    [
+                        'json'    => $body,
+                        'headers' => [
+                            'Authorization' => 'Bearer ' . $this->accessToken,
+                            'Content-Type'  => 'application/json'
+                        ],
+                    ]
+                );
+            }
+
+            $responses = Promise\Utils::settle($promises)->wait();
+
+            foreach ($responses as $token => $response) {
+                if ($response['state'] === 'fulfilled') {
+                    $results[] = [
+                        'token'  => $token,
+                        'status' => 'sent',
+                        'body'   => json_decode((string) $response['value']->getBody(), true)
+                    ];
+                } else {
+                    $reason = $response['reason'];
+                    $errorDetails = $reason->getMessage();
+
+                    if ($reason instanceof \GuzzleHttp\Exception\RequestException && $reason->hasResponse()) {
+                        $resBody = (string) $reason->getResponse()->getBody();
+                        $decoded = json_decode($resBody, true);
+                        if (!empty($decoded['error']['message'])) {
+                            $code   = $decoded['error']['code'] ?? $reason->getResponse()->getStatusCode();
+                            $fcmErr = $decoded['error']['details'][0]['errorCode'] ?? '';
+                            $errorDetails = "FCM [{$code}" . ($fcmErr ? " / {$fcmErr}" : "") . "]: " . $decoded['error']['message'];
+                        }
+                    }
+
+                    $results[] = [
+                        'token'  => $token,
+                        'status' => 'failed',
+                        'error'  => $errorDetails,
+                    ];
+                }
+            }
+
+>>>>>>> origin/main
             unset($promises);
             gc_collect_cycles();
         }
 
+<<<<<<< HEAD
         return $responses;
     }
     /**
      * Send multicast message using v1 API (simulated via parallel)
      * The legacy /fcm/send is deprecated and requires a server key which is missing.
      */
+=======
+        return $results;
+    }
+>>>>>>> origin/main
     public function sendMulticast(array $tokens, $title, $message, $routeName = null, array $data = [])
     {
         if (empty($tokens)) return [];

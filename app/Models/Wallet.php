@@ -17,17 +17,30 @@ class Wallet extends Model
   public function __construct()
   {
     parent::__construct();
+<<<<<<< HEAD
     $this->user_service_wallet   = 'user_service_wallet';
     $this->user_wallet_histories = 'user_wallet_histories';
     $this->sp_wallets            = 'sp_withdrawal_wallet';
     $this->sp_wallet_histories   = 'sp_wallet_histories';
     $this->transactions          = 'transactions';
+=======
+    $this->user_service_wallet = 'user_service_wallet';
+    $this->user_wallet_histories = 'user_wallet_histories';
+    $this->sp_wallets = 'sp_withdrawal_wallet';
+    $this->sp_wallet_histories = 'sp_wallet_histories';
+    $this->transactions = 'transactions';
+>>>>>>> origin/main
   }
   public function createUserWallet($user_id)
   {
     $wallet = [
+<<<<<<< HEAD
       'user_id'    => $user_id,
       'balance'    => 0,
+=======
+      'user_id' => $user_id,
+      'balance' => 0,
+>>>>>>> origin/main
       'created_at' => gmdate('Y-m-d H:i:s')
     ];
     $this->db->table($this->user_service_wallet)->insert($wallet);
@@ -41,11 +54,17 @@ class Wallet extends Model
       ->selectSum('training_amount', 'training_amount')
       ->selectSum('boarding_amount', 'boarding_amount')
       ->selectSum('grooming_amount', 'grooming_amount')
+<<<<<<< HEAD
+=======
+      ->selectSum('sitting_amount', 'sitting_amount')
+
+>>>>>>> origin/main
       ->where('user_id', $user_id)
       ->get()
       ->getRow();
 
     $totalServiceAmount = [
+<<<<<<< HEAD
       'service_amount'  => ($serviceAmountResult->walking_amount ?? 0) +
         ($serviceAmountResult->training_amount ?? 0) +
         ($serviceAmountResult->boarding_amount ?? 0) +
@@ -54,6 +73,19 @@ class Wallet extends Model
       'training_amount' => $serviceAmountResult->training_amount ?? 0,
       'boarding_amount' => $serviceAmountResult->boarding_amount ?? 0,
       'grooming_amount' => $serviceAmountResult->grooming_amount ?? 0
+=======
+      'service_amount' => ($serviceAmountResult->walking_amount ?? 0) +
+        ($serviceAmountResult->training_amount ?? 0) +
+        ($serviceAmountResult->boarding_amount ?? 0) +
+        ($serviceAmountResult->sitting_amount ?? 0) +
+        ($serviceAmountResult->grooming_amount ?? 0),
+      'walking_amount' => $serviceAmountResult->walking_amount ?? 0,
+      'training_amount' => $serviceAmountResult->training_amount ?? 0,
+      'boarding_amount' => $serviceAmountResult->boarding_amount ?? 0,
+      'grooming_amount' => $serviceAmountResult->grooming_amount ?? 0,
+      'sitting_amount' => $serviceAmountResult->sitting_amount ?? 0,
+
+>>>>>>> origin/main
     ];
 
     return $totalServiceAmount;
@@ -86,6 +118,7 @@ class Wallet extends Model
 
   public function getUserWalletDetails($user_id)
   {
+<<<<<<< HEAD
     $service_amount    = $this->getServiceWalletSum($user_id);
     $withdrawal_amount = $this->getWithdrawalWalletSum($user_id);
     $transactions      = $this->getUserWalletTransactions($user_id);
@@ -94,6 +127,16 @@ class Wallet extends Model
       'withdrawal_amount' => $withdrawal_amount,
       'service_amount'    => $service_amount,
       'transactions'      => []
+=======
+    $service_amount = $this->getServiceWalletSum($user_id);
+    $withdrawal_amount = $this->getWithdrawalWalletSum($user_id);
+    $transactions = $this->getUserWalletTransactions($user_id);
+
+    $result = [
+      'withdrawal_amount' => $withdrawal_amount,
+      'service_amount' => $service_amount,
+      'transactions' => []
+>>>>>>> origin/main
     ];
 
     $calcuttaTZ = new DateTimeZone('Asia/Calcutta');
@@ -105,10 +148,17 @@ class Wallet extends Model
       $transaction->created_at = $utcTime->format('Y-m-d h:i:s');
 
       $result['transactions'][] = [
+<<<<<<< HEAD
         'amount'           => $transaction->amount,
         'transaction_type' => $transaction->transaction_type,
         'description'      => $transaction->description,
         'created_at'       => $transaction->created_at,
+=======
+        'amount' => $transaction->amount,
+        'transaction_type' => $transaction->transaction_type,
+        'description' => $transaction->description,
+        'created_at' => $transaction->created_at,
+>>>>>>> origin/main
       ];
     }
 
@@ -124,6 +174,7 @@ class Wallet extends Model
       ->update();
 
     $transactionData = [
+<<<<<<< HEAD
       'wallet_id'        => $data->wallet_id,
       'amount'           => $data->amount,
       'transaction_type' => 'credit',
@@ -132,6 +183,16 @@ class Wallet extends Model
       'transaction_at'   => date('Y-m-d H:i:s'),
       'created_at'       => date('Y-m-d H:i:s'),
       'updated_at'       => date('Y-m-d H:i:s')
+=======
+      'wallet_id' => $data->wallet_id,
+      'amount' => $data->amount,
+      'transaction_type' => 'credit',
+      'transaction_for' => 'add_money',
+      'description' => 'Money added to wallet',
+      'transaction_at' => date('Y-m-d H:i:s'),
+      'created_at' => date('Y-m-d H:i:s'),
+      'updated_at' => date('Y-m-d H:i:s')
+>>>>>>> origin/main
     ];
     return $this->db->table($this->user_wallet_histories)
       ->insert($transactionData);
@@ -140,8 +201,13 @@ class Wallet extends Model
   {
     $wallet = [
       'provider_id' => $provider_id,
+<<<<<<< HEAD
       'amount'      => 0,
       'created_at'  => gmdate('Y-m-d H:i:s')
+=======
+      'amount' => 0,
+      'created_at' => gmdate('Y-m-d H:i:s')
+>>>>>>> origin/main
     ];
     $this->db->table($this->sp_wallets)->insert($wallet);
     return $this->db->insertID();
@@ -153,12 +219,17 @@ class Wallet extends Model
       ->selectSum('training_amount', 'training_amount')
       ->selectSum('boarding_amount', 'boarding_amount')
       ->selectSum('grooming_amount', 'grooming_amount')
+<<<<<<< HEAD
+=======
+      ->selectSum('sitting_amount', 'sitting_amount')
+>>>>>>> origin/main
       ->where('provider_id', $provider_id)
       ->get()
       ->getRow();
 
 
     $totalServiceAmount = [
+<<<<<<< HEAD
       'service_amount'  => ($serviceAmountResult->walking_amount ?? 0) +
         ($serviceAmountResult->training_amount ?? 0) +
         ($serviceAmountResult->boarding_amount ?? 0) +
@@ -167,6 +238,18 @@ class Wallet extends Model
       'training_amount' => $serviceAmountResult->training_amount ?? 0,
       'boarding_amount' => $serviceAmountResult->boarding_amount ?? 0,
       'grooming_amount' => $serviceAmountResult->grooming_amount ?? 0
+=======
+      'service_amount' => ($serviceAmountResult->walking_amount ?? 0) +
+        ($serviceAmountResult->training_amount ?? 0) +
+        ($serviceAmountResult->boarding_amount ?? 0) +
+        ($serviceAmountResult->sitting_amount ?? 0) +
+        ($serviceAmountResult->grooming_amount ?? 0),
+      'walking_amount' => $serviceAmountResult->walking_amount ?? 0,
+      'training_amount' => $serviceAmountResult->training_amount ?? 0,
+      'boarding_amount' => $serviceAmountResult->boarding_amount ?? 0,
+      'grooming_amount' => $serviceAmountResult->grooming_amount ?? 0,
+      'sitting_amount' => $serviceAmountResult->sitting_amount ?? 0
+>>>>>>> origin/main
     ];
 
     return $totalServiceAmount;
@@ -194,6 +277,7 @@ class Wallet extends Model
 
   public function getProviderWalletDetails($provider_id)
   {
+<<<<<<< HEAD
     $service_amount    = $this->getProviderServiceWalletSum($provider_id);
     $withdrawal_amount = $this->getProviderWithdrawalWalletSum($provider_id);
     $transactions      = $this->getProviderWalletTransactions($provider_id);
@@ -207,6 +291,21 @@ class Wallet extends Model
       'transactions'      => [],
       'withdrawal_status' => $withdrawal->withdrawal_status ?? '',
       'banks'             => !empty($banks) ? true : false,
+=======
+    $service_amount = $this->getProviderServiceWalletSum($provider_id);
+    $withdrawal_amount = $this->getProviderWithdrawalWalletSum($provider_id);
+    $transactions = $this->getProviderWalletTransactions($provider_id);
+    $withdrawal = $this->getPaymentsRequests($provider_id);
+    $banks = $this->getProviderBank($provider_id);
+    $actualEarningAmount = $withdrawal_amount;
+
+    $result = [
+      'withdrawal_amount' => $withdrawal_amount,
+      'service_wallet' => $service_amount,
+      'transactions' => [],
+      'withdrawal_status' => $withdrawal->withdrawal_status ?? '',
+      'banks' => !empty($banks) ? true : false,
+>>>>>>> origin/main
       'actualEarningAmount' => $actualEarningAmount ?? 0
     ];
     $calcuttaTZ = new DateTimeZone('Asia/Calcutta');
@@ -218,10 +317,17 @@ class Wallet extends Model
       $transaction->created_at = $utcTime->format('Y-m-d h:i:s');
 
       $result['transactions'][] = [
+<<<<<<< HEAD
         'amount'           => $transaction->amount,
         'transaction_type' => $transaction->transaction_type,
         'description'      => $transaction->description,
         'created_at'       => $transaction->created_at,
+=======
+        'amount' => $transaction->amount,
+        'transaction_type' => $transaction->transaction_type,
+        'description' => $transaction->description,
+        'created_at' => $transaction->created_at,
+>>>>>>> origin/main
       ];
     }
 
@@ -410,14 +516,22 @@ class Wallet extends Model
       // Insert a new record if the provider_id does not exist
       $data = [
         'provider_id' => $provider_id,
+<<<<<<< HEAD
         'amount'      => $providerCreditAmount,
+=======
+        'amount' => $providerCreditAmount,
+>>>>>>> origin/main
       ];
       return $this->db->table('sp_withdrawal_wallet')
         ->insert($data);
     }
   }
 
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> origin/main
 
   public function logTransaction($user_id, $serviceType, $booking_id, $type, $amount, $balanceAfter, $refundAmount, $category, $desc, $table, $idempotencyKey = null, $txnId = null)
   {
@@ -453,6 +567,7 @@ class Wallet extends Model
 
     // Insert with checksum chain
     return $this->db->table($table)->insert([
+<<<<<<< HEAD
       $idField        => $user_id,
       'booking_id'    => $booking_id,
       'service_id'    => $serviceType,
@@ -466,6 +581,21 @@ class Wallet extends Model
       'txn_id'        => $txnId,
       'prev_checksum' => $prev,
       'checksum'      => $checksum
+=======
+      $idField => $user_id,
+      'booking_id' => $booking_id,
+      'service_id' => $serviceType,
+      'transaction_type' => $type,
+      'amount' => $amount,
+      'balance_after' => $balanceAfter,
+      $walletField => $refundAmount,
+      'category' => $category,
+      'description' => $desc,
+      'idempotency_key' => $idempotencyKey,
+      'txn_id' => $txnId,
+      'prev_checksum' => $prev,
+      'checksum' => $checksum
+>>>>>>> origin/main
     ]);
   }
 
@@ -572,8 +702,13 @@ class Wallet extends Model
   public function createUserWWallet($user_id)
   {
     $wallet = [
+<<<<<<< HEAD
       'user_id'    => $user_id,
       'amount'     => 0,
+=======
+      'user_id' => $user_id,
+      'amount' => 0,
+>>>>>>> origin/main
       'created_at' => gmdate('Y-m-d H:i:s')
     ];
     $this->db->table('user_withdrawal_wallet')->insert($wallet);
@@ -609,13 +744,21 @@ class Wallet extends Model
     if ($table === 'user_service_wallet') {
       $where = [
         'user_id' => $data['user_id'],
+<<<<<<< HEAD
         'pet_id'  => $data['pet_id']
+=======
+        'pet_id' => $data['pet_id']
+>>>>>>> origin/main
       ];
       $column = $serviceType . '_amount';
     } elseif ($table === 'sp_service_wallet') {
       $where = [
         'provider_id' => $data['provider_id'],
+<<<<<<< HEAD
         'pet_id'      => $data['pet_id']
+=======
+        'pet_id' => $data['pet_id']
+>>>>>>> origin/main
       ];
       $column = $serviceType . '_amount';
     } elseif ($table === 'user_withdrawal_wallet') {

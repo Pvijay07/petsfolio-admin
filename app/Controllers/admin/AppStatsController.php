@@ -36,7 +36,11 @@ class AppStatsController extends BaseController
   public function updateStats()
   {
     $playStore = new PlayStoreAPI();
+<<<<<<< HEAD
     $stats = $playStore->getAppStatistics();
+=======
+    $stats = $playStore->getInstallsStatistics();
+>>>>>>> origin/main
 
     if ($stats) {
       $statsModel = new \App\Models\AppStatsModel();

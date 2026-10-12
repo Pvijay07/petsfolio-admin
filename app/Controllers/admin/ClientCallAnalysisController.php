@@ -9,6 +9,10 @@ use App\Models\CallKeywordModel;
 use App\Models\CallJobModel;
 use App\Services\RecordingService;
 use App\Services\ClientCallRatingService;
+<<<<<<< HEAD
+=======
+use App\Services\SpViolationWorkflowService;
+>>>>>>> origin/main
 
 class ClientCallAnalysisController extends BaseController
 {
@@ -18,6 +22,10 @@ class ClientCallAnalysisController extends BaseController
     protected CallJobModel $jobModel;
     protected RecordingService $recordingService;
     protected ClientCallRatingService $ratingService;
+<<<<<<< HEAD
+=======
+    protected SpViolationWorkflowService $workflowService;
+>>>>>>> origin/main
     protected $db;
 
     public function __construct()
@@ -28,6 +36,10 @@ class ClientCallAnalysisController extends BaseController
         $this->jobModel         = new CallJobModel();
         $this->recordingService = new RecordingService();
         $this->ratingService    = new ClientCallRatingService();
+<<<<<<< HEAD
+=======
+        $this->workflowService  = new SpViolationWorkflowService();
+>>>>>>> origin/main
         $this->db               = \Config\Database::connect();
 
         $this->ensureColumnsExist();
@@ -83,11 +95,23 @@ class ClientCallAnalysisController extends BaseController
         $criticalCount     = (int)($kpiRow['critical_count'] ?? 0);
         $reviewCount       = (int)($kpiRow['review_count'] ?? 0);
         $highRelevancePct  = $completedCount > 0 ? round(((int)($kpiRow['high_relevance_count'] ?? 0) / $completedCount) * 100, 1) : 100;
+<<<<<<< HEAD
 
         // Fetch Call Recordings List with Client, Provider & Analysis Info
         $callsQuery = $this->db->table('call_recordings cr')
             ->select("
                 cr.*,
+=======
+        $openCasesCount    = $this->db->table('sp_violation_cases')->where('status', 'open')->countAllResults();
+
+        // Fetch Call Recordings List with Client, Provider, Analysis & Violation Case Info
+        $callsQuery = $this->db->table('call_recordings cr')
+            ->select("
+                cr.*,
+                c.started_at as call_started_at,
+                c.ended_at as call_ended_at,
+                c.created_at as call_initiated_at,
+>>>>>>> origin/main
                 ca.id as analysis_id,
                 ca.summary,
                 ca.service_type as analyzed_service,
@@ -112,11 +136,30 @@ class ClientCallAnalysisController extends BaseController
                 u.name as client_name,
                 u.phone as client_phone,
                 p.name as provider_name,
+<<<<<<< HEAD
                 p.phone as provider_phone
             ")
             ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
             ->join('users u', 'u.id = cr.customer_id', 'left')
             ->join('service_providers p', 'p.id = cr.provider_id', 'left')
+=======
+                p.phone as provider_phone,
+                p.is_on_hold as provider_is_on_hold,
+                p.hold_expires_at as provider_hold_expires_at,
+                p.hold_reason as provider_hold_reason,
+                vc.id as violation_case_id,
+                vc.case_number as violation_case_number,
+                vc.status as violation_case_status,
+                vc.severity as violation_severity,
+                vc.has_active_services,
+                vc.affected_bookings_count
+            ")
+            ->join('calls c', 'c.id = cr.call_id', 'left')
+            ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+            ->join('users u', 'u.id = cr.customer_id', 'left')
+            ->join('service_providers p', 'p.id = cr.provider_id', 'left')
+            ->join('sp_violation_cases vc', 'vc.recording_id = cr.id', 'left')
+>>>>>>> origin/main
             ->where($clientCallWhere);
 
         // Apply service filter
@@ -147,11 +190,86 @@ class ClientCallAnalysisController extends BaseController
             }
         }
 
+<<<<<<< HEAD
         $calls = $callsQuery->orderBy('cr.id', 'DESC')
             ->limit(100)
             ->get()
             ->getResultArray();
 
+=======
+        // Pagination and Search query parameters
+        $page     = max(1, (int)($this->request->getGet('page') ?: 1));
+        $perPage  = max(5, min(100, (int)($this->request->getGet('per_page') ?: 25)));
+        $search   = trim((string)$this->request->getGet('search'));
+
+        // Apply search keyword filter
+        if (!empty($search)) {
+            $callsQuery->groupStart()
+                ->like('u.name', $search)
+                ->orLike('u.phone', $search)
+                ->orLike('p.name', $search)
+                ->orLike('p.phone', $search)
+                ->orLike('cr.id', $search)
+                ->orLike('cr.booking_id', $search)
+            ->groupEnd();
+        }
+
+        // Count total filtered calls for pagination
+        $totalFiltered = (clone $callsQuery)->countAllResults(false);
+        $totalPages    = max(1, (int)ceil($totalFiltered / $perPage));
+
+        $calls = $callsQuery->orderBy('cr.created_at', 'DESC')
+            ->orderBy('cr.id', 'DESC')
+            ->limit($perPage, ($page - 1) * $perPage)
+            ->get()
+            ->getResultArray();
+
+        // Pager Service
+        $pager = service('pager');
+        $pager->only(['service', 'rating', 'flag', 'search', 'per_page']);
+        $pagerLinks = $pager->makeLinks($page, $perPage, $totalFiltered, 'default_full');
+
+        // Format duration & call timings for each call
+        foreach ($calls as &$c) {
+            $durSec = (int)($c['duration'] ?? 0);
+            if ($durSec > 0) {
+                $mins = floor($durSec / 60);
+                $secs = $durSec % 60;
+                $c['formatted_duration'] = ($mins > 0 ? "{$mins}m " : "") . sprintf("%02ds", $secs);
+            } else {
+                $c['formatted_duration'] = '-';
+            }
+
+            // Call Start & End Time
+            $startRaw = !empty($c['call_started_at']) && $c['call_started_at'] !== '0000-00-00 00:00:00'
+                ? $c['call_started_at']
+                : (!empty($c['call_initiated_at']) && $c['call_initiated_at'] !== '0000-00-00 00:00:00'
+                    ? $c['call_initiated_at']
+                    : (!empty($c['created_at']) && $c['created_at'] !== '0000-00-00 00:00:00' ? $c['created_at'] : null));
+
+            if (!empty($startRaw)) {
+                $startTs = strtotime($startRaw);
+                $c['start_time_formatted'] = date('h:i:s A', $startTs);
+                $c['start_time_short']     = date('h:i A', $startTs);
+                $c['start_date_formatted'] = date('M d, Y', $startTs);
+
+                if (!empty($c['call_ended_at']) && $c['call_ended_at'] !== '0000-00-00 00:00:00') {
+                    $endTs = strtotime($c['call_ended_at']);
+                } else {
+                    $endTs = $startTs + $durSec;
+                }
+                $c['end_time_formatted'] = date('h:i:s A', $endTs);
+                $c['end_time_short']     = date('h:i A', $endTs);
+            } else {
+                $c['start_time_formatted'] = '-';
+                $c['start_time_short']     = '-';
+                $c['start_date_formatted'] = '-';
+                $c['end_time_formatted']   = '-';
+                $c['end_time_short']       = '-';
+            }
+        }
+
+>>>>>>> origin/main
         $data = [
             'totalRecordings'   => $totalRecordings,
             'completedCount'    => $completedCount,
@@ -166,9 +284,23 @@ class ClientCallAnalysisController extends BaseController
             'outsideSvcCount'   => $outsideSvcCount,
             'criticalCount'     => $criticalCount,
             'reviewCount'       => $reviewCount,
+<<<<<<< HEAD
             'selectedService'   => $selectedService,
             'selectedRating'    => $selectedRating,
             'selectedFlag'      => $selectedFlag,
+=======
+            'openCasesCount'    => $openCasesCount,
+            'selectedService'   => $selectedService,
+            'selectedRating'    => $selectedRating,
+            'selectedFlag'      => $selectedFlag,
+            'search'            => $search,
+            'page'              => $page,
+            'perPage'           => $perPage,
+            'totalFiltered'     => $totalFiltered,
+            'totalPages'        => $totalPages,
+            'pager'             => $pager,
+            'pagerLinks'        => $pagerLinks,
+>>>>>>> origin/main
             'calls'             => $calls,
         ];
 
@@ -185,17 +317,44 @@ class ClientCallAnalysisController extends BaseController
         $call = $this->db->table('call_recordings cr')
             ->select("
                 cr.*,
+<<<<<<< HEAD
+=======
+                c.started_at as call_started_at,
+                c.ended_at as call_ended_at,
+                c.created_at as call_initiated_at,
+>>>>>>> origin/main
                 ca.*,
                 u.name as client_name,
                 u.phone as client_phone,
                 u.email as client_email,
                 p.name as provider_name,
                 p.phone as provider_phone,
+<<<<<<< HEAD
                 p.email as provider_email
             ")
             ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
             ->join('users u', 'u.id = cr.customer_id', 'left')
             ->join('service_providers p', 'p.id = cr.provider_id', 'left')
+=======
+                p.email as provider_email,
+                p.is_on_hold as provider_is_on_hold,
+                p.hold_expires_at as provider_hold_expires_at,
+                p.hold_reason as provider_hold_reason,
+                vc.id as violation_case_id,
+                vc.case_number as violation_case_number,
+                vc.status as violation_case_status,
+                vc.severity as violation_severity,
+                vc.evidence_snippet as violation_evidence_snippet,
+                vc.evidence_timestamp as violation_evidence_timestamp,
+                vc.has_active_services as violation_has_active_services,
+                vc.affected_bookings_count as violation_affected_bookings_count
+            ")
+            ->join('calls c', 'c.id = cr.call_id', 'left')
+            ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+            ->join('users u', 'u.id = cr.customer_id', 'left')
+            ->join('service_providers p', 'p.id = cr.provider_id', 'left')
+            ->join('sp_violation_cases vc', 'vc.recording_id = cr.id', 'left')
+>>>>>>> origin/main
             ->where('cr.id', $id)
             ->get()
             ->getRowArray();
@@ -207,6 +366,36 @@ class ClientCallAnalysisController extends BaseController
             ]);
         }
 
+<<<<<<< HEAD
+=======
+        // Call Start & End Time
+        $startRaw = !empty($call['call_started_at']) && $call['call_started_at'] !== '0000-00-00 00:00:00'
+            ? $call['call_started_at']
+            : (!empty($call['call_initiated_at']) && $call['call_initiated_at'] !== '0000-00-00 00:00:00'
+                ? $call['call_initiated_at']
+                : (!empty($call['created_at']) && $call['created_at'] !== '0000-00-00 00:00:00' ? $call['created_at'] : null));
+
+        $durSec = (int)($call['duration'] ?? 0);
+        if (!empty($startRaw)) {
+            $startTs = strtotime($startRaw);
+            $call['start_time_formatted']     = date('h:i:s A', $startTs);
+            $call['start_datetime_formatted'] = date('d M Y, h:i:s A', $startTs);
+
+            if (!empty($call['call_ended_at']) && $call['call_ended_at'] !== '0000-00-00 00:00:00') {
+                $endTs = strtotime($call['call_ended_at']);
+            } else {
+                $endTs = $startTs + $durSec;
+            }
+            $call['end_time_formatted']     = date('h:i:s A', $endTs);
+            $call['end_datetime_formatted'] = date('d M Y, h:i:s A', $endTs);
+        } else {
+            $call['start_time_formatted']     = '-';
+            $call['start_datetime_formatted'] = '-';
+            $call['end_time_formatted']       = '-';
+            $call['end_datetime_formatted']   = '-';
+        }
+
+>>>>>>> origin/main
         // Decode JSON fields safely
         $call['service_topics']           = json_decode($call['service_topics'] ?? '[]', true) ?: [];
         $call['important_statements']     = json_decode($call['important_statements'] ?? '[]', true) ?: [];
@@ -228,6 +417,15 @@ class ClientCallAnalysisController extends BaseController
 
         $call['keywords'] = $keywords ?: [];
 
+<<<<<<< HEAD
+=======
+        if (!empty($call['violation_case_id'])) {
+            $call['violation_case'] = $this->workflowService->getCaseDetails((int)$call['violation_case_id']);
+        } elseif (!empty($call['provider_id'])) {
+            $call['active_services'] = $this->workflowService->getActiveServices((int)$call['provider_id']);
+        }
+
+>>>>>>> origin/main
         return $this->response->setJSON([
             'status' => true,
             'data'   => $call
@@ -508,10 +706,36 @@ class ClientCallAnalysisController extends BaseController
 
             $this->db->transComplete();
 
+<<<<<<< HEAD
             return $this->response->setJSON([
                 'status'      => true,
                 'message'     => 'Client call conversation analysis successfully saved.',
                 'analysis_id' => $analysisId
+=======
+            // Trigger Critical Violation Workflow if Contact Sharing + Off-App Payment
+            $isContactShare   = !empty($rawAnalysis['contact_sharing']);
+            $isOffPlatformPay = !empty($rawAnalysis['off_platform_payment']) || !empty($rawAnalysis['platform_bypass']) || !empty($rawAnalysis['gst_bypass']);
+            $violationCaseInfo = null;
+
+            if ($isContactShare && $isOffPlatformPay) {
+                try {
+                    $violationCaseInfo = $this->workflowService->handleCriticalViolationDetected(
+                        $recordingId,
+                        $rawAnalysis,
+                        !empty($recording['provider_id']) ? (int)$recording['provider_id'] : null,
+                        !empty($recording['customer_id']) ? (int)$recording['customer_id'] : null
+                    );
+                } catch (\Throwable $we) {
+                    log_message('error', 'SpViolationWorkflowService error in completeJob: ' . $we->getMessage());
+                }
+            }
+
+            return $this->response->setJSON([
+                'status'         => true,
+                'message'        => 'Client call conversation analysis successfully saved.',
+                'analysis_id'    => $analysisId,
+                'violation_case' => $violationCaseInfo
+>>>>>>> origin/main
             ]);
         } catch (\Throwable $e) {
             $this->jobModel->markFailed($jobId, $e->getMessage());
@@ -525,6 +749,196 @@ class ClientCallAnalysisController extends BaseController
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Clear all Client & Provider Calls records and their analysis from the database.
+     */
+    public function clearCalls()
+    {
+        $this->ensureColumnsExist();
+
+        $clientCallWhere = "(cr.call_type IN ('client_provider', 'client_sp') OR (cr.customer_id IS NOT NULL AND cr.customer_id > 0 AND (cr.verifier_id IS NULL OR cr.verifier_id = 0)))";
+
+        // Fetch all matching recording IDs
+        $recordings = $this->db->table('call_recordings cr')
+            ->select('cr.id, cr.recording_url')
+            ->where($clientCallWhere)
+            ->get()
+            ->getResultArray();
+
+        $deletedCount = count($recordings);
+
+        if ($deletedCount > 0) {
+            $recordingIds = array_column($recordings, 'id');
+
+            // Find all related analysis IDs to delete keywords
+            $analyses = $this->db->table('call_analysis')
+                ->select('id')
+                ->whereIn('recording_id', $recordingIds)
+                ->get()
+                ->getResultArray();
+
+            $analysisIds = !empty($analyses) ? array_column($analyses, 'id') : [];
+
+            $this->db->transStart();
+
+            // 1. Delete keywords
+            if (!empty($analysisIds)) {
+                $this->db->table('call_keywords')->whereIn('analysis_id', $analysisIds)->delete();
+            }
+
+            // 2. Delete analysis
+            $this->db->table('call_analysis')->whereIn('recording_id', $recordingIds)->delete();
+
+            // 3. Delete jobs
+            $this->db->table('call_analysis_jobs')->whereIn('recording_id', $recordingIds)->delete();
+
+            // 4. Delete recordings
+            $this->db->table('call_recordings')->whereIn('id', $recordingIds)->delete();
+
+            $this->db->transComplete();
+
+            // Clean up audio files if stored locally
+            foreach ($recordings as $rec) {
+                if (!empty($rec['recording_url'])) {
+                    $url = $rec['recording_url'];
+                    $cleanUrl = ltrim(parse_url($url, PHP_URL_PATH) ?? '', '/');
+                    $localPaths = [
+                        ROOTPATH . $cleanUrl,
+                        ROOTPATH . 'public/' . $cleanUrl,
+                        ROOTPATH . 'public/uploads/call_recordings/' . basename($url)
+                    ];
+
+                    foreach ($localPaths as $path) {
+                        if (file_exists($path) && is_file($path)) {
+                            @unlink($path);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($this->request->isAJAX() || strpos($this->request->getHeaderLine('Accept'), 'application/json') !== false) {
+            return $this->response->setJSON([
+                'status'  => true,
+                'message' => "Successfully cleared {$deletedCount} Client & Provider call recording(s) and analysis data.",
+                'deleted' => $deletedCount
+            ]);
+        }
+
+        return redirect()->to(base_url('client-call-analysis'))->with('message', "Successfully cleared {$deletedCount} Client & Provider calls.");
+    }
+
+    /**
+     * AJAX endpoint to return complete details for a violation case.
+     */
+    public function caseDetails(int $id)
+    {
+        $case = $this->workflowService->getCaseDetails($id);
+
+        if (!$case) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => false,
+                'message' => 'Violation case not found.'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $case
+        ]);
+    }
+
+    /**
+     * AJAX endpoint: Admin confirms violation.
+     * Applies first-time penalty (strike) and sets hold duration.
+     */
+    public function confirmViolation()
+    {
+        $caseId       = (int)$this->request->getPost('case_id');
+        $adminRemarks = trim((string)$this->request->getPost('admin_remarks'));
+        $holdHours    = max(1, min(720, (int)($this->request->getPost('hold_hours') ?: 24)));
+        $adminId      = (int)(session()->get('user_id') ?: 1);
+
+        if (!$caseId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => false,
+                'message' => 'Missing case_id.'
+            ]);
+        }
+
+        $result = $this->workflowService->adminConfirmViolation($caseId, $adminId, $adminRemarks, $holdHours);
+
+        return $this->response->setJSON($result);
+    }
+
+    /**
+     * AJAX endpoint: Admin dismisses violation (False positive).
+     * Releases hold and clears incorrect flag.
+     */
+    public function dismissViolation()
+    {
+        $caseId       = (int)$this->request->getPost('case_id');
+        $adminRemarks = trim((string)$this->request->getPost('admin_remarks'));
+        $adminId      = (int)(session()->get('user_id') ?: 1);
+
+        if (!$caseId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => false,
+                'message' => 'Missing case_id.'
+            ]);
+        }
+
+        $result = $this->workflowService->adminDismissViolation($caseId, $adminId, $adminRemarks);
+
+        return $this->response->setJSON($result);
+    }
+
+    /**
+     * AJAX endpoint: Trigger or re-evaluate critical violation workflow for a recording.
+     */
+    public function triggerViolation()
+    {
+        $recordingId = (int)$this->request->getPost('recording_id');
+
+        if (!$recordingId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => false,
+                'message' => 'Missing recording_id.'
+            ]);
+        }
+
+        $analysis = $this->analysisModel->where('recording_id', $recordingId)->first();
+        if (!$analysis) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => false,
+                'message' => 'Analysis record not found for this recording.'
+            ]);
+        }
+
+        $recording = $this->recordingModel->find($recordingId);
+        $rawAnalysis = [
+            'service_type'              => $analysis['service_type'] ?? 'walking',
+            'contact_sharing'           => (int)($analysis['contact_sharing'] ?? 1),
+            'off_platform_payment'      => (int)($analysis['off_platform_payment'] ?? 1),
+            'platform_bypass'           => 1,
+            'policy_violations'         => json_decode($analysis['policy_violations'] ?? '[]', true) ?: [],
+            'highlighted_conversations' => json_decode($analysis['highlighted_conversations'] ?? '[]', true) ?: [],
+        ];
+
+        $result = $this->workflowService->handleCriticalViolationDetected(
+            $recordingId,
+            $rawAnalysis,
+            !empty($recording['provider_id']) ? (int)$recording['provider_id'] : null,
+            !empty($recording['customer_id']) ? (int)$recording['customer_id'] : null
+        );
+
+        return $this->response->setJSON($result);
+    }
+
+    /**
+>>>>>>> origin/main
      * Automatically ensure required columns exist in MySQL to prevent DB errors.
      */
     private function ensureColumnsExist(): void
@@ -541,6 +955,7 @@ class ClientCallAnalysisController extends BaseController
                 $this->db->query("ALTER TABLE `call_recordings` ADD COLUMN `service_type` VARCHAR(50) NULL AFTER `call_type`");
             }
 
+<<<<<<< HEAD
             // Normalize client recordings call_type
             try {
                 $this->db->query("
@@ -551,6 +966,18 @@ class ClientCallAnalysisController extends BaseController
                 ");
             } catch (\Throwable $e) {
                 // Ignore normalization errors
+=======
+            // Ensure service_providers hold columns
+            $spFields = $this->db->getFieldNames('service_providers');
+            if (!in_array('is_on_hold', $spFields)) {
+                $this->db->query("ALTER TABLE `service_providers` ADD COLUMN `is_on_hold` TINYINT(1) DEFAULT 0 AFTER `status`");
+            }
+            if (!in_array('hold_expires_at', $spFields)) {
+                $this->db->query("ALTER TABLE `service_providers` ADD COLUMN `hold_expires_at` DATETIME NULL AFTER `is_on_hold`");
+            }
+            if (!in_array('hold_reason', $spFields)) {
+                $this->db->query("ALTER TABLE `service_providers` ADD COLUMN `hold_reason` VARCHAR(255) NULL AFTER `hold_expires_at`");
+>>>>>>> origin/main
             }
 
             $fields = $this->db->getFieldNames('call_analysis');

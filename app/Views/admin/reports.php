@@ -1,4 +1,5 @@
 <!doctype html>
+<<<<<<< HEAD
 <html lang="en">
 
 <head>
@@ -22,6 +23,11 @@
       } catch (e) {}
     })();
   </script>
+=======
+<html lang="en" class="light-theme">
+
+<head>
+>>>>>>> origin/main
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -52,7 +58,10 @@
   <link href="assets/css/light-theme.css" rel="stylesheet" />
   <link href="assets/css/semi-dark.css" rel="stylesheet" />
   <link href="assets/css/header-colors.css" rel="stylesheet" />
+<<<<<<< HEAD
   <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
+=======
+>>>>>>> origin/main
 
   <title>Reports</title>
 </head>

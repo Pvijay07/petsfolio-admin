@@ -6,6 +6,10 @@ use App\Controllers\BaseController;
 use App\Models\DemandSupplyModel;
 use App\Libraries\SPScoringLibrary;
 use App\Libraries\SPMatchingLibrary;
+<<<<<<< HEAD
+=======
+use App\Libraries\AIAnalyst\GeminiAnalyst;
+>>>>>>> origin/main
 
 /**
  * SPManagementController
@@ -40,7 +44,12 @@ class SPManagementController extends BaseController
     $data['grid_data'] = $this->demandSupplyModel->getDemandSupplySummary();
     $data['alerts'] = $this->getAdminAlerts();
     $data['simulator_options'] = $this->demandSupplyModel->getSimulatorOptions();
+<<<<<<< HEAD
     $data['density_map'] = $this->getDensityMapData();
+=======
+    $data['city_demand_supply'] = $this->getCityDemandSupplyData();
+    $data['google_maps_key'] = env('gMapKey') ?: 'AIzaSyAK-fLJRaxrzL1S6_2TuM9BARw9Ehb2rP8';
+>>>>>>> origin/main
 
     return view('admin/sp_management_dashboard', $data);
   }
@@ -69,6 +78,354 @@ class SPManagementController extends BaseController
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * Computes live demand vs supply metrics strictly from real database tables:
+   * - Real bookings from walking_service_bookings, grooming_service_bookings, 
+   *   training_service_bookings, and sitting_service_bookings joined with user_addresses.
+   * - Real active provider counts from service_providers joined with sp_services.
+   */
+  public function getCityDemandSupplyData(?string $selectedCity = 'Hyderabad', ?string $selectedService = 'All Services', int $days = 30): array
+  {
+    $db = \Config\Database::connect();
+    $city = !empty($selectedCity) ? trim($selectedCity) : 'Hyderabad';
+    $service = !empty($selectedService) ? trim($selectedService) : 'All Services';
+
+    // 1. Fetch available cities dynamically from live service providers and addresses
+    $citiesRes = $db->query("
+      SELECT DISTINCT COALESCE(NULLIF(TRIM(city), ''), 'Hyderabad') as city_name
+      FROM service_providers
+      WHERE city IS NOT NULL AND TRIM(city) != ''
+      ORDER BY (city = 'Hyderabad') DESC, (city = 'Bengaluru') DESC, (city = 'Secunderabad') DESC, city ASC
+    ")->getResultArray();
+
+    $availableCities = ['Hyderabad', 'Bengaluru', 'Mumbai', 'Secunderabad', 'Chennai', 'Delhi', 'Pune'];
+    foreach ($citiesRes as $cr) {
+      $cName = ucwords(strtolower(trim($cr['city_name'])));
+      if (!empty($cName) && !in_array($cName, $availableCities, true) && strlen($cName) > 2) {
+        $availableCities[] = $cName;
+      }
+    }
+
+    // 2. Service Filter Where Clause
+    $serviceWhere = "";
+    $spServiceWhere = "";
+    if (strtolower($service) !== 'all services' && strtolower($service) !== 'all' && !empty($service)) {
+      $cleanSvc = strtolower($service);
+      $escaped = $db->escapeLikeString($cleanSvc);
+      $serviceWhere = " AND b.service_type LIKE '%{$escaped}%' ";
+      $spServiceWhere = " AND (LOWER(s.name) LIKE '%{$escaped}%' OR LOWER(sps.service_id) LIKE '%{$escaped}%') ";
+    }
+
+    // Date Filter Where Clause
+    $dateWhere = "";
+    if ($days > 0) {
+      $dateWhere = " AND b.created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY) ";
+    }
+
+    // 3. Real Demand Query across all 4 booking tables with GPS coordinates
+    $demandSql = "
+      SELECT 
+        COALESCE(NULLIF(TRIM(ua.city), ''), 'Hyderabad') as city,
+        COALESCE(NULLIF(TRIM(ua.area), ''), NULLIF(TRIM(ua.landmark_areaname), ''), 'General') as area,
+        b.service_type,
+        AVG(NULLIF(ua.latitude, 0)) as avg_lat,
+        AVG(NULLIF(ua.longitude, 0)) as avg_lng,
+        COUNT(b.id) as total_demand
+      FROM (
+        SELECT id, address_id, created_at, 'walking' as service_type FROM walking_service_bookings
+        UNION ALL
+        SELECT id, address_id, created_at, 'grooming' as service_type FROM grooming_service_bookings
+        UNION ALL
+        SELECT id, address_id, created_at, 'training' as service_type FROM training_service_bookings
+        UNION ALL
+        SELECT id, address_id, created_at, 'sitting' as service_type FROM sitting_service_bookings
+      ) b
+      JOIN user_addresses ua ON ua.id = b.address_id
+      WHERE 1=1
+      {$dateWhere}
+      {$serviceWhere}
+      GROUP BY city, area, b.service_type
+    ";
+    $demandRows = $db->query($demandSql)->getResultArray();
+
+    // 4. Real Supply Query from service_providers with GPS coordinates
+    $supplySql = "
+      SELECT 
+        COALESCE(NULLIF(TRIM(sp.city), ''), 'Hyderabad') as city,
+        COALESCE(NULLIF(TRIM(sp.area), ''), 'General') as area,
+        AVG(NULLIF(COALESCE(sp.service_latitude, sp.permanent_latitude), 0)) as avg_lat,
+        AVG(NULLIF(COALESCE(sp.service_longitude, sp.permanent_longitude), 0)) as avg_lng,
+        COUNT(DISTINCT sp.id) as active_sp_count
+      FROM service_providers sp
+      LEFT JOIN sp_services sps ON sps.provider_id = sp.id
+      LEFT JOIN services s ON s.id = sps.service_id
+      WHERE sp.status = 'active'
+      {$spServiceWhere}
+      GROUP BY city, area
+    ";
+    $supplyRows = $db->query($supplySql)->getResultArray();
+
+    // Curated GPS Coordinates Dictionary for India Metros
+    $knownCoords = [
+      'Masab Tank'         => ['lat' => 17.4042, 'lng' => 78.4526],
+      'Basheer Bagh'       => ['lat' => 17.4022, 'lng' => 78.4764],
+      'Miyapur'            => ['lat' => 17.4968, 'lng' => 78.3614],
+      'West Marredpally'   => ['lat' => 17.4486, 'lng' => 78.5085],
+      'Malkajgiri'         => ['lat' => 17.4475, 'lng' => 78.5303],
+      'Hastinapuram'       => ['lat' => 17.3228, 'lng' => 78.5524],
+      'Serilingampalle'    => ['lat' => 17.4837, 'lng' => 78.3158],
+      'Kukatpally'         => ['lat' => 17.4849, 'lng' => 78.4138],
+      'Madhapur'           => ['lat' => 17.4483, 'lng' => 78.3915],
+      'Gachibowli'         => ['lat' => 17.4401, 'lng' => 78.3489],
+      'Jubilee Hills'      => ['lat' => 17.4319, 'lng' => 78.4073],
+      'Banjara Hills'      => ['lat' => 17.4156, 'lng' => 78.4350],
+      'Hitec City'         => ['lat' => 17.4435, 'lng' => 78.3772],
+      'Begumpet'           => ['lat' => 17.4447, 'lng' => 78.4664],
+      'Ameerpet'           => ['lat' => 17.4375, 'lng' => 78.4482],
+      'Dilsukhnagar'       => ['lat' => 17.3688, 'lng' => 78.5247],
+      'Sanjeeva Reddy Nagar' => ['lat' => 17.4431, 'lng' => 78.4439],
+      'Nizampet'           => ['lat' => 17.5186, 'lng' => 78.3846],
+      'Kondapur'           => ['lat' => 17.4699, 'lng' => 78.3578],
+      'Bachupally'         => ['lat' => 17.5332, 'lng' => 78.3644],
+      'Kompally'           => ['lat' => 17.5385, 'lng' => 78.4862],
+      'Sainikpuri'         => ['lat' => 17.4891, 'lng' => 78.5471],
+      'Padmarao Nagar'     => ['lat' => 17.4265, 'lng' => 78.5085],
+      'Kachiguda'          => ['lat' => 17.3917, 'lng' => 78.4977],
+      'Peerzadiguda'       => ['lat' => 17.4089, 'lng' => 78.5833],
+      'Himayatnagar'       => ['lat' => 17.4038, 'lng' => 78.4882],
+      'Amberpet'           => ['lat' => 17.3949, 'lng' => 78.5173],
+      'Kothapet'           => ['lat' => 17.3648, 'lng' => 78.5463],
+      'Quthbullapur'       => ['lat' => 17.5029, 'lng' => 78.4657],
+      'Hafeezpet'          => ['lat' => 17.4883, 'lng' => 78.3378],
+      'Suraram'            => ['lat' => 17.5255, 'lng' => 78.4452],
+      'Borabanda'          => ['lat' => 17.4563, 'lng' => 78.4061],
+      'Yousufguda'         => ['lat' => 17.4402, 'lng' => 78.4312],
+      'Kavadiguda'         => ['lat' => 17.4194, 'lng' => 78.4921],
+      'Moti Nagar'         => ['lat' => 17.4526, 'lng' => 78.4168],
+      'Osman Nagar'        => ['lat' => 17.4611, 'lng' => 78.2933],
+      'Manikonda'          => ['lat' => 17.4024, 'lng' => 78.3791],
+      'Sun City'           => ['lat' => 17.3486, 'lng' => 78.3978],
+      'Gudimalkapur'       => ['lat' => 17.3824, 'lng' => 78.4411],
+      'Nanakramguda'       => ['lat' => 17.4239, 'lng' => 78.3478],
+      'Hyderabad Central'  => ['lat' => 17.3850, 'lng' => 78.4867],
+      'Koramangala'        => ['lat' => 12.9352, 'lng' => 77.6245],
+      'Indiranagar'        => ['lat' => 12.9784, 'lng' => 77.6408],
+      'HSR Layout'         => ['lat' => 12.9121, 'lng' => 77.6446],
+      'Whitefield'         => ['lat' => 12.9698, 'lng' => 77.7500],
+      'Bellandur'          => ['lat' => 12.9260, 'lng' => 77.6762],
+      'Electronic City'    => ['lat' => 12.8452, 'lng' => 77.6602],
+      'Jayanagar'          => ['lat' => 12.9308, 'lng' => 77.5838],
+      'JP Nagar'           => ['lat' => 12.9063, 'lng' => 77.5857],
+      'Marathahalli'       => ['lat' => 12.9591, 'lng' => 77.6974],
+      'Hebbal'             => ['lat' => 13.0358, 'lng' => 77.5970],
+      'Bengaluru Central'  => ['lat' => 12.9716, 'lng' => 77.5946],
+      'Bandra'             => ['lat' => 19.0596, 'lng' => 72.8295],
+      'Andheri'            => ['lat' => 19.1136, 'lng' => 72.8697],
+      'Juhu'               => ['lat' => 19.1075, 'lng' => 72.8263],
+      'Powai'              => ['lat' => 19.1176, 'lng' => 72.9060],
+      'Worli'              => ['lat' => 19.0178, 'lng' => 72.8178],
+      'Malad'              => ['lat' => 19.1874, 'lng' => 72.8484],
+      'Thane'              => ['lat' => 19.2183, 'lng' => 72.9781],
+      'Colaba'             => ['lat' => 18.9067, 'lng' => 72.8147],
+      'Mumbai Central'     => ['lat' => 18.9690, 'lng' => 72.8205]
+    ];
+
+    $cityCenters = [
+      'Hyderabad'    => ['lat' => 17.3850, 'lng' => 78.4867, 'zoom' => 11],
+      'Secunderabad' => ['lat' => 17.4399, 'lng' => 78.4983, 'zoom' => 12],
+      'Bengaluru'    => ['lat' => 12.9716, 'lng' => 77.5946, 'zoom' => 11],
+      'Mumbai'       => ['lat' => 19.0760, 'lng' => 72.8777, 'zoom' => 11],
+      'Chennai'      => ['lat' => 13.0827, 'lng' => 80.2707, 'zoom' => 11],
+      'Delhi'        => ['lat' => 28.6139, 'lng' => 77.2090, 'zoom' => 11],
+      'Pune'         => ['lat' => 18.5204, 'lng' => 73.8567, 'zoom' => 11],
+      'All Cities'   => ['lat' => 17.3850, 'lng' => 78.4867, 'zoom' => 6],
+    ];
+
+    // 5. Aggregate by City and Area
+    $zoneAgg = [];
+    foreach ($demandRows as $dr) {
+      $c = ucwords(strtolower(trim($dr['city'])));
+      $a = ucwords(strtolower(trim($dr['area'])));
+      if ($a === 'General' || empty($a)) continue;
+      if (strcasecmp($a, $c) === 0) {
+        $a = "{$c} Central";
+      }
+      $key = "{$c}|{$a}";
+      if (!isset($zoneAgg[$key])) {
+        $zoneAgg[$key] = [
+          'city' => $c, 
+          'area' => $a, 
+          'demand' => 0, 
+          'supply' => 0, 
+          'services' => [],
+          'lat' => (float)$dr['avg_lat'],
+          'lng' => (float)$dr['avg_lng']
+        ];
+      }
+      $zoneAgg[$key]['demand'] += (int)$dr['total_demand'];
+      if (!empty($dr['avg_lat']) && empty($zoneAgg[$key]['lat'])) {
+        $zoneAgg[$key]['lat'] = (float)$dr['avg_lat'];
+        $zoneAgg[$key]['lng'] = (float)$dr['avg_lng'];
+      }
+      $st = $dr['service_type'];
+      $zoneAgg[$key]['services'][$st] = ($zoneAgg[$key]['services'][$st] ?? 0) + (int)$dr['total_demand'];
+    }
+
+    foreach ($supplyRows as $sr) {
+      $c = ucwords(strtolower(trim($sr['city'])));
+      $a = ucwords(strtolower(trim($sr['area'])));
+      if ($a === 'General' || empty($a)) continue;
+      if (strcasecmp($a, $c) === 0) {
+        $a = "{$c} Central";
+      }
+      $key = "{$c}|{$a}";
+      if (!isset($zoneAgg[$key])) {
+        $zoneAgg[$key] = [
+          'city' => $c, 
+          'area' => $a, 
+          'demand' => 0, 
+          'supply' => 0, 
+          'services' => [],
+          'lat' => (float)$sr['avg_lat'],
+          'lng' => (float)$sr['avg_lng']
+        ];
+      }
+      $zoneAgg[$key]['supply'] += (int)$sr['active_sp_count'];
+      if (!empty($sr['avg_lat']) && empty($zoneAgg[$key]['lat'])) {
+        $zoneAgg[$key]['lat'] = (float)$sr['avg_lat'];
+        $zoneAgg[$key]['lng'] = (float)$sr['avg_lng'];
+      }
+    }
+
+    // Filter by selected city
+    $cleanCityLower = strtolower($city);
+    $cityZones = [];
+    $activeCityCenter = $cityCenters[$city] ?? $cityCenters['Hyderabad'];
+
+    foreach ($zoneAgg as $z) {
+      if ($cleanCityLower !== 'all cities' && strtolower($z['city']) !== $cleanCityLower) {
+        // Twin city handling: include Secunderabad under Hyderabad region
+        if ($cleanCityLower === 'hyderabad' && strtolower($z['city']) === 'secunderabad') {
+          // allow
+        } else {
+          continue;
+        }
+      }
+
+      $dem = (int)$z['demand'];
+      $sup = (int)$z['supply'];
+      $gap = $sup - $dem;
+      $cov = $dem > 0 ? (int)round(($sup / $dem) * 100) : ($sup > 0 ? 100 : 0);
+      if ($cov < 75 || $gap <= -2) {
+        $status = 'shortage';
+      } elseif ($cov < 95 || $gap < 0) {
+        $status = 'tight';
+      } else {
+        $status = 'balanced';
+      }
+
+      $topService = 'walkers';
+      if (!empty($z['services'])) {
+        arsort($z['services']);
+        $topKey = array_key_first($z['services']);
+        $topService = $topKey === 'walking' ? 'walkers' : ($topKey === 'grooming' ? 'groomers' : ($topKey === 'training' ? 'trainers' : 'sitters'));
+      }
+
+      // Real GPS Resolution
+      $lat = (!empty($z['lat']) && $z['lat'] != 0) ? $z['lat'] : null;
+      $lng = (!empty($z['lng']) && $z['lng'] != 0) ? $z['lng'] : null;
+
+      if (!$lat || !$lng) {
+        if (isset($knownCoords[$z['area']])) {
+          $lat = $knownCoords[$z['area']]['lat'];
+          $lng = $knownCoords[$z['area']]['lng'];
+        } else {
+          // Deterministic fallback spread around city center
+          $seed = crc32($z['area']);
+          $angle = ($seed % 360) * (M_PI / 180);
+          $distKm = (($seed % 100) / 100) * 12 + 2; // 2 to 14 km
+          $lat = $activeCityCenter['lat'] + ($distKm / 111) * cos($angle);
+          $lng = $activeCityCenter['lng'] + ($distKm / (111 * cos($activeCityCenter['lat'] * (M_PI / 180)))) * sin($angle);
+        }
+      }
+
+      $cityZones[] = [
+        'zone'        => $z['area'],
+        'city'        => $z['city'],
+        'demand'      => $dem,
+        'supply'      => $sup,
+        'coverage'    => $cov,
+        'gap'         => $gap,
+        'status'      => $status,
+        'top_service' => $topService,
+        'lat'         => round((float)$lat, 5),
+        'lng'         => round((float)$lng, 5)
+      ];
+    }
+
+    // Sort: highest demand first, then lowest gap
+    usort($cityZones, function($a, $b) {
+      if ($a['demand'] === $b['demand']) {
+        return $a['gap'] <=> $b['gap'];
+      }
+      return $b['demand'] <=> $a['demand'];
+    });
+
+    // Extract shortage areas
+    $shortages = array_values(array_filter($cityZones, fn($item) => $item['gap'] < 0));
+    usort($shortages, fn($a, $b) => $a['gap'] <=> $b['gap']);
+
+    // Dynamic AI Recommendation
+    $topShortage = $shortages[0] ?? null;
+    if ($topShortage) {
+      $headline = "Need " . abs($topShortage['gap']) . " more {$topShortage['top_service']} in {$topShortage['zone']}";
+      $subtext  = "Based on live demand ({$topShortage['demand']} booking requests) vs active supply ({$topShortage['supply']} active SPs) resulting in an immediate local deficit.";
+    } else {
+      $headline = "Optimal Service Coverage Across {$city}";
+      $subtext  = "Active provider capacity balances with booking request volume across major zones.";
+    }
+
+    // Take top 15 zones as real map markers
+    $mapMarkers = array_slice($cityZones, 0, 15);
+
+    return [
+      'selected_city'    => $city,
+      'selected_service' => $service,
+      'date_days'        => $days,
+      'available_cities' => $availableCities,
+      'subtitle'         => "{$city} - Active SPs vs Demand",
+      'city_center'      => $activeCityCenter,
+      'recommendation'   => [
+        'headline' => $headline,
+        'subtext'  => $subtext
+      ],
+      'markers'          => $mapMarkers,
+      'nodes'            => $mapMarkers,
+      'shortage_areas'   => array_slice($shortages, 0, 5),
+      'zones'            => $cityZones
+    ];
+  }
+
+  /**
+   * AJAX endpoint: Retrieve live dynamic City Demand vs Supply dataset.
+   */
+  public function getCityDataAjax()
+  {
+    $city    = $this->request->getGet('city') ?: 'Hyderabad';
+    $service = $this->request->getGet('service') ?: 'All Services';
+    $daysParam = $this->request->getGet('days');
+    $days    = ($daysParam !== null && $daysParam !== '') ? (int)$daysParam : 30;
+
+    $data = $this->getCityDemandSupplyData($city, $service, $days);
+    return $this->response->setJSON([
+      'status' => 'success',
+      'data'   => $data
+    ]);
+  }
+
+  /**
+>>>>>>> origin/main
    * Compiles density map data from REAL live database tables.
    * - SP counts from `service_providers` (grouped by city/state/area).
    * - Demand (bookings) counted from all 4 service booking tables.
@@ -93,8 +450,16 @@ class SPManagementController extends BaseController
     }
 
     // ─── 2. Fetch all service providers to normalize locations in PHP ───
+<<<<<<< HEAD
     $allSps = $db->table('service_providers')
       ->select('id, area, city, state, service_address, service_latitude, service_longitude, status')
+=======
+    $allSps = $db->table('service_providers sp')
+      ->select('sp.id, sp.area, sp.city, sp.state, sp.service_address, sp.service_latitude, sp.service_longitude, sp.status, GROUP_CONCAT(DISTINCT LOWER(s.name) SEPARATOR ",") as services_offered')
+      ->join('sp_services ss', 'ss.provider_id = sp.id', 'left')
+      ->join('services s', 's.id = ss.service_id', 'left')
+      ->groupBy('sp.id')
+>>>>>>> origin/main
       ->get()->getResultArray();
 
     $pincodeToArea = [
@@ -261,6 +626,10 @@ class SPManagementController extends BaseController
             'pincode'       => $pincode,
             'sp_count'      => 0,
             'genuine_count' => 0,
+<<<<<<< HEAD
+=======
+            'services'      => [],
+>>>>>>> origin/main
             'lats'          => [],
             'lngs'          => [],
             'default_lat'   => $lat,
@@ -269,6 +638,12 @@ class SPManagementController extends BaseController
         }
 
         $areaGroups[$key]['sp_count']++;
+<<<<<<< HEAD
+=======
+        if (!empty($sp['services_offered'])) {
+          $areaGroups[$key]['services'][] = strtolower($sp['services_offered']);
+        }
+>>>>>>> origin/main
         if (isset($genuineMap[$spId])) {
           $areaGroups[$key]['genuine_count']++;
         }
@@ -277,6 +652,7 @@ class SPManagementController extends BaseController
       }
     }
 
+<<<<<<< HEAD
     // ─── 3. Count real bookings per area from ALL service booking tables ───
     $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
     $demandCounts = [];
@@ -306,6 +682,25 @@ class SPManagementController extends BaseController
           }
           $demandCounts[$key]++;
         }
+=======
+    // ─── 3. Count real bookings per area from quotations table ───
+    $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
+    $demandCounts = [];
+
+    $bookingRows = $db->query("
+      SELECT DISTINCT q.booking_id, q.provider_id
+      FROM quotations q
+      WHERE q.status IN ('Accepted', 'Completed')
+        AND q.created_at >= ?
+    ", [$thirtyDaysAgo])->getResultArray();
+
+    foreach ($bookingRows as $row) {
+      $pId = (int)$row['provider_id'];
+      if (isset($providerLocations[$pId])) {
+        $loc = $providerLocations[$pId];
+        $key = $loc['state'] . '|' . $loc['city'] . '|' . $loc['area'] . '|' . $loc['pincode'];
+        $demandCounts[$key] = ($demandCounts[$key] ?? 0) + 1;
+>>>>>>> origin/main
       }
     }
 
@@ -349,6 +744,7 @@ class SPManagementController extends BaseController
         ];
       }
 
+<<<<<<< HEAD
       $stateCityData[$state][$city]['areas'][] = [
         'name'    => $areaName,
         'pincode' => $pincode,
@@ -358,6 +754,20 @@ class SPManagementController extends BaseController
         'level'   => $level,
         'lat'     => $avgLat,
         'lng'     => $avgLng
+=======
+      $servicesStr = !empty($group['services']) ? implode(',', array_unique(explode(',', implode(',', $group['services'])))) : 'walking,grooming,training,sitting,boarding,vet';
+
+      $stateCityData[$state][$city]['areas'][] = [
+        'name'     => $areaName,
+        'pincode'  => $pincode,
+        'demand'   => $demand,
+        'supply'   => $spCount,
+        'genuine'  => $genuine,
+        'level'    => $level,
+        'services' => $servicesStr,
+        'lat'      => $avgLat,
+        'lng'      => $avgLng
+>>>>>>> origin/main
       ];
     }
 
@@ -596,4 +1006,119 @@ class SPManagementController extends BaseController
 
     return $alerts;
   }
+<<<<<<< HEAD
 }
+=======
+
+  /**
+   * AJAX endpoint: AI SP Operations & Demand-Supply Advisor Insights
+   */
+  public function aiInsights()
+  {
+    $liveDemand  = $this->demandSupplyModel->getLiveDemandStats();
+    $liveSupply  = $this->demandSupplyModel->getLiveSupplyStats();
+    $gridSummary = $this->demandSupplyModel->getDemandSupplySummary();
+    $alerts      = $this->getAdminAlerts();
+
+    $activeSp    = (int)($liveSupply['total_active_sp'] ?? 0);
+    $genuineSp   = (int)($liveSupply['genuine_sp_count'] ?? 0);
+    $totalDemand = (int)($liveDemand['total_daily_jobs'] ?? 0);
+    $callPending = (int)($liveSupply['waiting_call_verification'] ?? 0);
+
+    // Count critical alerts
+    $criticalCount = 0;
+    foreach ($alerts as $city => $cats) {
+        foreach ($cats as $cat => $alertItems) {
+            foreach ($alertItems as $al) {
+                if (($al['level'] ?? '') === 'critical') {
+                    $criticalCount++;
+                }
+            }
+        }
+    }
+
+    $prompt = "You are Petsfolio AI Service Provider Operations Advisor. Provide a crisp, concise executive operational summary (maximum 150-200 words). Do NOT output long essays or redundant headers. Focus strictly on:\n" .
+        "1. Active SP capacity ({$activeSp} active, {$genuineSp} genuine score>=70, {$callPending} paid providers waiting for call verification).\n" .
+        "2. Key operational bottleneck and top 3 priority action items for platform operations.";
+
+    $aiSummary = "Platform SP Operations Overview: Genuine SP capacity is {$genuineSp}/{$activeSp} active providers. " .
+        "Daily active booking demand is {$totalDemand} jobs across active cities. " .
+        "Primary Bottleneck: {$callPending} paid providers are currently waiting for call verification to complete onboarding and unlock active supply capacity.";
+
+    $improvements = [
+        "Accelerate call verifications for {$callPending} paid pending providers to immediately boost active supply density.",
+        "Deploy targeted SP recruitment in critical supply gap areas where supply-to-demand ratio is below 0.8.",
+        "Optimize auto-matching scoring to prioritize high-rated genuine providers with low active job loads."
+    ];
+
+    $supplyGapWarnings = [];
+    if ($criticalCount > 0) {
+        $supplyGapWarnings[] = "Detected {$criticalCount} critical zone capacity drops where genuine SP count is below threshold.";
+    } else {
+        $supplyGapWarnings[] = "All key coverage zones currently meet baseline SP capacity requirements.";
+    }
+
+    try {
+        $analyst = new GeminiAnalyst();
+        $aiRes = $analyst->ask($prompt);
+        if (!empty($aiRes['reply']) && strpos($aiRes['reply'], 'Error:') === false) {
+            $aiSummary = $aiRes['reply'];
+        }
+    } catch (\Throwable $e) {
+        // Fallback to static summary
+    }
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'data' => [
+            'total_active_sp'          => $activeSp,
+            'genuine_sp_count'         => $genuineSp,
+            'total_daily_jobs'         => $totalDemand,
+            'waiting_verification'     => $callPending,
+            'critical_alerts_count'    => $criticalCount,
+            'ai_executive_summary'     => $aiSummary,
+            'operational_improvements' => $improvements,
+            'supply_gap_warnings'      => $supplyGapWarnings
+        ]
+    ]);
+  }
+
+  /**
+   * AJAX endpoint: Interactive Ask AI SP Management Advisor
+   */
+  public function askAi()
+  {
+    $question = trim((string)($this->request->getPost('question') ?: $this->request->getPost('message') ?: $this->request->getGet('question')));
+    if (empty($question)) {
+      return $this->response->setJSON(['status' => false, 'message' => 'Please ask an operational question about service provider management.']);
+    }
+
+    $liveSupply = $this->demandSupplyModel->getLiveSupplyStats();
+    $liveDemand = $this->demandSupplyModel->getLiveDemandStats();
+
+    $contextPrompt = "User Question regarding SP Management: \"{$question}\"\n\n" .
+        "Live System Operational Context: Active SPs = " . ($liveSupply['total_active_sp'] ?? 0) . 
+        ", Genuine High-Rank SPs = " . ($liveSupply['genuine_sp_count'] ?? 0) . 
+        ", Daily Demand = " . ($liveDemand['total_daily_jobs'] ?? 0) . 
+        ", Call Verification Pending = " . ($liveSupply['waiting_call_verification'] ?? 0) . ".\n" .
+        "Answer the operational question thoroughly with actionable insights.";
+
+    try {
+      $analyst = new GeminiAnalyst();
+      $res = $analyst->ask($contextPrompt);
+      return $this->response->setJSON([
+          'status'  => true,
+          'reply'   => $res['reply'] ?? 'Unable to process request.',
+          'metrics' => $res['metrics'] ?? [],
+          'chart'   => $res['chart'] ?? null
+      ]);
+    } catch (\Throwable $e) {
+      return $this->response->setJSON([
+          'status' => false,
+          'reply'  => 'Error querying AI SP Advisor: ' . $e->getMessage()
+      ]);
+    }
+  }
+}
+
+>>>>>>> origin/main

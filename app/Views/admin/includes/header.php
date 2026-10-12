@@ -2,6 +2,7 @@
 <html>
 
 <head>
+<<<<<<< HEAD
   <!-- Theme Early Detection (Zero-Flicker) -->
   <script>
     (function() {
@@ -22,6 +23,8 @@
       } catch (e) {}
     })();
   </script>
+=======
+>>>>>>> origin/main
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Petsfolio | Admin</title>
@@ -45,9 +48,12 @@
   <!-- Dark Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/dark.min.css" />
 
+<<<<<<< HEAD
   <!-- Universal Dark Mode Overrides (Global Engine) -->
   <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
 
+=======
+>>>>>>> origin/main
   <!-- Customizer Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/customizer.min.css" />
 
@@ -399,6 +405,13 @@
       z-index: 1050 !important;
     }
 
+<<<<<<< HEAD
+=======
+    .swal2-container {
+      z-index: 99999 !important;
+    }
+
+>>>>>>> origin/main
     .font-weight-bold {
       font-weight: 700;
       background-color: #f8f9fa;
@@ -1350,6 +1363,7 @@
         display: none;
       }
     }
+<<<<<<< HEAD
 
     /* ==========================================================================
        GLOBAL DARK & LIGHT MODE STYLES
@@ -1944,6 +1958,8 @@
     body.dark .progress {
       background-color: #182234 !important;
     }
+=======
+>>>>>>> origin/main
   </style>
 </head>
 
@@ -1970,6 +1986,7 @@
 
       <!-- Dashboard -->
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?= service('uri')->getSegment(1) === 'dashboard' ? 'active' : '' ?>"
           onclick="window.location.href='<?= base_url() ?>dashboard'" data-tooltip="Dashboard">
           <div class="nav-button-content">
@@ -2001,10 +2018,62 @@
           </div>
         </button>
       </div>
+=======
+        <?php if (hasPermission('dashboard.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'dashboard' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>dashboard'" data-tooltip="Dashboard">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+              </svg>
+              <span class="nav-text">Dashboard</span>
+            </div>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Dashboard">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="7" height="9" x="3" y="3" rx="1"></rect>
+                <rect width="7" height="5" x="14" y="3" rx="1"></rect>
+                <rect width="7" height="9" x="14" y="12" rx="1"></rect>
+                <rect width="7" height="5" x="3" y="16" rx="1"></rect>
+              </svg>
+              <span class="nav-text">Dashboard</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <!-- AI Business Analyst -->
+      <?php if (hasPermission('ai_analyst.view')) : ?>
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'ai-analyst' || service('uri')->getSegment(1) === 'ai-analysis' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('ai-analyst') ?>'" data-tooltip="AI Analyst">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+                <polyline points="7 10 10 7 13 10 17 6"></polyline>
+              </svg>
+              <span class="nav-text">AI Analyst <span class="badge bg-success ms-1" style="font-size:10px;">BI</span></span>
+            </div>
+          </button>
+        </div>
+      <?php endif; ?>
+>>>>>>> origin/main
 
 
       <!-- Bookings Dropdown -->
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?=
                                   service('uri')->getSegment(1) === 'bookingRequests' ||
                                     service('uri')->getSegment(1) === 'bookings' ||
@@ -2143,6 +2212,159 @@
 
       <hr class="nav-divider">
 
+=======
+        <?php if (hasPermission('bookings.walking') || hasPermission('bookings.view_requests') || hasPermission('bookings.all')) : ?>
+          <button class="nav-button <?=
+                                    service('uri')->getSegment(1) === 'bookingRequests' ||
+                                      service('uri')->getSegment(1) === 'bookings' ||
+                                      service('uri')->getSegment(1) === 'missed-walks' ? 'active' : '' ?>"
+            onclick="toggleDropdown('bookings-dropdown')" data-tooltip="Bookings">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+                <path d="M8 14h.01"></path>
+                <path d="M12 14h.01"></path>
+                <path d="M16 14h.01"></path>
+                <path d="M8 18h.01"></path>
+                <path d="M12 18h.01"></path>
+                <path d="M16 18h.01"></path>
+              </svg>
+              <span class="nav-text">Bookings</span>
+              <span id="booking-parent-badge" class="nav-badge" style="display: none;"></span>
+            </div>
+            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div id="bookings-dropdown" class="sub-nav <?=
+                                                      service('uri')->getSegment(1) === 'bookingRequests' ||
+                                                        service('uri')->getSegment(1) === 'bookings' ||
+                                                        service('uri')->getSegment(1) === 'missed-walks' ? 'open' : '' ?>">
+            <!-- New Requests -->
+            <?php if (hasPermission('bookings.view_requests')) : ?>
+              <button class="nav-button <?= service('uri')->getSegment(1) === 'bookingRequests' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('bookingRequests') ?>'" data-tooltip="New Requests">
+                <span class="nav-text">New Requests</span>
+                <span id="new-requests-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="New Requests">
+                <span class="nav-text">New Requests</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- Active Bookings -->
+            <?php if (hasPermission('bookings.walking')) : ?>
+              <button
+                class="nav-button <?= service('uri')->getSegment(1) === 'bookings' && service('uri')->getSegment(2) === 'in_progress' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('bookings/in_progress') ?>'" data-tooltip="Active Bookings">
+                <span class="nav-text">Active Bookings</span>
+                <span id="active-bookings-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="Active Bookings">
+                <span class="nav-text">Active Bookings</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- Halted -->
+            <?php if (hasPermission('bookings.walking')) : ?>
+              <button
+                class="nav-button <?= service('uri')->getSegment(1) === 'bookings' && service('uri')->getSegment(2) === 'halted' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url() ?>bookings/halted'" data-tooltip="Halted">
+                <span class="nav-text">Halted</span>
+                <span id="on-hold-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="Halted">
+                <span class="nav-text">Halted</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- No Show -->
+            <?php if (hasPermission('bookings.missed_walks')) : ?>
+              <button class="nav-button <?= service('uri')->getSegment(1) === 'missed-walks' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url() ?>missed-walks'" data-tooltip="No Show">
+                <span class="nav-text">No Show</span>
+                <span id="no-show-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="No Show">
+                <span class="nav-text">No Show</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- Completed -->
+            <?php if (hasPermission('bookings.walking')) : ?>
+              <button
+                class="nav-button <?= service('uri')->getSegment(1) === 'bookings' && service('uri')->getSegment(2) === 'completed' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url() ?>bookings/completed'" data-tooltip="Completed">
+                <span class="nav-text">Completed</span>
+                <span id="completed-bookings-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="Completed">
+                <span class="nav-text">Completed</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- Cancelled -->
+            <?php if (hasPermission('bookings.walking')) : ?>
+              <button
+                class="nav-button <?= service('uri')->getSegment(1) === 'bookings' && service('uri')->getSegment(2) === 'cancelled' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url() ?>bookings/cancelled'" data-tooltip="Cancelled">
+                <span class="nav-text">Cancelled</span>
+                <span id="cancelled-bookings-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="Cancelled">
+                <span class="nav-text">Cancelled</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+
+            <!-- Deleted -->
+            <?php if (hasPermission('bookings.delete')) : ?>
+              <button
+                class="nav-button <?= service('uri')->getSegment(1) === 'bookings' && service('uri')->getSegment(2) === 'deleted' ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url() ?>bookings/deleted'" data-tooltip="Deleted">
+                <span class="nav-text">Deleted</span>
+                <span id="deleted-bookings-badge" class="nav-badge" style="display: none;"></span>
+              </button>
+            <?php else : ?>
+              <button class="nav-button disabled-link" data-tooltip="Deleted">
+                <span class="nav-text">Deleted</span>
+                <i class="fas fa-lock"></i>
+              </button>
+            <?php endif; ?>
+          </div>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Bookings">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+              </svg>
+              <span class="nav-text">Bookings</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+>>>>>>> origin/main
       <!-- AI Call Intelligence & Conversation Analysis -->
       <div class="nav-section-title">AI Call Intelligence</div>
 
@@ -2161,7 +2383,10 @@
           </div>
         </button>
       </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
       <!-- Client & SP Service Call Analysis (Client <-> SP) -->
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'client-call-analysis' ? 'active' : '' ?>"
@@ -2175,10 +2400,15 @@
           </div>
         </button>
       </div>
+<<<<<<< HEAD
+=======
+      <hr class="nav-divider">
+>>>>>>> origin/main
 
       <!-- Users Section -->
       <div class="nav-section-title">Users</div>
 
+<<<<<<< HEAD
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'chat-history' ? 'active' : '' ?>"
           onclick="window.location.href='<?= base_url() ?>chat-history'" data-tooltip="Chat History">
@@ -2191,6 +2421,38 @@
           </div>
         </button>
       </div>
+=======
+      <!-- AI Call Analysis -->
+      <!-- <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'ai-analysis' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url() ?>ai-analysis'" data-tooltip="AI Call Analysis">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" x2="12" y1="19" y2="22"></line>
+            </svg>
+            <span class="nav-text">AI Call Analysis</span>
+          </div>
+        </button>
+      </div> -->
+
+      <?php if (hasPermission('chat_history.view')) : ?>
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'chat-history' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>chat-history'" data-tooltip="Chat History">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span class="nav-text">Chat History</span>
+            </div>
+          </button>
+        </div>
+      <?php endif; ?>
+>>>>>>> origin/main
 
       <!-- Unauthorized Provider Visits -->
       <div class="nav-item">
@@ -2210,6 +2472,7 @@
 
       <!-- Service Providers Dropdown -->
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?= service('uri')->getSegment(1) === 'providers' ? 'active' : '' ?>"
           onclick="toggleDropdown('providers-dropdown')" data-tooltip="Service Providers">
           <div class="nav-button-content">
@@ -2292,10 +2555,140 @@
             </button>
           <?php endif; ?>
         </div>
+=======
+        <?php if (hasPermission('providers.view') || (function_exists('hasAnyProviderPermission') && hasAnyProviderPermission())) : ?>
+          <button class="nav-button <?= (service('uri')->getSegment(1) === 'providers' || service('uri')->getSegment(1) === 'aadhaar-verification-logs') ? 'active' : '' ?>"
+            onclick="toggleDropdown('providers-dropdown')" data-tooltip="Service Providers">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">Service Providers</span>
+            </div>
+            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div id="providers-dropdown"
+            class="sub-nav <?= (service('uri')->getSegment(1) === 'providers' || service('uri')->getSegment(1) === 'aadhaar-verification-logs') ? 'open' : '' ?>">
+            <?php if (hasPermission('providers.view') || hasPermission('fee_pending.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'pending_registration') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=pending_registration') ?>'"
+                data-tooltip="Fee Pending">
+                <span class="nav-text">Fee pending</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('wait_for_call.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'pending_verification' && (!isset($_GET['overdue']) || $_GET['overdue'] !== '1')) ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=pending_verification') ?>'"
+                data-tooltip="Waiting for Call">
+                <span class="nav-text">waiting for call</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('wait_for_call_24.view') || hasPermission('wait_for_call.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'pending_verification' && isset($_GET['overdue']) && $_GET['overdue'] === '1') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=pending_verification&overdue=1') ?>'"
+                data-tooltip="Waiting for Call (>24h)">
+                <span class="nav-text" style="color: #ff4d4d !important; font-weight: bold;">waiting for call (>24h)</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('manager_approval.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'approval') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=approval') ?>'"
+                data-tooltip="Manager Approval">
+                <span class="nav-text">Manager Approval</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('kyc_pending.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'pending_kyc') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=pending_kyc') ?>'"
+                data-tooltip="KYC Pending">
+                <span class="nav-text">KYC pending</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('verified.view') || hasPermission('old_verified.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'active') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=active') ?>'"
+                data-tooltip="Verified">
+                <span class="nav-text">Verified</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('old_non_verified.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'non_verified') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=non_verified') ?>'"
+                data-tooltip="Old SP-Non Verified">
+                <span class="nav-text">Old SP-Non Verified</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view') || hasPermission('suspended.view')) : ?>
+              <button
+                class="nav-button <?= (uri_string() === 'providers' && isset($_GET['status']) && $_GET['status'] === 'inactive') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('providers?status=inactive') ?>'"
+                data-tooltip="Suspended">
+                <span class="nav-text">Suspended</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('providers.view')) : ?>
+              <div class="px-3 py-2 fw-bold text-primary small bg-light my-2 rounded" style="font-size: 0.7rem;">VERIFICATIONS</div>
+              <button
+                class="nav-button <?= (uri_string() === 'aadhaar-verification-logs') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('aadhaar-verification-logs') ?>'"
+                data-tooltip="Aadhaar Verification Logs">
+                <span class="nav-text"><i class="bi bi-shield-check me-1"></i> Aadhaar Logs</span>
+              </button>
+            <?php endif; ?>
+
+            <?php if (hasPermission('media.approval')) : ?>
+              <div class="px-3 py-2 fw-bold text-success small bg-light my-2 rounded" style="font-size: 0.7rem;">MEDIA MANAGEMENT</div>
+              <button
+                class="nav-button <?= (uri_string() === 'service-media-approval') ? 'active' : '' ?>"
+                onclick="window.location.href='<?= base_url('service-media-approval') ?>'"
+                data-tooltip="Media Approval">
+                <span class="nav-text"><i class="fas fa-photo-video mr-1"></i> Media Approval</span>
+              </button>
+            <?php endif; ?>
+          </div>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Service Providers">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">Service Providers</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+>>>>>>> origin/main
       </div>
 
       <!-- Clients Dropdown -->
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?= service('uri')->getSegment(1) === 'clients' ? 'active' : '' ?>"
           onclick="toggleDropdown('clients-dropdown')" data-tooltip="Clients">
           <div class="nav-button-content">
@@ -2316,6 +2709,28 @@
         <div id="clients-dropdown"
           class="sub-nav <?= service('uri')->getSegment(1) === 'clients' ? 'open' : '' ?>">
           <?php if (hasPermission('50')) : ?>
+=======
+        <?php if (hasPermission('clients.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'clients' ? 'active' : '' ?>"
+            onclick="toggleDropdown('clients-dropdown')" data-tooltip="Clients">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+              </svg>
+              <span class="nav-text">Clients</span>
+            </div>
+            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div id="clients-dropdown"
+            class="sub-nav <?= service('uri')->getSegment(1) === 'clients' ? 'open' : '' ?>">
+>>>>>>> origin/main
             <button
               class="nav-button <?= (uri_string() === 'clients' && isset($_GET['status']) && $_GET['status'] === 'active') ? 'active' : '' ?>"
               onclick="window.location.href='<?= base_url('clients?status=active') ?>'" data-tooltip="Active Clients">
@@ -2327,6 +2742,7 @@
               data-tooltip="Blocked Clients">
               <span class="nav-text">Blocked Clients</span>
             </button>
+<<<<<<< HEAD
           <?php else : ?>
             <button class="nav-button disabled-link" data-tooltip="Clients">
               <span class="nav-text">Clients</span>
@@ -2334,11 +2750,69 @@
             </button>
           <?php endif; ?>
         </div>
+=======
+          </div>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Clients">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+              </svg>
+              <span class="nav-text">Clients</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <!-- Client & SP Agreements -->
+      <div class="nav-item">
+        <?php if (hasPermission('clients.view') || hasPermission('service_providers.view') || hasPermission('agreements.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'agreements' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('agreements') ?>'" data-tooltip="Agreements Received">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span class="nav-text">Agreements</span>
+            </div>
+            <span id="agreements-badge" class="nav-badge" style="display: none;"></span>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Agreements Received">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span class="nav-text">Agreements</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+>>>>>>> origin/main
       </div>
 
       <!-- Employees -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('34')) : ?>
+=======
+        <?php if (hasPermission('employees.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'employees' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>employees'" data-tooltip="Employees">
             <div class="nav-button-content">
@@ -2365,6 +2839,7 @@
         <?php endif; ?>
       </div>
 
+<<<<<<< HEAD
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'walker-leaderboard' ? 'active' : '' ?>"
           onclick="window.location.href='<?= base_url() ?>walker-leaderboard'" data-tooltip="Walker Leaderboard">
@@ -2390,6 +2865,66 @@
             <span class="nav-text">SP Management</span>
           </div>
         </button>
+=======
+
+
+      <!-- Walker Dashboard -->
+      <div class="nav-item">
+        <?php if (hasPermission('walker.leaderboard')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'walker-leaderboard' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>walker-leaderboard'" data-tooltip="Walker Leaderboard">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">Walker Dashboard</span>
+            </div>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Walker Dashboard">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">Walker Dashboard</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <!-- SP Management -->
+      <div class="nav-item">
+        <?php if (hasPermission('walker.sp_management')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'sp-management' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>sp-management'" data-tooltip="sp-management">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">SP Management</span>
+            </div>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="SP Management">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+              </svg>
+              <span class="nav-text">SP Management</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+>>>>>>> origin/main
       </div>
       <hr class="nav-divider">
 
@@ -2398,7 +2933,11 @@
 
       <!-- Client Support -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('72')) : ?>
+=======
+        <?php if (hasPermission('support.client')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'support' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>support'" data-tooltip="Client Support">
             <div class="nav-button-content">
@@ -2436,7 +2975,11 @@
 
       <!-- SP Support -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('73')) : ?>
+=======
+        <?php if (hasPermission('support.provider')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'sp-support' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>sp-support'" data-tooltip="SP Support">
             <div class="nav-button-content">
@@ -2479,23 +3022,46 @@
 
       <!-- New Enquiries -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('67')) : ?>
           <button class="nav-button <?= service('uri')->getSegment(1) === 'enquiries' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>enquiries'" data-tooltip="New Enquiries">
             <div class="nav-button-content">
               <span class="nav-text">📋 New Enquiries</span>
+=======
+        <?php if (hasPermission('insurance.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'enquiries' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>enquiries'" data-tooltip="New Enquiries">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+              <span class="nav-text">New Enquiries</span>
+>>>>>>> origin/main
             </div>
           </button>
         <?php else : ?>
           <button class="nav-button disabled-link" data-tooltip="New Enquiries">
             <div class="nav-button-content">
+<<<<<<< HEAD
               <span class="nav-text">📋 New Enquiries</span>
+=======
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              </svg>
+              <span class="nav-text">New Enquiries</span>
+>>>>>>> origin/main
             </div>
             <i class="fas fa-lock"></i>
           </button>
         <?php endif; ?>
       </div>
 
+<<<<<<< HEAD
 
 
       <!-- Active Insurance -->
@@ -2505,12 +3071,35 @@
             onclick="window.location.href='<?= base_url() ?>active'" data-tooltip="Active Insurance">
             <div class="nav-button-content">
               <span class="nav-text">✅ Active Insurance</span>
+=======
+      <!-- Active Insurance -->
+      <div class="nav-item">
+        <?php if (hasPermission('insurance.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'active' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>active'" data-tooltip="Active Insurance">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+              <span class="nav-text">Active Insurance</span>
+>>>>>>> origin/main
             </div>
           </button>
         <?php else : ?>
           <button class="nav-button disabled-link" data-tooltip="Active Insurance">
             <div class="nav-button-content">
+<<<<<<< HEAD
               <span class="nav-text">✅ Active Insurance</span>
+=======
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+              <span class="nav-text">Active Insurance</span>
+>>>>>>> origin/main
             </div>
             <i class="fas fa-lock"></i>
           </button>
@@ -2519,17 +3108,39 @@
 
       <!-- Expiring Soon -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('65')) : ?>
           <button class="nav-button <?= service('uri')->getSegment(1) === 'expiring' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>expiring'" data-tooltip="Expiring Soon">
             <div class="nav-button-content">
               <span class="nav-text">⏰ Expiring Soon</span>
+=======
+        <?php if (hasPermission('insurance.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'expiring' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>expiring'" data-tooltip="Expiring Soon">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="nav-text">Expiring Soon</span>
+>>>>>>> origin/main
             </div>
           </button>
         <?php else : ?>
           <button class="nav-button disabled-link" data-tooltip="Expiring Soon">
             <div class="nav-button-content">
+<<<<<<< HEAD
               <span class="nav-text">⏰ Expiring Soon</span>
+=======
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span class="nav-text">Expiring Soon</span>
+>>>>>>> origin/main
             </div>
             <i class="fas fa-lock"></i>
           </button>
@@ -2538,17 +3149,45 @@
 
       <!-- Insurance Claims -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('65')) : ?>
           <button class="nav-button <?= service('uri')->getSegment(1) === 'claims' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>claims'" data-tooltip="Insurance Claims">
             <div class="nav-button-content">
               <span class="nav-text">📑 Insurance Claims</span>
+=======
+        <?php if (hasPermission('insurance.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'claims' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>claims'" data-tooltip="Insurance Claims">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span class="nav-text">Insurance Claims</span>
+>>>>>>> origin/main
             </div>
           </button>
         <?php else : ?>
           <button class="nav-button disabled-link" data-tooltip="Insurance Claims">
             <div class="nav-button-content">
+<<<<<<< HEAD
               <span class="nav-text">📑 Insurance Claims</span>
+=======
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span class="nav-text">Insurance Claims</span>
+>>>>>>> origin/main
             </div>
             <i class="fas fa-lock"></i>
           </button>
@@ -2612,6 +3251,7 @@
 
       <hr class="nav-divider">
       <!-- Loyalty Section -->
+<<<<<<< HEAD
       <div class="nav-section-title">Loyalty Management</div>
 
       <!-- Programs -->
@@ -2701,6 +3341,99 @@
           <span class="nav-text">Delivered Orders</span>
           <span id="delivered-orders-badge" class="nav-badge" style="display: none;"></span>
       </button>
+=======
+      <?php if (hasPermission('loyalty.view')) : ?>
+        <div class="nav-section-title">Loyalty Management</div>
+
+        <!-- Programs -->
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'loyalty-programs' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('loyalty-programs') ?>'" data-tooltip="Programs">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-2.34"></path>
+                <path d="M18 22V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v17"></path>
+              </svg>
+              <span class="nav-text">Loyalty Programs</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Users with Points -->
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'loyalty-admin' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('loyalty-admin') ?>'" data-tooltip="Point Holders">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="5"></circle>
+                <path d="M20 21a8 8 0 0 0-16 0"></path>
+                <path d="M12 13V8"></path>
+              </svg>
+              <span class="nav-text">Loyalty Points</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Transactions -->
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'loyalty-transactions' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('loyalty-transactions') ?>'" data-tooltip="Transactions">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                <path d="M12 8v4"></path>
+                <path d="M12 16h.01"></path>
+              </svg>
+              <span class="nav-text">Loyalty Transactions</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Settings -->
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'loyalty-settings' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('loyalty-settings') ?>'" data-tooltip="Loyalty Settings">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path
+                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                </path>
+              </svg>
+              <span class="nav-text">Loyalty Settings</span>
+            </div>
+          </button>
+        </div>
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'reward-orders' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('reward-orders') ?>'" data-tooltip="Reward Orders">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            <span class="nav-text">Reward Orders</span>
+          </div>
+          <span id="reward-orders-badge" class="nav-badge" style="display: none;"></span>
+        </button>
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'delivered-orders' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('delivered-orders') ?>'" data-tooltip="Delivered Orders">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+            </svg>
+            <span class="nav-text">Delivered Orders</span>
+            <span id="delivered-orders-badge" class="nav-badge" style="display: none;"></span>
+        </button>
+      <?php endif; ?>
+>>>>>>> origin/main
 
 
       <hr class="nav-divider">
@@ -2708,6 +3441,7 @@
       <div class="nav-section-title">Notification Hub</div>
 
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?= service('uri')->getSegment(1) === 'notification-manager' && !service('uri')->getSegment(2) ? 'active' : '' ?>"
           onclick="toggleDropdown('notifications-hub-dropdown')" data-tooltip="Notification Hub">
           <div class="nav-button-content">
@@ -2764,6 +3498,67 @@
       <!-- Client Statistics -->
       <div class="nav-item">
         <?php if (hasPermission('70')) : ?>
+=======
+        <?php if (hasPermission('notifications.campaigns')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'notification-manager' && !service('uri')->getSegment(2) ? 'active' : '' ?>"
+            onclick="toggleDropdown('notifications-hub-dropdown')" data-tooltip="Notification Hub">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 11 18-5v12L3 13v-2z"></path>
+                <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
+              </svg>
+              <span class="nav-text">Notifications</span>
+            </div>
+            <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
+          </button>
+          <div id="notifications-hub-dropdown" class="sub-nav <?= service('uri')->getSegment(1) === 'notification-manager' ? 'open' : '' ?>">
+            <button class="nav-button <?= service('uri')->getSegment(1) === 'notification-manager' && !service('uri')->getSegment(2) ? 'active' : '' ?>"
+              onclick="window.location.href='<?= base_url('notification-manager') ?>'" data-tooltip="Dashboard">
+              <span class="nav-text">Dashboard</span>
+            </button>
+            <button class="nav-button <?= service('uri')->getSegment(2) === 'templates' ? 'active' : '' ?>"
+              onclick="window.location.href='<?= base_url('notification-manager/templates') ?>'" data-tooltip="Templates">
+              <span class="nav-text">Templates</span>
+            </button>
+            <button class="nav-button <?= service('uri')->getSegment(2) === 'campaigns' ? 'active' : '' ?>"
+              onclick="window.location.href='<?= base_url('notification-manager/campaigns') ?>'" data-tooltip="Campaigns">
+              <span class="nav-text">Campaigns</span>
+            </button>
+            <button class="nav-button <?= service('uri')->getSegment(2) === 'logs' ? 'active' : '' ?>"
+              onclick="window.location.href='<?= base_url('notification-manager/logs') ?>'" data-tooltip="Logs">
+              <span class="nav-text">Logs</span>
+            </button>
+            <button class="nav-button <?= service('uri')->getSegment(2) === 'analytics' ? 'active' : '' ?>"
+              onclick="window.location.href='<?= base_url('notification-manager/analytics') ?>'" data-tooltip="Analytics & SP Health">
+              <span class="nav-text">Analytics ⭐</span>
+            </button>
+          </div>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Notification Hub">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 11 18-5v12L3 13v-2z"></path>
+                <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
+              </svg>
+              <span class="nav-text">Notifications</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="nav-section-title">Statistics</div>
+
+      <!-- Client Statistics -->
+      <div class="nav-item">
+        <?php if (hasPermission('statistics.client')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'client-statistics' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url('client-statistics') ?>'" data-tooltip="Client Statistics">
             <div class="nav-button-content">
@@ -2796,7 +3591,11 @@
 
       <!-- SP Statistics -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('71')) : ?>
+=======
+        <?php if (hasPermission('statistics.provider')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'provider-statistics' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url('provider-statistics') ?>'" data-tooltip="SP Statistics">
             <div class="nav-button-content">
@@ -2829,7 +3628,11 @@
 
       <!-- Clients Segregation -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('70')) : ?>
+=======
+        <?php if (hasPermission('statistics.client')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'client-list' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url('client-list') ?>'" data-tooltip="Clients Segregation">
             <div class="nav-button-content">
@@ -2867,7 +3670,11 @@
 
       <!-- Provider Earnings -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('67')) : ?>
+=======
+        <?php if (hasPermission('finance.sp_earnings')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'sp-earnings' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>sp-earnings'" data-tooltip="Provider Earnings">
             <div class="nav-button-content">
@@ -2900,7 +3707,11 @@
 
       <!-- Client Spendings -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('64')) : ?>
+=======
+        <?php if (hasPermission('finance.client_spendings')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'client-spendings' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>client-spendings'" data-tooltip="Client Spendings">
             <div class="nav-button-content">
@@ -2933,7 +3744,11 @@
 
       <!-- Providers Payouts -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('63')) : ?>
+=======
+        <?php if (hasPermission('finance.sp_payments')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'providers-payments' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>providers-payments'" data-tooltip="Providers Payouts">
             <div class="nav-button-content">
@@ -2965,9 +3780,70 @@
         <?php endif; ?>
       </div>
 
+<<<<<<< HEAD
       <!-- Company Earnings -->
       <div class="nav-item">
         <?php if (hasPermission('65')) : ?>
+=======
+      <!-- Call Analysis -->
+      <!-- <div class="nav-item">
+        <?php if (hasPermission('call_analysis.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'call-analysis' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>call-analysis'" data-tooltip="Call Analysis">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+              <span class="nav-text">Call Analysis</span>
+            </div>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Call Analysis">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+              </svg>
+              <span class="nav-text">Call Analysis</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div> -->
+
+      <!-- Call Verification Executive Payouts -->
+      <div class="nav-item">
+        <?php if (hasPermission('verification.payouts')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'call-verification-payouts' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>call-verification-payouts'" data-tooltip="Call Verification Payouts">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <span class="nav-text">Call Verification Payouts</span>
+            </div>
+            <span id="call-verification-payouts-badge" class="nav-badge" style="display: none;"></span>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Call Verification Payouts">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+              <span class="nav-text">Call Verification Payouts</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+      </div>
+
+      <!-- Company Earnings -->
+      <div class="nav-item">
+        <?php if (hasPermission('finance.company_earnings')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'company-earnings' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>company-earnings'" data-tooltip="Company Earnings">
             <div class="nav-button-content">
@@ -3000,7 +3876,11 @@
 
       <!-- Client Wallets -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('74')) : ?>
+=======
+        <?php if (hasPermission('finance.client_wallets')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'client-wallets' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>client-wallets'" data-tooltip="Client Wallets">
             <div class="nav-button-content">
@@ -3034,7 +3914,11 @@
 
       <!-- Payments -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('75')) : ?>
+=======
+        <?php if (hasPermission('finance.payments')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'payments' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>payments'" data-tooltip="Payments">
             <div class="nav-button-content">
@@ -3065,9 +3949,15 @@
         <?php endif; ?>
       </div>
 
+<<<<<<< HEAD
       <!-- Payments -->
       <div class="nav-item">
         <?php if (hasPermission('75')) : ?>
+=======
+      <!-- SP Payments -->
+      <div class="nav-item">
+        <?php if (hasPermission('finance.sp_payments')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'sp-payments' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>sp-payments'" data-tooltip="SP Payments">
             <div class="nav-button-content">
@@ -3100,6 +3990,7 @@
 
       <!-- Reconciliation -->
       <div class="nav-item">
+<<<<<<< HEAD
         <button class="nav-button <?= service('uri')->getSegment(1) === 'recoinciliation' ? 'active' : '' ?>"
           onclick="window.location.href='<?= base_url() ?>recoinciliation'" data-tooltip="Reconciliation">
           <div class="nav-button-content">
@@ -3113,6 +4004,37 @@
             <span class="nav-text">Reconciliation</span>
           </div>
         </button>
+=======
+        <?php if (hasPermission('finance.reconciliation')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'recoinciliation' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>recoinciliation'" data-tooltip="Reconciliation">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z">
+                </path>
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              </svg>
+              <span class="nav-text">Reconciliation</span>
+            </div>
+          </button>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="Reconciliation">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z">
+                </path>
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+              </svg>
+              <span class="nav-text">Reconciliation</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+>>>>>>> origin/main
       </div>
 
       <hr class="nav-divider">
@@ -3122,7 +4044,11 @@
 
       <!-- Daily Bookings -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('66')) : ?>
+=======
+        <?php if (hasPermission('finance.daily_bookings')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'daily-bookings' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>daily-bookings'" data-tooltip="Daily Bookings">
             <div class="nav-button-content">
@@ -3160,7 +4086,11 @@
 
       <!-- Walking Services -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('22')) : ?>
+=======
+        <?php if (hasPermission('bookings.walking')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?=
                                     service('uri')->getSegment(1) === 'bookings' &&
                                       (service('uri')->getSegment(2) === 'addons' || service('uri')->getSegment(2) === 'packages') &&
@@ -3221,7 +4151,11 @@
 
       <!-- Grooming Services -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('14')) : ?>
+=======
+        <?php if (hasPermission('bookings.grooming')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?=
                                     (service('uri')->getSegment(1) === 'bookings' &&
                                       (service('uri')->getSegment(2) === 'addons' || service('uri')->getSegment(2) === 'packages') &&
@@ -3296,7 +4230,11 @@
 
       <!-- Training Services -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('20')) : ?>
+=======
+        <?php if (hasPermission('bookings.training')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?=
                                     service('uri')->getSegment(1) === 'bookings' &&
                                       (service('uri')->getSegment(2) === 'addons' || service('uri')->getSegment(2) === 'packages') &&
@@ -3353,7 +4291,11 @@
 
       <!-- Boarding Services -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('6')) : ?>
+=======
+        <?php if (hasPermission('bookings.boarding')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?=
                                     service('uri')->getSegment(1) === 'bookings' &&
                                       (service('uri')->getSegment(2) === 'addons' || service('uri')->getSegment(2) === 'packages') &&
@@ -3412,7 +4354,11 @@
 
       <!-- Veterinary Services -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('17')) : ?>
+=======
+        <?php if (hasPermission('bookings.sitting')) : ?>
+>>>>>>> origin/main
           <button class="nav-button" onclick="toggleDropdown('veterinary-dropdown')" data-tooltip="Veterinary">
             <div class="nav-button-content">
               <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -3464,7 +4410,11 @@
 
       <!-- Pet Types & Breeds -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('76')) : ?>
+=======
+        <?php if (hasPermission('pets.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'pets' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>pets'" data-tooltip="Pet Types & Breeds">
             <div class="nav-button-content">
@@ -3507,6 +4457,7 @@
 
       <hr class="nav-divider">
 
+<<<<<<< HEAD
       <!-- Release Management Section -->
       <?php if (hasPermission('release_management.view', session()->get('user_role'))): ?>
       <div class="nav-section-title">Release Management</div>
@@ -3546,6 +4497,12 @@
       <div class="nav-section-title">System Settings</div>
       <div class="nav-item">
         <?php if (hasPermission('46')) : ?>
+=======
+      <!-- System Settings Section -->
+      <div class="nav-section-title">System Settings</div>
+      <div class="nav-item">
+        <?php if (hasPermission('verification.questions')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'verification-questions' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>verification-questions'" data-tooltip="Notifications">
             <div class="nav-button-content">
@@ -3571,6 +4528,7 @@
           </button>
         <?php endif; ?>
       </div>
+<<<<<<< HEAD
       <!-- System Tasks -->
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'tasks' ? 'active' : '' ?>"
@@ -3585,11 +4543,67 @@
               <path d="M10 9H8"></path>
             </svg>
             <span class="nav-text">System Tasks</span>
+=======
+
+      <!-- Activity & Audit Logs -->
+      <div class="nav-item">
+        <?php if (hasPermission('audit_logs.view') || hasPermission('employees.view')) : ?>
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'audit-logs' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>audit-logs'" data-tooltip="Activity Logs">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span class="nav-text">Activity Logs</span>
+            </div>
+          </button>
+        <?php endif; ?>
+      </div>
+      <!-- System Tasks -->
+      <?php if (hasPermission('tasks.view')) : ?>
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'tasks' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>tasks'" data-tooltip="System Tasks">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <path d="M16 13H8"></path>
+                <path d="M16 17H8"></path>
+                <path d="M10 9H8"></path>
+              </svg>
+              <span class="nav-text">System Tasks</span>
+            </div>
+          </button>
+        </div>
+      <?php endif; ?>
+
+      <!-- Version Releases -->
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'version-releases' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url() ?>version-releases'" data-tooltip="Version Releases">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+              <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+              <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+              <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+            </svg>
+            <span class="nav-text">Version Releases</span>
+>>>>>>> origin/main
           </div>
         </button>
       </div>
 
       <!-- Service States -->
+<<<<<<< HEAD
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'servicestates' ? 'active' : '' ?>"
           onclick="window.location.href='<?= base_url() ?>servicestates'" data-tooltip="Service States">
@@ -3613,6 +4627,33 @@
       <!-- Notifications -->
       <div class="nav-item">
         <?php if (hasPermission('46')) : ?>
+=======
+      <?php if (hasPermission('service_states.view')) : ?>
+        <div class="nav-item">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'servicestates' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url() ?>servicestates'" data-tooltip="Service States">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v8"></path>
+                <path d="m4.93 10.93 1.41 1.41"></path>
+                <path d="M2 18h2"></path>
+                <path d="M20 18h2"></path>
+                <path d="m19.07 10.93-1.41 1.41"></path>
+                <path d="M22 22H2"></path>
+                <path d="m16 6-4 4-4-4"></path>
+                <path d="M16 18a4 4 0 0 0-8 0"></path>
+              </svg>
+              <span class="nav-text">Service States</span>
+            </div>
+          </button>
+        </div>
+      <?php endif; ?>
+
+      <!-- Notifications -->
+      <!-- <div class="nav-item">
+        <?php if (hasPermission('notifications.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'notifications' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>notifications'" data-tooltip="Notifications">
             <div class="nav-button-content">
@@ -3637,11 +4678,19 @@
             <i class="fas fa-lock"></i>
           </button>
         <?php endif; ?>
+<<<<<<< HEAD
       </div>
 
       <!-- Permissions -->
       <div class="nav-item">
         <?php if (hasPermission('46')) : ?>
+=======
+      </div> -->
+
+      <!-- Permissions -->
+      <div class="nav-item">
+        <?php if (hasPermission('permissions.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'permissions' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>permissions'" data-tooltip="Permissions">
             <div class="nav-button-content">
@@ -3670,7 +4719,11 @@
 
       <!-- Banners -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('46')) : ?>
+=======
+        <?php if (hasPermission('banners.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'banners' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>banners'" data-tooltip="Banners">
             <div class="nav-button-content">
@@ -3703,7 +4756,11 @@
 
       <!-- Events -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('46')) : ?>
+=======
+        <?php if (hasPermission('events.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'events' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>events'" data-tooltip="Events">
             <div class="nav-button-content">
@@ -3736,7 +4793,11 @@
 
       <!-- Tutorials -->
       <div class="nav-item">
+<<<<<<< HEAD
         <?php if (hasPermission('79')) : ?>
+=======
+        <?php if (hasPermission('tutorials.view')) : ?>
+>>>>>>> origin/main
           <button class="nav-button <?= service('uri')->getSegment(1) === 'tutorials' ? 'active' : '' ?>"
             onclick="window.location.href='<?= base_url() ?>tutorials'" data-tooltip="Tutorials">
             <div class="nav-button-content">
@@ -3763,6 +4824,7 @@
         <?php endif; ?>
 
         <!-- AI Business Analyst Sidebar Link -->
+<<<<<<< HEAD
         <a href="<?= base_url('ai-analyst') ?>" class="nav-button <?= (current_url() == base_url('ai-analyst')) ? 'active' : '' ?>" style="text-decoration: none;">
           <div class="nav-button-content">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -3775,6 +4837,36 @@
             <span class="nav-text">AI Analyst</span>
           </div>
         </a>
+=======
+        <?php if (hasPermission('ai_analyst.view')) : ?>
+          <a href="<?= base_url('ai-analyst') ?>" class="nav-button <?= (current_url() == base_url('ai-analyst')) ? 'active' : '' ?>" style="text-decoration: none;">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+                <polyline points="7 10 10 7 13 10 17 6"></polyline>
+              </svg>
+              <span class="nav-text">AI Analyst</span>
+            </div>
+          </a>
+        <?php else : ?>
+          <button class="nav-button disabled-link" data-tooltip="AI Analyst">
+            <div class="nav-button-content">
+              <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+                <polyline points="7 10 10 7 13 10 17 6"></polyline>
+              </svg>
+              <span class="nav-text">AI Analyst</span>
+            </div>
+            <i class="fas fa-lock"></i>
+          </button>
+        <?php endif; ?>
+>>>>>>> origin/main
       </div>
     </div>
 
@@ -3799,6 +4891,7 @@
     src="https://omnidim.io/web_widget.js?secret_key=cc7096796292801e2941c5e38da370ca">
   </script> -->
 
+<<<<<<< HEAD
   <!-- JavaScript for Sidebar & Theme Functionality -->
   <script>
     // Global Dark / Light Theme Engine
@@ -3854,6 +4947,10 @@
       }
     });
 
+=======
+  <!-- JavaScript for Sidebar Functionality -->
+  <script>
+>>>>>>> origin/main
     function toggleSidebar() {
       const sidebar = document.querySelector('.sidebar-container');
       sidebar.classList.toggle('collapsed');
@@ -3869,6 +4966,7 @@
 
     function toggleDropdown(dropdownId) {
       const dropdown = document.getElementById(dropdownId);
+<<<<<<< HEAD
       const button = dropdown.previousElementSibling;
       const chevron = button.querySelector('.nav-chevron');
 
@@ -3886,6 +4984,56 @@
     // Auto-open dropdowns and highlight active items on page load
     document.addEventListener('DOMContentLoaded', function() {
       // Auto-open dropdowns that contain active items
+=======
+      if (!dropdown) return;
+      const button = dropdown.previousElementSibling;
+      const chevron = button ? button.querySelector('.nav-chevron') : null;
+
+      dropdown.classList.toggle('open');
+
+      let openDropdowns = [];
+      try {
+        openDropdowns = JSON.parse(sessionStorage.getItem('sidebar_open_dropdowns') || '[]');
+      } catch (e) {}
+
+      if (dropdown.classList.contains('open')) {
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        if (button) button.classList.add('active');
+        if (!openDropdowns.includes(dropdownId)) {
+          openDropdowns.push(dropdownId);
+        }
+      } else {
+        if (chevron) chevron.style.transform = 'rotate(0deg)';
+        if (button) button.classList.remove('active');
+        openDropdowns = openDropdowns.filter(id => id !== dropdownId);
+      }
+
+      sessionStorage.setItem('sidebar_open_dropdowns', JSON.stringify(openDropdowns));
+    }
+
+    // Auto-open dropdowns, highlight active items, and preserve sticky sidebar scroll position
+    document.addEventListener('DOMContentLoaded', function() {
+      const sidebarContent = document.querySelector('.sidebar-content');
+
+      // 1. Reopen dropdowns saved in sessionStorage
+      try {
+        const openDropdowns = JSON.parse(sessionStorage.getItem('sidebar_open_dropdowns') || '[]');
+        openDropdowns.forEach(id => {
+          const dd = document.getElementById(id);
+          if (dd && dd.classList.contains('sub-nav')) {
+            dd.classList.add('open');
+            const parentButton = dd.previousElementSibling;
+            if (parentButton && parentButton.classList.contains('nav-button')) {
+              parentButton.classList.add('active');
+              const chevron = parentButton.querySelector('.nav-chevron');
+              if (chevron) chevron.style.transform = 'rotate(180deg)';
+            }
+          }
+        });
+      } catch (e) {}
+
+      // 2. Auto-open dropdowns that contain active items
+>>>>>>> origin/main
       const activeButtons = document.querySelectorAll('.nav-button.active');
       activeButtons.forEach(button => {
         const dropdown = button.nextElementSibling;
@@ -3914,6 +5062,40 @@
         }
       });
 
+<<<<<<< HEAD
+=======
+      // 3. Make sidebar sticky and preserve scroll position on click & navigation
+      if (sidebarContent) {
+        const savedScroll = sessionStorage.getItem('sidebar_scroll_top');
+        if (savedScroll !== null) {
+          sidebarContent.scrollTop = parseInt(savedScroll, 10);
+        } else {
+          // Scroll active item into view if no saved scroll position
+          const activeItem = sidebarContent.querySelector('.nav-button.active');
+          if (activeItem) {
+            activeItem.scrollIntoView({
+              block: 'center',
+              behavior: 'instant'
+            });
+          }
+        }
+
+        // Keep scroll position updated on scroll
+        sidebarContent.addEventListener('scroll', function() {
+          sessionStorage.setItem('sidebar_scroll_top', sidebarContent.scrollTop);
+        }, {
+          passive: true
+        });
+
+        // Save scroll position immediately on clicking any navigation button
+        document.querySelectorAll('.sidebar-container .nav-button').forEach(button => {
+          button.addEventListener('click', function() {
+            sessionStorage.setItem('sidebar_scroll_top', sidebarContent.scrollTop);
+          });
+        });
+      }
+
+>>>>>>> origin/main
       // Set up direct navigation for non-dropdown buttons
       document.querySelectorAll('.nav-button:not([onclick*="toggleDropdown"])').forEach(button => {
         if (!button.onclick) {
@@ -3924,7 +5106,17 @@
             button.addEventListener('click', function(e) {
               if (!this.classList.contains('disabled-link')) {
                 const url = this.getAttribute('data-url') || this.querySelector('a')?.href;
+<<<<<<< HEAD
                 if (url) window.location.href = url;
+=======
+                if (url) {
+                  if (e.ctrlKey || e.metaKey || e.button === 1) {
+                    window.open(url, '_blank');
+                  } else {
+                    window.location.href = url;
+                  }
+                }
+>>>>>>> origin/main
               }
             });
           }
@@ -3941,17 +5133,53 @@
       });
     });
 
+<<<<<<< HEAD
+=======
+    // Handle Ctrl + Click, Cmd + Click, or Middle Click on any sidebar nav button to open in a NEW TAB
+    function handleNavNewTab(e) {
+      const navBtn = e.target.closest('.nav-button:not([onclick*="toggleDropdown"])');
+      if (!navBtn || navBtn.classList.contains('disabled-link')) return;
+
+      if (e.ctrlKey || e.metaKey || e.button === 1) {
+        let targetUrl = navBtn.getAttribute('data-url') || navBtn.getAttribute('data-href') || navBtn.getAttribute('href');
+        if (!targetUrl) {
+          const onclickStr = navBtn.getAttribute('onclick') || '';
+          const match = onclickStr.match(/(?:window\.location\.href|location\.href)\s*=\s*['"]([^'"]+)['"]/);
+          if (match && match[1]) {
+            targetUrl = match[1];
+          }
+        }
+        if (targetUrl) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          window.open(targetUrl, '_blank');
+          return false;
+        }
+      }
+    }
+
+    // Capture phase event listeners to intercept navigation before inline onclick executes
+    document.addEventListener('click', handleNavNewTab, true);
+    document.addEventListener('auxclick', handleNavNewTab, true);
+
+>>>>>>> origin/main
     // Close dropdowns when clicking outside on mobile
     document.addEventListener('click', function(e) {
       if (window.innerWidth <= 768) {
         const sidebar = document.querySelector('.sidebar-container');
+<<<<<<< HEAD
         if (!sidebar.contains(e.target) && sidebar.classList.contains('open')) {
+=======
+        if (sidebar && !sidebar.contains(e.target) && sidebar.classList.contains('open')) {
+>>>>>>> origin/main
           sidebar.classList.remove('open');
         }
       }
     });
 
     // Fetch sidebar counts dynamically to avoid slow initial page load
+<<<<<<< HEAD
     // async function fetchSidebarCounts() {
     //   try {
     //     const response = await fetch('<?= base_url() ?>getSidebarCounts');
@@ -3990,6 +5218,35 @@
     //   //   console.error('Error fetching loyalty counts:', error);
     //   // }
     // }
+=======
+    async function fetchSidebarCounts() {
+      try {
+        const response = await fetch('<?= base_url('getSidebarCounts') ?>');
+        if (!response.ok) return;
+        const counts = await response.json();
+
+        updateBadge('booking-parent-badge', (counts.bookingRequests || 0) + (counts.Confirmedbookings || 0));
+        updateBadge('new-requests-badge', counts.bookingRequests);
+        updateBadge('active-bookings-badge', counts.Confirmedbookings);
+        updateBadge('on-hold-badge', counts.Haltedbookings);
+        updateBadge('no-show-badge', counts.missedwalks);
+        updateBadge('completed-bookings-badge', counts.Completedbookings);
+        updateBadge('cancelled-bookings-badge', counts.Cancelledbookings);
+        updateBadge('deleted-bookings-badge', counts.Deletedbookings);
+        updateBadge('client-support-badge', counts.clsupports);
+        updateBadge('sp-support-badge', counts.spsupports);
+        updateBadge('payout-badge', counts.providerPayouts);
+        updateBadge('call-verification-payouts-badge', counts.callVerificationPayouts);
+        updateBadge('agreements-badge', counts.agreementsCount);
+        updateBadge('refund-badge', counts.refundRequests);
+        updateBadge('reward-orders-badge', counts.pending_rewards);
+        updateBadge('delivered-orders-badge', counts.delivered_rewards);
+
+      } catch (error) {
+        console.error('Error fetching sidebar counts:', error);
+      }
+    }
+>>>>>>> origin/main
 
     function updateBadge(id, count) {
       const badge = document.getElementById(id);
@@ -4004,6 +5261,7 @@
     }
 
     // Call fetchSidebarCounts on page load
+<<<<<<< HEAD
     // document.addEventListener('DOMContentLoaded', fetchSidebarCounts);
 
     // Refresh counts every 30 seconds for real-time updates
@@ -4015,6 +5273,30 @@
   <!-- External Library Bundle Script -->
   <script src="<?= base_url() ?>public/assets/js/core/external.min.js"></script>
   
+=======
+    document.addEventListener('DOMContentLoaded', fetchSidebarCounts);
+
+    // Refresh counts every 30 seconds only when tab is active/visible
+    setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchSidebarCounts();
+      }
+    }, 30000);
+
+    // Immediately refresh counts when user switches back to this tab
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        fetchSidebarCounts();
+      }
+    });
+  </script>
+  <!-- Library Bundle Script -->
+  <script src="<?= base_url() ?>public/assets/js/core/libs.min.js"></script>
+
+  <!-- External Library Bundle Script -->
+  <script src="<?= base_url() ?>public/assets/js/core/external.min.js"></script>
+
+>>>>>>> origin/main
   <!-- Hope Ui Framework JavaScript -->
   <script src="<?= base_url() ?>public/assets/js/hope-ui.js" defer></script>
 

@@ -1,18 +1,42 @@
 $(document).ready(function () {
   $(document).ready(function () {
+<<<<<<< HEAD
     $("#example").DataTable({
       order: [[0, "desc"]],
+=======
+
+    $("#example").DataTable({
+      order: [[0, "desc"]],
+      // responsive: true,
+>>>>>>> origin/main
       columnDefs: [
         {
           targets: 0,
           visible: false,
         },
+<<<<<<< HEAD
+=======
+        // { responsivePriority: 2, targets: -1 }, // Action
+>>>>>>> origin/main
       ],
       paging: true,
       searching: true,
       ordering: true,
+<<<<<<< HEAD
       lengthMenu: [5, 10, 15],
       pageLength: 20,
+=======
+      lengthMenu: [
+        [10, 25, 50, 100, 250, 500, 1000],
+        ["10", "25", "50", "100", "250", "500", "1000"],
+      ],
+
+      pageLength: 20,
+      language: {
+        lengthMenu: "Show _MENU_ entries",
+        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+      },
+>>>>>>> origin/main
     });
   });
 
@@ -117,6 +141,10 @@ $(document).ready(function () {
         if (data.status == true) {
           // success
           Swal.fire(data.message);
+<<<<<<< HEAD
+=======
+          window.location.reload();
+>>>>>>> origin/main
         } else {
           // failed
           Swal.fire(data.message);
@@ -261,6 +289,7 @@ $(document).ready(function () {
     });
   });
 });
+<<<<<<< HEAD
 
 function showSection(id) {
   document
@@ -688,3 +717,5 @@ if (typeof $ !== 'undefined') {
 }
 
 
+=======
+>>>>>>> origin/main

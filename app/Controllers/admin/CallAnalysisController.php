@@ -25,11 +25,16 @@ class CallAnalysisController extends BaseController
 
     /**
      * Display the Call Analysis Executive Dashboard with Reviewer / Verifier Performance.
+<<<<<<< HEAD
+=======
+     * Segregates SP Verification Calls & Registration Executive Calls from Client-Provider calls.
+>>>>>>> origin/main
      */
     public function index()
     {
         $db = \Config\Database::connect();
 
+<<<<<<< HEAD
         // Summary KPI Metrics
         $totalRecordings = $this->recordingModel->countAllResults();
         $completedCount  = $this->recordingModel->where('status', 'completed')->countAllResults();
@@ -40,6 +45,46 @@ class CallAnalysisController extends BaseController
             ->selectAvg('overall_rating', 'avg_rating')
             ->selectAvg('risk_score', 'avg_risk')
             ->selectAvg('qa_score', 'avg_qa')
+=======
+        // 1. Auto-sync any un-imported executive call recordings from sp_reviews / executive_call_records
+        // $this->syncExecutiveCallRecords();
+
+        // Base filter: Strictly executive-to-provider verification & registration calls (excludes client-provider calls)
+        $execCallWhere = "(cr.call_type NOT IN ('client_provider', 'client_sp') AND (cr.customer_id IS NULL OR cr.customer_id = 0))";
+
+        // Query parameters for filtering (Default: SP Verification Calls)
+        $selectedType     = $this->request->getGet('type') ? strtolower(trim($this->request->getGet('type'))) : 'verification';
+        $selectedVerifier = $this->request->getGet('verifier_id') ? (int)$this->request->getGet('verifier_id') : null;
+        $selectedStatus   = $this->request->getGet('status') ? strtolower(trim($this->request->getGet('status'))) : null;
+
+        // Base count builder
+        $baseBuilder = $db->table('call_recordings cr')->where($execCallWhere);
+
+        // Summary KPI Metrics (Scoped to Executive Calls)
+        $totalRecordings = (clone $baseBuilder)->countAllResults();
+        $completedCount  = (clone $baseBuilder)->where('cr.status', 'completed')->countAllResults();
+        $queuedCount     = (clone $baseBuilder)->where('cr.status', 'queued')->countAllResults();
+        $failedCount     = (clone $baseBuilder)->where('cr.status', 'failed')->countAllResults();
+
+        // Registration & Verification specific counts
+        $registrationCount = $db->table('call_recordings cr')
+            ->join('employees e', 'e.id = cr.verifier_id', 'left')
+            ->where($execCallWhere)
+            ->groupStart()
+                ->whereIn('cr.call_type', ['registration', 'register', 'registration_call', 'registration_executive'])
+                ->orWhere('e.role_id', 13)
+            ->groupEnd()
+            ->countAllResults();
+
+        $verificationCount = max(0, $totalRecordings - $registrationCount);
+
+        $avgRatingRow = $db->table('call_analysis ca')
+            ->join('call_recordings cr', 'cr.id = ca.recording_id')
+            ->where($execCallWhere)
+            ->selectAvg('ca.overall_rating', 'avg_rating')
+            ->selectAvg('ca.risk_score', 'avg_risk')
+            ->selectAvg('ca.qa_score', 'avg_qa')
+>>>>>>> origin/main
             ->get()
             ->getRowArray();
 
@@ -47,12 +92,20 @@ class CallAnalysisController extends BaseController
         $avgRisk   = round((float)($avgRatingRow['avg_risk'] ?? 0), 1);
         $avgQa     = round((float)($avgRatingRow['avg_qa'] ?? 0), 1);
 
+<<<<<<< HEAD
         $positiveCount = $db->table('call_analysis')
             ->where('customer_sentiment', 'Positive')
+=======
+        $positiveCount = $db->table('call_analysis ca')
+            ->join('call_recordings cr', 'cr.id = ca.recording_id')
+            ->where($execCallWhere)
+            ->where('ca.customer_sentiment', 'Positive')
+>>>>>>> origin/main
             ->countAllResults();
 
         $positivePercentage = $completedCount > 0 ? round(($positiveCount / $completedCount) * 100, 1) : 0;
 
+<<<<<<< HEAD
         // Fetch recent call recordings list with analysis & verifier info
         $calls = $db->table('call_recordings')
             ->select('call_recordings.*, call_analysis.overall_rating, call_analysis.customer_sentiment, call_analysis.risk_score, call_analysis.summary, call_analysis.communication, call_analysis.professionalism, call_analysis.empathy, call_analysis.compliance, call_analysis.verification_status, call_analysis.qa_score, call_analysis.is_escalated, call_analysis.has_complaint, employees.name as verifier_name')
@@ -70,6 +123,108 @@ class CallAnalysisController extends BaseController
         $verifiers = $db->table('employees')
             ->select('id, name, email')
             ->where('status', 1)
+=======
+        // Fetch recent call recordings list with analysis, verifier info, executive role & provider details
+        $callsQuery = $db->table('call_recordings cr')
+            ->select('cr.*, ca.overall_rating, ca.customer_sentiment, ca.risk_score, ca.summary, ca.communication, ca.professionalism, ca.empathy, ca.compliance, ca.verification_status, ca.qa_score, ca.is_escalated, ca.has_complaint, employees.name as verifier_name, employees.role_id as verifier_role_id, roles.name as verifier_role_name, sp.name as provider_name, sp.phone as provider_phone')
+            ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+            ->join('employees', 'employees.id = cr.verifier_id', 'left')
+            ->join('roles', 'roles.id = employees.role_id', 'left')
+            ->join('service_providers sp', 'sp.id = cr.provider_id', 'left')
+            ->where($execCallWhere);
+
+        // Apply call type filter
+        if ($selectedType === 'registration') {
+            $callsQuery->groupStart()
+                ->whereIn('cr.call_type', ['registration', 'register', 'registration_call', 'registration_executive'])
+                ->orWhere('employees.role_id', 13)
+                ->groupEnd();
+        } elseif ($selectedType === 'verification') {
+            $callsQuery->groupStart()
+                ->whereNotIn('cr.call_type', ['registration', 'register', 'registration_call', 'registration_executive'])
+                ->groupStart()
+                    ->where('employees.role_id !=', 13)
+                    ->orWhere('employees.role_id IS NULL')
+                ->groupEnd()
+                ->groupEnd();
+        }
+
+        // Apply verifier filter
+        if ($selectedVerifier) {
+            $callsQuery->where('cr.verifier_id', $selectedVerifier);
+        }
+
+        // Apply verification status filter
+        if ($selectedStatus && in_array($selectedStatus, ['approved', 're_verification', 'escalated', 'rejected', 'pending'])) {
+            $callsQuery->where('ca.verification_status', $selectedStatus);
+        }
+
+        // Pagination and Search query parameters
+        $page     = max(1, (int)($this->request->getGet('page') ?: 1));
+        $perPage  = max(5, min(100, (int)($this->request->getGet('per_page') ?: 25)));
+        $search   = trim((string)$this->request->getGet('search'));
+
+        // Apply search keyword filter
+        if (!empty($search)) {
+            $callsQuery->groupStart()
+                ->like('sp.name', $search)
+                ->orLike('sp.phone', $search)
+                ->orLike('employees.name', $search)
+                ->orLike('cr.id', $search)
+                ->orLike('cr.provider_id', $search)
+            ->groupEnd();
+        }
+
+        // Count total filtered calls for pagination
+        $totalFiltered = (clone $callsQuery)->countAllResults(false);
+        $totalPages    = max(1, (int)ceil($totalFiltered / $perPage));
+
+        $calls = $callsQuery->orderBy('cr.created_at', 'DESC')
+            ->orderBy('cr.id', 'DESC')
+            ->limit($perPage, ($page - 1) * $perPage)
+            ->get()
+            ->getResultArray();
+
+        // Pager Service
+        $pager = service('pager');
+        $pager->only(['type', 'verifier_id', 'status', 'search', 'per_page']);
+        $pagerLinks = $pager->makeLinks($page, $perPage, $totalFiltered, 'default_full');
+
+        // Add normalized executive type tag and formatted duration for each call
+        foreach ($calls as &$c) {
+            $cRole = (int)($c['verifier_role_id'] ?? 0);
+            $cType = strtolower($c['call_type'] ?? '');
+            if ($cRole === 13 || in_array($cType, ['registration', 'register', 'registration_call', 'registration_executive'])) {
+                $c['display_type']  = 'Registration';
+                $c['is_register']   = true;
+                $c['role_badge']    = 'Registration Executive';
+            } else {
+                $c['display_type']  = 'Verification';
+                $c['is_register']   = false;
+                $c['role_badge']    = 'Verification Executive';
+            }
+
+            // Duration formatting
+            $durSec = (int)($c['duration'] ?? 0);
+            if ($durSec > 0) {
+                $mins = floor($durSec / 60);
+                $secs = $durSec % 60;
+                $c['formatted_duration'] = ($mins > 0 ? "{$mins}m " : "") . sprintf("%02ds", $secs);
+            } else {
+                $c['formatted_duration'] = '-';
+            }
+        }
+
+        // Fetch Reviewer / Verifier Performance Metrics (scoped strictly to executive calls)
+        $verifierStats = $this->analysisModel->getVerifierPerformanceStats($selectedVerifier);
+
+        // Fetch Verifiers list (Employees) for dropdowns with role information
+        $verifiers = $db->table('employees e')
+            ->select('e.id, e.name, e.email, e.role_id, r.name as role_name')
+            ->join('roles r', 'r.id = e.role_id', 'left')
+            ->where('e.status', 1)
+            ->orderBy('e.name', 'ASC')
+>>>>>>> origin/main
             ->get()
             ->getResultArray();
 
@@ -78,10 +233,28 @@ class CallAnalysisController extends BaseController
             'completedCount'     => $completedCount,
             'queuedCount'        => $queuedCount,
             'failedCount'        => $failedCount,
+<<<<<<< HEAD
+=======
+            'registrationCount'  => $registrationCount,
+            'verificationCount'  => $verificationCount,
+>>>>>>> origin/main
             'avgRating'          => $avgRating,
             'avgRisk'            => $avgRisk,
             'avgQa'              => $avgQa,
             'positivePercentage' => $positivePercentage,
+<<<<<<< HEAD
+=======
+            'selectedType'       => $selectedType,
+            'selectedVerifier'   => $selectedVerifier,
+            'selectedStatus'     => $selectedStatus,
+            'search'             => $search,
+            'page'               => $page,
+            'perPage'            => $perPage,
+            'totalFiltered'      => $totalFiltered,
+            'totalPages'         => $totalPages,
+            'pager'              => $pager,
+            'pagerLinks'         => $pagerLinks,
+>>>>>>> origin/main
             'calls'              => $calls,
             'verifierStats'      => $verifierStats,
             'verifiers'          => $verifiers,
@@ -170,11 +343,21 @@ class CallAnalysisController extends BaseController
     {
         $db = \Config\Database::connect();
 
+<<<<<<< HEAD
         $call = $db->table('call_recordings')
             ->select('call_recordings.*, call_analysis.*, employees.name as verifier_name')
             ->join('call_analysis', 'call_analysis.recording_id = call_recordings.id', 'left')
             ->join('employees', 'employees.id = call_recordings.verifier_id', 'left')
             ->where('call_recordings.id', $id)
+=======
+        $call = $db->table('call_recordings cr')
+            ->select('cr.*, ca.*, employees.name as verifier_name, employees.role_id as verifier_role_id, roles.name as verifier_role_name, sp.name as provider_name, sp.phone as provider_phone, sp.email as provider_email')
+            ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+            ->join('employees', 'employees.id = cr.verifier_id', 'left')
+            ->join('roles', 'roles.id = employees.role_id', 'left')
+            ->join('service_providers sp', 'sp.id = cr.provider_id', 'left')
+            ->where('cr.id', $id)
+>>>>>>> origin/main
             ->get()
             ->getRowArray();
 
@@ -185,6 +368,7 @@ class CallAnalysisController extends BaseController
             ]);
         }
 
+<<<<<<< HEAD
         // Decode JSON fields for clean frontend rendering
         $call['strengths']            = json_decode($call['strengths'] ?? '[]', true);
         $call['weaknesses']           = json_decode($call['weaknesses'] ?? '[]', true);
@@ -192,6 +376,27 @@ class CallAnalysisController extends BaseController
         $call['tags']                 = json_decode($call['tags'] ?? '[]', true);
         $call['abuse_instances']      = json_decode($call['abuse_instances'] ?? '[]', true);
         $call['negative_speech_flags'] = json_decode($call['negative_speech_flags'] ?? '[]', true);
+=======
+        // Tag executive role display
+        $cRole = (int)($call['verifier_role_id'] ?? 0);
+        $cType = strtolower($call['call_type'] ?? '');
+        if ($cRole === 13 || in_array($cType, ['registration', 'register', 'registration_call', 'registration_executive'])) {
+            $call['display_type'] = 'Registration';
+            $call['role_badge']   = 'Registration Executive';
+        } else {
+            $call['display_type'] = 'Verification';
+            $call['role_badge']   = 'Verification Executive';
+        }
+
+        // Decode JSON fields for clean frontend rendering
+        $call['strengths']            = json_decode($call['strengths'] ?? '[]', true) ?: [];
+        $call['weaknesses']           = json_decode($call['weaknesses'] ?? '[]', true) ?: [];
+        $call['recommendations']      = json_decode($call['recommendations'] ?? '[]', true) ?: [];
+        $call['tags']                 = json_decode($call['tags'] ?? '[]', true) ?: [];
+        $call['abuse_instances']      = json_decode($call['abuse_instances'] ?? '[]', true) ?: [];
+        $call['negative_speech_flags'] = json_decode($call['negative_speech_flags'] ?? '[]', true) ?: [];
+        $call['verification_qa']      = json_decode($call['verification_qa'] ?? 'null', true) ?: null;
+>>>>>>> origin/main
 
         // Fetch extracted keywords
         $keywords = $db->table('call_keywords')
@@ -200,7 +405,11 @@ class CallAnalysisController extends BaseController
             ->get()
             ->getResultArray();
 
+<<<<<<< HEAD
         $call['keywords'] = $keywords;
+=======
+        $call['keywords'] = $keywords ?: [];
+>>>>>>> origin/main
 
         return $this->response->setJSON([
             'status' => true,
@@ -223,12 +432,33 @@ class CallAnalysisController extends BaseController
         }
 
         try {
+<<<<<<< HEAD
             $metadata = [
                 'booking_id'  => $this->request->getPost('booking_id'),
                 'provider_id' => $this->request->getPost('provider_id'),
                 'customer_id' => $this->request->getPost('customer_id'),
                 'verifier_id' => $this->request->getPost('verifier_id') ?: (session()->get('user')->id ?? null),
                 'call_type'   => $this->request->getPost('call_type') ?: 'verification',
+=======
+            $callType = strtolower($this->request->getPost('call_type') ?: 'verification');
+            $verifierId = $this->request->getPost('verifier_id') ? (int)$this->request->getPost('verifier_id') : (session()->get('user')->id ?? null);
+
+            // Auto-detect if verifier is Registration Executive (Role 13)
+            if ($verifierId) {
+                $db = \Config\Database::connect();
+                $emp = $db->table('employees')->select('role_id')->where('id', $verifierId)->get()->getRowArray();
+                if (!empty($emp['role_id']) && (int)$emp['role_id'] === 13 && $callType === 'verification') {
+                    $callType = 'registration';
+                }
+            }
+
+            $metadata = [
+                'booking_id'  => $this->request->getPost('booking_id'),
+                'provider_id' => $this->request->getPost('provider_id'),
+                'customer_id' => null, // Strictly null for executive-provider verification & registration calls
+                'verifier_id' => $verifierId,
+                'call_type'   => $callType,
+>>>>>>> origin/main
                 'duration'    => (int)($this->request->getPost('duration') ?: 0),
             ];
 
@@ -249,11 +479,19 @@ class CallAnalysisController extends BaseController
     }
 
     /**
+<<<<<<< HEAD
      * AJAX Endpoint for Chart.js Analytics.
+=======
+     * AJAX Endpoint for Chart.js Analytics (Strictly scoped to Executive Calls).
+>>>>>>> origin/main
      */
     public function getAnalyticsData()
     {
         $db = \Config\Database::connect();
+<<<<<<< HEAD
+=======
+        $execCallWhere = "call_recordings.call_type NOT IN ('client_provider', 'client_sp') AND (call_recordings.customer_id IS NULL OR call_recordings.customer_id = 0)";
+>>>>>>> origin/main
 
         // 1. Daily Average Rating (last 14 days)
         $dailyRatings = $db->query("
@@ -263,6 +501,10 @@ class CallAnalysisController extends BaseController
             FROM call_recordings
             JOIN call_analysis ON call_analysis.recording_id = call_recordings.id
             WHERE call_recordings.created_at >= DATE_SUB(CURDATE(), INTERVAL 14 DAY)
+<<<<<<< HEAD
+=======
+              AND {$execCallWhere}
+>>>>>>> origin/main
             GROUP BY DATE(call_recordings.created_at)
             ORDER BY call_date ASC
         ")->getResultArray();
@@ -275,6 +517,10 @@ class CallAnalysisController extends BaseController
             FROM call_recordings
             JOIN call_analysis ON call_analysis.recording_id = call_recordings.id
             WHERE provider_id IS NOT NULL AND provider_id > 0
+<<<<<<< HEAD
+=======
+              AND {$execCallWhere}
+>>>>>>> origin/main
             GROUP BY provider_id
             ORDER BY avg_rating DESC
             LIMIT 10
@@ -284,28 +530,57 @@ class CallAnalysisController extends BaseController
         $verifierRankings = $db->query("
             SELECT cr.verifier_id,
                    COALESCE(e.name, 'Unassigned') as verifier_name,
+<<<<<<< HEAD
+=======
+                   r.name as role_name,
+>>>>>>> origin/main
                    AVG(ca.qa_score) as avg_qa_score,
                    COUNT(cr.id) as total_calls,
                    SUM(CASE WHEN ca.verification_status = 'approved' THEN 1 ELSE 0 END) as approved_calls
             FROM call_recordings cr
             JOIN call_analysis ca ON ca.recording_id = cr.id
             LEFT JOIN employees e ON e.id = cr.verifier_id
+<<<<<<< HEAD
+=======
+            LEFT JOIN roles r ON r.id = e.role_id
+            WHERE cr.call_type NOT IN ('client_provider', 'client_sp') 
+              AND (cr.customer_id IS NULL OR cr.customer_id = 0)
+>>>>>>> origin/main
             GROUP BY cr.verifier_id
             ORDER BY avg_qa_score DESC
         ")->getResultArray();
 
         // 4. Sentiment Breakdown
         $sentimentStats = $db->query("
+<<<<<<< HEAD
             SELECT customer_sentiment, COUNT(*) as total
             FROM call_analysis
             GROUP BY customer_sentiment
+=======
+            SELECT ca.customer_sentiment, COUNT(*) as total
+            FROM call_analysis ca
+            JOIN call_recordings cr ON cr.id = ca.recording_id
+            WHERE cr.call_type NOT IN ('client_provider', 'client_sp') 
+              AND (cr.customer_id IS NULL OR cr.customer_id = 0)
+            GROUP BY ca.customer_sentiment
+>>>>>>> origin/main
         ")->getResultArray();
 
         // 5. Top Keywords / Complaints
         $topKeywords = $db->query("
+<<<<<<< HEAD
             SELECT keyword, SUM(frequency) as total_freq
             FROM call_keywords
             GROUP BY keyword
+=======
+            SELECT ck.keyword, SUM(ck.frequency) as total_freq
+            FROM call_keywords ck
+            JOIN call_analysis ca ON ca.id = ck.analysis_id
+            JOIN call_recordings cr ON cr.id = ca.recording_id
+            WHERE cr.call_type NOT IN ('client_provider', 'client_sp') 
+              AND (cr.customer_id IS NULL OR cr.customer_id = 0)
+            GROUP BY ck.keyword
+>>>>>>> origin/main
             ORDER BY total_freq DESC
             LIMIT 10
         ")->getResultArray();
@@ -321,6 +596,132 @@ class CallAnalysisController extends BaseController
     }
 
     /**
+<<<<<<< HEAD
+=======
+     * Auto-sync un-imported executive recordings from sp_reviews and executive_call_records into call_recordings table.
+     */
+    protected function syncExecutiveCallRecords(): void
+    {
+        try {
+            $db = \Config\Database::connect();
+            $jobModel = new \App\Models\CallJobModel();
+
+            // Find reviews with call_record audio files that are not yet in call_recordings
+            $reviews = $db->table('sp_reviews')
+                ->select('sp_reviews.id, sp_reviews.provider_id, sp_reviews.service_id, sp_reviews.call_record, sp_reviews.admin_id, sp_reviews.created_at, employees.role_id')
+                ->join('employees', 'employees.id = sp_reviews.admin_id', 'left')
+                ->where('sp_reviews.call_record IS NOT NULL')
+                ->where('sp_reviews.call_record !=', '')
+                ->where('sp_reviews.call_record !=', '0')
+                ->get()
+                ->getResultArray();
+
+            foreach ($reviews as $rev) {
+                $rawRecord = trim($rev['call_record']);
+                if (empty($rawRecord)) continue;
+
+                $filename = basename(parse_url($rawRecord, PHP_URL_PATH) ?? $rawRecord);
+                if (empty($filename)) continue;
+
+                $relPath = 'public/uploads/providers/call_records/' . $filename;
+                $fullPath = ROOTPATH . $relPath;
+
+                // Check if file exists on disk
+                if (!file_exists($fullPath)) {
+                    // Try alternative path
+                    $altPath = ROOTPATH . 'public/uploads/call_recordings/' . $filename;
+                    if (file_exists($altPath)) {
+                        $relPath = 'public/uploads/call_recordings/' . $filename;
+                    } else {
+                        continue;
+                    }
+                }
+
+                // Check if already in call_recordings
+                $exists = $db->table('call_recordings')
+                    ->groupStart()
+                        ->where('recording_url', $relPath)
+                        ->orLike('recording_url', $filename)
+                    ->groupEnd()
+                    ->countAllResults();
+
+                if ($exists === 0) {
+                    $isRegRole = ((int)($rev['role_id'] ?? 0) === 13);
+                    $callType  = $isRegRole ? 'registration' : 'verification';
+                    $verifierId = !empty($rev['admin_id']) ? (int)$rev['admin_id'] : null;
+                    $duration   = \App\Services\RecordingService::extractAudioDuration($fullPath);
+
+                    $serviceMap = [
+                        2 => 'grooming',
+                        3 => 'training',
+                        4 => 'walking',
+                        6 => 'sitting',
+                        1 => 'sitting'
+                    ];
+                    $serviceName = $serviceMap[(int)($rev['service_id'] ?? 0)] ?? null;
+
+                    $recId = $this->recordingModel->insert([
+                        'provider_id'   => (int)$rev['provider_id'],
+                        'customer_id'   => null,
+                        'verifier_id'   => $verifierId,
+                        'call_type'     => $callType,
+                        'service_type'  => $serviceName,
+                        'recording_url' => $relPath,
+                        'duration'      => $duration,
+                        'status'        => 'queued',
+                        'created_at'    => $rev['created_at'] ?: date('Y-m-d H:i:s'),
+                        'updated_at'    => $rev['created_at'] ?: date('Y-m-d H:i:s'),
+                    ], true);
+
+                    if ($recId) {
+                        $jobModel->insert([
+                            'recording_id' => $recId,
+                            'status'       => 'queued',
+                            'retry_count'  => 0,
+                        ]);
+                    }
+                }
+            }
+
+            // Backfill existing call_recordings with 0 duration if audio file exists on disk
+            $zeroDurationRecs = $db->table('call_recordings')
+                ->select('id, recording_url')
+                ->groupStart()
+                    ->where('duration', 0)
+                    ->orWhere('duration IS NULL')
+                ->groupEnd()
+                ->limit(60)
+                ->get()
+                ->getResultArray();
+
+            foreach ($zeroDurationRecs as $z) {
+                $rawUrl = trim($z['recording_url'] ?? '');
+                if (empty($rawUrl)) continue;
+
+                $pathCandidates = [
+                    ROOTPATH . ltrim(parse_url($rawUrl, PHP_URL_PATH) ?? $rawUrl, '/'),
+                    ROOTPATH . 'public/' . ltrim(parse_url($rawUrl, PHP_URL_PATH) ?? $rawUrl, '/'),
+                    ROOTPATH . 'public/uploads/providers/call_records/' . basename($rawUrl),
+                    ROOTPATH . 'public/uploads/call_recordings/' . basename($rawUrl),
+                ];
+
+                foreach ($pathCandidates as $cand) {
+                    if (file_exists($cand) && filesize($cand) > 0) {
+                        $dur = \App\Services\RecordingService::extractAudioDuration($cand);
+                        if ($dur > 0) {
+                            $db->table('call_recordings')->where('id', $z['id'])->update(['duration' => $dur]);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            log_message('error', 'syncExecutiveCallRecords error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+>>>>>>> origin/main
      * Endpoint for Local PC Worker: Get next queued call analysis job.
      */
     public function nextJob()
@@ -514,4 +915,81 @@ class CallAnalysisController extends BaseController
             'url'    => base_url('public/uploads/call_recordings/' . $filename)
         ]);
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Direct endpoint to re-run AI analysis on a specific recording ID.
+     * GET /api/re-analyze/{recordingId}
+     */
+    public function reAnalyzeRecording(int $recordingId)
+    {
+        $logFile = "/tmp/ca_{$recordingId}.log";
+        @unlink($logFile);
+        $sparkPath = realpath(APPPATH . '../spark');
+        $cmd = "php " . escapeshellarg($sparkPath) . " call-analysis:process " . (int)$recordingId . " > " . escapeshellarg($logFile) . " 2>&1 &";
+        shell_exec($cmd);
+
+        return $this->response->setJSON([
+            'status' => true,
+            'message' => "Call analysis for recording #{$recordingId} dispatched in background.",
+            'recording_id' => $recordingId,
+            'log_file' => $logFile,
+        ]);
+    }
+
+    /**
+     * Get analysis summary and QA evaluation for a given recording ID.
+     * GET /api/analysis-status/{recordingId}
+     */
+    public function getAnalysisStatus(int $recordingId)
+    {
+        $db = \Config\Database::connect();
+        $analysis = $db->table('call_analysis ca')
+            ->select('ca.id, ca.recording_id, ca.service_type, ca.overall_rating, ca.qa_score, ca.verification_status, ca.summary, ca.verification_qa, cr.provider_id')
+            ->join('call_recordings cr', 'cr.id = ca.recording_id', 'left')
+            ->where('ca.recording_id', $recordingId)
+            ->get()->getRowArray();
+
+        if (!$analysis) {
+            return $this->response->setJSON(['status' => false, 'error' => "No analysis found for recording #{$recordingId}."]);
+        }
+
+        $qa = !empty($analysis['verification_qa']) ? json_decode($analysis['verification_qa'], true) : [];
+
+        return $this->response->setJSON([
+            'status' => true,
+            'recording_id' => (int)$analysis['recording_id'],
+            'provider_id' => (int)$analysis['provider_id'],
+            'service' => $analysis['service_type'],
+            'overall_rating' => (float)$analysis['overall_rating'],
+            'qa_score' => (float)$analysis['qa_score'],
+            'verification_status' => $analysis['verification_status'],
+            'summary' => $analysis['summary'],
+            'total_questions_count' => $qa['total_questions_count'] ?? null,
+            'questions_asked_count' => $qa['questions_asked_count'] ?? null,
+            'question_coverage_pct' => $qa['question_coverage_pct'] ?? null,
+            'mandatory_questions_status' => $qa['mandatory_questions_status'] ?? null,
+            'missed_mandatory_questions' => $qa['missed_mandatory_questions'] ?? [],
+            'qa_checklist' => $qa['qa_checklist'] ?? [],
+        ]);
+    }
+
+    /**
+     * List recent recordings and their analysis status.
+     * GET /api/list-recordings
+     */
+    public function listRecentRecordings()
+    {
+        $db = \Config\Database::connect();
+        $recordings = $db->table('call_recordings cr')
+            ->select('cr.id, cr.provider_id, cr.call_type, cr.service_type, cr.status, cr.recording_url, cr.created_at, ca.id as analysis_id, ca.overall_rating, ca.verification_status')
+            ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+            ->orderBy('cr.id', 'DESC')
+            ->limit(15)
+            ->get()->getResultArray();
+
+        return $this->response->setJSON(['status' => true, 'data' => $recordings]);
+    }
+>>>>>>> origin/main
 }

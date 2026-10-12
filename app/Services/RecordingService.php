@@ -45,15 +45,30 @@ class RecordingService
         $db = \Config\Database::connect();
         $db->transStart();
 
+<<<<<<< HEAD
+=======
+        $duration = (int)($metadata['duration'] ?? 0);
+        if ($duration <= 0) {
+            $duration = self::extractAudioDuration($absolutePath);
+        }
+
+>>>>>>> origin/main
         $recordingId = $this->recordingModel->insert([
             'booking_id'    => $metadata['booking_id'] ?? null,
             'provider_id'   => $metadata['provider_id'] ?? null,
             'customer_id'   => $metadata['customer_id'] ?? null,
+<<<<<<< HEAD
             'verifier_id'   => $metadata['verifier_id'] ?? null,
             'call_type'     => $metadata['call_type'] ?? 'client_provider',
             'service_type'  => $metadata['service_type'] ?? 'walking',
             'recording_url' => $relativeUrl,
             'duration'      => $metadata['duration'] ?? 0,
+=======
+            'verifier_id'   => !empty($metadata['verifier_id']) ? (int)$metadata['verifier_id'] : null,
+            'call_type'     => $metadata['call_type'] ?? 'inbound',
+            'recording_url' => $relativeUrl,
+            'duration'      => $duration,
+>>>>>>> origin/main
             'status'        => 'queued',
         ], true);
 
@@ -73,7 +88,34 @@ class RecordingService
             'recording_id'  => $recordingId,
             'job_id'        => $jobId,
             'relative_url'  => $relativeUrl,
+<<<<<<< HEAD
             'absolute_path' => $absolutePath
         ];
     }
+=======
+            'absolute_path' => $absolutePath,
+            'duration'      => $duration
+        ];
+    }
+
+    /**
+     * Extract duration in seconds from an audio file using ffprobe.
+     */
+    public static function extractAudioDuration(string $filePath): int
+    {
+        if (!file_exists($filePath) || filesize($filePath) === 0) {
+            return 0;
+        }
+
+        try {
+            $cmd = sprintf('ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 %s 2>/dev/null', escapeshellarg($filePath));
+            $output = trim((string)shell_exec($cmd));
+            if (is_numeric($output) && (float)$output > 0) {
+                return (int)round((float)$output);
+            }
+        } catch (\Throwable $e) {}
+
+        return 0;
+    }
+>>>>>>> origin/main
 }

@@ -7,6 +7,10 @@ use App\Controllers\BaseController;
 class UserController extends BaseController
 {
   protected $userModel;
+<<<<<<< HEAD
+=======
+  protected $db;
+>>>>>>> origin/main
   public function __construct()
   {
     $this->userModel = model('User');
@@ -14,8 +18,22 @@ class UserController extends BaseController
   }
   public function index()
   {
+<<<<<<< HEAD
     $status          = $this->request->getGet('status');
     $data['clients'] = $this->userModel->getAll($status);
+=======
+    $status = $this->request->getGet('status');
+    if ($status === null || $status === '') {
+      $status = 'active';
+    }
+    $data['clients'] = $this->userModel->getAll($status);
+    $data['current_status'] = $status;
+    $counts = $this->userModel->getClientCounts();
+    $data['total_count']      = $counts['total'];
+    $data['active_count']     = $counts['active'];
+    $data['inactive_count']   = $counts['inactive'];
+    $data['incomplete_count'] = $counts['incomplete'];
+>>>>>>> origin/main
     $data['title']   = '';
     $data['page']    = 'client';
     if (!empty($data['clients'])) {
@@ -88,6 +106,7 @@ class UserController extends BaseController
     return $this->loadView('admin/user/client_list', $data);
   }
 
+<<<<<<< HEAD
   public function sendUserAgreementEmail($user_id)
   {
 
@@ -164,6 +183,9 @@ class UserController extends BaseController
     }
     return $this->response->setJSON(['status' => false, 'message' => 'Failed to send user agreement.']);
   }
+=======
+
+>>>>>>> origin/main
   public function saveClientComment()
   {
     $client_id = $this->request->getPost('client_id');

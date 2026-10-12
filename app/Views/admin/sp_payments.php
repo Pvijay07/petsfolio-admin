@@ -34,6 +34,30 @@
                     placeholder="Search by TXN ID, name or phone..." id="searchInput">
                 </div>
 
+<<<<<<< HEAD
+=======
+                <!-- Service Type Filter -->
+                <div class="d-flex align-items-center gap-2">
+                  <label class="form-label text-muted mb-0 small">Service Type:</label>
+                  <select class="form-select form-select-sm border-0 bg-light" id="serviceTypeFilter" style="width: 150px;">
+                    <option value="">All Services</option>
+                    <?php
+                    $serviceTypes = [];
+                    foreach ($payments as $p) {
+                      if (!empty($p->transaction_type)) {
+                        $serviceTypes[] = trim($p->transaction_type);
+                      }
+                    }
+                    $serviceTypes = array_unique($serviceTypes);
+                    foreach ($serviceTypes as $sType) {
+                      $label = str_replace('_', ' ', $sType);
+                      echo '<option value="' . htmlspecialchars(strtolower($sType)) . '">' . htmlspecialchars(ucwords(strtolower($label))) . '</option>';
+                    }
+                    ?>
+                  </select>
+                </div>
+
+>>>>>>> origin/main
                 <!-- Payment Mode Filter -->
                 <div class="d-flex align-items-center gap-2">
                   <label class="form-label text-muted mb-0 small">Payment Mode:</label>
@@ -172,10 +196,22 @@
                 Transaction</th>
               <th width="140" class="py-3 text-black fs-6 fw-semibold border-bottom d-none d-lg-table-cell"
                 style="background: #c6d2ff!important;">Customer</th>
+<<<<<<< HEAD
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
                 style="background: #c6d2ff!important;">Amount</th>
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom text-center d-none d-md-table-cell"
                 style="background: #c6d2ff!important;">Status</th>
+=======
+
+              <th width="110" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
+                style="background: #c6d2ff!important;">Paid Amount</th>
+              <th width="110" class="py-3 text-black fs-6 fw-semibold border-bottom text-center"
+                style="background: #c6d2ff!important;">GST</th>
+              <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom text-center d-none d-md-table-cell"
+                style="background: #c6d2ff!important;">Status</th>
+              <th width="140" class="py-3 text-black fs-6 fw-semibold border-bottom d-none d-md-table-cell"
+                style="background: #c6d2ff!important;">Service Type</th>
+>>>>>>> origin/main
               <th width="120" class="py-3 text-black fs-6 fw-semibold border-bottom d-none d-xl-table-cell"
                 style="background: #c6d2ff!important;">Payment Mode</th>
               <th width="150" class="pe-4 py-3 text-black fs-6 fw-semibold border-bottom "
@@ -218,7 +254,11 @@
                 $failureReason = '<div class="text-danger mt-1 text-center" style="font-size: 0.75rem; max-width: 15rem; white-space: normal; line-height: 1.2;">' . htmlspecialchars($reason) . '</div>';
               }
             ?>
+<<<<<<< HEAD
               <tr class="payment-row" data-status="<?= $mappedStatus ?>" data-mode="<?= strtolower($payment->payment_mode ?? '') ?>">
+=======
+              <tr class="payment-row" data-status="<?= $mappedStatus ?>" data-mode="<?= strtolower($payment->payment_mode ?? '') ?>" data-service-type="<?= strtolower($payment->transaction_type ?? '') ?>">
+>>>>>>> origin/main
                 <td class="ps-4 py-3 fw-medium"><?= $i ?></td>
                 <td class="py-3">
                   <div class="d-flex flex-column">
@@ -248,9 +288,20 @@
                     </div>
                   </div>
                 </td>
+<<<<<<< HEAD
                 <td class="py-3 text-center">
                   <span class="fw-bold text-dark">₹<?= number_format($payment->amount, 2) ?></span>
                 </td>
+=======
+
+                <td class="py-3 text-center">
+                  <span class="fw-bold text-success">₹<?= number_format($payment->paid_amount ?? $payment->amount, 2) ?></span>
+                </td>
+                <td class="py-3 text-center">
+                  <span class="fw-medium text-secondary">₹<?= (49 / 100 * 18) ?></span>
+                </td>
+
+>>>>>>> origin/main
                 <td class="py-3 text-center d-none d-md-table-cell">
                   <div class="d-flex flex-column align-items-center justify-content-center">
                     <span class="badge <?= $statusClass ?> border border-opacity-25 px-3 py-1 fw-medium" style="border-radius: 50px !important;">
@@ -259,6 +310,14 @@
                     <?= $failureReason ?>
                   </div>
                 </td>
+<<<<<<< HEAD
+=======
+                <td class="py-3 d-none d-md-table-cell">
+                  <span class="badge bg-primary bg-opacity-10 text-white border border-primary border-opacity-25 px-3 py-1 fw-medium" style="border-radius: 50px !important;">
+                    <?= !empty(trim($payment->transaction_type ?? '')) ? ucwords(str_replace('_', ' ', strtolower($payment->transaction_type))) : '--' ?>
+                  </span>
+                </td>
+>>>>>>> origin/main
                 <td class="py-3 d-none d-xl-table-cell">
                   <span class="badge bg-light text-dark border px-3 py-1 fw-medium" style="background: rgba(34, 197, 94, 0.1) !important;
          color: #16a34a !important;
@@ -493,6 +552,10 @@
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const status = activeStatusTab.toLowerCase();
     const paymentMode = document.getElementById('paymentModeFilter').value.toLowerCase();
+<<<<<<< HEAD
+=======
+    const serviceType = document.getElementById('serviceTypeFilter').value.toLowerCase();
+>>>>>>> origin/main
 
     filteredPayments = allPayments.filter(row => {
       // Status filter
@@ -503,11 +566,22 @@
       const rowMode = (row.getAttribute('data-mode') || '').toLowerCase();
       const modeMatch = !paymentMode || rowMode === paymentMode;
 
+<<<<<<< HEAD
+=======
+      // Service Type filter
+      const rowServiceType = (row.getAttribute('data-service-type') || '').toLowerCase();
+      const serviceTypeMatch = !serviceType || rowServiceType === serviceType;
+
+>>>>>>> origin/main
       // Search filter (ID, Name, Phone, etc)
       const text = row.textContent.toLowerCase();
       const searchMatch = !searchTerm || text.includes(searchTerm);
 
+<<<<<<< HEAD
       return statusMatch && modeMatch && searchMatch;
+=======
+      return statusMatch && modeMatch && serviceTypeMatch && searchMatch;
+>>>>>>> origin/main
     });
 
     // Update summary cards
@@ -560,6 +634,10 @@
   function setupEventListeners() {
     document.getElementById('searchInput').addEventListener('input', applyFilters);
     document.getElementById('paymentModeFilter').addEventListener('change', applyFilters);
+<<<<<<< HEAD
+=======
+    document.getElementById('serviceTypeFilter').addEventListener('change', applyFilters);
+>>>>>>> origin/main
 
     // Tab Listeners
     const tabs = document.querySelectorAll('#paymentTabs .nav-link');
@@ -722,6 +800,10 @@
     // Reset filters and pagination
     document.getElementById('searchInput').value = '';
     document.getElementById('paymentModeFilter').value = '';
+<<<<<<< HEAD
+=======
+    document.getElementById('serviceTypeFilter').value = '';
+>>>>>>> origin/main
 
     // Reset tabs
     activeStatusTab = '';

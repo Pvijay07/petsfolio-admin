@@ -20,12 +20,24 @@ class CRMMetrics
     /**
      * Calculate live lead conversion rate from MongoDB `leads` collection.
      */
+<<<<<<< HEAD
     public function conversion_rate(string $date_range = '30_days', ?string $source = null, ?string $channel = null, ?string $start_date = null, ?string $end_date = null): array
+=======
+    public function conversion_rate(string $date_range = '30_days', ?string $source = null, ?string $channel = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+>>>>>>> origin/main
     {
         $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         if (!empty($source) && strtolower($source) !== 'all') {
+<<<<<<< HEAD
             $match['source'] = new \MongoDB\BSON\Regex(trim($source), 'i');
+=======
+            if (class_exists('MongoDB\BSON\Regex')) {
+                $match['source'] = new \MongoDB\BSON\Regex(trim($source), 'i');
+            } else {
+                $match['source'] = trim($source);
+            }
+>>>>>>> origin/main
         }
 
         $pipeline = [];
@@ -49,15 +61,28 @@ class CRMMetrics
             ]
         ];
 
+<<<<<<< HEAD
         $results   = $this->mongo->aggregate('leads', $pipeline);
+=======
+        $results   = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+>>>>>>> origin/main
         $data      = $results[0] ?? ['total_leads' => 0, 'converted' => 0];
 
         $total     = (int) ($data['total_leads'] ?? 0);
         $converted = (int) ($data['converted'] ?? 0);
         $rate      = $total > 0 ? round(($converted / $total) * 100, 2) : 0.0;
+<<<<<<< HEAD
 
         return [
             'metric'          => 'lead_conversion_rate',
+=======
+        $dbName    = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'          => 'lead_conversion_rate',
+            'crm_type'        => $crm_type,
+            'database'        => $dbName,
+>>>>>>> origin/main
             'date_range'      => $date_range,
             'source_filter'   => $source ?: 'all',
             'total_leads'     => $total,
@@ -70,7 +95,11 @@ class CRMMetrics
     /**
      * Analyze live CRM sales funnel drop-off by stage from MongoDB `leads` collection.
      */
+<<<<<<< HEAD
     public function funnel_dropoff(string $date_range = '30_days', ?string $stage = null, ?string $start_date = null, ?string $end_date = null): array
+=======
+    public function funnel_dropoff(string $date_range = '30_days', ?string $stage = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+>>>>>>> origin/main
     {
         $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
@@ -87,7 +116,19 @@ class CRMMetrics
         ];
         $pipeline[] = ['$sort' => ['count' => -1]];
 
+<<<<<<< HEAD
         $stages = $this->mongo->aggregate('leads', $pipeline);
+=======
+        $stages = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+
+        if (empty($stages)) {
+            $fallbackPipeline = [
+                ['$group' => ['_id' => '$status', 'count' => ['$sum' => 1]]],
+                ['$sort' => ['count' => -1]]
+            ];
+            $stages = $this->mongo->aggregate('leads', $fallbackPipeline, $crm_type);
+        }
+>>>>>>> origin/main
 
         $totalLeads = 0;
         foreach ($stages as $s) {
@@ -114,8 +155,17 @@ class CRMMetrics
             $previous = $current;
         }
 
+<<<<<<< HEAD
         return [
             'metric'      => 'funnel_dropoff',
+=======
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'      => 'funnel_dropoff',
+            'crm_type'    => $crm_type,
+            'database'    => $dbName,
+>>>>>>> origin/main
             'date_range'  => $date_range,
             'total_leads' => $totalLeads,
             'funnel'      => $formatted
@@ -125,7 +175,11 @@ class CRMMetrics
     /**
      * Compare live lead source performance from MongoDB `leads` collection.
      */
+<<<<<<< HEAD
     public function lead_source_performance(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
+=======
+    public function lead_source_performance(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+>>>>>>> origin/main
     {
         $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
@@ -151,7 +205,11 @@ class CRMMetrics
         ];
         $pipeline[] = ['$sort' => ['total' => -1]];
 
+<<<<<<< HEAD
         $results = $this->mongo->aggregate('leads', $pipeline);
+=======
+        $results = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+>>>>>>> origin/main
 
         $sources       = [];
         $totalAllLeads = 0;
@@ -171,8 +229,17 @@ class CRMMetrics
             ];
         }
 
+<<<<<<< HEAD
         return [
             'metric'          => 'lead_source_performance',
+=======
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'          => 'lead_source_performance',
+            'crm_type'        => $crm_type,
+            'database'        => $dbName,
+>>>>>>> origin/main
             'date_range'      => $date_range,
             'total_crm_leads' => $totalAllLeads,
             'sources'         => $sources
@@ -182,12 +249,24 @@ class CRMMetrics
     /**
      * Evaluate live sales agent performance from MongoDB `leads` collection.
      */
+<<<<<<< HEAD
     public function agent_performance(string $date_range = '30_days', ?string $agent_id = null, ?string $start_date = null, ?string $end_date = null): array
+=======
+    public function agent_performance(string $date_range = '30_days', ?string $agent_id = null, ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+>>>>>>> origin/main
     {
         $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         if (!empty($agent_id) && strtolower($agent_id) !== 'all') {
+<<<<<<< HEAD
             $match['assignedTo'] = new \MongoDB\BSON\Regex(trim($agent_id), 'i');
+=======
+            if (class_exists('MongoDB\BSON\Regex')) {
+                $match['assignedTo'] = new \MongoDB\BSON\Regex(trim($agent_id), 'i');
+            } else {
+                $match['assignedTo'] = trim($agent_id);
+            }
+>>>>>>> origin/main
         }
 
         $pipeline = [];
@@ -212,7 +291,11 @@ class CRMMetrics
         ];
         $pipeline[] = ['$sort' => ['total' => -1]];
 
+<<<<<<< HEAD
         $results = $this->mongo->aggregate('leads', $pipeline);
+=======
+        $results = $this->mongo->aggregate('leads', $pipeline, $crm_type);
+>>>>>>> origin/main
 
         $agents = [];
         foreach ($results as $res) {
@@ -228,14 +311,24 @@ class CRMMetrics
             ];
         }
 
+<<<<<<< HEAD
         return [
             'metric'      => 'agent_performance',
+=======
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'      => 'agent_performance',
+            'crm_type'    => $crm_type,
+            'database'    => $dbName,
+>>>>>>> origin/main
             'date_range'  => $date_range,
             'agent_stats' => $agents
         ];
     }
 
     /**
+<<<<<<< HEAD
      * Average support ticket resolution time.
      */
     public function avg_resolution_time(string $date_range = '30_days', ?string $issue_type = null, ?string $start_date = null, ?string $end_date = null): array
@@ -246,10 +339,84 @@ class CRMMetrics
             'total_support_activity' => 0,
             'overall_avg_resolution' => '0 hours',
             'by_issue_type'          => []
+=======
+     * Average support ticket resolution time from MySQL `tickets` & `ticket_categories` tables.
+     */
+    public function avg_resolution_time(string $date_range = '30_days', ?string $issue_type = null, ?string $start_date = null, ?string $end_date = null): array
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        $db = \Config\Database::connect();
+
+        $builder = $db->table('tickets t')
+            ->select("
+                COALESCE(tc.name, 'General Support') AS issue_type,
+                COUNT(t.id) AS total_tickets,
+                SUM(CASE WHEN t.status IN ('resolved', 'closed') THEN 1 ELSE 0 END) AS resolved_tickets,
+                AVG(CASE WHEN t.status IN ('resolved', 'closed') AND t.updated_at IS NOT NULL AND t.updated_at >= t.created_at THEN TIMESTAMPDIFF(MINUTE, t.created_at, t.updated_at) / 60.0 ELSE NULL END) AS avg_hours
+            ", false)
+            ->join('ticket_categories tc', 'tc.id = t.category', 'left');
+
+        if ($startStr) {
+            $builder->where('t.created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $builder->where('t.created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        if (!empty($issue_type) && strtolower($issue_type) !== 'all') {
+            $cleanIssue = trim($issue_type);
+            $builder->groupStart()
+                ->like('tc.name', $cleanIssue)
+                ->orLike('t.subject', $cleanIssue)
+                ->orLike('t.description', $cleanIssue)
+            ->groupEnd();
+        }
+
+        $results = $builder->groupBy("COALESCE(tc.name, 'General Support')")
+            ->orderBy('total_tickets', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $totalSupportActivity = 0;
+        $totalResolved = 0;
+        $sumHours = 0.0;
+        $byIssueType = [];
+
+        foreach ($results as $row) {
+            $tot  = (int) ($row['total_tickets'] ?? 0);
+            $res  = (int) ($row['resolved_tickets'] ?? 0);
+            $avgH = round((float) ($row['avg_hours'] ?? 0), 1);
+
+            $totalSupportActivity += $tot;
+            $totalResolved += $res;
+            if ($res > 0) {
+                $sumHours += ($avgH * $res);
+            }
+
+            $byIssueType[] = [
+                'issue_type'           => $row['issue_type'],
+                'total_tickets'        => $tot,
+                'resolved_tickets'     => $res,
+                'avg_resolution_hours' => $avgH,
+                'formatted_avg_time'   => "{$avgH} hours"
+            ];
+        }
+
+        $overallAvg = $totalResolved > 0 ? round($sumHours / $totalResolved, 1) : 0.0;
+
+        return [
+            'metric'                 => 'avg_resolution_time',
+            'date_range'             => $date_range,
+            'total_support_activity' => $totalSupportActivity,
+            'total_tickets_resolved' => $totalResolved,
+            'overall_avg_resolution' => "{$overallAvg} hours",
+            'by_issue_type'          => $byIssueType
+>>>>>>> origin/main
         ];
     }
 
     /**
+<<<<<<< HEAD
      * Cross-sell acceptance rate.
      */
     public function cross_sell_acceptance_rate(string $date_range = '30_days', ?string $product = null, ?string $start_date = null, ?string $end_date = null): array
@@ -260,18 +427,103 @@ class CRMMetrics
             'total_addons_purchased'=> 0,
             'overall_acceptance'    => '0%',
             'products_breakdown'    => []
+=======
+     * Cross-sell acceptance rate from MySQL `booking_addons` & `v_bookings_overview` tables.
+     */
+    public function cross_sell_acceptance_rate(string $date_range = '30_days', ?string $product = null, ?string $start_date = null, ?string $end_date = null): array
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        $db = \Config\Database::connect();
+
+        // 1. Fetch total overall bookings in period
+        $bookingsBuilder = $db->table('v_bookings_overview')
+            ->select('COUNT(*) as total_bookings');
+
+        if ($startStr) {
+            $bookingsBuilder->where('created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $bookingsBuilder->where('created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        $totalBookingsRow = $bookingsBuilder->get()->getRowArray();
+        $totalBookings = (int) ($totalBookingsRow['total_bookings'] ?? 0);
+
+        // 2. Fetch add-ons purchased
+        $addonsBuilder = $db->table('booking_addons ba')
+            ->select("
+                ba.addon AS product_name,
+                COUNT(ba.id) AS total_purchased,
+                COALESCE(SUM(ba.price), 0) AS total_addon_revenue
+            ", false);
+
+        if ($startStr) {
+            $addonsBuilder->where('ba.created_at >=', date('Y-m-d 00:00:00', strtotime($startStr)));
+        }
+        if ($endStr) {
+            $addonsBuilder->where('ba.created_at <=', date('Y-m-d 23:59:59', strtotime($endStr)));
+        }
+
+        if (!empty($product) && strtolower($product) !== 'all') {
+            $addonsBuilder->like('ba.addon', trim($product));
+        }
+
+        $addonResults = $addonsBuilder->groupBy('ba.addon')
+            ->orderBy('total_purchased', 'DESC')
+            ->get()
+            ->getResultArray();
+
+        $totalAddonsPurchased = 0;
+        $totalAddonRevenue = 0.0;
+        $productsBreakdown = [];
+
+        foreach ($addonResults as $row) {
+            $purchased = (int) ($row['total_purchased'] ?? 0);
+            $rev       = (float) ($row['total_addon_revenue'] ?? 0);
+            $totalAddonsPurchased += $purchased;
+            $totalAddonRevenue += $rev;
+
+            $attachRate = $totalBookings > 0 ? round(($purchased / $totalBookings) * 100, 1) : 0.0;
+
+            $productsBreakdown[] = [
+                'product_name'        => $row['product_name'] ?: 'General Add-on',
+                'units_purchased'     => $purchased,
+                'total_addon_revenue' => "₹" . number_format($rev, 2),
+                'attachment_rate'     => "{$attachRate}%"
+            ];
+        }
+
+        $overallAcceptancePct = $totalBookings > 0 ? round(($totalAddonsPurchased / $totalBookings) * 100, 1) : 0.0;
+
+        return [
+            'metric'                   => 'cross_sell_acceptance_rate',
+            'date_range'               => $date_range,
+            'total_bookings_in_period' => $totalBookings,
+            'total_addons_purchased'    => $totalAddonsPurchased,
+            'total_addon_revenue'      => "₹" . number_format($totalAddonRevenue, 2),
+            'overall_acceptance'       => "{$overallAcceptancePct}%",
+            'products_breakdown'       => $productsBreakdown
+>>>>>>> origin/main
         ];
     }
 
     /**
      * Categorize and analyze live incoming WhatsApp client message topics from MongoDB `messages` collection.
      */
+<<<<<<< HEAD
     public function whatsapp_inquiry_topics(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
+=======
+    public function whatsapp_inquiry_topics(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null, string $crm_type = 'client'): array
+>>>>>>> origin/main
     {
         $match = $this->buildDateMatch($date_range, $start_date, $end_date);
         $match['direction'] = 'incoming';
 
+<<<<<<< HEAD
         $messages = $this->mongo->find('messages', $match, ['text' => 1, 'createdAt' => 1], 1000);
+=======
+        $messages = $this->mongo->find('messages', $match, ['text' => 1, 'createdAt' => 1], 1000, $crm_type);
+>>>>>>> origin/main
 
         $total = count($messages);
         $categories = [
@@ -320,9 +572,18 @@ class CRMMetrics
 
         usort($breakdown, fn($a, $b) => $b['inquiry_count'] <=> $a['inquiry_count']);
 
+<<<<<<< HEAD
         return [
             'metric'                => 'whatsapp_inquiry_topics',
             'data_source'           => 'MongoDB Atlas (petsfolio-crm-live.messages collection)',
+=======
+        $dbName = in_array(strtolower($crm_type), ['provider', 'sp', 'service-provider']) ? 'service-provider-crm' : 'crm';
+
+        return [
+            'metric'                => 'whatsapp_inquiry_topics',
+            'crm_type'              => $crm_type,
+            'database'              => $dbName,
+>>>>>>> origin/main
             'date_range'            => $date_range,
             'total_inquiries_found' => $total,
             'topic_breakdown'       => $breakdown
@@ -340,18 +601,22 @@ class CRMMetrics
             return [];
         }
 
+<<<<<<< HEAD
         $startMs = $startStr ? strtotime($startStr) * 1000 : 0;
         $endMs   = $endStr ? strtotime($endStr) * 1000 : strtotime('2099-12-31') * 1000;
 
         $startUtc = new \MongoDB\BSON\UTCDateTime($startMs);
         $endUtc   = new \MongoDB\BSON\UTCDateTime($endMs);
 
+=======
+>>>>>>> origin/main
         $startIso = date('c', strtotime($startStr));
         $endIso   = date('c', strtotime($endStr));
 
         $startDateOnly = date('Y-m-d', strtotime($startStr));
         $endDateOnly   = date('Y-m-d', strtotime($endStr));
 
+<<<<<<< HEAD
         return [
             '$or' => [
                 ['createdAt' => ['$gte' => $startUtc, '$lte' => $endUtc]],
@@ -361,6 +626,31 @@ class CRMMetrics
                 ['created_at' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]],
                 ['createdAt' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]]
             ]
+=======
+        $orConditions = [
+            ['createdAt' => ['$gte' => $startIso, '$lte' => $endIso]],
+            ['created_at' => ['$gte' => $startIso, '$lte' => $endIso]],
+            ['created_at' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]],
+            ['createdAt' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]]
+        ];
+
+        if (class_exists('MongoDB\BSON\UTCDateTime')) {
+            $startMs = $startStr ? strtotime($startStr) * 1000 : 0;
+            $endMs   = $endStr ? strtotime($endStr) * 1000 : strtotime('2099-12-31') * 1000;
+
+            $startUtc = new \MongoDB\BSON\UTCDateTime($startMs);
+            $endUtc   = new \MongoDB\BSON\UTCDateTime($endMs);
+
+            array_unshift(
+                $orConditions,
+                ['createdAt' => ['$gte' => $startUtc, '$lte' => $endUtc]],
+                ['created_at' => ['$gte' => $startUtc, '$lte' => $endUtc]]
+            );
+        }
+
+        return [
+            '$or' => $orConditions
+>>>>>>> origin/main
         ];
     }
 }

@@ -306,13 +306,20 @@
                             <th>Status</th>
                             <th>WhatsApp</th>
                             <th>Last Scan</th>
+<<<<<<< HEAD
                             <!-- <th>Staff</th> -->
+=======
+                            <th>Staff</th>
+>>>>>>> origin/main
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (!empty($bookings)): ?>
                             <?php foreach ($bookings as $booking): ?>
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
                                 <?php
                                 $statusClass = 'status-active';
                                 $statusText = 'Active';
@@ -326,6 +333,7 @@
                                     $statusText = 'Partial';
                                     $statusValue = 'partial';
                                 }
+<<<<<<< HEAD
                                 $petType = 'without_pet';
 
                                 $packages = json_decode($booking['package_details'] ?? '', true);
@@ -343,11 +351,14 @@
                                         }
                                     }
                                 }
+=======
+>>>>>>> origin/main
 
                                 // Generate booking code
                                 $bookingCode = $booking['booking_code'] ?? strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $booking['booking_id'] . 'BK' . rand(100, 999)), 0, 7));
                                 ?>
                                 <tr class="booking-row" data-status="<?= $statusValue ?>">
+<<<<<<< HEAD
                                     <td class="fw-bold text-primary">
                                         <div>#<?= $booking['booking_id'] ?></div>
                                         <?php if (strpos($booking['order_id'], 'CASH_') === 0): ?>
@@ -358,6 +369,9 @@
                                             <span class="badge bg-soft-success text-success border-success mt-1" style="font-size: 0.65rem; background: #f0fdf4;">ONLINE</span>
                                         <?php endif; ?>
                                     </td>
+=======
+                                    <td class="fw-bold text-primary">#<?= $booking['booking_id'] ?></td>
+>>>>>>> origin/main
                                     <td>
                                         <?php if (!empty($booking['qr_image'])): ?>
                                             <div class="d-flex align-items-center gap-2">
@@ -369,9 +383,15 @@
                                                                                     "customer_name" => $booking["user_name"] ?? $booking["customer_name"] ?? "Guest",
                                                                                     "package_details" => $booking["package_details"] ?? "",
                                                                                     "booking_code" => $bookingCode,
+<<<<<<< HEAD
                                                                                     "max_entries" => $booking["max_entries"],
                                                                                     "pet_type" => $petType
                                                                                 ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)' class="btn-icon btn-soft-primary" title="Download Ticket">
+=======
+                                                                                    "max_entries" => $booking["max_entries"]
+                                                                                ], JSON_HEX_APOS | JSON_HEX_QUOT) ?>)'
+                                                    class="btn-icon btn-soft-primary" title="Download Ticket">
+>>>>>>> origin/main
                                                     <i class="bi bi-download"></i>
                                                 </button>
                                             </div>
@@ -390,6 +410,7 @@
                                         </div>
                                     </td>
                                     <td>
+<<<<<<< HEAD
                                         <div class="d-flex flex-column gap-1">
                                             <?php if (!empty($booking['pet_name'])): ?>
                                                 <div class="badge bg-soft-success text-success border-success mb-1 fw-bold shadow-sm d-inline-flex align-items-center px-2 py-1" style="background: #eefdf3; width: fit-content;">
@@ -424,6 +445,29 @@
                                                 </span>
                                             <?php endif; ?>
                                         </div>
+=======
+                                        <?php
+                                        $packages = json_decode($booking['package_details'] ?? '', true);
+                                        if (!empty($packages)):
+                                            foreach ($packages as $key => $pkg):
+                                                $name = is_array($pkg) && isset($pkg['name']) ? $pkg['name'] : $key;
+                                                $qty = is_array($pkg) ? ($pkg['qty'] ?? $pkg['quantity'] ?? 1) : $pkg;
+                                        ?>
+                                                <div
+                                                    class="badge bg-light text-dark border mb-1 fw-medium shadow-sm d-inline-flex align-items-center px-2 py-1 search-target">
+                                                    <i class="bi bi-ticket-perforated text-primary me-1"></i>
+                                                    <span><?= esc(ucwords(str_replace(['_', '-'], ' ', $name))) ?></span>
+                                                    <span class="text-primary mx-1">×</span>
+                                                    <span class="fw-bold"><?= $qty ?></span>
+                                                </div>
+                                            <?php endforeach;
+                                        else: ?>
+                                            <span class="badge bg-light text-muted fw-normal px-2 py-1">
+                                                <i
+                                                    class="bi bi-dash-circle me-1"></i><?= esc($booking['package_id'] ?? 'Free Pass') ?>
+                                            </span>
+                                        <?php endif; ?>
+>>>>>>> origin/main
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
@@ -458,10 +502,17 @@
                                             <span class="text-muted small">--</span>
                                         <?php endif; ?>
                                     </td>
+<<<<<<< HEAD
                                     <!-- <td>
                                         <span
                                             class="badge bg-light text-dark fw-medium border"><?= $booking['checked_in_by'] ?? '--' ?></span>
                                     </td> -->
+=======
+                                    <td>
+                                        <span
+                                            class="badge bg-light text-dark fw-medium border"><?= $booking['checked_in_by'] ?? '--' ?></span>
+                                    </td>
+>>>>>>> origin/main
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -513,6 +564,7 @@
                             <label class="form-label">Phone Number</label>
                             <input type="tel" name="phone" class="form-control premium-input" placeholder="+91">
                         </div>
+<<<<<<< HEAD
                         <div class="col-md-6">
                             <label class="form-label">Pet Name</label>
                             <input type="text" name="pet_name" class="form-control premium-input" placeholder="e.g. Joey">
@@ -524,6 +576,8 @@
                                 <option value="cash">Cash Payment</option>
                             </select>
                         </div>
+=======
+>>>>>>> origin/main
                         <div class="col-12">
                             <label class="form-label">Maximum Entries</label>
                             <div class="input-group">
@@ -654,11 +708,14 @@
         let max_entries = bookingData?.
         max_entries || 1
         let packageName = 'Entry Pass';
+<<<<<<< HEAD
         const customerName = bookingData.customer_name || 'Guest';
         const petLabel =
             bookingData.pet_type === 'with_pet' ?
             'With Pet 🐾' :
             'Without Pet';
+=======
+>>>>>>> origin/main
         try {
             const packages = JSON.parse(bookingData.package_details || '[]');
             if (packages && packages.length > 0) {
@@ -731,6 +788,7 @@
             <div style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">
             1 ticket
                             </div>
+<<<<<<< HEAD
                             <div style="font-size: 14px; margin-bottom: 6px;">
     <strong>Name:</strong> ${customerName}
 </div>
@@ -750,6 +808,10 @@
 
                             <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
                                  ${max_entries > 1 ? 'No.of Entries' : 'No.of Entries'} : ${max_entries}
+=======
+                            <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px;">
+                                 ${max_entries > 1 ? 'Max Entries' : 'Max Entries'} : ${max_entries}
+>>>>>>> origin/main
                             </div>
                             <div style="font-size: 15px;">
                                 Booking ID: #${bookingData.booking_id}
@@ -776,6 +838,7 @@
                         >
                     </div>
 
+<<<<<<< HEAD
                    <div style="border-top: 1px solid #eee; padding: 20px 0 10px 0; text-align: center;">
     
     <div style="display: flex; justify-content: center; align-items: center; gap: 40px; flex-wrap: wrap;">
@@ -795,6 +858,15 @@
     </div>
 
 </div>
+=======
+                    <div style="border-top: 1px solid #eee; padding: 20px 0 10px 0; text-align: center;">
+                        <img 
+                            src="https://beta.petsfolio.in/admin/public/assets/images/LogoEvent.png"
+                            style="height: 60px; display: block; margin: 0 auto 10px auto;"
+                            crossorigin="anonymous"
+                        >
+                    </div>
+>>>>>>> origin/main
                 </div>
             </div>
         `;

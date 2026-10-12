@@ -8,8 +8,12 @@ class Home extends BaseController
     {
         return redirect('https://www.petsfolio.com/in/');
     }
+<<<<<<< HEAD
     public function chat()
     {
         return view('chat');
     }
+=======
+   
+>>>>>>> origin/main
 }

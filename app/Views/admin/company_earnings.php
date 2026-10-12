@@ -18,6 +18,7 @@
         <i class="bi bi-bar-chart-line position-absolute end-0 bottom-0 opacity-10"
           style="font-size: 12rem; transform: rotate(12deg); margin-right: -2rem; margin-bottom: -2rem;"></i>
       </div>
+<<<<<<< HEAD
       <div class="p-3">
         <div class="card border-0 shadow-sm mb-0">
           <div class="card-body p-3">
@@ -73,6 +74,10 @@
     <!-- Search and Filters -->
 
 
+=======
+    </div>
+
+>>>>>>> origin/main
     <!-- Summary Cards -->
     <div class="row g-4 mb-4">
       <div class="col-md-3">
@@ -103,7 +108,11 @@
                 <i class="bi bi-currency-rupee fs-4"></i>
               </div>
               <div class="ms-3">
+<<<<<<< HEAD
                 <p class="text-muted small mb-1">Total Revenue</p>
+=======
+                <p class="text-muted small mb-1">Total Booking Amount</p>
+>>>>>>> origin/main
                 <h4 class="mb-0">₹<?= number_format(array_sum(array_column($earnings, 'bid_amount')) ?? 0, 2) ?></h4>
               </div>
             </div>
@@ -151,7 +160,58 @@
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Earnings Table -->
+=======
+    <div class="card border-0 shadow-sm ">
+      <div class="card-body p-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+          <!-- Search and Actions -->
+          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-3 w-100 w-md-auto">
+            <div class="input-group flex-grow-1 flex-md-grow-0">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="bi bi-search text-muted"></i>
+              </span>
+              <input type="text" class="form-control border-start-0 ps-0" placeholder="Search booking ID or customer..."
+                id="searchEarnings">
+            </div>
+
+            <!-- Filter by Month -->
+            <select class="form-select flex-grow-0" style="width: 180px;" id="monthFilter">
+              <option value="">All Months</option>
+              <?php
+              $months = [];
+              foreach ($earnings as $earning) {
+                if (!in_array($earning->month, $months)) {
+                  $months[] = $earning->month;
+                }
+              }
+              sort($months);
+              foreach ($months as $month) {
+                echo '<option value="' . htmlspecialchars($month) . '">' . htmlspecialchars($month) . '</option>';
+              }
+              ?>
+            </select>
+
+            <!-- Refresh Button -->
+            <button type="button" onclick="refreshEarnings()"
+              class="btn bg-primary d-flex align-items-center justify-content-center gap-1">
+              <i class="bi bi-arrow-clockwise text-white"></i>
+              <span class="d-none d-md-inline text-white">Refresh</span>
+            </button>
+          </div>
+
+          <!-- Export Button -->
+          <button class="btn btn-outline-primary d-flex align-items-center gap-1">
+            <i class="bi bi-download"></i>
+            <span>Export</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+>>>>>>> origin/main
     <div class="card border-0 shadow-sm overflow-hidden">
       <div class="table-responsive">
         <table class="table table-hover mb-0" id="earningsTable">
@@ -264,6 +324,7 @@
 
     <!-- Pagination -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 px-2 gap-3">
+<<<<<<< HEAD
       <div class="text-muted small">
         Showing <?= count($earnings) ?> of <?= count($earnings) ?> entries
       </div>
@@ -271,6 +332,12 @@
         <button class="btn btn-outline-primary btn-sm">Previous</button>
         <button class="btn btn-primary btn-sm">1</button>
         <button class="btn btn-outline-primary btn-sm">Next</button>
+=======
+      <div class="text-muted small showing-text">
+        Showing <?= count($earnings) ?> of <?= count($earnings) ?> entries
+      </div>
+      <div class="btn-group pagination-container">
+>>>>>>> origin/main
       </div>
     </div>
   </div>
@@ -410,6 +477,7 @@
 </style>
 
 <script>
+<<<<<<< HEAD
   // Search functionality
   document.getElementById('searchEarnings').addEventListener('input', function (e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -450,6 +518,149 @@
     console.log('Company Earnings page loaded');
     // Add any initialization code here
   });
+=======
+  document.addEventListener('DOMContentLoaded', function () {
+    const table = document.getElementById('earningsTable');
+    if (!table) return;
+    
+    const tbody = table.querySelector('tbody');
+    const allRows = Array.from(tbody.querySelectorAll('tr'));
+    
+    // Ignore footer or empty rows if they exist inside tbody
+    const dataRows = allRows.filter(row => row.children.length === 6 && !row.querySelector('.bi-inbox'));
+    
+    const rowsPerPage = 10;
+    let currentPage = 1;
+    let filteredRows = [...dataRows]; 
+
+    const searchInput = document.getElementById('searchEarnings');
+    const monthFilter = document.getElementById('monthFilter');
+    const paginationContainer = document.querySelector('.pagination-container');
+    const showingText = document.querySelector('.showing-text');
+    
+    const emptyRow = allRows.find(row => row.querySelector('.bi-inbox'));
+
+    function applyFilters() {
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+      const selectedMonth = monthFilter ? monthFilter.value.toLowerCase() : '';
+
+      filteredRows = dataRows.filter(row => {
+        const text = row.textContent.toLowerCase();
+        const matchesSearch = text.includes(searchTerm);
+        
+        let matchesMonth = true;
+        if (selectedMonth !== '') {
+          const monthCell = row.querySelector('td:nth-child(6)');
+          if (monthCell) {
+            matchesMonth = monthCell.textContent.toLowerCase().includes(selectedMonth);
+          }
+        }
+        
+        return matchesSearch && matchesMonth;
+      });
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    function renderTable() {
+      // Hide all rows cleanly
+      dataRows.forEach(row => {
+        row.style.display = 'none';
+        row.style.setProperty('display', 'none', 'important');
+      });
+
+      if (filteredRows.length === 0) {
+        if (emptyRow) {
+          emptyRow.style.display = '';
+          emptyRow.style.removeProperty('display');
+        }
+      } else {
+        if (emptyRow) {
+          emptyRow.style.display = 'none';
+          emptyRow.style.setProperty('display', 'none', 'important');
+        }
+        
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const currentRows = filteredRows.slice(start, end);
+        
+        currentRows.forEach(row => {
+          row.style.display = '';
+          row.style.removeProperty('display');
+        });
+      }
+
+      updatePagination();
+      updateFooterTotals();
+    }
+
+    function updateFooterTotals() {
+      const tfoot = table.querySelector('tfoot');
+      if (!tfoot) return;
+      
+      let sumAmount = 0;
+      let sumCharges = 0;
+      
+      filteredRows.forEach(row => {
+        const amountText = row.querySelector('td:nth-child(3)')?.textContent.replace(/[^0-9.-]+/g, '') || '0';
+        const chargesText = row.querySelector('td:nth-child(4)')?.textContent.replace(/[^0-9.-]+/g, '') || '0';
+        sumAmount += parseFloat(amountText);
+        sumCharges += parseFloat(chargesText);
+      });
+      
+      const amtTd = tfoot.querySelector('.text-success');
+      const chgTd = tfoot.querySelector('.text-danger');
+      if (amtTd) amtTd.textContent = '₹' + sumAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      if (chgTd) chgTd.textContent = '₹' + sumCharges.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+      
+      const start = filteredRows.length === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
+      const end = Math.min(currentPage * rowsPerPage, filteredRows.length);
+      if(showingText) showingText.innerHTML = `Showing ${start} to ${end} of ${filteredRows.length} entries`;
+
+      if(!paginationContainer) return;
+      
+      let html = `<button class="btn btn-outline-primary btn-sm" id="btn-prev" ${currentPage === 1 || totalPages === 0 ? 'disabled' : ''}>Previous</button>`;
+      
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="btn ${i === currentPage ? 'btn-primary' : 'btn-outline-primary'} btn-sm page-btn" data-page="${i}">${i}</button>`;
+      }
+      
+      html += `<button class="btn btn-outline-primary btn-sm" id="btn-next" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next</button>`;
+      
+      paginationContainer.innerHTML = html;
+
+      document.getElementById('btn-prev')?.addEventListener('click', () => {
+        if (currentPage > 1) { currentPage--; renderTable(); }
+      });
+      document.getElementById('btn-next')?.addEventListener('click', () => {
+        if (currentPage < totalPages) { currentPage++; renderTable(); }
+      });
+      document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentPage = parseInt(e.target.getAttribute('data-page'));
+          renderTable();
+        });
+      });
+    }
+
+    if(searchInput) searchInput.addEventListener('input', applyFilters);
+    if(monthFilter) monthFilter.addEventListener('change', applyFilters);
+
+    renderTable();
+  });
+
+  function refreshEarnings() {
+    location.reload();
+  }
+>>>>>>> origin/main
 </script>
 
 <?= $this->endSection() ?>

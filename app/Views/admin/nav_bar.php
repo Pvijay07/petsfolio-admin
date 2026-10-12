@@ -20,6 +20,7 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
+<<<<<<< HEAD
                     <!-- Dark / Light Mode Toggle Button -->
                     <li class="nav-item me-2 me-md-3">
                         <button type="button" class="btn btn-sm rounded-pill theme-toggle-btn shadow-sm" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" aria-label="Toggle Dark / Light Mode" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.85); transition: all 0.25s ease;">
@@ -28,6 +29,8 @@
                         </button>
                     </li>
 
+=======
+>>>>>>> origin/main
                     <li class="nav-item dropdown me-3">
                         <a class="nav-link position-relative p-2" href="#" id="notificationDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -60,7 +63,11 @@
                                 </div>
                             </div>
                             <div class="p-3 border-top">
+<<<<<<< HEAD
                                 <a href="https://beta.petsfolio.in/admin/support" class="btn btn-outline-primary w-100">
+=======
+                                <a href="https://admin.petsfolio.in/support" class="btn btn-outline-primary w-100">
+>>>>>>> origin/main
                                     <i class="bi bi-eye me-1"></i> View All Notifications
                                 </a>
                             </div>
@@ -70,7 +77,11 @@
                         <a class="nav-link d-flex align-items-center gap-2 p-2" href="#" id="userProfileDropdown"
                             role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="position-relative">
+<<<<<<< HEAD
                                 <img src="<?= base_url () ?>public/assets/images/avatars/01.png" alt="User Profile"
+=======
+                                <img src="<?= base_url() ?>public/assets/images/avatars/01.png" alt="User Profile"
+>>>>>>> origin/main
                                     class="img-fluid rounded-circle border border-3 border-white shadow-sm"
                                     style="width: 40px; height: 40px; object-fit: cover;">
                                 <span
@@ -79,9 +90,15 @@
                             </div>
                             <div class="d-none d-xl-block text-start">
                                 <h6 class="mb-0 fw-semibold text-dark" style="font-size: 0.9rem;">
+<<<<<<< HEAD
                                     <?php echo session ()->get ( 'user' )->name ?>
                                 </h6>
                                 <small class="text-muted" style="font-size: 0.8rem;">Administrator</small>
+=======
+                                    <?php echo session()->get('user')->name ?>
+                                </h6>
+                                <!-- <small class="text-muted" style="font-size: 0.8rem;"></small> -->
+>>>>>>> origin/main
                             </div>
                             <i class="bi bi-chevron-down text-muted"></i>
                         </a>
@@ -90,24 +107,40 @@
                             style="min-width: 220px; border-radius: 12px; margin-top: 10px;">
                             <div class="p-3 border-bottom">
                                 <div class="d-flex align-items-center gap-3">
+<<<<<<< HEAD
                                     <img src="<?= base_url () ?>public/assets/images/avatars/01.png" alt="Profile"
+=======
+                                    <img src="<?= base_url() ?>public/assets/images/avatars/01.png" alt="Profile"
+>>>>>>> origin/main
                                         class="rounded-circle border"
                                         style="width: 50px; height: 50px; object-fit: cover;">
                                     <div>
                                         <h6 class="mb-0 fw-bold text-dark">
+<<<<<<< HEAD
                                             <?php echo session ()->get ( 'user' )->name ?>
                                         </h6>
                                         <small
                                             class="text-muted"><?= session ()->get ( 'user' )->email ?? 'admin@petsfolio.com' ?></small>
+=======
+                                            <?php echo session()->get('user')->name ?>
+                                        </h6>
+                                        <small
+                                            class="text-muted"><?= session()->get('user')->email ?? 'admin@petsfolio.com' ?></small>
+>>>>>>> origin/main
                                     </div>
                                 </div>
                             </div>
                             <div class="p-2">
+<<<<<<< HEAD
                                 <a href="<?= base_url ( '/profile' ) ?>" class="dropdown-item p-3">
+=======
+                                <a href="<?= base_url('/profile') ?>" class="dropdown-item p-3">
+>>>>>>> origin/main
                                     <i class="bi bi-person me-2 text-primary"></i>
                                     <span>My Profile</span>
                                 </a>
 
+<<<<<<< HEAD
                                 <div class="dropdown-item p-3 d-flex align-items-center justify-content-between" onclick="toggleTheme()" style="cursor: pointer;">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-moon-stars me-2 text-primary"></i>
@@ -120,6 +153,10 @@
 
                                 <div class="dropdown-divider my-2"></div>
                                 <a href="<?= base_url ( 'logout' ) ?>" class="dropdown-item p-3 text-danger">
+=======
+                                <div class="dropdown-divider my-2"></div>
+                                <a href="<?= base_url('logout') ?>" class="dropdown-item p-3 text-danger">
+>>>>>>> origin/main
                                     <i class="bi bi-box-arrow-right me-2"></i>
                                     <span>Logout</span>
                                 </a>
@@ -375,14 +412,25 @@
     }
 
     // Initialize navbar
+<<<<<<< HEAD
     document.addEventListener('DOMContentLoaded', function () {
+=======
+    document.addEventListener('DOMContentLoaded', function() {
+>>>>>>> origin/main
         // Initial margin update
         updateNavbarMargin();
 
         // Update on sidebar changes
         const sidebar = document.querySelector('.sidebar-container');
         const observer = new MutationObserver(updateNavbarMargin);
+<<<<<<< HEAD
         observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+=======
+        observer.observe(sidebar, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+>>>>>>> origin/main
 
         // Update on window resize
         window.addEventListener('resize', updateNavbarMargin);
@@ -393,7 +441,11 @@
         // Search functionality
         const searchInput = document.querySelector('.search-input input');
         if (searchInput) {
+<<<<<<< HEAD
             searchInput.addEventListener('input', function (e) {
+=======
+            searchInput.addEventListener('input', function(e) {
+>>>>>>> origin/main
                 const searchTerm = e.target.value.toLowerCase();
                 // Implement search functionality here
                 console.log('Searching for:', searchTerm);
@@ -407,7 +459,11 @@
         const notificationCount = document.getElementById('notificationCount');
         const notificationSubtitle = document.getElementById('notificationSubtitle');
 
+<<<<<<< HEAD
         fetch('<?= base_url () ?>supports')
+=======
+        fetch('<?= base_url() ?>supports')
+>>>>>>> origin/main
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -478,12 +534,20 @@
         const li = document.createElement('div');
         li.className = 'notification-item border-bottom';
         li.innerHTML = `
+<<<<<<< HEAD
             <a class="dropdown-item " href="https://beta.petsfolio.in/admin/support">
+=======
+            <a class="dropdown-item " href="https://admin.petsfolio.in//support">
+>>>>>>> origin/main
                 <div class="d-flex gap-3">
                     <div class="flex-shrink-0">
                         <div class="rounded-circle overflow-hidden" style="width: 40px; height: 40px;">
                             <img class="img-fluid h-100 w-100" style="object-fit: cover;"
+<<<<<<< HEAD
                                 src="${notification.profile ? `https://beta.petsfolio.in/public/uploads/${path}/${notification.profile}` : 'https://petsfolio.in/admin/public/assets/images/avatars/user.png'}"
+=======
+                                src="${notification.profile ? `https://admin.petsfolio.in/public/uploads/${path}/${notification.profile}` : 'https://petsfolio.in/admin/public/assets/images/avatars/user.png'}"
+>>>>>>> origin/main
                                 alt="${notification.name}">
                         </div>
                     </div>
@@ -520,7 +584,15 @@
         } else if (diffDays < 7) {
             return `${diffDays} days ago`;
         } else {
+<<<<<<< HEAD
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+=======
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+>>>>>>> origin/main
         }
     }
 
@@ -538,7 +610,11 @@
     }
 
     // Mark notifications as read when clicked
+<<<<<<< HEAD
     document.addEventListener('click', function (e) {
+=======
+    document.addEventListener('click', function(e) {
+>>>>>>> origin/main
         if (e.target.closest('.notification-item')) {
             const notificationBadge = document.getElementById('notificationBadge');
             const notificationCount = document.getElementById('notificationCount');
@@ -562,7 +638,11 @@
     });
 
     // Close dropdowns when clicking outside
+<<<<<<< HEAD
     document.addEventListener('click', function (e) {
+=======
+    document.addEventListener('click', function(e) {
+>>>>>>> origin/main
         const dropdowns = document.querySelectorAll('.dropdown-menu');
         dropdowns.forEach(dropdown => {
             if (!dropdown.contains(e.target) && !dropdown.previousElementSibling.contains(e.target)) {

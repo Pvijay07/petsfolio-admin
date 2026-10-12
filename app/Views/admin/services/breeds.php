@@ -257,12 +257,18 @@
                             data-bs-target="#form-offcanvas"
                             aria-label="Edit"
                             data-edit="<?= $breed->id; ?>"
+<<<<<<< HEAD
                             data-module="breeds"
                             data-url="<?= base_url() ?>getBreed"
+=======
+                            data-module="dog_breeds"
+                            data-url="<?= base_url() ?>getUser"
+>>>>>>> origin/main
                             data-id="<?= $breed->id; ?>">
                       <i class="bi bi-pencil"></i>
                       <span class="d-none d-md-inline">Edit</span>
                     </button>
+<<<<<<< HEAD
                     <button type="button" 
                             class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 delete-breed"
                             data-id="<?= $breed->id; ?>"
@@ -271,6 +277,20 @@
                       <i class="bi bi-trash"></i>
                       <span class="d-none d-md-inline">Delete</span>
                     </button>
+=======
+                    <a href="<?= base_url() ?>deleteUser" 
+                       id="delete-employees-<?= $breed->id; ?>" 
+                       class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                       data-type="ajax" 
+                       data-method="DELETE"
+                       data-token="<?= csrf_hash(); ?>"
+                       data-id="<?= $breed->id; ?>"
+                       data-confirm="Are you certain you want to delete it?"
+                       aria-label="Delete">
+                      <i class="bi bi-trash"></i>
+                      <span class="d-none d-md-inline">Delete</span>
+                    </a>
+>>>>>>> origin/main
                   </div>
                 </td>
               </tr>
@@ -338,7 +358,11 @@
   </div>
 
   <!-- Edit Form Offcanvas -->
+<<<<<<< HEAD
   <form action="<?= base_url() ?>updateBreed" id="updateBreedForm">
+=======
+  <form action="<?= base_url() ?>update" id="updateUser">
+>>>>>>> origin/main
     <div class="offcanvas offcanvas-end border-0 shadow" tabindex="-1" id="form-offcanvas"
          aria-labelledby="form-offcanvasLabel" aria-modal="true" role="dialog" style="width: 50%;">
       <div class="offcanvas-header bg-primary text-white">
@@ -347,6 +371,7 @@
       </div>
       <div class="offcanvas-body p-4">
         <div class="row g-4">
+<<<<<<< HEAD
           <div class="col-md-12">
             <label class="form-label fw-medium text-muted mb-2" for="edit_pet_type_id">Pet Type</label>
             <input type="hidden" name="id" value="" id="edit_id">
@@ -361,13 +386,55 @@
           <div class="col-md-12">
             <label for="edit_breed" class="form-label fw-medium text-muted mb-2">Breed Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="breed" id="edit_breed" placeholder="Enter breed name" required>
+=======
+          <div class="col-md-6">
+            <label for="name" class="form-label fw-medium text-muted mb-2">Name <span class="text-danger">*</span></label>
+            <input type="hidden" name="id" value="" id="id">
+            <input type="hidden" name="module" value="service_providers" id="module">
+            <input type="text" class="form-control" name="name" id="name" placeholder="Enter name">
+          </div>
+
+          <div class="col-md-6">
+            <label for="email" class="form-label fw-medium text-muted mb-2">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" name="email" id="email" placeholder="Enter email">
+          </div>
+
+          <div class="col-md-6">
+            <label for="phone" class="form-label fw-medium text-muted mb-2">Phone Number <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control" name="phone" id="phone" placeholder="Enter phone number">
+          </div>
+
+          <div class="col-md-6">
+            <label for="dob" class="form-label fw-medium text-muted mb-2">DOB<span class="text-danger">*</span></label>
+            <input type="date" class="form-control" name="dob" id="dob" placeholder="Enter date of birth">
+          </div>
+
+          <div class="col-12">
+            <label class="form-label fw-medium text-muted mb-2">Gender</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="male" value="Male">
+                <label class="form-check-label" for="male">Male</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="gender" id="female" value="Female">
+                <label class="form-check-label" for="female">Female</label>
+              </div>
+            </div>
+>>>>>>> origin/main
           </div>
 
           <div class="col-12">
             <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded">
+<<<<<<< HEAD
               <label for="edit_status" class="form-label fw-medium text-muted mb-0">Status</label>
               <div class="form-check form-switch">
                 <input class="form-check-input" name="status" type="checkbox" id="edit_status">
+=======
+              <label for="category-status" class="form-label fw-medium text-muted mb-0">Status</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" name="status" type="checkbox" id="category-status">
+>>>>>>> origin/main
               </div>
             </div>
           </div>
@@ -617,6 +684,7 @@
       });
     });
 
+<<<<<<< HEAD
     // Add Breed form submission
     let isSubmitting = false;
     $('#addonForm').off('submit').on('submit', function(e) {
@@ -656,6 +724,8 @@
       });
     });
 
+=======
+>>>>>>> origin/main
     // Pet Type filter
     $('#petTypeFilter').on('change', function() {
       filterTable();
@@ -699,6 +769,7 @@
     applyButton.disabled = selectedRows.length === 0;
   }
 
+<<<<<<< HEAD
   document.getElementById('quick-action-apply').addEventListener('click', function(e) {
     e.preventDefault();
     const selectedAction = document.getElementById('quick-action-type').value;
@@ -724,11 +795,32 @@
           }
         });
       }
+=======
+  document.getElementById('quick-action-apply').addEventListener('click', function() {
+    const selectedAction = document.getElementById('quick-action-type').value;
+    const selectedStatus = document.getElementById('status').value;
+    const selectedRows = document.querySelectorAll('.select-table-row:checked');
+
+    if (selectedAction === 'delete') {
+      selectedRows.forEach(row => {
+        const rowId = row.value;
+        const deleteLink = document.getElementById(`delete-employees-${rowId}`);
+        if (deleteLink) {
+          if (confirm('Are you certain you want to delete it?')) {
+            deleteLink.click();
+          }
+        }
+      });
+>>>>>>> origin/main
     } else if (selectedAction === 'change-status') {
       selectedRows.forEach(row => {
         const statusCell = row.closest('tr').querySelector('.switch-status-change');
         if (statusCell) {
           statusCell.checked = selectedStatus == '1';
+<<<<<<< HEAD
+=======
+          // Trigger change event to update via AJAX
+>>>>>>> origin/main
           $(statusCell).trigger('change');
         }
       });
@@ -749,7 +841,11 @@
     toggleApplyButton();
   });
 
+<<<<<<< HEAD
     // Status switch change (assuming this functionality exists elsewhere)
+=======
+  // Status switch change (assuming this functionality exists elsewhere)
+>>>>>>> origin/main
   $(document).on('change', '.switch-status-change', function() {
     const url = $(this).data('url');
     const module = $(this).data('module');
@@ -763,8 +859,12 @@
       data: {
         id: id,
         status: status,
+<<<<<<< HEAD
         module: module,
         "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
+=======
+        module: module
+>>>>>>> origin/main
       },
       success: function(response) {
         if (response.status) {
@@ -774,6 +874,7 @@
     });
   });
 
+<<<<<<< HEAD
   // Edit button functionality
   $(document).on('click', 'button[data-edit]', function() {
     const id = $(this).data('id');
@@ -793,12 +894,37 @@
           $('#edit_breed').val(response.data.label);
           $('#edit_status').prop('checked', response.data.status == '1');
           
+=======
+  // Edit button functionality (assuming this exists elsewhere)
+  $(document).on('click', 'button[data-edit]', function() {
+    const id = $(this).data('id');
+    const module = $(this).data('module');
+    const url = $(this).data('url');
+    
+    // AJAX call to get data and populate form
+    $.ajax({
+      url: url,
+      method: 'POST',
+      data: {
+        id: id,
+        module: module
+      },
+      success: function(response) {
+        if (response.status) {
+          // Populate form fields
+          $('#id').val(response.data.id);
+          $('#name').val(response.data.name);
+          // ... populate other fields
+          
+          // Show offcanvas
+>>>>>>> origin/main
           const offcanvas = new bootstrap.Offcanvas(document.getElementById('form-offcanvas'));
           offcanvas.show();
         }
       }
     });
   });
+<<<<<<< HEAD
 
   // Update breed form submission
   $('#updateBreedForm').on('submit', function(e) {
@@ -840,6 +966,8 @@
       });
     }
   });
+=======
+>>>>>>> origin/main
 </script>
 
 <?= $this->endSection() ?>

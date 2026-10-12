@@ -29,7 +29,11 @@
                 <?php
                 $unsolvedCount = 0;
                 foreach ($supports as $support) {
+<<<<<<< HEAD
                   if ($support->status != 'completed')
+=======
+                  if ($support->status != 'resolved')
+>>>>>>> origin/main
                     $unsolvedCount++;
                 }
                 echo $unsolvedCount;
@@ -59,7 +63,11 @@
               <table class="table table-hover align-middle mb-0">
                 <thead style="background: #c6d2ff !important;">
                   <tr>
+<<<<<<< HEAD
                     <!-- <th style="background: #c6d2ff !important;" class="py-3 text-black fw-semibold border-bottom">Ticket ID</th> -->
+=======
+                    <th style="background: #c6d2ff !important;" class="py-3 text-black fw-semibold border-bottom">Ticket ID</th>
+>>>>>>> origin/main
                     <th style="background: #c6d2ff !important;"
                       class="py-3 fs-6   text-black fw-semibold border-bottom">User
                       Details</th>
@@ -77,6 +85,7 @@
                 </thead>
                 <tbody>
                   <?php foreach ($supports as $support):
+<<<<<<< HEAD
                     if ($support->status != 'completed') {
                       $path = ($support->user_type == 'user' || $support->user_type == 'client') ? 'users' : 'providers';
                       $message = htmlspecialchars($support->message);
@@ -85,14 +94,31 @@
                       <tr>
                         <!-- Ticket ID -->
                         <!-- <td class="fw-bold text-dark">#<?= $support->id ?></td> -->
+=======
+                    if ($support->status != 'resolved') {
+                      $path = ($support->user_type == 'user' || $support->user_type == 'client') ? 'users' : 'providers';
+                      $message = htmlspecialchars($support->message);
+                      $isReactivateRequest = $support->message == 'Please reactivate my account';
+                  ?>
+                      <tr>
+                        <!-- Ticket ID -->
+                        <td class="fw-bold text-dark">#<?= $support->ticket_number ?></td>
+>>>>>>> origin/main
 
                         <!-- User Details (merged Profile + Name + Phone + User Type badge) -->
                         <td class="p-2 px-3">
                           <div class="d-flex align-items-center gap-3">
+<<<<<<< HEAD
                             <div class="rounded-circle overflow-hidden" style="width: 45px; height: 45px;">
                               <img class="w-100 h-100 object-fit-cover"
                                 src="<?= $support->profile ? 'https://beta.petsfolio.in/public/uploads/' . $path . '/' . $support->profile : 'https://fitinex.com/public/img/avatar/avatar.png'; ?>"
                                 alt="Profile">
+=======
+                            <div
+                              class="rounded-circle bg-primary bg-opacity-10 text-black d-flex align-items-center justify-content-center fw-bold"
+                              style="width: 44px; height: 44px; border: 2px solid #e5dbff; font-size: 1.2rem; color: #fff !important;">
+                              <?= strtoupper(substr($support->name ?? '?', 0, 1)) ?>
+>>>>>>> origin/main
                             </div>
                             <div>
                               <div class="fw-medium text-dark mb-1">
@@ -176,15 +202,29 @@
                                 <i class="bi bi-check-circle me-1"></i>Mark as Solved
                               </button>
                               <a href="<?= base_url('sp-supportticket/' . $support->id) ?>"
+<<<<<<< HEAD
                                 class="btn btn-outline-primary btn-sm px-3 py-2 rounded-5"
                                 style="background: #c6d2ff !important; border-color: #a3b4ff !important; color: #1a1a1a !important;">
                                 <i class="bi bi-chat-left-text me-1"></i>Chat
                               </a>
+=======
+                                class="btn btn-outline-primary btn-sm px-3 py-2 rounded-5 d-inline-flex align-items-center gap-1"
+                                style="background: #c6d2ff !important; border-color: #a3b4ff !important; color: #1a1a1a !important;">
+                                <i class="bi bi-chat-left-text"></i> Chat
+                              </a>
+                              <!-- <span class="badge rounded-pill px-2 py-1" style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.25); font-size: 0.72rem;" title="AI Mode & Human Mode Active">
+                                <i class="bi bi-robot text-warning"></i> AI
+                              </span> -->
+>>>>>>> origin/main
                             <?php } ?>
                           </div>
                         </td>
                       </tr>
+<<<<<<< HEAD
                     <?php }
+=======
+                  <?php }
+>>>>>>> origin/main
                   endforeach; ?>
                 </tbody>
               </table>
@@ -226,7 +266,11 @@
                     if ($support->status == 'completed' || $support->status == 'resolved') {
                       $path = ($support->user_type == 'user' || $support->user_type == 'client') ? 'users' : 'providers';
                       $message = htmlspecialchars($support->message);
+<<<<<<< HEAD
                       ?>
+=======
+                  ?>
+>>>>>>> origin/main
                       <tr>
                         <!-- Ticket ID -->
                         <td class="fw-bold text-dark p-2 px-3">#<?= $support->id ?></td>
@@ -282,7 +326,11 @@
                           </span>
                         </td>
                       </tr>
+<<<<<<< HEAD
                     <?php }
+=======
+                  <?php }
+>>>>>>> origin/main
                   endforeach; ?>
                 </tbody>
               </table>
@@ -391,7 +439,11 @@
 
 <script>
   // ✅ Handle Active/Inactive Status Toggle
+<<<<<<< HEAD
   $(document).on('click', '.status', function (e) {
+=======
+  $(document).on('click', '.status', function(e) {
+>>>>>>> origin/main
     e.preventDefault();
 
     const id = $(this).data('id');
@@ -424,7 +476,11 @@
             user_type: userType,
             queryId: queryId
           },
+<<<<<<< HEAD
           success: function (data) {
+=======
+          success: function(data) {
+>>>>>>> origin/main
             if (data.status === true) {
               // ✅ Update button appearance dynamically
               button.attr('value', newStatus)
@@ -449,7 +505,11 @@
               });
             }
           },
+<<<<<<< HEAD
           error: function () {
+=======
+          error: function() {
+>>>>>>> origin/main
             Swal.fire({
               icon: 'error',
               title: 'Error',
@@ -462,7 +522,11 @@
   });
 
   // ✅ Handle Query Status Update
+<<<<<<< HEAD
   $(document).on('click', '.query_status', function (e) {
+=======
+  $(document).on('click', '.query_status', function(e) {
+>>>>>>> origin/main
     e.preventDefault();
 
     const queryId = $(this).data('queryid');
@@ -507,7 +571,11 @@
     $.ajax({
       type: 'POST',
       url: url + '/' + queryId,
+<<<<<<< HEAD
       success: function (data) {
+=======
+      success: function(data) {
+>>>>>>> origin/main
         if (data.status === true) {
           Swal.fire({
             icon: 'success',
@@ -526,7 +594,11 @@
           });
         }
       },
+<<<<<<< HEAD
       error: function () {
+=======
+      error: function() {
+>>>>>>> origin/main
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -537,9 +609,16 @@
   }
 
   // Initialize tooltips
+<<<<<<< HEAD
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
+=======
+  $(function() {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+
+>>>>>>> origin/main
   function confirmMarkAsSolved(chatId) {
     Swal.fire({
       title: 'Mark as Solved',
@@ -552,13 +631,21 @@
       cancelButtonText: 'Cancel'
     }).then((result) => {
       if (result.isConfirmed) {
+<<<<<<< HEAD
         updateTicketStatus(chatId, 'completed');
+=======
+        updateTicketStatus(chatId, 'resolved');
+>>>>>>> origin/main
       }
     });
   }
 
   function updateTicketStatus(chatId, status) {
+<<<<<<< HEAD
     fetch("https://beta.petsfolio.in/api/supportticket/updateStatus", {
+=======
+    fetch('<?= base_url("supportticket/updateStatus") ?>', {
+>>>>>>> origin/main
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -594,7 +681,10 @@
         });
       });
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
 </script>
 
 <?php echo $this->endSection() ?>

@@ -15,7 +15,11 @@ class SoundManager {
         this.isUserInteracted = true;
         this.unlockAudio();
       },
+<<<<<<< HEAD
       { once: true }
+=======
+      { once: true },
+>>>>>>> origin/main
     );
 
     document.addEventListener(
@@ -24,14 +28,24 @@ class SoundManager {
         this.isUserInteracted = true;
         this.unlockAudio();
       },
+<<<<<<< HEAD
       { once: true }
+=======
+      { once: true },
+>>>>>>> origin/main
     );
   }
 
   unlockAudio() {
     if (!this.audioContext) {
+<<<<<<< HEAD
       this.audioContext = new (window.AudioContext ||
         window.webkitAudioContext)();
+=======
+      this.audioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
+>>>>>>> origin/main
     }
     if (this.audioContext.state === "suspended") {
       this.audioContext.resume();
@@ -66,8 +80,14 @@ class SoundManager {
 
     try {
       if (!this.audioContext) {
+<<<<<<< HEAD
         this.audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
+=======
+        this.audioContext = new (
+          window.AudioContext || window.webkitAudioContext
+        )();
+>>>>>>> origin/main
       }
 
       if (!this.soundBuffer) {
@@ -78,7 +98,11 @@ class SoundManager {
         const buffer = this.audioContext.createBuffer(
           1,
           frameCount,
+<<<<<<< HEAD
           sampleRate
+=======
+          sampleRate,
+>>>>>>> origin/main
         );
         const data = buffer.getChannelData(0);
 
@@ -162,8 +186,13 @@ class ChatPushNotifications {
   async registerServiceWorker() {
     try {
       const registration = await navigator.serviceWorker.register(
+<<<<<<< HEAD
   "https://beta.petsfolio.in/admin/sw.js?v=" + Date.now()
 );
+=======
+        "https://admin.petsfolio.in/sw.js?v=" + Date.now(),
+      );
+>>>>>>> origin/main
       this.log("Service Worker registered");
 
       // Wait for service worker to be ready
@@ -185,10 +214,15 @@ class ChatPushNotifications {
       if (subscription) {
         this.isSubscribed = true;
         this.log(
+<<<<<<< HEAD
           `Already subscribed: ${subscription.endpoint.substring(0, 50)}...`
         );
         // Always ensure the server has the latest subscription
         await this.sendSubscriptionToServer(subscription);
+=======
+          `Already subscribed: ${subscription.endpoint.substring(0, 50)}...`,
+        );
+>>>>>>> origin/main
       } else {
         this.log("Not subscribed to push, subscribing now...");
         await this.subscribeToPush();
@@ -203,10 +237,13 @@ class ChatPushNotifications {
       const registration = await navigator.serviceWorker.ready;
 
       // Check permission first
+<<<<<<< HEAD
       if (Notification.permission === "default") {
         await Notification.requestPermission();
       }
       
+=======
+>>>>>>> origin/main
       if (Notification.permission !== "granted") {
         this.log("Notification permission not granted");
         return;
@@ -235,7 +272,11 @@ class ChatPushNotifications {
   async sendSubscriptionToServer(subscription) {
     try {
       const response = await fetch(
+<<<<<<< HEAD
         "https://beta.petsfolio.in/admin/notifications/subscribe",
+=======
+        "https://admin.petsfolio.in/notifications/subscribe",
+>>>>>>> origin/main
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -244,7 +285,11 @@ class ChatPushNotifications {
             type: "admin_chat",
             user_agent: navigator.userAgent,
           }),
+<<<<<<< HEAD
         }
+=======
+        },
+>>>>>>> origin/main
       );
 
       const result = await response.json();
@@ -276,7 +321,11 @@ class ChatPushNotifications {
 
     try {
       const response = await fetch(
+<<<<<<< HEAD
         "https://beta.petsfolio.in/admin/notifications/send-chat-notification",
+=======
+        "https://admin.petsfolio.in/notifications/send-chat-notification",
+>>>>>>> origin/main
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -288,10 +337,17 @@ class ChatPushNotifications {
             message_id: messageData.id || "msg_" + Date.now(),
             timestamp: Date.now(),
             source: "chat_system",
+<<<<<<< HEAD
             
             force_push: true,
           }),
         }
+=======
+
+            force_push: true,
+          }),
+        },
+>>>>>>> origin/main
       );
 
       const result = await response.json();
@@ -299,7 +355,11 @@ class ChatPushNotifications {
 
       if (result.success) {
         console.log(
+<<<<<<< HEAD
           `✅ Push sent successfully to ${result.sent_count || 0} subscribers`
+=======
+          `✅ Push sent successfully to ${result.sent_count || 0} subscribers`,
+>>>>>>> origin/main
         );
       } else {
         console.error("❌ Push failed:", result.error);
@@ -411,7 +471,11 @@ chatChannel.bind("new-message", function (data) {
 
   console.log(
     `📨 New message from ${senderType}:`,
+<<<<<<< HEAD
     data.message.substring(0, 50) + "..."
+=======
+    data.message.substring(0, 50) + "...",
+>>>>>>> origin/main
   );
 
   // Handle client/provider messages
@@ -422,6 +486,15 @@ chatChannel.bind("new-message", function (data) {
         console.log("💡 Click anywhere to enable sounds");
       }
     });
+<<<<<<< HEAD
+=======
+
+    // ALWAYS try to send push notification for client messages
+    // Remove the focus check for testing
+    setTimeout(() => {
+      chatPushManager.sendPushNotification(data, currentChatId);
+    }, 1000);
+>>>>>>> origin/main
   }
 
   // Avoid duplicates
@@ -436,7 +509,11 @@ chatChannel.bind("new-message", function (data) {
     data.sender_name || (isMe ? "You" : "Customer"),
     data.timestamp,
     data.id,
+<<<<<<< HEAD
     data.file_url || null
+=======
+    data.file_url || null,
+>>>>>>> origin/main
   );
 
   if (!isMe) {
@@ -448,6 +525,10 @@ chatChannel.bind("new-message", function (data) {
 // Rest of your existing functions remain the same...
 chatChannel.bind("typing", function (data) {
   const typingIndicator = document.getElementById("typingIndicator");
+<<<<<<< HEAD
+=======
+  if (!typingIndicator) return;
+>>>>>>> origin/main
 
   if (data.sender_id != senderId && data.sender_type !== "support") {
     if (data.isTyping) {
@@ -477,10 +558,22 @@ function sendMessage() {
     formData.append("message", message);
   }
 
+<<<<<<< HEAD
   const sendBtn = document.querySelector('button[type="submit"]');
   const originalText = sendBtn.innerHTML;
   sendBtn.disabled = true;
   sendBtn.innerHTML = '<i class="ti ti-loader"></i> Sending...';
+=======
+  const sendBtn =
+    document.querySelector('button[type="submit"]') ||
+    document.querySelector(".btn-send");
+  const originalText = sendBtn ? sendBtn.innerHTML : "";
+
+  if (sendBtn) {
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="ti ti-loader"></i> Sending...';
+  }
+>>>>>>> origin/main
 
   fetch(BASE_URL + "/chat/send", {
     method: "POST",
@@ -490,6 +583,25 @@ function sendMessage() {
     .then((data) => {
       if (data.status === "ok") {
         input.value = "";
+<<<<<<< HEAD
+=======
+        
+        // Optimistically add message if Pusher event hasn't already added it
+        const realId = data.id || (data.data && data.data.id);
+        const idToUse = realId || "tmp_" + Date.now();
+        
+        if (!document.querySelector(`[data-msg-id="${idToUse}"]`)) {
+          addMessageToChat(
+            message,
+            "support",
+            "You",
+            getCurrentTime(),
+            idToUse,
+            null,
+            "support"
+          );
+        }
+>>>>>>> origin/main
       } else {
         throw new Error(data.message || "Failed to send message");
       }
@@ -499,8 +611,15 @@ function sendMessage() {
       alert("Failed to send message. Please try again.");
     })
     .finally(() => {
+<<<<<<< HEAD
       sendBtn.disabled = false;
       sendBtn.innerHTML = originalText;
+=======
+      if (sendBtn) {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = originalText;
+      }
+>>>>>>> origin/main
     });
 }
 
@@ -511,7 +630,11 @@ function addMessageToChat(
   timestamp,
   id,
   fileUrl = null,
+<<<<<<< HEAD
   currentUserType = "support"
+=======
+  currentUserType = "support",
+>>>>>>> origin/main
 ) {
   const messagesContainer = document.getElementById("chatBody");
   const msgDiv = document.createElement("div");
@@ -614,6 +737,7 @@ function escapeHtml(text) {
 }
 
 // Typing indicator
+<<<<<<< HEAD
 document.getElementById("messageInput").addEventListener("input", function () {
   if (this.value.trim()) {
     notifyTyping(true);
@@ -634,6 +758,34 @@ document.getElementById("messageInput").addEventListener("blur", function () {
 
 // Initialize
 document.getElementById("filePreview").style.display = "none";
+=======
+const messageInput = document.getElementById("messageInput");
+if (messageInput) {
+  messageInput.addEventListener("input", function () {
+    if (this.value.trim()) {
+      notifyTyping(true);
+
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => notifyTyping(false), 2000);
+    } else {
+      notifyTyping(false);
+      clearTimeout(typingTimeout);
+    }
+  });
+
+  // Stop typing when user stops typing
+  messageInput.addEventListener("blur", function () {
+    notifyTyping(false);
+    clearTimeout(typingTimeout);
+  });
+}
+
+// Initialize
+const filePreview = document.getElementById("filePreview");
+if (filePreview) {
+  filePreview.style.display = "none";
+}
+>>>>>>> origin/main
 
 // Auto-scroll to bottom on page load
 document.addEventListener("DOMContentLoaded", function () {
@@ -659,6 +811,10 @@ window.addEventListener("blur", () => {
 
 function updateUnreadBadge() {
   const badge = document.getElementById("unreadCount");
+<<<<<<< HEAD
+=======
+  if (!badge) return;
+>>>>>>> origin/main
   if (unreadCount > 0) {
     badge.style.display = "inline-block";
     badge.textContent = unreadCount;

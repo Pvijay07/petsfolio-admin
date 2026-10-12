@@ -129,7 +129,12 @@ class CampaignService
                     $campaign->route_name,
                     [],
                     $sentCount,
+<<<<<<< HEAD
                     $failedCount
+=======
+                    $failedCount,
+                    $campaign->id
+>>>>>>> origin/main
                 );
             }
 
@@ -149,7 +154,10 @@ class CampaignService
                 'sent'           => $sentCount,
                 'failed'         => $failedCount,
             ];
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'CampaignService Error: ' . $e->getMessage());
 
@@ -165,7 +173,11 @@ class CampaignService
     /**
      * Send batch push notifications
      */
+<<<<<<< HEAD
     protected function sendBatchPush($tokens, $title, $body, $routeName = null, $data = [], &$sentCount = 0, &$failedCount = 0)
+=======
+    protected function sendBatchPush($tokens, $title, $body, $routeName = null, $data = [], &$sentCount = 0, &$failedCount = 0, $campaignId = null)
+>>>>>>> origin/main
     {
         try {
             if (!$this->pushService) {
@@ -181,16 +193,60 @@ class CampaignService
                 50 // batch size
             );
 
+<<<<<<< HEAD
             foreach ($responses as $response) {
                 if (isset($response['state']) && $response['state'] === 'fulfilled') {
                     $sentCount++;
                 } else {
                     $failedCount++;
+=======
+            $sentTokens = [];
+            $failedTokensByError = [];
+
+            foreach ($responses as $response) {
+                if (isset($response['status']) && $response['status'] === 'sent') {
+                    $sentCount++;
+                    if (!empty($response['token'])) {
+                        $sentTokens[] = $response['token'];
+                    }
+                } else {
+                    $failedCount++;
+                    if (!empty($response['token'])) {
+                        $errMsg = !empty($response['error']) ? $response['error'] : 'FCM delivery failed';
+                        $failedTokensByError[$errMsg][] = $response['token'];
+                    }
+                }
+            }
+
+            // Update notification logs in DB
+            if ($campaignId) {
+                $db = \Config\Database::connect();
+                if (!empty($sentTokens)) {
+                    foreach (array_chunk($sentTokens, 500) as $chunk) {
+                        $db->table('notification_logs')
+                            ->where('campaign_id', $campaignId)
+                            ->whereIn('device_token', $chunk)
+                            ->update(['status' => 'sent', 'sent_at' => date('Y-m-d H:i:s')]);
+                    }
+                }
+                if (!empty($failedTokensByError)) {
+                    foreach ($failedTokensByError as $errMsg => $fTokens) {
+                        foreach (array_chunk($fTokens, 500) as $chunk) {
+                            $db->table('notification_logs')
+                                ->where('campaign_id', $campaignId)
+                                ->whereIn('device_token', $chunk)
+                                ->update(['status' => 'failed', 'error_message' => $errMsg]);
+                        }
+                    }
+>>>>>>> origin/main
                 }
             }
 
             return $sentCount;
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
         } catch (\Exception $e) {
             log_message('error', 'Batch push error: ' . $e->getMessage());
             $failedCount += count($tokens);

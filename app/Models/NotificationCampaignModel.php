@@ -130,6 +130,7 @@ class NotificationCampaignModel extends Model
         if ($target === 'all' || $target === 'clients' || $target === 'segment') {
             $builder = $this->db->table('users');
 
+<<<<<<< HEAD
             if ($countOnly) {
                 $builder->select('COUNT(*) as count');
             } else {
@@ -140,6 +141,26 @@ class NotificationCampaignModel extends Model
             $builder->where('device_token IS NOT NULL');
             $builder->where('device_token !=', 'default_token');
             $builder->where('device_token !=', '');
+=======
+            $hasFcmToken = $this->db->fieldExists('fcm_token', 'users');
+            $tokenSelect = $hasFcmToken 
+                ? 'COALESCE(NULLIF(device_token, ""), fcm_token) as device_token' 
+                : 'device_token';
+
+            if ($countOnly) {
+                $builder->select('COUNT(*) as count');
+            } else {
+                $builder->select("id, name, phone, {$tokenSelect}, city, 'user' as user_type");
+            }
+
+            $builder->where('status', 'active');
+            $builder->groupStart();
+                $builder->where('device_token IS NOT NULL AND device_token != "" AND device_token != "default_token"');
+                if ($hasFcmToken) {
+                    $builder->orWhere('fcm_token IS NOT NULL AND fcm_token != "" AND fcm_token != "default_token"');
+                }
+            $builder->groupEnd();
+>>>>>>> origin/main
 
             // Apply segment rules
             if ($target === 'segment' && !empty($rules)) {
@@ -162,6 +183,7 @@ class NotificationCampaignModel extends Model
         if ($target === 'all' || $target === 'providers' || $target === 'segment') {
             $builder = $this->db->table('service_providers');
 
+<<<<<<< HEAD
             if ($countOnly) {
                 $builder->select('COUNT(*) as count');
             } else {
@@ -172,6 +194,26 @@ class NotificationCampaignModel extends Model
             $builder->where('device_token IS NOT NULL');
             $builder->where('device_token !=', 'default_token');
             $builder->where('device_token !=', '');
+=======
+            $hasFcmToken = $this->db->fieldExists('fcm_token', 'service_providers');
+            $tokenSelect = $hasFcmToken 
+                ? 'COALESCE(NULLIF(device_token, ""), fcm_token) as device_token' 
+                : 'device_token';
+
+            if ($countOnly) {
+                $builder->select('COUNT(*) as count');
+            } else {
+                $builder->select("id, name, phone, {$tokenSelect}, city, 'provider' as user_type");
+            }
+
+            $builder->where('status', 'active');
+            $builder->groupStart();
+                $builder->where('device_token IS NOT NULL AND device_token != "" AND device_token != "default_token"');
+                if ($hasFcmToken) {
+                    $builder->orWhere('fcm_token IS NOT NULL AND fcm_token != "" AND fcm_token != "default_token"');
+                }
+            $builder->groupEnd();
+>>>>>>> origin/main
 
             // Apply segment rules
             if ($target === 'segment' && !empty($rules)) {

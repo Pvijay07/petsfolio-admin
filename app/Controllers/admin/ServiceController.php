@@ -5,6 +5,11 @@ namespace App\Controllers\admin;
 use App\Controllers\BaseController;
 use App\Libraries\PushNotify;
 use App\Models\ServiceModel;
+<<<<<<< HEAD
+=======
+use Exception;
+use Throwable;
+>>>>>>> origin/main
 
 class ServiceController extends BaseController
 {
@@ -142,9 +147,15 @@ class ServiceController extends BaseController
     $status  = $this->request->getPost('status');
     $module  = $this->request->getPost('module');
     $queryId = $this->request->getPost('queryId');
+<<<<<<< HEAD
    if($module=='service_providers'){
       $check = $this->serviceModel->checkProviderJobStatus($id);
       if($check && $status=='inactive'){
+=======
+    if ($module == 'service_providers') {
+      $check = $this->serviceModel->checkProviderJobStatus($id);
+      if ($check && $status == 'inactive') {
+>>>>>>> origin/main
         return $this->response->setJSON(['status' => false, 'message' => 'This service provider is currently assigned to an active job']);
       }
     }
@@ -189,10 +200,19 @@ class ServiceController extends BaseController
   }
   public function sendNotification()
   {
+<<<<<<< HEAD
     $ids     = $this->request->getPost('id');
     $title   = $this->request->getPost('title');
     $message = $this->request->getPost('message');
     $module  = $this->request->getPost('module');
+=======
+    $ids        = $this->request->getPost('id');
+    $title      = $this->request->getPost('title');
+    $message    = $this->request->getPost('message');
+    $module     = $this->request->getPost('module');
+    $queueOnly  = $this->request->getPost('queue_only');
+    $routeName  = $this->request->getPost('route_name');
+>>>>>>> origin/main
 
     if (empty($ids) || !$title || !$message) {
       return $this->response->setJSON([
@@ -217,13 +237,17 @@ class ServiceController extends BaseController
     }
 
     if (!is_array($ids)) {
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
       $ids = [$ids];
     }
 
     foreach ($ids as $id) {
       $result = $this->serviceModel->getUser($id, $module);
 
+<<<<<<< HEAD
       if ($result && !empty($result->device_token)) {
         $tokens[] = $result->device_token;
       } else {
@@ -240,14 +264,103 @@ class ServiceController extends BaseController
 
         $response     = $notify->notifyMultipleParallel($tokens, $title, $message);
         $successCount = count($tokens);
+=======
+      if ($result && !empty($result->device_token) && $result->device_token !== 'default_token') {
+        $tokens[] = $result->device_token;
+      } else {
+        $errors[] = "User ID $id not found or missing device token";
+      }
+    }
+
+    $isQueue = ($queueOnly === '1' || $queueOnly === 1 || $queueOnly === true || $queueOnly === 'true' || $queueOnly === 'on');
+
+    if (!empty($tokens)) {
+      if ($isQueue) {
+        $db = \Config\Database::connect();
+        $inserted = $db->table('notification_queue')->insert([
+          'tokens'       => json_encode(array_values($tokens)),
+          'title'        => $title,
+          'message'      => $message,
+          'priority'     => 'high',
+          'status'       => 'pending',
+          'scheduled_at' => date('Y-m-d H:i:s'),
+          'attempts'     => 0,
+          'route_name'   => $routeName ?? null,
+          'created_at'   => date('Y-m-d H:i:s'),
+          'updated_at'   => date('Y-m-d H:i:s')
+        ]);
+        $successCount = count($tokens);
+
+        return $this->response->setJSON([
+          'status'   => $inserted ? true : false,
+          'is_queue' => true,
+          'message'  => "$successCount notification(s) queued successfully for background dispatch",
+          'errors'   => $errors
+        ]);
+      } else {
+        $logModel = new \App\Models\NotificationLogModel();
+        if (count($tokens) === 1) {
+          $response     = $notify->notify($tokens[0], $title, $message);
+          $isSent       = ($response['status_code'] ?? 0) === 200;
+          $successCount = $isSent ? 1 : 0;
+          $logModel->createLog([
+              'channel'       => 'push',
+              'title'         => $title,
+              'body'          => $message,
+              'status'        => $isSent ? 'sent' : 'failed',
+              'error_message' => $isSent ? null : ($response['message'] ?? 'Push failed'),
+              'device_token'  => $tokens[0],
+              'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+              'created_at'    => date('Y-m-d H:i:s'),
+          ]);
+        } else {
+          $response     = $notify->notifyMultipleParallel($tokens, $title, $message);
+          $successCount = 0;
+          $batchLogs    = [];
+          foreach ($response as $res) {
+              $tok = $res['token'] ?? '';
+              $isSent = ($res['status'] === 'sent');
+              if ($isSent) {
+                  $successCount++;
+              }
+              $batchLogs[] = [
+                  'channel'       => 'push',
+                  'title'         => $title,
+                  'body'          => $message,
+                  'status'        => $isSent ? 'sent' : 'failed',
+                  'error_message' => $isSent ? null : ($res['error'] ?? 'Push failed'),
+                  'device_token'  => $tok,
+                  'sent_at'       => $isSent ? date('Y-m-d H:i:s') : null,
+                  'created_at'    => date('Y-m-d H:i:s'),
+              ];
+          }
+          if (!empty($batchLogs)) {
+              $logModel->createBatchLogs($batchLogs);
+          }
+        }
+
+        return $this->response->setJSON([
+          'status'   => $successCount > 0,
+          'is_queue' => false,
+          'message'  => "$successCount notification(s) sent successfully",
+          'errors'   => $errors,
+          'response' => $response
+        ]);
+>>>>>>> origin/main
       }
     }
 
     return $this->response->setJSON([
+<<<<<<< HEAD
       'status'   => $successCount > 0,
       'message'  => "$successCount notification(s) sent successfully",
       'errors'   => $errors,
       'response' => $response
+=======
+      'status'   => false,
+      'message'  => "No active device tokens found for selected recipients",
+      'errors'   => $errors
+>>>>>>> origin/main
     ]);
   }
 
@@ -279,6 +392,7 @@ class ServiceController extends BaseController
       'module' => $this->request->getPost('module')
     ];
 
+<<<<<<< HEAD
     // $profileImage = $this->request->getFile('profile_image');
     // if ($profileImage && $profileImage->isValid()) {
     //   if (!$profileImage->hasMoved() && $profileImage->isValid() && $profileImage->getSize() <= 2048000) {
@@ -301,6 +415,8 @@ class ServiceController extends BaseController
     //   }
     // }
 
+=======
+>>>>>>> origin/main
     if ($module === 'service_providers') {
       $status = $this->request->getPost('status') === 'on' ? 'active' : 'inactive';
     } elseif ($module === 'users') {
@@ -456,6 +572,7 @@ class ServiceController extends BaseController
     $data['title'] = 'Banners';
     $data['banners'] = $this->serviceModel->getBanners();
     $data['services'] = $this->serviceModel->getServices();
+<<<<<<< HEAD
     $data['available_screens'] = [
         'all'         => ['label' => 'All Screens', 'icon' => '📱', 'color' => 'primary'],
         'home'        => ['label' => 'Home Screen', 'icon' => '🏠', 'color' => 'info'],
@@ -468,11 +585,22 @@ class ServiceController extends BaseController
         'community'   => ['label' => 'Community',   'icon' => '👥', 'color' => 'purple'],
         'bookings'    => ['label' => 'Bookings',    'icon' => '📅', 'color' => 'orange'],
         'profile'     => ['label' => 'Profile',     'icon' => '👤', 'color' => 'indigo'],
+=======
+
+    // Standard core app screens
+    $data['standardScreens'] = [
+      'all'        => ['label' => 'All Screens', 'badge' => 'primary'],
+      'home'       => ['label' => 'Home Screen', 'badge' => 'info'],
+      'community'  => ['label' => 'Community',   'badge' => 'warning'],
+      'bookings'   => ['label' => 'Bookings',    'badge' => 'secondary'],
+      'profile'    => ['label' => 'Profile',     'badge' => 'dark'],
+>>>>>>> origin/main
     ];
 
     return $this->loadView('admin/banners', $data);
   }
 
+<<<<<<< HEAD
   public function getBannerDetails($id = null)
   {
       if (!$id) {
@@ -634,10 +762,146 @@ class ServiceController extends BaseController
               'csrf_hash'  => csrf_hash(),
           ]);
       }
+=======
+  public function addBanner()
+  {
+    if (!$this->request->isAJAX()) {
+      return $this->response->setJSON([
+        'status' => false,
+        'message' => 'Invalid request'
+      ]);
+    }
+
+    $id = $this->request->getPost('id');
+    $uploadPath = ROOTPATH . 'public/uploads/banners/';
+
+    // Create folder if not exists
+    if (!is_dir($uploadPath)) {
+      mkdir($uploadPath, 0777, true);
+    }
+
+    $mediaType = strtolower(trim((string)$this->request->getPost('media_type')));
+    if ($mediaType !== 'video') {
+      $mediaType = 'image';
+    }
+
+    // Process screens selection
+    $screensInput = $this->request->getPost('screens');
+    if (is_array($screensInput)) {
+      $screensClean = array_values(array_filter(array_unique(array_map('trim', $screensInput))));
+      if (in_array('all', $screensClean) || empty($screensClean)) {
+        $screenStr = 'all';
+      } else {
+        $screenStr = implode(',', $screensClean);
+      }
+    } else {
+      $screenStr = trim((string)($this->request->getPost('screen') ?: 'all'));
+    }
+    if (empty($screenStr)) {
+      $screenStr = 'all';
+    }
+
+    $showPopup = $this->request->getPost('show_popup');
+    $showPopupVal = ($showPopup === '1' || $showPopup === 1 || $showPopup === 'yes') ? '1' : '0';
+
+    $data = [
+      'media_type' => $mediaType,
+      'screen'     => $screenStr,
+      'video_url'  => trim((string)$this->request->getPost('video_url')),
+      'show_popup' => $showPopupVal,
+      'popup_link' => trim((string)$this->request->getPost('popup_link')),
+    ];
+
+    $db = \Config\Database::connect();
+    $existingBanner = null;
+    if ($id) {
+      $existingBanner = $db->table('banners')->where('id', $id)->get()->getRow();
+    }
+
+    // Handle Banner Image / Video Poster
+    $bannerImage = $this->request->getFile('banner_image');
+    if ($bannerImage && $bannerImage->isValid() && !$bannerImage->hasMoved()) {
+      $bannerImageName = $bannerImage->getRandomName();
+      $bannerImage->move($uploadPath, $bannerImageName);
+      $data['banner_image'] = $bannerImageName;
+
+      // Clean old image on replace
+      if ($existingBanner && !empty($existingBanner->banner_image) && file_exists($uploadPath . $existingBanner->banner_image)) {
+        @unlink($uploadPath . $existingBanner->banner_image);
+      }
+    }
+
+    // Handle Banner Video file
+    $bannerVideo = $this->request->getFile('banner_video');
+    if ($bannerVideo && $bannerVideo->isValid() && !$bannerVideo->hasMoved()) {
+      $ext = strtolower($bannerVideo->getClientExtension());
+      $allowedVideoExts = ['mp4', 'webm', 'ogg', 'mov', 'mkv'];
+      if (!in_array($ext, $allowedVideoExts)) {
+        return $this->response->setJSON([
+          'status' => false,
+          'message' => 'Invalid video format. Allowed formats: ' . implode(', ', $allowedVideoExts)
+        ]);
+      }
+
+      $bannerVideoName = $bannerVideo->getRandomName();
+      $bannerVideo->move($uploadPath, $bannerVideoName);
+      $data['banner_video'] = $bannerVideoName;
+
+      // Clean old video on replace
+      if ($existingBanner && !empty($existingBanner->banner_video) && file_exists($uploadPath . $existingBanner->banner_video)) {
+        @unlink($uploadPath . $existingBanner->banner_video);
+      }
+    }
+
+    // Handle Popup Image
+    $popupImage = $this->request->getFile('popup_image');
+    if ($popupImage && $popupImage->isValid() && !$popupImage->hasMoved()) {
+      $popupImageName = $popupImage->getRandomName();
+      $popupImage->move($uploadPath, $popupImageName);
+      $data['popup_image'] = $popupImageName;
+
+      if ($existingBanner && !empty($existingBanner->popup_image) && file_exists($uploadPath . $existingBanner->popup_image)) {
+        @unlink($uploadPath . $existingBanner->popup_image);
+      }
+    }
+
+    // Validation for new banners
+    if (!$id) {
+      if ($mediaType === 'image' && empty($data['banner_image'])) {
+        return $this->response->setJSON([
+          'status' => false,
+          'message' => 'Please upload a banner image.'
+        ]);
+      }
+      if ($mediaType === 'video' && empty($data['banner_video']) && empty($data['video_url'])) {
+        return $this->response->setJSON([
+          'status' => false,
+          'message' => 'Please upload a video file or provide a video URL.'
+        ]);
+      }
+
+      $data['is_active']  = 1;
+      $data['created_at'] = date('Y-m-d H:i:s');
+      $db->table('banners')->insert($data);
+      $status = $db->affectedRows() > 0;
+      $message = $status ? 'Banner created successfully' : 'Failed to create banner';
+    } else {
+      $data['updated_at'] = date('Y-m-d H:i:s');
+      $db->table('banners')->where('id', $id)->update($data);
+      $status = true;
+      $message = 'Banner updated successfully';
+    }
+
+    return $this->response->setJSON([
+      'status' => $status,
+      'message' => $message
+    ]);
+>>>>>>> origin/main
   }
 
   public function deleteBanner()
   {
+<<<<<<< HEAD
       $id = $this->request->getVar('id');
       if (!$id) {
           return $this->response->setJSON([
@@ -681,10 +945,40 @@ class ServiceController extends BaseController
           'csrf_token' => csrf_token(),
           'csrf_hash'  => csrf_hash()
       ]);
+=======
+    $id = $this->request->getPost('id') ?: $this->request->getVar('id');
+    if (!$id) {
+      return $this->response->setJSON(['status' => false, 'message' => 'Banner ID is required']);
+    }
+
+    $banner = $this->serviceModel->getBannerById($id);
+    $result = $this->serviceModel->deleteBanner($id);
+
+    if ($result) {
+      // Clean up files from storage
+      $uploadPath = ROOTPATH . 'public/uploads/banners/';
+      if ($banner) {
+        if (!empty($banner->banner_image) && file_exists($uploadPath . $banner->banner_image)) {
+          @unlink($uploadPath . $banner->banner_image);
+        }
+        if (!empty($banner->banner_video) && file_exists($uploadPath . $banner->banner_video)) {
+          @unlink($uploadPath . $banner->banner_video);
+        }
+        if (!empty($banner->popup_image) && file_exists($uploadPath . $banner->popup_image)) {
+          @unlink($uploadPath . $banner->popup_image);
+        }
+      }
+
+      return $this->response->setJSON(['status' => true, 'message' => 'Banner deleted successfully']);
+    } else {
+      return $this->response->setJSON(['status' => false, 'message' => 'Failed to delete banner']);
+    }
+>>>>>>> origin/main
   }
 
   public function updateBannerStatus()
   {
+<<<<<<< HEAD
       $id = $this->request->getPost('id');
       $status = $this->request->getPost('status');
 
@@ -704,6 +998,16 @@ class ServiceController extends BaseController
               'csrf_hash'  => csrf_hash()
           ]);
       }
+=======
+    $id = $this->request->getPost('id');
+    $status = $this->request->getPost('status');
+    $result = $this->serviceModel->updateBannerStatus($id, $status);
+    if ($result) {
+      return $this->response->setJSON(['status' => true, 'message' => 'Status updated successfully']);
+    } else {
+      return $this->response->setJSON(['status' => false, 'message' => 'Failed to update status']);
+    }
+>>>>>>> origin/main
   }
   public function events()
   {

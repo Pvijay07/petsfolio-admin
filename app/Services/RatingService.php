@@ -52,6 +52,22 @@ class RatingService
             $overallRating = round(($communication + $professionalism + $empathy + $compliance) / 4, 1);
         }
 
+<<<<<<< HEAD
+=======
+        // Enforce score penalty for missing mandatory verification questions
+        $qaData = $rawAnalysis['verification_qa'] ?? null;
+        if (is_string($qaData)) {
+            $qaData = json_decode($qaData, true);
+        }
+        if (is_array($qaData) && !empty($qaData['missed_mandatory_questions'])) {
+            $missedCount = count($qaData['missed_mandatory_questions']);
+            $coveragePct = (float)($qaData['question_coverage_pct'] ?? 100.0);
+            $maxScore = round(max(1.0, 10.0 - ($missedCount * 0.6)), 1);
+            $overallRating = min($overallRating, $maxScore);
+            $compliance = min($compliance, max(1, (int)round($coveragePct / 10.0)));
+        }
+
+>>>>>>> origin/main
         // Cap overall for abusive calls
         if ($hasAbuse) {
             $overallRating = min($overallRating, 4.0);
@@ -81,6 +97,14 @@ class RatingService
         }
 
         $qaScore = isset($rawAnalysis['qa_score']) ? (float)$rawAnalysis['qa_score'] : $overallRating;
+<<<<<<< HEAD
+=======
+        if (is_array($qaData) && !empty($qaData['missed_mandatory_questions'])) {
+            $missedCount = count($qaData['missed_mandatory_questions']);
+            $maxScore = round(max(1.0, 10.0 - ($missedCount * 0.6)), 1);
+            $qaScore = min($qaScore, $maxScore);
+        }
+>>>>>>> origin/main
         if ($hasAbuse) {
             $qaScore = min($qaScore, 3.0);
         }
@@ -129,6 +153,10 @@ class RatingService
                 'has_abuse'             => $hasAbuse,
                 'abuse_instances'       => json_encode($abuseInstances),
                 'negative_speech_flags' => json_encode($negativeSpeechFlags),
+<<<<<<< HEAD
+=======
+                'verification_qa'       => isset($rawAnalysis['verification_qa']) ? (is_string($rawAnalysis['verification_qa']) ? $rawAnalysis['verification_qa'] : json_encode($rawAnalysis['verification_qa'])) : null,
+>>>>>>> origin/main
                 'risk_score'            => min(10, max(0, $riskScore)),
                 'strengths'             => json_encode($strengths),
                 'weaknesses'            => json_encode($weaknesses),

@@ -10,6 +10,7 @@
   <div class="conatiner-fluid content-inner pb-0" id="page_layout">
     <!-- Modern Header Section -->
     <div class="container-fluid p-0 mb-4">
+<<<<<<< HEAD
       <div class="bg-gradient-primary text-white p-5 rounded-3 shadow position-relative overflow-hidden">
         <div class="position-relative z-1">
           <h1 class="h2 fw-bold mb-2 text-white">Dispute Management</h1>
@@ -17,6 +18,30 @@
         </div>
         <i class="bi bi-exclamation-triangle position-absolute end-0 bottom-0 opacity-10"
           style="font-size: 14rem; transform: rotate(12deg); margin-right: -3rem; margin-bottom: -3rem;"></i>
+=======
+      <div class="p-4 p-md-5 rounded-4 shadow-lg position-relative overflow-hidden text-white"
+        style="background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%);">
+        
+        <!-- Subtle glass background circles -->
+        <div class="position-absolute" style="top: -60px; right: -60px; width: 260px; height: 260px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        <div class="position-absolute" style="bottom: -50px; left: 30%; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none;"></div>
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-2.5">
+              <span class="badge rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-2"
+                style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); color: #fecdd3; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 0.8rem;">
+                <i class="bi bi-shield-exclamation text-danger"></i>
+                Dispute Resolution Desk
+              </span>
+            </div>
+            <h1 class="h2 fw-bold text-white mb-2 tracking-tight">Dispute Management</h1>
+            <p class="text-white-50 mb-0 fs-6">
+              Review, mediate, and resolve customer disputes, addon adjustments, and package claims.
+            </p>
+          </div>
+        </div>
+>>>>>>> origin/main
       </div>
     </div>
 
@@ -355,17 +380,28 @@
   }
 
   .modal-header {
+<<<<<<< HEAD
     background: #c6d2ff !important;
     padding: 1.25rem 1.5rem;
     border-bottom: 2px solid #a3b4ff;
+=======
+    background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 25%, #3730a3 60%, #4f46e5 100%) !important;
+    padding: 1.25rem 1.5rem;
+    border-bottom: none;
+>>>>>>> origin/main
     flex-shrink: 0;
   }
 
   .modal-header h3 {
     margin: 0;
     font-size: 1.25rem;
+<<<<<<< HEAD
     font-weight: 600;
     color: #000;
+=======
+    font-weight: 700;
+    color: #ffffff !important;
+>>>>>>> origin/main
   }
 
   .modal-body {
@@ -373,7 +409,11 @@
     overflow-y: auto;
     padding: 1.5rem;
     scrollbar-width: thin;
+<<<<<<< HEAD
     scrollbar-color: #c6d2ff #f1f1f1;
+=======
+    scrollbar-color: #cbd5e1 #f1f1f1;
+>>>>>>> origin/main
   }
 
   .modal-body::-webkit-scrollbar {
@@ -386,12 +426,20 @@
   }
 
   .modal-body::-webkit-scrollbar-thumb {
+<<<<<<< HEAD
     background: #c6d2ff;
+=======
+    background: #cbd5e1;
+>>>>>>> origin/main
     border-radius: 4px;
   }
 
   .modal-body::-webkit-scrollbar-thumb:hover {
+<<<<<<< HEAD
     background: #a3b4ff;
+=======
+    background: #94a3b8;
+>>>>>>> origin/main
   }
 
   .modal-footer {
@@ -456,7 +504,11 @@
 
   .custom-checkbox:hover {
     background: #e9ecef;
+<<<<<<< HEAD
     border-color: #c6d2ff;
+=======
+    border-color: #cbd5e1;
+>>>>>>> origin/main
   }
 
   .custom-checkbox span {
@@ -477,11 +529,16 @@
     color: #2d3436;
     margin: 0 0 1rem 0;
     padding-bottom: 0.5rem;
+<<<<<<< HEAD
     border-bottom: 2px solid #c6d2ff;
+=======
+    border-bottom: 2px solid #e0e7ff;
+>>>>>>> origin/main
   }
 
   /* Action button styling */
   .action-btn {
+<<<<<<< HEAD
     background: #c6d2ff;
     color: #000;
     border: none;
@@ -489,16 +546,31 @@
     border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 500;
+=======
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px solid #c7d2fe;
+    padding: 0.4rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+>>>>>>> origin/main
     transition: all 0.2s;
   }
 
   .action-btn:hover {
+<<<<<<< HEAD
     background: #a3b4ff;
+=======
+    background: #4f46e5;
+    color: #ffffff;
+>>>>>>> origin/main
     transform: translateY(-1px);
   }
 
   /* Table improvements */
   .table th {
+<<<<<<< HEAD
     background: #c6d2ff !important;
     color: #000 !important;
     font-weight: 600;
@@ -507,6 +579,16 @@
     letter-spacing: 0.05em;
     padding: 1rem !important;
     border-bottom: 2px solid #a3b4ff !important;
+=======
+    background: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 1rem !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+>>>>>>> origin/main
   }
 
   .table td {
@@ -516,7 +598,11 @@
   }
 
   .table tbody tr:hover {
+<<<<<<< HEAD
     background-color: rgba(198, 210, 255, 0.1) !important;
+=======
+    background-color: rgba(99, 102, 241, 0.04) !important;
+>>>>>>> origin/main
   }
 
   /* Avatar styles */
@@ -524,6 +610,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+<<<<<<< HEAD
     background: #c6d2ff;
     display: flex;
     align-items: center;
@@ -531,6 +618,16 @@
     font-weight: 600;
     color: #000;
     margin-right: 0.75rem;
+=======
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #ffffff !important;
+    margin-right: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+>>>>>>> origin/main
   }
 
   /* Responsive */

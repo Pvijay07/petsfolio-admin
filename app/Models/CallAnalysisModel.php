@@ -32,7 +32,10 @@ class CallAnalysisModel extends Model
         'qa_score',
         'is_escalated',
         'has_complaint',
+<<<<<<< HEAD
         'has_abuse',
+=======
+>>>>>>> origin/main
         'risk_score',
         'ai_rating_category',
         'off_platform_payment',
@@ -54,6 +57,14 @@ class CallAnalysisModel extends Model
         'highlighted_conversations',
         'conversation_segments',
         'alerts',
+<<<<<<< HEAD
+=======
+        'has_abuse',
+        'abuse_instances',
+        'negative_speech_flags',
+        'verification_qa',
+        'verifier_id',
+>>>>>>> origin/main
         'created_at',
         'updated_at'
     ];
@@ -83,8 +94,15 @@ class CallAnalysisModel extends Model
         $builder = $this->db->table('call_recordings cr')
             ->select("
                 cr.verifier_id,
+<<<<<<< HEAD
                 COALESCE(e.name, 'Unassigned / Automated System') as verifier_name,
                 e.email as verifier_email,
+=======
+                e.name as verifier_name,
+                e.email as verifier_email,
+                e.role_id,
+                r.name as role_name,
+>>>>>>> origin/main
                 COUNT(cr.id) as calls_completed,
                 ROUND(AVG(cr.duration), 1) as avg_duration_seconds,
                 ROUND(AVG(ca.overall_rating), 2) as avg_verification_score,
@@ -95,8 +113,21 @@ class CallAnalysisModel extends Model
                 SUM(CASE WHEN ca.has_complaint = 1 THEN 1 ELSE 0 END) as complaint_count
             ")
             ->join('call_analysis ca', 'ca.recording_id = cr.id', 'left')
+<<<<<<< HEAD
             ->join('employees e', 'e.id = cr.verifier_id', 'left')
             ->where('cr.status', 'completed');
+=======
+            ->join('employees e', 'e.id = cr.verifier_id', 'inner')
+            ->join('roles r', 'r.id = e.role_id', 'left')
+            ->where('cr.status', 'completed')
+            ->where("(cr.call_type NOT IN ('client_provider', 'client_sp') AND (cr.customer_id IS NULL OR cr.customer_id = 0))")
+            ->where("(cr.call_type = 'verification' OR cr.call_type IS NULL OR cr.call_type = '' OR cr.call_type = 'inbound')")
+            ->where("cr.verifier_id IS NOT NULL")
+            ->where("cr.verifier_id >", 0)
+            ->where("e.id IS NOT NULL")
+            ->where("(e.role_id = 10 OR r.name LIKE '%Verification%')")
+            ->where("COALESCE(e.role_id, 0) != 13");
+>>>>>>> origin/main
 
         if ($verifierId) {
             $builder->where('cr.verifier_id', $verifierId);
@@ -135,6 +166,13 @@ class CallAnalysisModel extends Model
             $mins = floor($seconds / 60);
             $secs = $seconds % 60;
             $row['formatted_duration'] = sprintf('%dm %02ds', $mins, $secs);
+<<<<<<< HEAD
+=======
+
+            // Tag executive role type as Verification Executive
+            $row['executive_type'] = 'verification';
+            $row['role_title']     = 'Verification Executive';
+>>>>>>> origin/main
         }
 
         return $rows;

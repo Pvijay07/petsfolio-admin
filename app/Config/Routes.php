@@ -27,11 +27,17 @@ $routes->get('mongo-diagnostic', 'admin\AiAnalysisController::mongoDiagnostic');
 $routes->get('call-analysis/next-job', 'admin\CallAnalysisController::nextJob');
 $routes->post('call-analysis/complete-job', 'admin\CallAnalysisController::completeJob');
 $routes->post('api/upload-call-recording', 'admin\CallAnalysisController::uploadCallRecording');
+<<<<<<< HEAD
 
 // Public Analytics Event Ingestion API (for Mobile Apps and Web Frontend)
 $routes->match(['POST', 'OPTIONS'], 'api/analytics/events', 'AnalyticsApiController::recordEvents');
 $routes->match(['POST', 'OPTIONS'], 'analytics/events', 'AnalyticsApiController::recordEvents');
 
+=======
+$routes->get('api/re-analyze/(:num)', 'admin\CallAnalysisController::reAnalyzeRecording/$1');
+$routes->get('api/analysis-status/(:num)', 'admin\CallAnalysisController::getAnalysisStatus/$1');
+$routes->get('api/list-recordings', 'admin\CallAnalysisController::listRecentRecordings');
+>>>>>>> origin/main
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
   // Admin Panels
@@ -60,6 +66,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('breeds/(:any)', 'admin\AdminController::breeds/$1');
   $routes->get('notifications', 'admin\AdminController::notifications', ['filter' => 'permission:notifications.view']);
   $routes->post('updateProfile', 'admin\AdminController::updateProfile');
+<<<<<<< HEAD
+=======
+  $routes->match(['GET', 'POST'], 'clean-unwanted-assets', 'admin\AdminController::cleanUnwantedAssets');
+>>>>>>> origin/main
   $routes->post('updatePassword', 'admin\AdminController::updatePassword');
   $routes->get('getMonthlyRevenue', 'admin\AdminController::getMonthlyRevenue');
 
@@ -146,6 +156,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('bookings/(:any)', 'admin\BookingController::bookings/$1');
   $routes->get('bookingRequests', 'admin\BookingController::bookingRequests', ['filter' => 'permission:bookings.view_requests']);
   $routes->post('bookings/notifyNearbyProviders', 'admin\BookingController::notifyNearbyProviders');
+<<<<<<< HEAD
+=======
+  $routes->post('bookings/sendBulkNotifications', 'admin\BookingController::sendBulkNotifications');
+>>>>>>> origin/main
   $routes->get('premiumRequests', 'admin\BookingController::premiumRequests');
   $routes->post('assignPremiumProvider', 'admin\BookingController::assignPremiumProvider');
   $routes->get('grooming/disputes', 'admin\BookingController::groomingDisputes');
@@ -167,7 +181,16 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('call-verification-payouts/bank-details/(:num)', 'admin\CallVerificationPayoutController::getExecutiveBankDetails/$1');
   $routes->post('call-verification-payouts/send-bank-otp', 'admin\CallVerificationPayoutController::sendBankOtp');
   $routes->post('call-verification-payouts/verify-bank-otp', 'admin\CallVerificationPayoutController::verifyBankOtp');
+<<<<<<< HEAD
   
+=======
+
+  // Aadhaar / DigiLocker Verification Logs
+  $routes->get('aadhaar-verification-logs', 'admin\IdentityVerificationController::index', ['filter' => 'permission:providers.view']);
+  $routes->get('aadhaar-verification-logs/details/(:num)', 'admin\IdentityVerificationController::getAttemptDetails/$1', ['filter' => 'permission:providers.view']);
+  $routes->get('aadhaar-verification-logs/export', 'admin\IdentityVerificationController::exportCsv', ['filter' => 'permission:providers.view']);
+
+>>>>>>> origin/main
   $routes->post('admin/update_status', 'admin\PaymentController::updateStatus');
   $routes->post('admin/upload_receipt', 'admin\ProviderController::uploadReceipt');
   $routes->post('update-provider-call-status', 'admin\ProviderController::updateProviderCall');
@@ -192,8 +215,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->post('addBanner', 'admin\ServiceController::addBanner');
   $routes->post('deleteBanner', 'admin\ServiceController::deleteBanner');
   $routes->post('updateBannerStatus', 'admin\ServiceController::updateBannerStatus');
+<<<<<<< HEAD
   $routes->match(['get', 'post'], 'getBannerDetails', 'admin\ServiceController::getBannerDetails');
   $routes->match(['get', 'post'], 'getBannerDetails/(:num)', 'admin\ServiceController::getBannerDetails/$1');
+=======
+>>>>>>> origin/main
   $routes->get('events', 'admin\ServiceController::events', ['filter' => 'permission:events.view']);
   $routes->get('tutorials', 'admin\AdminController::tutorials', ['filter' => 'permission:tutorials.view']);
   $routes->post('tutorials/saveTutorial', 'admin\AdminController::saveTutorial');
@@ -206,6 +232,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('trackings', 'admin\BookingController::trackings');
   $routes->get('suspicious-visits', 'admin\AdminController::suspiciousVisits');
 
+<<<<<<< HEAD
   // Customer Journey Funnel & Event Analytics
   $routes->get('customer-journey', 'admin\AnalyticsController::index');
   $routes->get('analytics/journey', 'admin\AnalyticsController::index');
@@ -216,6 +243,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->post('analytics/funnels/save', 'admin\AnalyticsController::saveFunnel');
   $routes->post('analytics/funnels/delete/(:num)', 'admin\AnalyticsController::deleteFunnel/$1');
   $routes->post('analytics/generate-sample-data', 'admin\AnalyticsController::generateSampleData');
+=======
+  // Activity & Audit Trail
+  $routes->get('audit-logs', 'admin\AuditLogController::index', ['filter' => 'permission:audit_logs.view']);
+  $routes->get('audit-logs/data', 'admin\AuditLogController::data', ['filter' => 'permission:audit_logs.view']);
+  $routes->get('audit-logs/details/(:num)', 'admin\AuditLogController::details/$1', ['filter' => 'permission:audit_logs.view']);
+>>>>>>> origin/main
 
   $routes->get('app-stats', 'admin\AppStatsController::index');
   $routes->get('app-stats/update', 'admin\AppStatsController::updateStats');
@@ -229,6 +262,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
   $routes->get('supportticket/(:num)', 'admin\AdminController::supportChat/$1');
   $routes->get('sp-supportticket/(:num)', 'admin\AdminController::spSupportChat/$1');
+<<<<<<< HEAD
+=======
+  $routes->post('supportticket/updateStatus', 'admin\AdminController::updateTicketStatus');
+>>>>>>> origin/main
   $routes->get('support', 'admin\AdminController::support', ['filter' => 'permission:support.client']);
   $routes->get('unupdatedPaidBookings', 'admin\AdminController::unupdatedPaidBookings');
 
@@ -259,6 +296,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->post('insurance/addPolicy', 'Insurance\InsuranceManagement::addPolicy');
   $routes->post('insurance/addEnquiry', 'Insurance\InsuranceManagement::addEnquiry');
   $routes->post('insurance/updateEnquiryStatus', 'Insurance\InsuranceManagement::updateEnquiryStatus');
+<<<<<<< HEAD
+=======
+  $routes->post('insurance/deleteEnquiry', 'Insurance\InsuranceManagement::deleteEnquiry');
+>>>>>>> origin/main
   $routes->post('insurance/searchActivePolicies', 'Insurance\InsuranceManagement::searchActivePolicies');
   $routes->post('insurance/addClaim', 'Insurance\InsuranceManagement::addClaim');
   $routes->get('insurance/getDogBreeds', 'Insurance\InsuranceManagement::getDogBreeds');
@@ -282,6 +323,45 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('export', 'admin\Tasks::export');
   });
 
+<<<<<<< HEAD
+=======
+  // Version Release Management Routes
+  $routes->group('version-releases', function ($routes) {
+    $routes->get('/', 'admin\VersionReleaseController::index');
+    $routes->get('details/(:num)', 'admin\VersionReleaseController::details/$1');
+    $routes->post('store', 'admin\VersionReleaseController::store');
+    $routes->post('update/(:num)', 'admin\VersionReleaseController::update/$1');
+    $routes->post('delete/(:num)', 'admin\VersionReleaseController::delete/$1');
+    $routes->post('status-update/(:num)', 'admin\VersionReleaseController::updateStatus/$1');
+
+    // Updates
+    $routes->post('updates/save', 'admin\VersionReleaseController::saveUpdate');
+    $routes->post('updates/delete/(:num)', 'admin\VersionReleaseController::deleteUpdate/$1');
+
+    // Checklists
+    $routes->post('checklist/item-update', 'admin\VersionReleaseController::updateChecklistItem');
+    $routes->post('checklist/populate-defaults/(:num)', 'admin\VersionReleaseController::populateDefaultChecklists/$1');
+
+    // Production Backup
+    $routes->post('backup/save', 'admin\VersionReleaseController::saveBackup');
+
+    // Approvals
+    $routes->post('approvals/submit', 'admin\VersionReleaseController::submitApproval');
+
+    // Approval Email
+    $routes->get('email/preview/(:num)', 'admin\VersionReleaseController::previewEmail/$1');
+    $routes->post('email/send/(:num)', 'admin\VersionReleaseController::sendApprovalEmail/$1');
+
+    // Emergency Rollback
+    $routes->post('rollback/initiate', 'admin\VersionReleaseController::initiateRollback');
+    $routes->post('rollback/complete/(:num)', 'admin\VersionReleaseController::completeRollback/$1');
+
+    // Threads & Comments
+    $routes->post('comments/add', 'admin\VersionReleaseController::addComment');
+    $routes->get('diff/(:num)/(:num)', 'admin\VersionReleaseController::compareVersions/$1/$2');
+  });
+
+>>>>>>> origin/main
   // API Routes for AJAX calls
   $routes->group('api', ['namespace' => 'App\Controllers\Api'], function ($routes) {
     $routes->group('tasks', function ($routes) {
@@ -384,9 +464,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 
   $routes->get('chat-history', 'admin\AiAnalysisController::chatHistory', ['filter' => 'permission:chat_history.view']);
+<<<<<<< HEAD
   $routes->get('chat-history/messages/(:any)', 'admin\AiAnalysisController::chatMessages/$1');
   $routes->get('insurance/chat-history', 'Insurance\InsuranceManagement::chatHistory', ['filter' => 'permission:chat_history.view']);
   $routes->get('insurance/chat-history/messages/(:any)', 'Insurance\InsuranceManagement::chatMessages/$1');
+=======
+  $routes->get('chat-history/messages/(:any)', 'admin\AiAnalysisController::getInsuranceMessages/$1');
+>>>>>>> origin/main
   $routes->get('sp-payments', 'admin\BookingController::spPayments', ['filter' => 'permission:finance.sp_payments']);
   $routes->post('service-verification', 'admin\ProviderController::submitServiceVerification');
   $routes->get('provider/verify/(:num)/(:num)', 'admin\ProviderController::verify/$1/$2');
@@ -397,7 +481,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('delete-rule/(:num)', 'admin\ProviderController::deleteRule/$1');
 
 
+<<<<<<< HEAD
     // Call Record Analysis API
+=======
+  // Call Record Analysis API
+>>>>>>> origin/main
   $routes->post('analyze-call-record', 'admin\CallRecordController::analyzeCallRecord');
   $routes->post('analyze-call-record-batch', 'admin\CallRecordController::analyzeCallRecordBatch');
   $routes->get('get-call-record-batch-status', 'admin\CallRecordController::getBatchStatus');
@@ -417,7 +505,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('verification-questions/delete/(:num)', 'admin\VerificationQuestionController::delete/$1');
 
 
+<<<<<<< HEAD
 // Admin UI Route
+=======
+  // Admin UI Route
+>>>>>>> origin/main
   $routes->get('walker-leaderboard', 'admin\WalkerStatsController::leaderboard', ['filter' => 'permission:walker.leaderboard']);
   $routes->get('walkerstats/predictions/(:num)', 'admin\WalkerStatsController::predictions/$1');
   $routes->get('walkerstats/ai-insights', 'admin\WalkerStatsController::aiInsights');
@@ -426,6 +518,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   // SP Management Routes
   $routes->get('sp-management', 'admin\SPManagementController::index', ['filter' => 'permission:walker.sp_management']);
   $routes->get('sp-management/stats', 'admin\SPManagementController::getDashboardStats');
+<<<<<<< HEAD
+=======
+  $routes->get('sp-management/city-data', 'admin\SPManagementController::getCityDataAjax');
+>>>>>>> origin/main
   $routes->post('sp-management/simulate-match', 'admin\SPManagementController::runMatchingSimulation');
   $routes->get('sp-management/evaluate-score/(:num)', 'admin\SPManagementController::runScoringEvaluation/$1');
   $routes->get('sp-management/ai-insights', 'admin\SPManagementController::aiInsights');
@@ -438,6 +534,7 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
   $routes->get('cli/evaluate-walker-tiers', 'Cli\WalkerTierEvaluator::evaluate');
 
   // Unprotected AI Worker Machine-to-Machine Endpoints
+<<<<<<< HEAD
 $routes->get('call-analysis/next-job', 'admin\CallAnalysisController::nextJob');
 $routes->post('call-analysis/complete-job', 'admin\CallAnalysisController::completeJob');
 $routes->get('client-call-analysis/next-job', 'admin\ClientCallAnalysisController::nextJob');
@@ -445,6 +542,15 @@ $routes->post('client-call-analysis/complete-job', 'admin\ClientCallAnalysisCont
 
 
 // Call Record Analysis API
+=======
+  $routes->get('call-analysis/next-job', 'admin\CallAnalysisController::nextJob');
+  $routes->post('call-analysis/complete-job', 'admin\CallAnalysisController::completeJob');
+  $routes->get('client-call-analysis/next-job', 'admin\ClientCallAnalysisController::nextJob');
+  $routes->post('client-call-analysis/complete-job', 'admin\ClientCallAnalysisController::completeJob');
+
+
+  // Call Record Analysis API
+>>>>>>> origin/main
   $routes->post('analyze-call-record', 'admin\CallRecordController::analyzeCallRecord');
   $routes->post('analyze-call-record-batch', 'admin\CallRecordController::analyzeCallRecordBatch');
   $routes->get('get-call-record-batch-status', 'admin\CallRecordController::getBatchStatus');
@@ -463,6 +569,22 @@ $routes->post('client-call-analysis/complete-job', 'admin\ClientCallAnalysisCont
   $routes->post('client-call-analysis/upload', 'admin\ClientCallAnalysisController::upload');
   $routes->get('client-call-analysis/analytics', 'admin\ClientCallAnalysisController::getAnalyticsData');
   $routes->post('client-call-analysis/save-admin-review', 'admin\ClientCallAnalysisController::saveAdminReview');
+<<<<<<< HEAD
+=======
+  $routes->get('client-call-analysis/case-details/(:num)', 'admin\ClientCallAnalysisController::caseDetails/$1');
+  $routes->post('client-call-analysis/confirm-violation', 'admin\ClientCallAnalysisController::confirmViolation');
+  $routes->post('client-call-analysis/dismiss-violation', 'admin\ClientCallAnalysisController::dismissViolation');
+  $routes->post('client-call-analysis/trigger-violation', 'admin\ClientCallAnalysisController::triggerViolation');
+  $routes->match(['GET', 'POST'], 'client-call-analysis/clear-all', 'admin\ClientCallAnalysisController::clearCalls');
+
+  // Chat History
+  $routes->get('chat-history', 'admin\AiAnalysisController::chatHistory');
+  $routes->get('chat-history/messages/(:any)', 'admin\AiAnalysisController::getInsuranceMessages/$1');
+
+  // Client & Service Provider Agreements
+  $routes->get('agreements', 'admin\AgreementController::index');
+  $routes->get('agreements/details/(:segment)/(:num)', 'admin\AgreementController::getDetails/$1/$2');
+>>>>>>> origin/main
 });
 
 $routes->get('firestore/getMessages/(:any)/(:any)/(:any)', 'FirestoreController::getAllChats/$1/$2/$3');
@@ -485,6 +607,7 @@ $routes->group('', ['namespace' => 'App\Controllers\admin', 'filter' => 'permiss
   $routes->post('update-whatsapp-status', 'EventController::updateWhatsappStatus');
 });
 // Notification Campaign Manager
+<<<<<<< HEAD
   $routes->group('notification-manager', ['filter' => 'permission:notifications.campaigns'], function ($routes) {
     $routes->get('/', 'admin\NotificationCampaignController::index');
     $routes->get('templates', 'admin\NotificationCampaignController::templates');
@@ -554,3 +677,22 @@ $routes->group('releases', ['filter' => 'permission:release_management.view'], f
     $routes->get('audit-log/(:num)', 'admin\ReleaseManagementController::getAuditLog/$1');
     $routes->get('version-thread/(:num)', 'admin\ReleaseManagementController::getVersionThread/$1');
 });
+=======
+$routes->group('notification-manager', ['filter' => 'permission:notifications.campaigns'], function ($routes) {
+  $routes->get('/', 'admin\NotificationCampaignController::index');
+  $routes->get('templates', 'admin\NotificationCampaignController::templates');
+  $routes->post('templates/save', 'admin\NotificationCampaignController::saveTemplate');
+  $routes->post('templates/delete', 'admin\NotificationCampaignController::deleteTemplate');
+  $routes->get('templates/variables', 'admin\NotificationCampaignController::getTemplateVariables');
+  $routes->post('templates/preview', 'admin\NotificationCampaignController::previewTemplate');
+
+  $routes->get('campaigns', 'admin\NotificationCampaignController::campaigns');
+  $routes->post('campaigns/save', 'admin\NotificationCampaignController::saveCampaign');
+  $routes->post('campaigns/send', 'admin\NotificationCampaignController::sendCampaign');
+  $routes->post('campaigns/cancel', 'admin\NotificationCampaignController::cancelCampaign');
+  $routes->post('campaigns/preview-audience', 'admin\NotificationCampaignController::previewAudience');
+
+  $routes->get('logs', 'admin\NotificationCampaignController::logs');
+  $routes->get('analytics', 'admin\NotificationCampaignController::analytics');
+});
+>>>>>>> origin/main

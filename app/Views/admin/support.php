@@ -74,7 +74,11 @@
     <div class="card border-0 shadow-sm mb-4 rounded-3">
       <div class="card-body p-3">
         <div class="row g-3 align-items-center">
+<<<<<<< HEAD
           <div class="col-md-5">
+=======
+          <div class="col-md-9">
+>>>>>>> origin/main
             <div class="input-group">
               <span class="input-group-text bg-black border-end-0 text-white">
                 <i class="bi bi-search"></i>
@@ -95,6 +99,7 @@
               <label class="text-muted small ms-2">entries</label>
             </div>
           </div>
+<<<<<<< HEAD
           <div class="col-md-2">
             <select class="form-select" id="categoryFilter">
               <option value="">All Categories</option>
@@ -110,6 +115,9 @@
               <i class="bi bi-x-circle me-1"></i>Clear
             </button>
           </div>
+=======
+
+>>>>>>> origin/main
         </div>
       </div>
     </div>
@@ -145,7 +153,11 @@
                     return $item->status != 'resolved';
                   });
                   foreach ($openTickets as $support):
+<<<<<<< HEAD
                     ?>
+=======
+                  ?>
+>>>>>>> origin/main
                     <tr class="support-row open-ticket" data-status="open" data-category="<?= esc($support->category) ?>">
                       <td class="text-center py-2">
                         <div class="fw-bold text-dark"><?= $i ?></div>
@@ -203,6 +215,7 @@
                         </div>
                       </td>
                       <td class="py-2 text-center">
+<<<<<<< HEAD
                         <div class="d-flex justify-content-center gap-2">
                           <a href="<?= base_url('supportticket/' . $support->id) ?>"
                             class="btn btn-outline-primary btn-sm px-3 py-2"
@@ -213,6 +226,21 @@
                       </td>
                     </tr>
                     <?php
+=======
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                          <a href="<?= base_url('supportticket/' . $support->id) ?>"
+                            class="btn btn-outline-primary btn-sm px-3 py-2 d-inline-flex align-items-center gap-1 rounded-pill"
+                            style="background: #c6d2ff !important; border-color: #a3b4ff !important; color: #1a1a1a !important;">
+                            <i class="bi bi-chat-left-text"></i> Chat
+                          </a>
+                          <!-- <span class="badge rounded-pill px-2 py-1" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; border: 1px solid rgba(79, 70, 229, 0.2); font-size: 0.72rem;" title="AI Mode & Human Mode Active">
+                            <i class="bi bi-robot text-warning"></i> AI
+                          </span> -->
+                        </div>
+                      </td>
+                    </tr>
+                  <?php
+>>>>>>> origin/main
                     $i++;
                   endforeach;
                   ?>
@@ -255,7 +283,11 @@
                     return $item->status == 'resolved';
                   });
                   foreach ($closedTickets as $support):
+<<<<<<< HEAD
                     ?>
+=======
+                  ?>
+>>>>>>> origin/main
                     <tr class="support-row closed-ticket" data-status="closed"
                       data-category="<?= esc($support->category) ?>">
                       <td class="text-center py-2">
@@ -314,7 +346,11 @@
                         </div>
                       </td>
                     </tr>
+<<<<<<< HEAD
                     <?php
+=======
+                  <?php
+>>>>>>> origin/main
                     $j++;
                   endforeach;
                   ?>
@@ -813,15 +849,24 @@
 
   // Tab change handler
   document.querySelectorAll('.nav-tabs .nav-link').forEach(tab => {
+<<<<<<< HEAD
     tab.addEventListener('click', function () {
+=======
+    tab.addEventListener('click', function() {
+>>>>>>> origin/main
       // Clear filters when switching tabs
       clearFilters();
     });
   });
 
   // Row click handler
+<<<<<<< HEAD
   document.querySelectorAll(".support-row").forEach(function (row) {
     row.addEventListener("click", function (e) {
+=======
+  document.querySelectorAll(".support-row").forEach(function(row) {
+    row.addEventListener("click", function(e) {
+>>>>>>> origin/main
       // Only navigate if clicked outside the action button
       if (!e.target.closest('.btn')) {
         const link = this.querySelector('a.btn');
@@ -832,18 +877,30 @@
     });
 
     // Hover effect
+<<<<<<< HEAD
     row.addEventListener("mouseenter", function () {
+=======
+    row.addEventListener("mouseenter", function() {
+>>>>>>> origin/main
       this.style.backgroundColor = "rgba(99, 102, 241, 0.03)";
       this.style.cursor = "pointer";
     });
 
+<<<<<<< HEAD
     row.addEventListener("mouseleave", function () {
+=======
+    row.addEventListener("mouseleave", function() {
+>>>>>>> origin/main
       this.style.backgroundColor = "";
     });
   });
 
   // DOM Ready
+<<<<<<< HEAD
   document.addEventListener('DOMContentLoaded', function () {
+=======
+  document.addEventListener('DOMContentLoaded', function() {
+>>>>>>> origin/main
     // Initialize pagination manager
     window.paginationManager = new PaginationManager();
 
