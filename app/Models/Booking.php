@@ -11,15 +11,15 @@ class Booking extends Model
     {
         $this->db = \Config\Database::connect();
     }
-    public function getWalkingBookings()
+    public function getWalkingBookings($booking_status = 'New', $approval = null)
     {
         $builder = $this->db->table('walking_service_bookings');
 
         $builder->select('walking_service_bookings.*');
         $builder->select('packages.package_name AS package_name');
         $builder->select('users.name AS user_name, users.phone AS user_phone, users.has_app_installed');
-        $builder->select("GROUP_CONCAT(COALESCE(user_pets.name, '') SEPARATOR ', ') AS pet_names");
-        $builder->select("GROUP_CONCAT(COALESCE(user_pets.breed, '') SEPARATOR ', ') AS pet_breeds");
+        $builder->select("GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '') SEPARATOR ', ') AS pet_names");
+        $builder->select("GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '') SEPARATOR ', ') AS pet_breeds");
         $builder->select('user_addresses.city,
                       user_addresses.state,
                       user_addresses.address,
@@ -33,13 +33,33 @@ class Booking extends Model
         $builder->join('packages', 'packages.id = walking_service_bookings.package_id', 'left');
         $builder->join('users', 'users.id = walking_service_bookings.user_id', 'left');
         $builder->join('booking_pets', 'booking_pets.booking_id = walking_service_bookings.id', 'left');
+        $builder->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = walking_service_bookings.original_booking_id', 'left');
         $builder->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left');
+        $builder->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left');
         $builder->join('user_addresses', 'user_addresses.id = walking_service_bookings.address_id', 'left');
         $builder->join('services', 'services.id = walking_service_bookings.service_id', 'left');
 
-        // WHERE status = 'New' AND type != 'premium'
-        $builder->where('walking_service_bookings.status', 'New')
-            ->where('walking_service_bookings.type !=', 'premium');
+        if ($booking_status === 'New') {
+            $builder->groupStart()
+                ->groupStart()
+                    ->where('walking_service_bookings.status', 'New')
+                    ->groupStart()
+                        ->where('walking_service_bookings.type !=', 'premium')
+                        ->orWhere('walking_service_bookings.type', null)
+                    ->groupEnd()
+                ->groupEnd()
+                ->orGroupStart()
+                    ->where('walking_service_bookings.type', 'extend')
+                    ->whereIn('walking_service_bookings.status', ['New', 'onHold'])
+                ->groupEnd()
+            ->groupEnd();
+        } else {
+            $builder->where('walking_service_bookings.status', $booking_status);
+        }
+
+        if ($approval !== null) {
+            $builder->where('walking_service_bookings.approval', $approval);
+        }
 
         // AND (is_deleted = 0 OR is_deleted IS NULL)
         $builder->groupStart()
@@ -143,14 +163,25 @@ class Booking extends Model
         }
         return $grooming;
     }
-    public function getBookingAddons($id, $service_id)
+    public function getBookingAddons($id, $service_id, $original_booking_id = null)
     {
-        return $this->db->table('booking_addons')
+        $addons = $this->db->table('booking_addons')
             ->select('booking_addons.addon')
             ->where('booking_addons.booking_id', $id)
             ->where('booking_addons.service_id', $service_id)
             ->get()
             ->getResult();
+
+        if (empty($addons) && !empty($original_booking_id)) {
+            $addons = $this->db->table('booking_addons')
+                ->select('booking_addons.addon')
+                ->where('booking_addons.booking_id', $original_booking_id)
+                ->where('booking_addons.service_id', $service_id)
+                ->get()
+                ->getResult();
+        }
+
+        return $addons;
     }
     public function getTotalQuotes($booking_id, $service_id)
     {
@@ -1853,26 +1884,39 @@ class Booking extends Model
     }
     public function getTrainingBookings($booking_status)
     {
-        return $this->db->table('training_service_bookings')
-            ->select('training_service_bookings.*')
+        $builder = $this->db->table('training_service_bookings');
+        $builder->select('training_service_bookings.*')
             ->select('packages.package_name as package_name')
             ->select('users.name as user_name,users.phone as user_phone,users.has_app_installed')
             ->select(
-                "GROUP_CONCAT(COALESCE(user_pets.name, '') SEPARATOR ', ') as pet_names"
+                "GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '') SEPARATOR ', ') as pet_names"
             )
-            ->select("GROUP_CONCAT(COALESCE(user_pets.breed, '') SEPARATOR ', ') as pet_breeds")
+            ->select("GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '') SEPARATOR ', ') as pet_breeds")
             ->select('user_addresses.city, user_addresses.state,user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
             ->select('services.name as service_name')
 
             ->join('packages', 'packages.id = training_service_bookings.package_id', 'left')
             ->join('users', 'users.id = training_service_bookings.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = training_service_bookings.id', 'left')
+            ->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = training_service_bookings.original_booking_id', 'left')
             ->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left')
+            ->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left')
             ->join('user_addresses', 'user_addresses.id = training_service_bookings.address_id', 'left')
-            ->join('services', 'services.id = training_service_bookings.service_id', 'left')
+            ->join('services', 'services.id = training_service_bookings.service_id', 'left');
 
-            ->where('training_service_bookings.status', $booking_status)
-            ->groupStart()
+        if ($booking_status === 'New') {
+            $builder->groupStart()
+                ->where('training_service_bookings.status', 'New')
+                ->orGroupStart()
+                    ->where('training_service_bookings.type', 'extend')
+                    ->whereIn('training_service_bookings.status', ['New', 'onHold', 'OnHold'])
+                ->groupEnd()
+            ->groupEnd();
+        } else {
+            $builder->where('training_service_bookings.status', $booking_status);
+        }
+
+        return $builder->groupStart()
             ->where('training_service_bookings.is_deleted', 0)
             ->orWhere('training_service_bookings.is_deleted', null)
             ->groupEnd()
@@ -1883,24 +1927,37 @@ class Booking extends Model
     }
     public function getSittingBookings($booking_status)
     {
-        return $this->db->table('sitting_service_bookings')
-            ->select('sitting_service_bookings.*')
+        $builder = $this->db->table('sitting_service_bookings');
+        $builder->select('sitting_service_bookings.*')
             ->select('users.name as user_name,users.phone as user_phone,users.has_app_installed')
             ->select(
-                "GROUP_CONCAT(COALESCE(user_pets.name, '') SEPARATOR ', ') as pet_names"
+                "GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '') SEPARATOR ', ') as pet_names"
             )
-            ->select("GROUP_CONCAT(COALESCE(user_pets.breed, '') SEPARATOR ', ') as pet_breeds")
+            ->select("GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '') SEPARATOR ', ') as pet_breeds")
             ->select('user_addresses.city, user_addresses.state,user_addresses.address, user_addresses.latitude as booking_latitude, user_addresses.longitude as booking_longitude,user_addresses.houseno_floor,user_addresses.building_blockno,user_addresses.landmark_areaname')
             ->select('services.name as service_name')
 
             ->join('users', 'users.id = sitting_service_bookings.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = sitting_service_bookings.id', 'left')
+            ->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = sitting_service_bookings.original_booking_id', 'left')
             ->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left')
+            ->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left')
             ->join('user_addresses', 'user_addresses.id = sitting_service_bookings.address_id', 'left')
-            ->join('services', 'services.id = sitting_service_bookings.service_id', 'left')
+            ->join('services', 'services.id = sitting_service_bookings.service_id', 'left');
 
-            ->where('sitting_service_bookings.status', $booking_status)
-            ->groupStart()
+        if ($booking_status === 'New') {
+            $builder->groupStart()
+                ->where('sitting_service_bookings.status', 'New')
+                ->orGroupStart()
+                    ->where('sitting_service_bookings.type', 'extend')
+                    ->whereIn('sitting_service_bookings.status', ['New', 'onHold', 'OnHold'])
+                ->groupEnd()
+            ->groupEnd();
+        } else {
+            $builder->where('sitting_service_bookings.status', $booking_status);
+        }
+
+        return $builder->groupStart()
             ->where('sitting_service_bookings.is_deleted', 0)
             ->orWhere('sitting_service_bookings.is_deleted', null)
             ->groupEnd()
@@ -3728,6 +3785,7 @@ END AS status
             uw.txn_id as txn_id,
             uw.service_id,
             uw.booking_id,
+            uw.pet_id,
             uw.transaction_type,
             uw.category,
             uw.amount,
@@ -3737,7 +3795,9 @@ END AS status
             uw.created_at,
             u.id as client_id,
             u.phone as client_phone,
-            u.name as client_name
+            u.name as client_name,
+            u.email as client_email,
+            u.created_at as joined_date
         ");
             $builder->join('users u', 'u.id = uw.user_id', 'left');
 
@@ -3755,6 +3815,7 @@ END AS status
             sw.txn_id as txn_id,
             sw.service_id,
             sw.booking_id,
+            sw.pet_id,
             sw.transaction_type,
             sw.category,
             sw.amount,
@@ -3764,7 +3825,11 @@ END AS status
             sw.created_at,
             sp.id as walker_id,
             sp.phone as walker_phone,
-            sp.name as walker_name
+            sp.name as walker_name,
+            sp.email as walker_email,
+            sp.area as walker_area,
+            sp.city as walker_city,
+            sp.created_at as joined_date
         ");
             $builder->join('service_providers sp', 'sp.id = sw.provider_id', 'left');
 
@@ -3802,17 +3867,17 @@ END AS status
         $summary = [];
 
         foreach ($rows as $row) {
-            // $txnId = 'TXN-' . str_pad($row['txn_id'], 3, '0', STR_PAD_LEFT);
-
             $summary[] = [
-                'txn_id'           => $row['txn_id'],
-                'service_id'       => $row['booking_id'],
-                'date'             => date('Y-m-d', strtotime($row['created_at'])),
-                'action'           => $row['description'],
+                'txn_id'           => $row['txn_id'] ?? '',
+                'service_id'       => $row['booking_id'] ?? '',
+                'pet_id'           => $row['pet_id'] ?? null,
+                'raw_service_id'   => $row['service_id'] ?? null,
+                'date'             => isset($row['created_at']) ? date('Y-m-d H:i:s', strtotime($row['created_at'])) : date('Y-m-d H:i:s'),
+                'action'           => $row['description'] ?? '',
 
-                'debit'            => ($row['transaction_type'] === 'debit') ? number_format($row['amount'], 2) : '0.00',
-                'credit'           => ($row['transaction_type'] === 'credit') ? number_format($row['amount'], 2) : '0.00',
-                'transaction_type' => $row['transaction_type'],
+                'debit'            => ($row['transaction_type'] === 'debit') ? number_format((float)($row['amount'] ?? 0), 2, '.', '') : '0.00',
+                'credit'           => ($row['transaction_type'] === 'credit') ? number_format((float)($row['amount'] ?? 0), 2, '.', '') : '0.00',
+                'transaction_type' => $row['transaction_type'] ?? '',
                 'category'         => $row['category'] ?? '',
 
                 'balance'          => $row['clbalance_after'] ?? 0,
@@ -3820,19 +3885,51 @@ END AS status
                 'earned_balance'   => $row['earned_balance'] ?? 0,
                 'spbalance_after'  => $row['spbalance_after'] ?? 0,
                 'amount'           => $row['amount'] ?? 0,
-                'description'      => $row['description'],
+                'description'      => $row['description'] ?? '',
 
                 'client_id'        => $row['client_id'] ?? null,
                 'client_phone'     => $row['client_phone'] ?? null,
                 'client_name'      => $row['client_name'] ?? null,
+                'client_email'     => $row['client_email'] ?? null,
 
                 'walker_id'        => $row['walker_id'] ?? null,
                 'walker_phone'     => $row['walker_phone'] ?? null,
                 'walker_name'      => $row['walker_name'] ?? null,
+                'walker_email'     => $row['walker_email'] ?? null,
+                'walker_area'      => $row['walker_area'] ?? null,
+                'walker_city'      => $row['walker_city'] ?? null,
+
+                'joined_date'      => $row['joined_date'] ?? null,
             ];
         }
 
         return $summary;
+    }
+
+    public function getBookingPetDetailsMap()
+    {
+        $db = \Config\Database::connect();
+        $map = [];
+        try {
+            $bpRows = $db->table('booking_pets bp')
+                ->select('bp.booking_id, bp.pet_id, bp.service_id, bp.status as bp_status, bp.track_status, p.name as pet_name, p.breed as pet_breed, p.type as pet_type')
+                ->join('user_pets p', 'p.id = bp.pet_id', 'left')
+                ->get()->getResultArray();
+            foreach ($bpRows as $row) {
+                if (!empty($row['booking_id'])) {
+                    $map[$row['booking_id']] = [
+                        'pet_name'   => $row['pet_name'] ?? '',
+                        'pet_breed'  => $row['pet_breed'] ?? '',
+                        'pet_type'   => $row['pet_type'] ?? '',
+                        'service_id' => $row['service_id'] ?? null,
+                        'status'     => !empty($row['track_status']) ? ucfirst(str_replace('_', ' ', $row['track_status'])) : (!empty($row['bp_status']) ? ucfirst($row['bp_status']) : 'Completed')
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            // gracefully fallback
+        }
+        return $map;
     }
     public function getTotalBookings()
     {
@@ -5226,7 +5323,7 @@ END AS status
             ->select("
                 wb.id, wb.user_id, wb.service_id, wb.package_id, wb.status, wb.created_at, wb.service_start_date, wb.service_end_date, wb.total_price, wb.comment,wb.type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 services.name as service_name,
@@ -5235,7 +5332,9 @@ END AS status
             ", false)
             ->join('users', 'users.id = wb.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = wb.id AND booking_pets.service_id = wb.service_id', 'left')
+            ->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = wb.original_booking_id AND original_booking_pets.service_id = wb.service_id', 'left')
             ->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left')
+            ->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left')
             ->join('user_addresses', 'user_addresses.id = wb.address_id', 'left')
             ->join('services', 'services.id = wb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = wb.id AND quotations.service_id = wb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
@@ -5247,12 +5346,18 @@ END AS status
         } else {
             if ($status === 'New') {
                 $walkingBuilder->groupStart()
-                    ->where('wb.status', 'New')
-                    ->orGroupStart()
-                    ->where('wb.type', 'extend')
-                    ->where('wb.status', 'New')
+                    ->groupStart()
+                        ->where('wb.status', 'New')
+                        ->groupStart()
+                            ->where('wb.type !=', 'premium')
+                            ->orWhere('wb.type', null)
+                        ->groupEnd()
                     ->groupEnd()
-                    ->groupEnd();
+                    ->orGroupStart()
+                        ->where('wb.type', 'extend')
+                        ->whereIn('wb.status', ['New', 'onHold'])
+                    ->groupEnd()
+                ->groupEnd();
             } else {
                 $walkingBuilder->where('wb.status', $status);
             }
@@ -5305,9 +5410,9 @@ END AS status
         // Training
         $trainingBuilder = $this->db->table('training_service_bookings tb')
             ->select("
-                tb.id, tb.user_id, tb.service_id, tb.package_id, tb.status, tb.created_at, tb.service_start_date, (NULL) as service_end_date, tb.total_price, tb.comment,(NULL) as type,
+                tb.id, tb.user_id, tb.service_id, tb.package_id, tb.status, tb.created_at, tb.service_start_date, (NULL) as service_end_date, tb.total_price, tb.comment, tb.type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 services.name as service_name,
@@ -5316,7 +5421,9 @@ END AS status
             ", false)
             ->join('users', 'users.id = tb.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = tb.id AND booking_pets.service_id = tb.service_id', 'left')
+            ->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = tb.original_booking_id AND original_booking_pets.service_id = tb.service_id', 'left')
             ->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left')
+            ->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left')
             ->join('user_addresses', 'user_addresses.id = tb.address_id', 'left')
             ->join('services', 'services.id = tb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = tb.id AND quotations.service_id = tb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
@@ -5326,8 +5433,18 @@ END AS status
         if ($showDeleted) {
             $trainingBuilder->where('tb.is_deleted', 1);
         } else {
-            $trainingBuilder->where('tb.status', $status)
-                ->groupStart()->where('tb.is_deleted', 0)->orWhere('tb.is_deleted', null)->groupEnd();
+            if ($status === 'New') {
+                $trainingBuilder->groupStart()
+                    ->where('tb.status', 'New')
+                    ->orGroupStart()
+                        ->where('tb.type', 'extend')
+                        ->whereIn('tb.status', ['New', 'onHold', 'OnHold'])
+                    ->groupEnd()
+                ->groupEnd();
+            } else {
+                $trainingBuilder->where('tb.status', $status);
+            }
+            $trainingBuilder->groupStart()->where('tb.is_deleted', 0)->orWhere('tb.is_deleted', null)->groupEnd();
         }
         if ($search) {
             $trainingBuilder->groupStart()
@@ -5336,12 +5453,12 @@ END AS status
         }
         if ($date) $trainingBuilder->where('tb.service_start_date', $date);
 
-        // Boarding
+        // Sitting / Boarding
         $sittingBuilder = $this->db->table('sitting_service_bookings sb')
             ->select("
-                sb.id, sb.user_id, sb.service_id, (NULL) as package_id, sb.status, sb.created_at, sb.service_start_date, (NULL) as service_end_date, sb.total_price, sb.comment,(NULL) as type,
+                sb.id, sb.user_id, sb.service_id, (NULL) as package_id, sb.status, sb.created_at, sb.service_start_date, (NULL) as service_end_date, sb.total_price, sb.comment, sb.type,
                 users.name as user_name, users.phone as user_phone,
-                GROUP_CONCAT(COALESCE(user_pets.name, '')) as pet_name, GROUP_CONCAT(COALESCE(user_pets.breed, '')) as breed,
+                GROUP_CONCAT(DISTINCT COALESCE(user_pets.name, original_user_pets.name, '')) as pet_name, GROUP_CONCAT(DISTINCT COALESCE(user_pets.breed, original_user_pets.breed, '')) as breed,
                 user_addresses.address, user_addresses.state, user_addresses.city, 
                 user_addresses.houseno_floor, user_addresses.building_blockno, user_addresses.landmark_areaname,
                 services.name as service_name,
@@ -5350,7 +5467,9 @@ END AS status
             ", false)
             ->join('users', 'users.id = sb.user_id', 'left')
             ->join('booking_pets', 'booking_pets.booking_id = sb.id AND booking_pets.service_id = sb.service_id', 'left')
+            ->join('booking_pets as original_booking_pets', 'original_booking_pets.booking_id = sb.original_booking_id AND original_booking_pets.service_id = sb.service_id', 'left')
             ->join('user_pets', 'user_pets.id = booking_pets.pet_id', 'left')
+            ->join('user_pets as original_user_pets', 'original_user_pets.id = original_booking_pets.pet_id', 'left')
             ->join('user_addresses', 'user_addresses.id = sb.address_id', 'left')
             ->join('services', 'services.id = sb.service_id', 'left')
             ->join('quotations', 'quotations.booking_id = sb.id AND quotations.service_id = sb.service_id AND (quotations.status = "Accepted" OR quotations.status = "Completed")', 'left')
@@ -5360,8 +5479,18 @@ END AS status
         if ($showDeleted) {
             $sittingBuilder->where('sb.is_deleted', 1);
         } else {
-            $sittingBuilder->where('sb.status', $status)
-                ->groupStart()->where('sb.is_deleted', 0)->orWhere('sb.is_deleted', null)->groupEnd();
+            if ($status === 'New') {
+                $sittingBuilder->groupStart()
+                    ->where('sb.status', 'New')
+                    ->orGroupStart()
+                        ->where('sb.type', 'extend')
+                        ->whereIn('sb.status', ['New', 'onHold', 'OnHold'])
+                    ->groupEnd()
+                ->groupEnd();
+            } else {
+                $sittingBuilder->where('sb.status', $status);
+            }
+            $sittingBuilder->groupStart()->where('sb.is_deleted', 0)->orWhere('sb.is_deleted', null)->groupEnd();
         }
         if ($search) {
             $sittingBuilder->groupStart()

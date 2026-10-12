@@ -179,20 +179,40 @@
                         <div class="card border-0 rounded-4xl shadow-sm">
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="d-flex gap-3">
-                                        <img src="https://i.pravatar.cc/150?u=<?= $post['user_id'] ?>" class="rounded-circle" width="56" height="56" style="object-fit: cover;">
+                                    <?php
+                                    $authorAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($post['name'] ?? 'User') . '&background=random';
+                                    if (!empty($post['profile'])) {
+                                        if (($post['user_type'] ?? '') == 'provider') {
+                                            $authorAvatar = 'https://beta.petsfolio.in/public/uploads/providers/' . $post['profile'];
+                                        } elseif (($post['user_type'] ?? '') == 'admin') {
+                                            $authorAvatar = base_url('public/uploads/employees/' . $post['profile']);
+                                        } else {
+                                            $authorAvatar = 'https://beta.petsfolio.in/public/uploads/users/' . $post['profile'];
+                                        }
+                                    }
+                                    ?>
+                                    <div class="d-flex gap-3 align-items-center">
+                                        <img src="<?= $authorAvatar ?>" class="rounded-circle shadow-sm" width="56" height="56" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($post['name'] ?? 'User') ?>&background=random'">
                                         <div>
-                                            <h6 class="fw-bold mb-0"><?= $post['name'] ?></h6>
-                                            <div class="d-flex align-items-center gap-2 small text-muted">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <h6 class="fw-bold mb-0"><?= esc($post['name']) ?></h6>
+                                                <?php if (($post['user_type'] ?? '') == 'admin'): ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">ADMIN</span>
+                                                <?php elseif (($post['user_type'] ?? '') == 'provider'): ?>
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">PROVIDER</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">CLIENT</span>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 small text-muted mt-1">
                                                 <span class="material-symbols-outlined fs-6">schedule</span>
-                                                <?= date('M d', strtotime($post['created_at'])) ?>
-                                                <span class="text-primary fw-bold">• Featured Post</span>
+                                                <?= date('M d, Y', strtotime($post['created_at'])) ?>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-light border-0 rounded-circle p-2">
-                                        <span class="material-symbols-outlined">more_horiz</span>
-                                    </button>
+                                    <a href="<?= base_url('community/post/' . $post['id']) ?>" class="btn btn-light border-0 rounded-circle p-2">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </a>
                                 </div>
 
                                 <a href="<?= base_url('community/post/' . $post['id']) ?>" class="text-decoration-none">

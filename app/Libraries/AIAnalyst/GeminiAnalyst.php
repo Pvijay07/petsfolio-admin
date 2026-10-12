@@ -126,49 +126,13 @@ class GeminiAnalyst
             }
         }
 
-        // Auto-recovery: If no function calls were made by the model, but a 10-digit phone number is detected in the prompt, force execute provider metrics!
+        // Auto-recovery: If no function calls were made by the model, infer intent from user message
         if (empty($functionResults)) {
-            if (preg_match('/\b[6-9]\d{9}\b/', $userMessage, $phoneMatches)) {
-                $phone = $phoneMatches[0];
-
-                $metricResult1 = $this->validator->executeMetric('provider_performance_score', ['provider_id' => $phone], $messageId);
-                $metricResult2 = $this->validator->executeMetric('provider_stats', ['provider_search' => $phone], $messageId);
-
-                $metricsCalled[] = [
-                    'name' => 'provider_performance_score',
-                    'args' => ['provider_id' => $phone],
-                    'data' => $metricResult1['data'] ?? []
-                ];
-                $metricsCalled[] = [
-                    'name' => 'provider_stats',
-                    'args' => ['provider_search' => $phone],
-                    'data' => $metricResult2['data'] ?? []
-                ];
-
-                $functionResults[] = [
-                    'functionResponse' => [
-                        'name'     => 'provider_performance_score',
-                        'response' => [
-                            'name'    => 'provider_performance_score',
-                            'content' => $metricResult1['data'] ?? []
-                        ]
-                    ]
-                ];
-                $functionResults[] = [
-                    'functionResponse' => [
-                        'name'     => 'provider_stats',
-                        'response' => [
-                            'name'    => 'provider_stats',
-                            'content' => $metricResult2['data'] ?? []
-                        ]
-                    ]
-                ];
-
-                // Fake initial model turn to allow 2nd turn summary
-                $parts = [
-                    ['functionCall' => ['name' => 'provider_performance_score', 'args' => ['provider_id' => $phone]]],
-                    ['functionCall' => ['name' => 'provider_stats', 'args' => ['provider_search' => $phone]]]
-                ];
+            $recovered = $this->autoRecoverMetrics($userMessage, $messageId);
+            if (!empty($recovered['functionResults'])) {
+                $metricsCalled   = $recovered['metrics'];
+                $functionResults = $recovered['functionResults'];
+                $parts           = $recovered['parts'];
             }
         }
 
@@ -202,7 +166,11 @@ class GeminiAnalyst
                 }
             }
 
-            $reply = trim($finalText) ?: $this->buildFallbackTextSummary($metricsCalled);
+            if (empty(trim($finalText)) || preg_match('/cannot directly compare|values are not provided|not provided in the query|cannot offer data-driven|without the specific/i', $finalText)) {
+                $reply = $this->buildExecutiveComparisonSummary($metricsCalled);
+            } else {
+                $reply = trim($finalText);
+            }
         } else {
             // No function call was needed, get text directly
             $finalText = '';
@@ -301,46 +269,11 @@ class GeminiAnalyst
         }
 
         if (empty($functionResults)) {
-            if (preg_match('/\b[6-9]\d{9}\b/', $userMessage, $phoneMatches)) {
-                $phone = $phoneMatches[0];
-
-                $metricResult1 = $this->validator->executeMetric('provider_performance_score', ['provider_id' => $phone], $messageId);
-                $metricResult2 = $this->validator->executeMetric('provider_stats', ['provider_search' => $phone], $messageId);
-
-                $metricsCalled[] = [
-                    'name' => 'provider_performance_score',
-                    'args' => ['provider_id' => $phone],
-                    'data' => $metricResult1['data'] ?? []
-                ];
-                $metricsCalled[] = [
-                    'name' => 'provider_stats',
-                    'args' => ['provider_search' => $phone],
-                    'data' => $metricResult2['data'] ?? []
-                ];
-
-                $functionResults[] = [
-                    'functionResponse' => [
-                        'name'     => 'provider_performance_score',
-                        'response' => [
-                            'name'    => 'provider_performance_score',
-                            'content' => $metricResult1['data'] ?? []
-                        ]
-                    ]
-                ];
-                $functionResults[] = [
-                    'functionResponse' => [
-                        'name'     => 'provider_stats',
-                        'response' => [
-                            'name'    => 'provider_stats',
-                            'content' => $metricResult2['data'] ?? []
-                        ]
-                    ]
-                ];
-
-                $parts = [
-                    ['functionCall' => ['name' => 'provider_performance_score', 'args' => ['provider_id' => $phone]]],
-                    ['functionCall' => ['name' => 'provider_stats', 'args' => ['provider_search' => $phone]]]
-                ];
+            $recovered = $this->autoRecoverMetrics($userMessage, $messageId);
+            if (!empty($recovered['functionResults'])) {
+                $metricsCalled   = $recovered['metrics'];
+                $functionResults = $recovered['functionResults'];
+                $parts           = $recovered['parts'];
             }
         }
 
@@ -360,8 +293,8 @@ class GeminiAnalyst
             ];
 
             $reply = $this->callGeminiStream($secondPayload, $onChunk);
-            if (empty($reply)) {
-                $reply = $this->buildFallbackTextSummary($metricsCalled);
+            if (empty(trim($reply)) || preg_match('/cannot directly compare|values are not provided|not provided in the query|cannot offer data-driven|without the specific/i', $reply)) {
+                $reply = $this->buildExecutiveComparisonSummary($metricsCalled);
                 if ($onChunk) {
                     $onChunk($reply);
                 }
@@ -1249,5 +1182,199 @@ class GeminiAnalyst
         }
 
         return null;
+    }
+
+    /**
+     * Infer intent and auto-recover metric function calls when LLM outputs text instead of functionCall.
+     */
+    private function autoRecoverMetrics(string $userMessage, ?int $messageId): array
+    {
+        $metricsCalled   = [];
+        $functionResults = [];
+        $parts           = [];
+
+        $msgLower = strtolower($userMessage);
+        $isComparison = (bool) preg_match('/vs|compare|last month|this month|previous|difference|change/i', $userMessage);
+
+        if (str_contains($msgLower, 'conversion')) {
+            if ($isComparison) {
+                $m1 = $this->validator->executeMetric('conversion_rate', ['date_range' => 'this_month'], $messageId);
+                $m2 = $this->validator->executeMetric('conversion_rate', ['date_range' => 'last_month'], $messageId);
+
+                $metricsCalled[] = ['name' => 'conversion_rate', 'args' => ['date_range' => 'this_month'], 'data' => $m1['data'] ?? []];
+                $metricsCalled[] = ['name' => 'conversion_rate', 'args' => ['date_range' => 'last_month'], 'data' => $m2['data'] ?? []];
+
+                $functionResults[] = ['functionResponse' => ['name' => 'conversion_rate', 'response' => ['name' => 'conversion_rate', 'content' => $m1['data'] ?? []]]];
+                $functionResults[] = ['functionResponse' => ['name' => 'conversion_rate', 'response' => ['name' => 'conversion_rate', 'content' => $m2['data'] ?? []]]];
+
+                $parts = [
+                    ['functionCall' => ['name' => 'conversion_rate', 'args' => ['date_range' => 'this_month']]],
+                    ['functionCall' => ['name' => 'conversion_rate', 'args' => ['date_range' => 'last_month']]]
+                ];
+            } else {
+                $m1 = $this->validator->executeMetric('conversion_rate', ['date_range' => 'this_month'], $messageId);
+                $metricsCalled[] = ['name' => 'conversion_rate', 'args' => ['date_range' => 'this_month'], 'data' => $m1['data'] ?? []];
+                $functionResults[] = ['functionResponse' => ['name' => 'conversion_rate', 'response' => ['name' => 'conversion_rate', 'content' => $m1['data'] ?? []]]];
+                $parts = [
+                    ['functionCall' => ['name' => 'conversion_rate', 'args' => ['date_range' => 'this_month']]]
+                ];
+            }
+        } elseif (str_contains($msgLower, 'revenue') || str_contains($msgLower, 'earning') || str_contains($msgLower, 'profit')) {
+            if ($isComparison) {
+                $m1 = $this->validator->executeMetric('revenue_overview', ['date_range' => 'this_month'], $messageId);
+                $m2 = $this->validator->executeMetric('revenue_overview', ['date_range' => 'last_month'], $messageId);
+
+                $metricsCalled[] = ['name' => 'revenue_overview', 'args' => ['date_range' => 'this_month'], 'data' => $m1['data'] ?? []];
+                $metricsCalled[] = ['name' => 'revenue_overview', 'args' => ['date_range' => 'last_month'], 'data' => $m2['data'] ?? []];
+
+                $functionResults[] = ['functionResponse' => ['name' => 'revenue_overview', 'response' => ['name' => 'revenue_overview', 'content' => $m1['data'] ?? []]]];
+                $functionResults[] = ['functionResponse' => ['name' => 'revenue_overview', 'response' => ['name' => 'revenue_overview', 'content' => $m2['data'] ?? []]]];
+
+                $parts = [
+                    ['functionCall' => ['name' => 'revenue_overview', 'args' => ['date_range' => 'this_month']]],
+                    ['functionCall' => ['name' => 'revenue_overview', 'args' => ['date_range' => 'last_month']]]
+                ];
+            } else {
+                $m1 = $this->validator->executeMetric('revenue_overview', ['date_range' => '30_days'], $messageId);
+                $metricsCalled[] = ['name' => 'revenue_overview', 'args' => ['date_range' => '30_days'], 'data' => $m1['data'] ?? []];
+                $functionResults[] = ['functionResponse' => ['name' => 'revenue_overview', 'response' => ['name' => 'revenue_overview', 'content' => $m1['data'] ?? []]]];
+                $parts = [
+                    ['functionCall' => ['name' => 'revenue_overview', 'args' => ['date_range' => '30_days']]]
+                ];
+            }
+        } elseif (str_contains($msgLower, 'booking') || str_contains($msgLower, 'order')) {
+            if ($isComparison) {
+                $m1 = $this->validator->executeMetric('bookings_summary', ['date_range' => 'this_month'], $messageId);
+                $m2 = $this->validator->executeMetric('bookings_summary', ['date_range' => 'last_month'], $messageId);
+
+                $metricsCalled[] = ['name' => 'bookings_summary', 'args' => ['date_range' => 'this_month'], 'data' => $m1['data'] ?? []];
+                $metricsCalled[] = ['name' => 'bookings_summary', 'args' => ['date_range' => 'last_month'], 'data' => $m2['data'] ?? []];
+
+                $functionResults[] = ['functionResponse' => ['name' => 'bookings_summary', 'response' => ['name' => 'bookings_summary', 'content' => $m1['data'] ?? []]]];
+                $functionResults[] = ['functionResponse' => ['name' => 'bookings_summary', 'response' => ['name' => 'bookings_summary', 'content' => $m2['data'] ?? []]]];
+
+                $parts = [
+                    ['functionCall' => ['name' => 'bookings_summary', 'args' => ['date_range' => 'this_month']]],
+                    ['functionCall' => ['name' => 'bookings_summary', 'args' => ['date_range' => 'last_month']]]
+                ];
+            } else {
+                $m1 = $this->validator->executeMetric('bookings_summary', ['date_range' => '30_days'], $messageId);
+                $metricsCalled[] = ['name' => 'bookings_summary', 'args' => ['date_range' => '30_days'], 'data' => $m1['data'] ?? []];
+                $functionResults[] = ['functionResponse' => ['name' => 'bookings_summary', 'response' => ['name' => 'bookings_summary', 'content' => $m1['data'] ?? []]]];
+                $parts = [
+                    ['functionCall' => ['name' => 'bookings_summary', 'args' => ['date_range' => '30_days']]]
+                ];
+            }
+        } elseif (str_contains($msgLower, 'cancel')) {
+            $m1 = $this->validator->executeMetric('cancellation_rate', ['date_range' => '30_days'], $messageId);
+            $metricsCalled[] = ['name' => 'cancellation_rate', 'args' => ['date_range' => '30_days'], 'data' => $m1['data'] ?? []];
+            $functionResults[] = ['functionResponse' => ['name' => 'cancellation_rate', 'response' => ['name' => 'cancellation_rate', 'content' => $m1['data'] ?? []]]];
+            $parts = [
+                ['functionCall' => ['name' => 'cancellation_rate', 'args' => ['date_range' => '30_days']]]
+            ];
+        } elseif (str_contains($msgLower, 'source')) {
+            $m1 = $this->validator->executeMetric('lead_source_performance', ['date_range' => '30_days'], $messageId);
+            $metricsCalled[] = ['name' => 'lead_source_performance', 'args' => ['date_range' => '30_days'], 'data' => $m1['data'] ?? []];
+            $functionResults[] = ['functionResponse' => ['name' => 'lead_source_performance', 'response' => ['name' => 'lead_source_performance', 'content' => $m1['data'] ?? []]]];
+            $parts = [
+                ['functionCall' => ['name' => 'lead_source_performance', 'args' => ['date_range' => '30_days']]]
+            ];
+        } elseif (str_contains($msgLower, 'funnel') || str_contains($msgLower, 'dropoff')) {
+            $m1 = $this->validator->executeMetric('funnel_dropoff', ['date_range' => '30_days'], $messageId);
+            $metricsCalled[] = ['name' => 'funnel_dropoff', 'args' => ['date_range' => '30_days'], 'data' => $m1['data'] ?? []];
+            $functionResults[] = ['functionResponse' => ['name' => 'funnel_dropoff', 'response' => ['name' => 'funnel_dropoff', 'content' => $m1['data'] ?? []]]];
+            $parts = [
+                ['functionCall' => ['name' => 'funnel_dropoff', 'args' => ['date_range' => '30_days']]]
+            ];
+        } elseif (preg_match('/\b[6-9]\d{9}\b/', $userMessage, $phoneMatches)) {
+            $phone = $phoneMatches[0];
+            $m1 = $this->validator->executeMetric('provider_performance_score', ['provider_id' => $phone], $messageId);
+            $m2 = $this->validator->executeMetric('provider_stats', ['provider_search' => $phone], $messageId);
+
+            $metricsCalled[] = ['name' => 'provider_performance_score', 'args' => ['provider_id' => $phone], 'data' => $m1['data'] ?? []];
+            $metricsCalled[] = ['name' => 'provider_stats', 'args' => ['provider_search' => $phone], 'data' => $m2['data'] ?? []];
+
+            $functionResults[] = ['functionResponse' => ['name' => 'provider_performance_score', 'response' => ['name' => 'provider_performance_score', 'content' => $m1['data'] ?? []]]];
+            $functionResults[] = ['functionResponse' => ['name' => 'provider_stats', 'response' => ['name' => 'provider_stats', 'content' => $m2['data'] ?? []]]];
+
+            $parts = [
+                ['functionCall' => ['name' => 'provider_performance_score', 'args' => ['provider_id' => $phone]]],
+                ['functionCall' => ['name' => 'provider_stats', 'args' => ['provider_search' => $phone]]]
+            ];
+        }
+
+        return [
+            'metrics'         => $metricsCalled,
+            'functionResults' => $functionResults,
+            'parts'           => $parts
+        ];
+    }
+
+    /**
+     * Synthesize clean executive comparison summary directly from metrics data.
+     */
+    private function buildExecutiveComparisonSummary(array $metricsCalled): string
+    {
+        $out = "### 📊 Business Intelligence Performance Analysis\n\n";
+
+        $byMetric = [];
+        foreach ($metricsCalled as $mc) {
+            $name = $mc['name'];
+            $byMetric[$name][] = $mc;
+        }
+
+        foreach ($byMetric as $name => $items) {
+            $title = ucwords(str_replace('_', ' ', $name));
+            $out .= "#### {$title} Comparison\n\n";
+
+            if ($name === 'lead_conversion_rate' || $name === 'conversion_rate') {
+                $out .= "| Period | Total CRM Leads | Converted Leads | Conversion Rate |\n";
+                $out .= "| :--- | :---: | :---: | :---: |\n";
+                foreach ($items as $it) {
+                    $dr = ucwords(str_replace('_', ' ', $it['args']['date_range'] ?? '30 Days'));
+                    $d  = $it['data'] ?? [];
+                    $tot = $d['total_leads'] ?? 0;
+                    $conv = $d['converted_leads'] ?? 0;
+                    $rate = $d['conversion_rate'] ?? '0%';
+                    $out .= "| **{$dr}** | {$tot} | {$conv} | **{$rate}** |\n";
+                }
+                $out .= "\n";
+            } elseif ($name === 'revenue_overview') {
+                $out .= "| Period | Gross Revenue | Platform Profit | Provider Payouts |\n";
+                $out .= "| :--- | :---: | :---: | :---: |\n";
+                foreach ($items as $it) {
+                    $dr = ucwords(str_replace('_', ' ', $it['args']['date_range'] ?? '30 Days'));
+                    $d  = $it['data'] ?? [];
+                    $gross = "₹" . number_format($d['gross_revenue_inr'] ?? 0, 2);
+                    $comm  = "₹" . number_format($d['platform_commission'] ?? 0, 2);
+                    $pay   = "₹" . number_format($d['provider_payouts_inr'] ?? 0, 2);
+                    $out .= "| **{$dr}** | **{$gross}** | {$comm} | {$pay} |\n";
+                }
+                $out .= "\n";
+            } elseif ($name === 'bookings_summary') {
+                $out .= "| Period | Total Bookings | Total Revenue |\n";
+                $out .= "| :--- | :---: | :---: |\n";
+                foreach ($items as $it) {
+                    $dr = ucwords(str_replace('_', ' ', $it['args']['date_range'] ?? '30 Days'));
+                    $d  = $it['data'] ?? [];
+                    $tot = $d['total_bookings'] ?? 0;
+                    $rev = "₹" . number_format($d['total_revenue_inr'] ?? 0, 2);
+                    $out .= "| **{$dr}** | **{$tot}** | **{$rev}** |\n";
+                }
+                $out .= "\n";
+            } else {
+                foreach ($items as $it) {
+                    $dr = ucwords(str_replace('_', ' ', $it['args']['date_range'] ?? '30 Days'));
+                    $dataJson = json_encode($it['data'], JSON_PRETTY_PRINT);
+                    $out .= "##### Period: {$dr}\n```json\n{$dataJson}\n```\n\n";
+                }
+            }
+        }
+
+        $out .= "### 💡 Key Insights & Recommendations\n";
+        $out .= "• All metrics reflect live business data directly queried from Petsfolio databases.\n";
+        $out .= "• Use these period-over-period figures to evaluate campaign efficiency and operational performance.\n";
+
+        return $out;
     }
 }

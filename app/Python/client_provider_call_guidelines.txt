@@ -1,0 +1,336 @@
+AI Integration – Call Summary & Service Conversation Analysis (Client & Provider Calls)
+
+1. Document Purpose
+The purpose of this document is to define the requirements for AI-based Call Summary and Conversation Analysis in the Petsfolio platform.
+Petsfolio has introduced Mobile-to-Mobile Calling between the Client/Pet Parent and Service Provider (SP). Calls will be automatically recorded.
+The AI system must analyze the recorded conversation and generate a structured Call Summary.
+The primary objective is to ensure that conversations between Clients and Service Providers are relevant to the booked Petsfolio service, such as:
+- Walking
+- Grooming
+- Training
+- Sitting
+The AI must identify and highlight any unrelated, inappropriate, or potentially problematic conversation in the summary.
+
+2. Call Flow
+Basic Call Flow:
+Client → Petsfolio Mobile-to-Mobile Call → Service Provider
+↓
+Call Automatically Recorded
+↓
+AI Processes Call Recording
+↓
+Speech-to-Text Conversion
+↓
+Conversation Analysis
+↓
+Service Relevance Check
+↓
+AI Call Summary Generated
+↓
+Unrelated / Important Statements Highlighted
+↓
+Call Rating / AI Alerts
+↓
+Admin Can Review
+
+3. AI Analysis Objectives
+The AI should analyze the complete conversation and determine:
+- What service was discussed?
+- Whether the conversation is related to the booked service.
+- Whether the Client and SP discussed the service correctly.
+- Whether important service information was exchanged.
+- Whether any unrelated conversation occurred.
+- Whether inappropriate language was used.
+- Whether there were complaints or disputes.
+- Whether the SP made any unauthorized commitments.
+- Whether the Client requested something outside the booked service.
+- Whether the call requires Admin attention.
+
+4. Supported Services
+The AI must understand the four major Petsfolio service categories.
+
+4.1 Walking
+The AI should recognize conversations related to:
+- Walk date
+- Walk time
+- Walk duration
+- Walk location
+- Pickup/drop location
+- Pet name
+- Pet behavior
+- Pet walking requirements
+- Leash requirements
+- Pet safety
+- Toilet/poop requirements
+- Paw cleaning
+- Combing
+- Number of walks
+- Walk completion
+- Delayed walk
+- Missed walk
+- Walk rescheduling
+- Walker arrival
+- Walk cancellation
+- Walk-related complaints
+
+Example:
+Client: "Can you come tomorrow at 7 AM for Bruno's walk?"
+SP: "Yes, I will come at 7 AM."
+AI Classification: ✅ Service Related – Walking
+
+5. Grooming Conversation Analysis
+The AI should identify conversations related to:
+- Grooming appointment
+- Grooming date and time
+- Grooming location
+- Pet preparation
+- Bath
+- Hair trimming
+- Anti-tick treatment
+- Nail trimming
+- Grooming requirements
+- Pet behavior during grooming
+- Grooming duration
+- Grooming completion
+- Grooming complaints
+- Grooming rescheduling
+- Grooming cancellation
+
+Example:
+Client: "I booked grooming for Sunday. Will you provide hair trimming?"
+SP: "Yes, hair trimming is included in the selected grooming package."
+AI Classification: ✅ Service Related – Grooming
+
+6. Training Conversation Analysis
+The AI should identify conversations related to:
+- Training schedule
+- Training sessions
+- Puppy training
+- Intermediate training
+- Behaviour training
+- Advanced training
+- Training duration
+- Training location
+- Pet behaviour
+- Commands
+- Obedience
+- Training progress
+- Training requirements
+- Training session cancellation
+- Training rescheduling
+- Training feedback
+- Training complaints
+
+Example:
+Client: "My dog is not following basic commands. Can you work on obedience training?"
+Trainer: "Yes, we can focus on basic obedience and commands during the sessions."
+AI Classification: ✅ Service Related – Training
+
+7. Sitting Conversation Analysis
+The AI should identify conversations related to:
+- Sitting booking
+- Sitting date
+- Sitting duration
+- Day care
+- Overnight sitting
+- Hourly sitting
+- Pet feeding
+- Pet medication instructions if applicable
+- Pet routine
+- Sleeping arrangements
+- Pet safety
+- Pet behaviour
+- Pickup/drop requirements
+- Sitting completion
+- Sitting cancellation
+- Sitting rescheduling
+- Sitting complaints
+
+Example:
+Client: "My dog needs sitting from Saturday morning until Sunday morning."
+SP: "Okay, I will provide overnight sitting as per the booking."
+AI Classification: ✅ Service Related – Sitting
+
+8. AI Must Understand Service Context
+The AI should not only search for specific keywords.
+It should understand the context of the conversation.
+For example:
+"Is 7 okay for tomorrow?"
+By itself, this is ambiguous.
+But if the previous conversation is:
+"Tomorrow's walk is scheduled at 7 AM."
+Then the AI should classify:
+Service: Walking
+Classification: Service Related
+
+9. Unrelated Conversation Detection
+The AI must identify conversations that are not related to the Petsfolio service.
+Examples include:
+- Politics
+- Movies
+- Personal entertainment
+- General gossip
+- Personal relationships
+- Religion
+- Sports
+- Unrelated business
+- Personal financial discussions
+- Other unrelated topics
+- Long personal conversations
+These statements should be highlighted in the AI Call Summary.
+
+10. Example – Unrelated Conversation
+Conversation:
+Client: "What time will you come for Bruno's walk?"
+SP: "I will come at 7 AM."
+Client: "Okay. By the way, did you watch yesterday's cricket match?"
+SP: "Yes, it was a very good match."
+
+AI Analysis:
+Service-related: ✅ Walking
+Unrelated conversation: ⚠️ Cricket discussion
+Summary: Client and Service Provider discussed the scheduled walking time. An unrelated discussion regarding a cricket match was also detected.
+The unrelated sentence should be highlighted in the Admin Call Summary.
+
+11. Mixed Conversation
+A call can contain both service-related and unrelated conversations.
+The AI should not mark the entire call as unrelated.
+Instead, it should identify individual portions.
+
+Example:
+Client: "Can you come at 6 PM for the grooming?"
+SP: "Yes, I will be there at 6 PM."
+Client: "Okay. I recently bought a new car."
+SP: "Oh, which car?"
+Client: "It is a Honda."
+
+AI Result:
+- Grooming at 6 PM: ✅ Service Related
+- New car discussion: ⚠️ Unrelated
+
+12. Inappropriate Language Detection
+AI should identify inappropriate or abusive language during the call.
+Examples:
+- Abusive words
+- Offensive language
+- Threatening statements
+- Harassment
+- Personal insults
+- Aggressive communication
+- Disrespectful communication
+
+The AI should not simply highlight a word because it is potentially ambiguous. It should consider the context.
+Example:
+Client: "I am very angry because the walker did not arrive."
+Classification: ⚠️ Complaint / Negative Sentiment
+Client: [Abusive statement directed at SP]
+Classification: 🚨 Inappropriate Language
+
+13. Complaint Detection
+AI should identify service complaints.
+Examples:
+- SP arrived late
+- SP did not arrive
+- Pet was not handled properly
+- Grooming was incomplete
+- Trainer missed sessions
+- Sitting service was not provided properly
+- Service quality was poor
+- SP behaved improperly
+- Client is requesting a refund
+
+Example:
+Client: "The walker came 30 minutes late today."
+AI Classification:
+Service: Walking | Category: Complaint | Priority: Medium
+
+14. Cancellation Detection
+AI should identify cancellation-related conversations.
+Example:
+Client: "I don't need tomorrow's walk. I want to cancel it."
+AI Result:
+Service: Walking | Topic: Cancellation | Action Required: Review cancellation status/process
+
+15. Rescheduling Detection
+Example:
+Client: "Can we move today's grooming appointment to tomorrow?"
+AI Result:
+Service: Grooming | Topic: Rescheduling | Status: Service-related
+
+16. Refund Discussion
+AI should identify refund-related discussions.
+Example:
+Client: "I want my money back because the service was not completed."
+AI Result:
+🚨 Refund Request Detected
+Service: Service identified from booking/call context
+The AI should highlight the statement and make it available for Admin review.
+
+17. Outside-Service Request
+The Client may ask the SP for something that is not included in the booked service.
+Example:
+Client: "I booked walking, but can you also groom my dog?"
+AI Result:
+⚠️ Additional Service Request
+Booked Service: Walking | Requested Service: Grooming
+This should be highlighted because the request is outside the current service context.
+
+18. Direct Personal Payment Discussion
+If a Client and SP discuss making payments outside the Petsfolio platform, the AI should flag the conversation for Admin review.
+Example:
+Client: "Can I pay you directly instead of using Petsfolio?"
+SP: "Yes, you can send it directly."
+AI Result:
+🚨 Potential Off-Platform Payment Discussion
+This should generate an Admin Alert.
+
+19. Contact Sharing Detection
+If the conversation includes an attempt to exchange personal contact details outside the platform, AI should flag it according to Petsfolio's configured policy.
+Examples:
+- Asking for personal phone number
+- Sharing another contact number
+- WhatsApp contact discussion
+- Personal email exchange
+AI Result:
+⚠️ Potential Contact Sharing Detected
+
+20. Service Quality Analysis
+AI should evaluate whether the conversation indicates good or poor service communication.
+Possible categories:
+- Positive
+- Neutral
+- Negative
+- Complaint
+- Escalation Required
+
+21. Call Summary Format
+Every completed call should generate a structured summary answering 3 core questions:
+1. What was discussed?
+2. Was the conversation related to the booked Petsfolio service?
+3. Was there anything that requires Admin attention?
+
+22. Overall Call Rating
+🟢 Good (Rating >= 8.0 / 10):
+- Mostly service-related
+- No major complaint
+- No policy concern
+- Professional communication
+
+🟡 Needs Review / Review Recommended (5.0 - 7.9 / 10):
+- Significant unrelated conversation
+- Service complaint
+- Negative communication
+- Potential issue requiring Admin review
+
+🔴 Critical (Rating < 5.0 / 10 or Policy Violation):
+- Abusive/threatening communication
+- Off-platform payment attempt
+- Serious policy violation
+- Serious client/SP dispute
+
+23. Conversation Highlighting Categories
+🟢 Service Related
+🟡 Unrelated Conversation
+🔴 Policy Violation / Serious Issue
+🟠 Complaint
+🔵 Important Service Information

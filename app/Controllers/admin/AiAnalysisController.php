@@ -48,8 +48,8 @@ class AiAnalysisController extends BaseController
         $conversations = $this->db->table('ai_analyst_conversations')
             ->where('is_deleted', 0)
             ->groupStart()
-                ->where('admin_id', $adminId)
-                ->orWhere('admin_id', 1)
+            ->where('admin_id', $adminId)
+            ->orWhere('admin_id', 1)
             ->groupEnd()
             ->orderBy('id', 'DESC')
             ->get()
@@ -238,8 +238,8 @@ class AiAnalysisController extends BaseController
         $conversations = $this->db->table('ai_analyst_conversations')
             ->where('is_deleted', 0)
             ->groupStart()
-                ->where('admin_id', $adminId)
-                ->orWhere('admin_id', 1)
+            ->where('admin_id', $adminId)
+            ->orWhere('admin_id', 1)
             ->groupEnd()
             ->orderBy('id', 'DESC')
             ->get()
@@ -472,6 +472,103 @@ class AiAnalysisController extends BaseController
         } catch (\Throwable $e) {
             log_message('error', 'Failed to update v_bookings_overview view collation: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Render the Chat History view for chatbot conversations.
+     */
+    public function chatHistory()
+    {
+        $this->ensureDbConnection();
+
+        $conversations = [];
+        if ($this->db->tableExists('chatbot_logs')) {
+            $sessions = $this->db->table('chatbot_logs')
+                ->select('chatbot_logs.session_id as id, MAX(chatbot_logs.created_at) as last_message_at, MAX(users.name) as user_name, MAX(users.phone) as phone')
+                ->join('users', 'users.id = chatbot_logs.user_id', 'left')
+                ->groupBy('chatbot_logs.session_id')
+                ->orderBy('last_message_at', 'DESC')
+                ->get()
+                ->getResultArray();
+
+            foreach ($sessions as $session) {
+                $latest = $this->db->table('chatbot_logs')
+                    ->where('session_id', $session['id'])
+                    ->orderBy('created_at', 'DESC')
+                    ->limit(1)
+                    ->get()
+                    ->getRowArray();
+
+                $conversations[] = [
+                    'id'              => $session['id'],
+                    'user_name'       => $session['user_name'] ?: 'Guest User',
+                    'phone'           => $session['phone'] ?: '',
+                    'last_message_at' => $session['last_message_at'],
+                    'last_message'    => $latest ? $latest['message'] : '',
+                    'call_id'         => null
+                ];
+            }
+        }
+
+        $data['conversations']   = $conversations;
+        $data['theme']           = 'Insurance';
+        $data['current_section'] = 'chat_history';
+        $data['title']           = 'Chat History';
+
+        return $this->loadView('admin/chat_history_view', $data);
+    }
+
+    /**
+     * Fetch messages for a chatbot session ID.
+     */
+    public function chatMessages($sessionId)
+    {
+        $this->ensureDbConnection();
+
+        if (!$this->db->tableExists('chatbot_logs')) {
+            return $this->response->setJSON([
+                'status' => 'success',
+                'data'   => [
+                    'user'     => ['user_name' => 'Guest User', 'user_phone' => ''],
+                    'messages' => []
+                ]
+            ]);
+        }
+
+        $messagesData = $this->db->table('chatbot_logs')
+            ->where('session_id', $sessionId)
+            ->orderBy('created_at', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $sessionUser = $this->db->table('chatbot_logs')
+            ->select('users.name as user_name, users.phone')
+            ->join('users', 'users.id = chatbot_logs.user_id', 'left')
+            ->where('chatbot_logs.session_id', $sessionId)
+            ->where('chatbot_logs.user_id IS NOT NULL', null, false)
+            ->limit(1)
+            ->get()
+            ->getRowArray();
+
+        $messages = [];
+        foreach ($messagesData as $msg) {
+            $messages[] = [
+                'sender'     => $msg['role'] === 'model' ? 'bot' : 'user',
+                'message'    => $msg['message'],
+                'created_at' => $msg['created_at']
+            ];
+        }
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'data'   => [
+                'user' => [
+                    'user_name'  => (!empty($sessionUser['user_name'])) ? $sessionUser['user_name'] : 'Guest User',
+                    'user_phone' => (!empty($sessionUser['phone'])) ? $sessionUser['phone'] : ''
+                ],
+                'messages' => $messages
+            ]
+        ]);
     }
 
     /**

@@ -157,8 +157,9 @@
                 </div>
 
                 <!-- Right Column: Settings -->
-                <div class="lg:col-span-4 space-y-6 lg:space-y-8  "> <!-- Channel Assignment -->
-                    <div class="bg-white p-3 md:p-10 rounded-[2rem] shadow-sm border border-white/60">
+                <div class="lg:col-span-4 space-y-6 lg:space-y-8">
+                    <!-- Channel Assignment -->
+                    <div class="bg-white p-3 md:p-8 rounded-[2rem] shadow-sm border border-white/60">
                         <div class="flex items-center gap-3 mb-2">
                             <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                                 <span class="material-symbols-outlined text-lg">hub</span>
@@ -166,7 +167,7 @@
                             <label class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 italic mb-0">Channel</label>
                         </div>
                         <div class="relative">
-                            <select name="channel_id" id="channelSelect" class="w-full appearance-none px-4 py-4 bg-gray-50 border-0 rounded-2xl text-sm font-black text-[#1a1a1a] focus:bg-white focus:ring-8 focus:ring-primary/5 transition-all pr-12 cursor-pointer shadow-sm">
+                            <select name="channel_id" id="channelSelect" class="w-full appearance-none px-4 py-3.5 bg-gray-50 border-0 rounded-2xl text-sm font-black text-[#1a1a1a] focus:bg-white focus:ring-8 focus:ring-primary/5 transition-all pr-12 cursor-pointer shadow-sm">
                                 <?php foreach ($channels as $channel): ?>
                                     <option value="<?= $channel['id'] ?>" <?= (isset($post) && $post['channel_id'] == $channel['id']) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($channel['name']) ?>
@@ -174,6 +175,42 @@
                                 <?php endforeach; ?>
                             </select>
                             <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Target Audience -->
+                    <div class="bg-white p-3 md:p-8 rounded-[2rem] shadow-sm border border-white/60 mt-2">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-lg">target</span>
+                            </div>
+                            <label class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 italic mb-0">Target Audience</label>
+                        </div>
+                        <div class="relative">
+                            <select name="visibility" id="visibilitySelect" class="w-full appearance-none px-4 py-3.5 bg-gray-50 border-0 rounded-2xl text-sm font-black text-[#1a1a1a] focus:bg-white focus:ring-8 focus:ring-primary/5 transition-all pr-12 cursor-pointer shadow-sm">
+                                <option value="public" <?= (isset($post) && ($post['visibility'] ?? '') == 'public') ? 'selected' : '' ?>>🌐 All Community (Clients & Providers)</option>
+                                <option value="user" <?= (isset($post) && in_array($post['visibility'] ?? '', ['user', 'client'])) ? 'selected' : '' ?>>🐾 Clients (Pet Parents) Only</option>
+                                <option value="provider" <?= (isset($post) && ($post['visibility'] ?? '') == 'provider') ? 'selected' : '' ?>>💼 Service Providers Only</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary/40 pointer-events-none">expand_more</span>
+                        </div>
+                    </div>
+
+                    <!-- Post Category -->
+                    <div class="bg-white p-3 md:p-8 rounded-[2rem] shadow-sm border border-white/60 mt-2">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-8 h-8 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+                                <span class="material-symbols-outlined text-lg">category</span>
+                            </div>
+                            <label class="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400 italic mb-0">Post Category</label>
+                        </div>
+                        <div class="relative">
+                            <select name="category" id="categorySelect" class="w-full appearance-none px-4 py-3.5 bg-gray-50 border-0 rounded-2xl text-sm font-black text-[#1a1a1a] focus:bg-white focus:ring-8 focus:ring-secondary/5 transition-all pr-12 cursor-pointer shadow-sm">
+                                <option value="post" <?= (isset($post) && ($post['category'] ?? '') == 'post') ? 'selected' : '' ?>>📢 General Post / Update</option>
+                                <option value="question" <?= (isset($post) && ($post['category'] ?? '') == 'question') ? 'selected' : '' ?>>❓ Question / Discussion</option>
+                                <option value="announcement" <?= (isset($post) && ($post['category'] ?? '') == 'announcement') ? 'selected' : '' ?>>⚡ Official Announcement</option>
+                            </select>
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-secondary/40 pointer-events-none">expand_more</span>
                         </div>
                     </div>
                     <div class="p-4 bg-white rounded-[2rem] border border-white/60 shadow-sm transition-all hover:shadow-md mt-2">

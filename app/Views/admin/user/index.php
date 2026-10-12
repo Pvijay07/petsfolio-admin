@@ -417,6 +417,7 @@
                             <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Pets</th>
                             <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Location</th>
                             <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Wallet</th>
+                            <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Device & App</th>
                             <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Status</th>
                             <th class="text-dark text-center fs-6" style="background: #c6d2ff !important;">Action</th>
                         </tr>
@@ -507,6 +508,29 @@
         border: 1px solid rgba(34, 197, 94, 0.2) !important; font-weight: 600;">
                                         ₹<?= $client->wallet_amount ?>
                                     </span>
+                                </td>
+
+                                <!-- Device & App Column -->
+                                <td>
+                                    <?php if (!empty($client->latest_device)): ?>
+                                        <?php $dev = $client->latest_device; ?>
+                                        <div class="d-flex flex-column align-items-center text-center">
+                                            <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                            </span>
+                                            <span class="text-dark small fw-bold">
+                                                <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                            </span>
+                                            <span class="text-muted small" style="font-size: 0.75rem;">
+                                                <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                            </span>
+                                            <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                            </span>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="text-center"><span class="text-muted small">No Device</span></div>
+                                    <?php endif; ?>
                                 </td>
 
                                 <!-- Status -->
@@ -1316,6 +1340,40 @@
                 addressDetailsHtml = '<div class="text-center text-muted py-3">No addresses registered</div>';
             }
 
+            let deviceDetailsHtml = '';
+            if (client.devices && client.devices.length > 0) {
+                client.devices.forEach((dev) => {
+                    deviceDetailsHtml += `
+                    <div class="detail-card mb-2 p-2 border rounded">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge ${dev.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${dev.is_active == 1 ? 'Active' : 'Inactive'}</span>
+                            <span class="badge bg-primary">App v${dev.app_version || 'N/A'} ${dev.build_number ? '('+dev.build_number+')' : ''}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-1">
+                                <div class="detail-label">OS / Version</div>
+                                <div class="detail-value fw-bold">${(dev.os || '').toUpperCase()} ${dev.os_version || ''}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="detail-label">Device Model</div>
+                                <div class="detail-value">${dev.manufacturer || ''} ${dev.model || dev.device_name || '--'}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="detail-label">Last Login</div>
+                                <div class="detail-value small">${dev.last_login_at ? formatDate(dev.last_login_at) : '--'}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="detail-label">Last Active</div>
+                                <div class="detail-value small">${dev.last_active_at ? formatDate(dev.last_active_at) : '--'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+            } else {
+                deviceDetailsHtml = '<div class="text-center text-muted py-3">No registered devices</div>';
+            }
+
             return `
             <div class="client-detail-section bg-primary-subtle">
                 <div class="d-flex align-items-center">
@@ -1351,6 +1409,10 @@
                         <div class="detail-value">${formatDate(client.created_at)}</div>
                     </div>
                 </div>
+            </div>
+            <div class="client-detail-section">
+                <h6 class="fw-bold mb-3 text-primary">Registered Devices (${client.devices ? client.devices.length : 0})</h6>
+                ${deviceDetailsHtml}
             </div>
             <div class="client-detail-section">
                 <h6 class="fw-bold mb-3 text-primary">Wallet Information</h6>

@@ -88,6 +88,13 @@ class User extends Model
         ->where ( 'user_id', $user->id )
         ->get ()
         ->getResult ();
+      $user->devices   = $this->db->table ( 'user_devices' )
+        ->where ( 'user_id', $user->id )
+        ->where ( 'user_type', 'client' )
+        ->orderBy ( 'last_active_at', 'DESC' )
+        ->get ()
+        ->getResult ();
+      $user->latest_device = !empty($user->devices) ? $user->devices[0] : null;
     }
     return $users;
   }

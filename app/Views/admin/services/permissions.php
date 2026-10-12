@@ -1,557 +1,867 @@
 <?php echo $this->extend('admin/includes/header'); ?>
 <?php echo $this->section('content'); ?>
 
+<style>
+  .bg-gradient-permissions {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  }
+  .perm-card-modern {
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .perm-card-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+  }
+  .nav-tabs-modern {
+    border-bottom: 2px solid #e2e8f0;
+    gap: 8px;
+  }
+  .nav-tabs-modern .nav-link {
+    border: none;
+    border-radius: 12px 12px 0 0;
+    padding: 12px 24px;
+    font-weight: 700;
+    color: #64748b;
+    background: transparent;
+    transition: all 0.2s ease;
+  }
+  .nav-tabs-modern .nav-link.active {
+    color: #4f46e5;
+    background: #ffffff;
+    border-bottom: 3px solid #4f46e5;
+    box-shadow: 0 -4px 12px rgba(79, 70, 229, 0.08);
+  }
+  .form-switch .form-check-input {
+    width: 2.6em;
+    height: 1.3em;
+    cursor: pointer;
+  }
+  .form-switch .form-check-input:checked {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+  .badge-inherited {
+    background: #e0e7ff;
+    color: #4338ca;
+    font-weight: 600;
+  }
+  .badge-direct {
+    background: #dcfce7;
+    color: #15803d;
+    font-weight: 700;
+  }
+  .module-header {
+    background: #f8fafc;
+    border-left: 4px solid #4f46e5;
+  }
+</style>
+
 <main class="main-content">
   <div class="position-relative iq-banner">
     <?php echo $this->include('admin/nav_bar') ?>
   </div>
 
-  <div class="conatiner-fluid content-inner pb-0 px-4" id="page_layout">
-    <!-- Modern Header Section -->
-    <div class="container-fluid p-0 mb-4 bg-gradient-primary rounded-3">
-      <div class="text-white p-5 shadow position-relative overflow-hidden">
-        <div class="position-relative z-1">
-          <h1 class="h2 fw-bold mb-2 text-white">Permissions Management</h1>
-          <p class="text-white-75 mb-0">Manage and assign permissions to user roles</p>
-        </div>
-        <i class="bi bi-shield-lock position-absolute end-0 bottom-0 opacity-10"
-          style="font-size: 12rem; transform: rotate(12deg); margin-right: -2rem; margin-bottom: -2rem;"></i>
-      </div>
-    
-    </div>
+  <div class="container-fluid content-inner mt-n5 py-0 px-4" id="page_layout">
 
-    <!-- Summary Cards -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div
-                class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center"
-                style="width: 48px; height: 48px;">
-                <i class="bi bi-eye fs-4"></i>
-              </div>
-              <div class="ms-3">
-                <p class="text-muted small mb-1">View Permissions</p>
-                <h3 class="mb-0">
-                  <?= count(array_filter($permissions, function($perm) {
-                    return $perm['name'] == 'view';
-                  })) ?>
-                </h3>
-              </div>
-            </div>
-          </div>
+    <!-- Hero Banner -->
+    <div class="container-fluid p-0 mb-4 bg-gradient-permissions rounded-3 shadow">
+      <div class="text-white p-4 p-md-5 rounded-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h1 class="h2 fw-bold mb-2 text-white"><i class="fas fa-user-shield me-2"></i> Access Control & Permissions Management</h1>
+          <p class="text-white-75 mb-0">Role-Based Access Control (RBAC), Direct User Permission Overrides, and Granular Functionality Matrix.</p>
         </div>
-      </div>
-
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div
-                class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center"
-                style="width: 48px; height: 48px;">
-                <i class="bi bi-plus-circle fs-4"></i>
-              </div>
-              <div class="ms-3">
-                <p class="text-muted small mb-1">Add Permissions</p>
-                <h3 class="mb-0">
-                  <?= count(array_filter($permissions, function($perm) {
-                    return $perm['name'] == 'add';
-                  })) ?>
-                </h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div
-                class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center"
-                style="width: 48px; height: 48px;">
-                <i class="bi bi-pencil-square fs-4"></i>
-              </div>
-              <div class="ms-3">
-                <p class="text-muted small mb-1">Edit Permissions</p>
-                <h3 class="mb-0">
-                  <?= count(array_filter($permissions, function($perm) {
-                    return $perm['name'] == 'edit';
-                  })) ?>
-                </h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex align-items-center">
-              <div
-                class="rounded-circle bg-danger bg-opacity-10 text-danger d-flex align-items-center justify-content-center"
-                style="width: 48px; height: 48px;">
-                <i class="bi bi-trash fs-4"></i>
-              </div>
-              <div class="ms-3">
-                <p class="text-muted small mb-1">Delete Permissions</p>
-                <h3 class="mb-0">
-                  <?= count(array_filter($permissions, function($perm) {
-                    return $perm['name'] == 'delete';
-                  })) ?>
-                </h3>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-lg-8">
-        <!-- Add New Permission Card -->
-        <div class="card border-0 shadow-sm mb-4">
-          <div class="card-header bg-transparent border-0 p-4">
-            <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-              <i class="bi bi-plus-circle text-primary"></i>
-              Add New Permission
-            </h4>
-            <p class="text-muted small mb-0">Create new permission for specific module</p>
-          </div>
-          <div class="card-body p-4 pt-0">
-            <form method="post" action="<?= base_url('admin/add-permission') ?>" class="needs-validation" novalidate>
-              <div class="row g-3">
-                <div class="col-md-5">
-                  <label class="form-label fw-medium text-muted mb-2">Module Name</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-light">
-                      <i class="bi bi-folder text-muted"></i>
-                    </span>
-                    <input type="text" name="module" class="form-control" placeholder="Enter module name" required>
-                    <div class="invalid-feedback">
-                      Please enter module name.
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-5">
-                  <label class="form-label fw-medium text-muted mb-2">Permission Type</label>
-                  <div class="input-group">
-                    <span class="input-group-text bg-light">
-                      <i class="bi bi-shield text-muted"></i>
-                    </span>
-                    <select name="name" class="form-select" required>
-                      <option value="">Select permission</option>
-                      <option value="view">View</option>
-                      <option value="add">Add</option>
-                      <option value="edit">Edit</option>
-                      <option value="delete">Delete</option>
-                    </select>
-                    <div class="invalid-feedback">
-                      Please select permission type.
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                  <button type="submit" class="btn bg-primary text-white w-100 d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-plus-lg"></i>
-                    <span class="d-none d-md-inline">Add</span>
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4">
-        <!-- Role Selection Card -->
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-transparent border-0 p-3">
-            <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-              <i class="bi bi-person-badge text-success"></i>
-             Role for Assignment
-            </h4>
-            <p class="text-muted small mb-0">Choose a role to assign permissions</p>
-          </div>
-          <div class="card-body p-3 pt-0">
-            <form method="post" action="<?= base_url('admin/assign-permissions') ?>" id="assignPermissionsForm">
-              <div class="mb-4">
-                <label class="form-label fw-medium text-muted mb-2">Select Role</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light">
-                    <i class="fa-solid fa-user-group text-black"></i>
-                  </span>
-                  <select name="role_id" class="form-select" id="roleSelect" required>
-                    <option value="">Select a role</option>
-                    <?php foreach ($roles as $role): ?>
-                      <option value="<?= $role->id ?>"><?= esc($role->name) ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                  <div class="invalid-feedback">
-                    Please select a role.
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Permissions Table Card -->
-    <div class="card border-0 shadow-sm overflow-hidden">
-      <div class="card-header bg-transparent border-0 p-4">
-        <h4 class="card-title mb-0 d-flex align-items-center gap-2">
-          <i class="bi bi-list-check text-warning"></i>
-          Permissions Assignment Matrix
-        </h4>
-        <p class="text-muted small mb-0">Select permissions to assign to the selected role</p>
-      </div>
-      <div class="card-body p-0 pt-0">
-        <div class="table-responsive">
-          <table class="table table-hover table-bordered mb-0" style="table-layout: fixed; width: 100%;">
-            <thead style="background-color: #c6d2ff!important;">
-              <tr>
-                <th width="250" class="py-3 text-black fs-6 fw-semibold border-bottom" style="background: #c6d2ff!important;">
-                  Module
-                </th>
-                <th width="150" class="py-3 text-black fs-6 fw-semibold border-bottom text-center" style="background: #c6d2ff!important;">
-                  <div class="d-flex align-items-center justify-content-center gap-2">
-                    <input type="checkbox" class="form-check-input" id="select-all-view">
-                    <label class="form-check-label mb-0">View</label>
-                  </div>
-                </th>
-                <th width="150" class="py-3 text-black fs-6 fw-semibold border-bottom text-center" style="background: #c6d2ff!important;">
-                  <div class="d-flex align-items-center justify-content-center gap-2">
-                    <input type="checkbox" class="form-check-input" id="select-all-add">
-                    <label class="form-check-label mb-0">Add</label>
-                  </div>
-                </th>
-                <th width="150" class="py-3 text-black fs-6 fw-semibold border-bottom text-center" style="background: #c6d2ff!important;">
-                  <div class="d-flex align-items-center justify-content-center gap-2">
-                    <input type="checkbox" class="form-check-input" id="select-all-edit">
-                    <label class="form-check-label mb-0">Edit</label>
-                  </div>
-                </th>
-                <th width="150" class="py-3 text-black fs-6 fw-semibold border-bottom text-center" style="background: #c6d2ff!important;">
-                  <div class="d-flex align-items-center justify-content-center gap-2">
-                    <input type="checkbox" class="form-check-input" id="select-all-delete">
-                    <label class="form-check-label mb-0">Delete</label>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $modules = array_unique(array_column($permissions, 'module'));
-              foreach ($modules as $module): ?>
-                <tr>
-                  <td class="py-3">
-                    <div class="d-flex align-items-center gap-2">
-                      <div class="bg-primary bg-opacity-10 rounded p-2">
-                        <i class="bi bi-folder text-white"></i>
-                      </div>
-                      <span class="fw-medium text-dark"><?= esc($module) ?></span>
-                    </div>
-                  </td>
-                  <?php foreach (['view', 'add', 'edit', 'delete'] as $perm):
-                    $permExists = array_filter($permissions, function ($p) use ($module, $perm) {
-                      return $p['module'] == $module && $p['name'] == $perm;
-                    });
-                    $permissionId = !empty($permExists) ? reset($permExists)['id'] : '';
-                  ?>
-                    <td class="py-3 text-center">
-                      <div class="form-check d-inline-block">
-                        <input type="checkbox" 
-                               class="form-check-input perm-checkbox perm-<?= $perm ?>" 
-                               name="permissions[]" 
-                               value="<?= $permissionId ?>" 
-                               id="perm_<?= $module ?>_<?= $perm ?>"
-                               <?= $permissionId ? 'checked' : '' ?>
-                               data-perm-type="<?= $perm ?>"
-                               data-module="<?= $module ?>">
-                        <label class="form-check-label" for="perm_<?= $module ?>_<?= $perm ?>"></label>
-                      </div>
-                    </td>
-                  <?php endforeach; ?>
-                </tr>
-              <?php endforeach; ?>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="mt-4 text-center">
-          <button type="submit" form="assignPermissionsForm" class="btn bg-success text-white d-flex align-items-center justify-content-center gap-2 mx-auto px-5">
-            <i class="bi bi-check-circle"></i>
-            Assign Permissions to Selected Role
+        <div class="d-flex gap-2">
+          <button class="btn btn-light text-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+            <i class="fas fa-plus-circle me-1"></i> Add New Role
+          </button>
+          <button class="btn btn-outline-light fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addPermissionModal">
+            <i class="fas fa-key me-1"></i> Add Custom Permission
           </button>
         </div>
       </div>
     </div>
+
+    <!-- Summary KPI Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card perm-card-modern p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <span class="text-muted small fw-semibold uppercase">Total Roles</span>
+              <h3 class="fw-extrabold mb-0 mt-1 text-primary"><?= count($roles ?? []) ?></h3>
+            </div>
+            <div class="avatar bg-soft-primary text-primary rounded-circle p-3">
+              <i class="fas fa-users-cog fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card perm-card-modern p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <span class="text-muted small fw-semibold uppercase">Total Permissions</span>
+              <h3 class="fw-extrabold mb-0 mt-1 text-success"><?= count($permissions ?? []) ?></h3>
+            </div>
+            <div class="avatar bg-soft-success text-success rounded-circle p-3">
+              <i class="fas fa-shield-alt fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card perm-card-modern p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <span class="text-muted small fw-semibold uppercase">Active Modules</span>
+              <h3 class="fw-extrabold mb-0 mt-1 text-info"><?= count($groupedPermissions ?? []) ?></h3>
+            </div>
+            <div class="avatar bg-soft-info text-info rounded-circle p-3">
+              <i class="fas fa-cubes fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card perm-card-modern p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <span class="text-muted small fw-semibold uppercase">Configured Staff</span>
+              <h3 class="fw-extrabold mb-0 mt-1 text-warning"><?= count($employees ?? []) ?></h3>
+            </div>
+            <div class="avatar bg-soft-warning text-warning rounded-circle p-3">
+              <i class="fas fa-user-check fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs nav-tabs-modern mb-4" id="permissionsTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="role-matrix-tab" data-bs-toggle="tab" data-bs-target="#role-matrix" type="button" role="tab">
+          <i class="fas fa-table-cells me-2"></i> Role Permissions Matrix
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="user-override-tab" data-bs-toggle="tab" data-bs-target="#user-override" type="button" role="tab">
+          <i class="fas fa-user-lock me-2"></i> User-Wise Direct Permissions
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="manage-roles-tab" data-bs-toggle="tab" data-bs-target="#manage-roles" type="button" role="tab">
+          <i class="fas fa-id-card me-2"></i> Roles & User Assignment
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="perm-master-tab" data-bs-toggle="tab" data-bs-target="#perm-master" type="button" role="tab">
+          <i class="fas fa-list me-2"></i> Functionalities Directory
+        </button>
+      </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="permissionsTabContent">
+
+      <!-- TAB 1: ROLE PERMISSIONS MATRIX -->
+      <div class="tab-pane fade show active" id="role-matrix" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+          <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <div>
+                <label class="form-label fw-bold small text-muted text-uppercase mb-1">Select System Role</label>
+                <select id="matrixRoleSelect" class="form-select fw-bold border-primary shadow-sm" style="min-width: 260px;">
+                  <?php foreach (($roles ?? []) as $r) : ?>
+                    <option value="<?= $r['id'] ?>"><?= esc($r['name']) ?> <?= $r['id'] == 1 ? '(Super Admin - Full Access)' : '' ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </div>
+              <span id="rolePermCountBadge" class="badge bg-soft-primary text-primary px-3 py-2 rounded-pill fw-bold mt-4">
+                0 Permissions Active
+              </span>
+            </div>
+
+            <!-- Quick Action Toolbar -->
+            <div class="d-flex flex-wrap gap-2 align-items-center mt-3 mt-md-0">
+              <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="quickSelectAllMatrix(true)">
+                <i class="fas fa-check-double me-1"></i> Select All
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary fw-bold" onclick="quickSelectAllMatrix(false)">
+                <i class="fas fa-times-circle me-1"></i> Deselect All
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info fw-bold" onclick="quickSelectTypeMatrix('view')">
+                <i class="fas fa-eye me-1"></i> Toggle All View
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-success fw-bold" onclick="quickSelectTypeMatrix('add')">
+                <i class="fas fa-plus me-1"></i> Toggle All Add
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-warning fw-bold" onclick="quickSelectTypeMatrix('edit')">
+                <i class="fas fa-edit me-1"></i> Toggle All Edit
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger fw-bold" onclick="quickSelectTypeMatrix('delete')">
+                <i class="fas fa-trash me-1"></i> Toggle All Delete
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+            <!-- Filter Search Bar -->
+            <div class="mb-4">
+              <input type="text" id="matrixSearchInput" class="form-control form-control-lg rounded-3 border-light shadow-sm" placeholder="🔍 Search module or functionality name (e.g. Booking, Call Analysis, Refund, Clients)...">
+            </div>
+
+            <!-- Role Matrix Form -->
+            <form id="roleMatrixForm">
+              <input type="hidden" id="matrixFormRoleId" name="role_id">
+              
+              <div class="row g-4" id="matrixModulesContainer">
+                <?php if (!empty($groupedPermissions)) : ?>
+                  <?php foreach ($groupedPermissions as $moduleName => $modulePerms) : ?>
+                    <div class="col-12 col-md-6 col-xl-4 module-card-wrapper" data-module="<?= strtolower(esc($moduleName)) ?>">
+                      <div class="card border rounded-3 h-100 shadow-sm overflow-hidden">
+                        <div class="module-header p-3 d-flex justify-content-between align-items-center">
+                          <h6 class="fw-bold mb-0 text-dark">
+                            <i class="fas fa-folder me-2 text-primary"></i> <?= esc($moduleName) ?>
+                          </h6>
+                          <button type="button" class="btn btn-xs btn-soft-primary" onclick="toggleModuleGroup('<?= esc($moduleName) ?>', true)">Select Module</button>
+                        </div>
+                        <div class="card-body p-3">
+                          <div class="d-flex flex-column gap-2">
+                            <?php foreach ($modulePerms as $p) : ?>
+                              <div class="d-flex align-items-center justify-content-between p-2 rounded hover-bg-light border-bottom border-light perm-item" data-perm-name="<?= strtolower(esc($p['name'])) ?>">
+                                <div>
+                                  <span class="fw-semibold text-dark text-capitalize small"><?= esc($p['name']) ?></span>
+                                  <small class="text-muted d-block" style="font-size:0.75rem;">ID #<?= $p['id'] ?></small>
+                                </div>
+                                <div class="form-check form-switch m-0">
+                                  <input class="form-check-input matrix-checkbox" 
+                                         type="checkbox" 
+                                         name="permissions[]" 
+                                         value="<?= $p['id'] ?>" 
+                                         id="matrix_p_<?= $p['id'] ?>"
+                                         data-module="<?= esc($moduleName) ?>"
+                                         data-type="<?= strtolower(esc($p['name'])) ?>"
+                                         onchange="onMatrixToggle(<?= $p['id'] ?>, this.checked)">
+                                </div>
+                              </div>
+                            <?php endforeach; ?>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+
+              <!-- Floating Save Bar -->
+              <div class="mt-4 pt-3 border-top text-end">
+                <button type="submit" class="btn btn-primary btn-lg px-5 shadow rounded-pill fw-bold" id="btnSaveRoleMatrix">
+                  <i class="fas fa-save me-2"></i> Save Role Permissions
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: USER-WISE DIRECT PERMISSIONS -->
+      <div class="tab-pane fade" id="user-override" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+          <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+              <h5 class="fw-bold mb-1"><i class="fas fa-user-lock me-2 text-primary"></i> User Direct Permissions & Overrides</h5>
+              <p class="text-muted small mb-0">Assign or revoke specific permissions for an individual staff member regardless of their global role.</p>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+              <select id="userSelect" class="form-select fw-bold border-success shadow-sm" style="min-width: 280px;">
+                <option value="">-- Select Employee / User --</option>
+                <?php foreach (($employees ?? []) as $emp) : ?>
+                  <option value="<?= $emp['id'] ?>"><?= esc($emp['name']) ?> (Role: <?= esc($emp['role_name'] ?: 'Unassigned') ?>)</option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+            <div id="userOverridePrompt" class="text-center py-5 text-muted">
+              <i class="fas fa-user-shield fa-3x mb-3 text-secondary opacity-50"></i>
+              <h5>Select an Employee to view & manage direct permission overrides.</h5>
+            </div>
+
+            <div id="userOverrideContent" style="display:none;">
+              <!-- User Info Header Box -->
+              <div class="alert alert-info border-0 rounded-3 mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="fw-bold mb-1 text-dark" id="userHeaderName">Employee Name</h6>
+                  <p class="mb-0 text-muted small" id="userHeaderRole">Role: -</p>
+                </div>
+                <div class="d-flex gap-2">
+                  <span class="badge badge-inherited p-2"><i class="fas fa-shield-alt me-1"></i> Inherited from Role</span>
+                  <span class="badge badge-direct p-2"><i class="fas fa-user-check me-1"></i> Direct User Override</span>
+                </div>
+              </div>
+
+              <!-- User Override Form -->
+              <form id="userOverrideForm">
+                <input type="hidden" id="overrideUserId" name="user_id">
+                
+                <div class="row g-4" id="userModulesContainer">
+                  <?php if (!empty($groupedPermissions)) : ?>
+                    <?php foreach ($groupedPermissions as $moduleName => $modulePerms) : ?>
+                      <div class="col-12 col-md-6 col-xl-4">
+                        <div class="card border rounded-3 h-100 shadow-sm">
+                          <div class="module-header p-3 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-folder me-2 text-primary"></i> <?= esc($moduleName) ?></h6>
+                          </div>
+                          <div class="card-body p-3">
+                            <div class="d-flex flex-column gap-2">
+                              <?php foreach ($modulePerms as $p) : ?>
+                                <div class="d-flex align-items-center justify-content-between p-2 rounded hover-bg-light border-bottom border-light">
+                                  <div>
+                                    <span class="fw-semibold text-dark text-capitalize small"><?= esc($p['name']) ?></span>
+                                    <span id="user_badge_<?= $p['id'] ?>" class="badge bg-secondary ms-2 small" style="font-size:0.7rem;">None</span>
+                                  </div>
+                                  <div class="form-check form-switch m-0">
+                                    <input class="form-check-input user-override-checkbox" 
+                                           type="checkbox" 
+                                           name="permissions[]" 
+                                           value="<?= $p['id'] ?>" 
+                                           id="user_p_<?= $p['id'] ?>"
+                                           onchange="onUserOverrideToggle(<?= $p['id'] ?>, this.checked)">
+                                  </div>
+                                </div>
+                              <?php endforeach; ?>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </div>
+
+                <div class="mt-4 pt-3 border-top text-end">
+                  <button type="submit" class="btn btn-success btn-lg px-5 shadow rounded-pill fw-bold" id="btnSaveUserOverride">
+                    <i class="fas fa-save me-2"></i> Save User Direct Overrides
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: ROLES & USER ASSIGNMENT -->
+      <div class="tab-pane fade" id="manage-roles" role="tabpanel">
+        <div class="row g-4">
+          <!-- Roles Cards Grid -->
+          <div class="col-12 col-lg-5">
+            <div class="card border-0 shadow-sm rounded-3">
+              <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0"><i class="fas fa-users-cog me-2 text-primary"></i> System Roles</h5>
+                <button class="btn btn-sm btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                  <i class="fas fa-plus me-1"></i> New Role
+                </button>
+              </div>
+              <div class="card-body p-3">
+                <div class="list-group list-group-flush">
+                  <?php foreach (($roles ?? []) as $r) : ?>
+                    <div class="list-group-item p-3 border rounded-3 mb-2 d-flex justify-content-between align-items-center bg-light">
+                      <div>
+                        <h6 class="fw-bold mb-1 text-dark"><?= esc($r['name']) ?></h6>
+                        <small class="text-muted"><?= esc($r['description'] ?: 'Standard system access role') ?></small>
+                      </div>
+                      <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-icon btn-outline-primary" onclick="editRole(<?= $r['id'] ?>, '<?= esc($r['name']) ?>', '<?= esc($r['description'] ?? '') ?>')">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <?php if ($r['id'] != 1) : ?>
+                          <button class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteRole(<?= $r['id'] ?>, '<?= esc($r['name']) ?>')">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Employees Role Assignment Table -->
+          <div class="col-12 col-lg-7">
+            <div class="card border-0 shadow-sm rounded-3">
+              <div class="card-header bg-transparent border-bottom p-4">
+                <h5 class="fw-bold mb-0"><i class="fas fa-user-tag me-2 text-primary"></i> Staff Role Assignment</h5>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                      <tr>
+                        <th class="py-3 px-4">Staff Member</th>
+                        <th class="py-3">Email</th>
+                        <th class="py-3">Assigned Role</th>
+                        <th class="py-3 text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <?php foreach (($employees ?? []) as $emp) : ?>
+                        <tr>
+                          <td class="px-4 fw-bold text-dark">
+                            <i class="fas fa-user-circle me-1 text-primary"></i> <?= esc($emp['name']) ?>
+                          </td>
+                          <td class="text-muted small"><?= esc($emp['email']) ?></td>
+                          <td>
+                            <select class="form-select form-select-sm fw-bold border-secondary" onchange="changeUserRole(<?= $emp['id'] ?>, this.value)">
+                              <?php foreach (($roles ?? []) as $r) : ?>
+                                <option value="<?= $r['id'] ?>" <?= $emp['role_id'] == $r['id'] ? 'selected' : '' ?>><?= esc($r['name']) ?></option>
+                              <?php endforeach; ?>
+                            </select>
+                          </td>
+                          <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary" onclick="switchToUserTab(<?= $emp['id'] ?>)">
+                              <i class="fas fa-user-lock me-1"></i> Overrides
+                            </button>
+                          </td>
+                        </tr>
+                      <?php endforeach; ?>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: FUNCTIONALITIES DIRECTORY -->
+      <div class="tab-pane fade" id="perm-master" role="tabpanel">
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+          <div class="card-header bg-transparent border-bottom p-4 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fas fa-key me-2 text-primary"></i> Master Functionalities & Permissions</h5>
+            <button class="btn btn-sm btn-primary rounded-pill fw-bold" data-bs-toggle="modal" data-bs-target="#addPermissionModal">
+              <i class="fas fa-plus me-1"></i> Add Permission
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                  <tr>
+                    <th class="py-3 px-4">ID</th>
+                    <th class="py-3">Module Name</th>
+                    <th class="py-3">Permission Key / Action</th>
+                    <th class="py-3 text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach (($permissions ?? []) as $p) : ?>
+                    <tr>
+                      <td class="px-4 fw-bold">#<?= $p['id'] ?></td>
+                      <td><span class="badge bg-soft-primary text-primary fw-bold px-3 py-2"><?= esc($p['module']) ?></span></td>
+                      <td class="fw-bold text-dark text-capitalize"><?= esc($p['name']) ?></td>
+                      <td class="text-center">
+                        <button class="btn btn-sm btn-icon btn-outline-danger" onclick="deletePermission(<?= $p['id'] ?>)">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </main>
 
-<style>
-  /* Custom styles to match the exact design */
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, #3f30e3 0%, #5555fa 100%) !important;
-  }
-
-  .card {
-    border-radius: 16px !important;
-  }
-
-  .table thead th {
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .table tbody td {
-    vertical-align: middle;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .table tbody tr {
-    transition: all 0.2s ease;
-  }
-
-  .table tbody tr:hover {
-    background-color: rgba(99, 102, 241, 0.03) !important;
-  }
-
-  .form-label {
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .input-group-text {
-    background-color: #f9fafb !important;
-    border-color: #e5e7eb !important;
-  }
-
-  .form-control:focus,
-  .form-select:focus,
-  .form-check-input:focus {
-    border-color: #6366f1 !important;
-    box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25) !important;
-  }
-
-  .form-check-input:checked {
-    background-color: #6366f1 !important;
-    border-color: #6366f1 !important;
-  }
-
-  /* Custom checkbox styling */
-  .form-check {
-    margin-bottom: 0;
-  }
-
-  .form-check-input {
-    width: 1.2em;
-    height: 1.2em;
-    cursor: pointer;
-  }
-
-  .form-check-label {
-    cursor: pointer;
-  }
-
-  /* Fixed table layout */
-  .table {
-    table-layout: fixed !important;
-    width: 100% !important;
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 992px) {
-    .table-responsive {
-      overflow-x: auto;
-    }
-    
-    .table {
-      min-width: 700px;
-    }
-    
-    .row.g-4 .col-md-3 {
-      margin-bottom: 1rem;
-    }
-
-    .col-lg-6 {
-      margin-bottom: 1.5rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .d-flex.justify-content-between.align-items-center {
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .table td,
-    .table th {
-      padding: 0.75rem 0.5rem;
-    }
-
-    .btn span.d-none.d-md-inline {
-      display: none !important;
-    }
-
-    .input-group {
-      flex-direction: column;
-    }
-
-    .input-group-text {
-      width: 100%;
-      justify-content: center;
-      border-radius: 0.375rem 0.375rem 0 0 !important;
-    }
-
-    .form-control,
-    .form-select {
-      border-radius: 0 0 0.375rem 0.375rem !important;
-    }
-  }
-
-  @media (max-width: 576px) {
-    .table {
-      min-width: 600px;
-    }
-
-    .btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-    }
-
-    .col-md-1 {
-      margin-top: 1rem;
-    }
-  }
-
-  /* Summary card hover effects */
-  .card:hover {
-    transform: translateY(-2px);
-    transition: transform 0.2s ease;
-  }
-
-  /* Validation styles */
-  .was-validated .form-control:invalid,
-  .was-validated .form-select:invalid {
-    border-color: #dc3545 !important;
-  }
-
-  .was-validated .form-control:invalid:focus,
-  .was-validated .form-select:invalid:focus {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
-  }
-</style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Form validation
-    const forms = document.querySelectorAll('.needs-validation');
-    Array.from(forms).forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-
-    // Select all checkboxes for each permission type
-    function setupSelectAll(mainCheckboxId, checkboxesClass) {
-      const mainCheckbox = document.getElementById(mainCheckboxId);
-      if (mainCheckbox) {
-        mainCheckbox.addEventListener("change", function() {
-          let checkboxes = document.querySelectorAll("." + checkboxesClass);
-          checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-          });
-        });
-      }
-    }
-
-    setupSelectAll("select-all-view", "perm-view"); // Select all View permissions
-    setupSelectAll("select-all-add", "perm-add"); // Select all Add permissions
-    setupSelectAll("select-all-edit", "perm-edit"); // Select all Edit permissions
-    setupSelectAll("select-all-delete", "perm-delete"); // Select all Delete permissions
-
-    // Role selection validation for the assign form
-    const roleSelect = document.getElementById('roleSelect');
-    const assignForm = document.getElementById('assignPermissionsForm');
-    
-    if (assignForm) {
-      assignForm.addEventListener('submit', function(event) {
-        if (!roleSelect.value) {
-          event.preventDefault();
-          event.stopPropagation();
-          roleSelect.classList.add('is-invalid');
-          
-          // Show toast or alert
-          showNotification('Please select a role before assigning permissions.', 'warning');
-        } else {
-          roleSelect.classList.remove('is-invalid');
-        }
-      });
-    }
-
-    // Show notification function
-    function showNotification(message, type = 'info') {
-      const types = {
-        'success': { bg: 'bg-success', icon: 'bi-check-circle' },
-        'warning': { bg: 'bg-warning', icon: 'bi-exclamation-triangle' },
-        'danger': { bg: 'bg-danger', icon: 'bi-x-circle' },
-        'info': { bg: 'bg-info', icon: 'bi-info-circle' }
-      };
-
-      const toastId = 'toast-' + Date.now();
-      const toastHtml = `
-        <div id="${toastId}" class="toast align-items-center text-white ${types[type].bg} border-0 position-fixed bottom-0 end-0 m-3" role="alert">
-          <div class="d-flex">
-            <div class="toast-body d-flex align-items-center gap-2">
-              <i class="bi ${types[type].icon} fs-5"></i>
-              ${message}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+<!-- Add/Edit Role Modal -->
+<div class="modal fade" id="addRoleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-gradient-permissions text-white p-4">
+        <h5 class="modal-title text-white fw-bold" id="roleModalTitle"><i class="fas fa-users-cog me-2"></i> System Role</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="roleForm">
+        <input type="hidden" id="roleEditId" name="role_id">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Role Name <span class="text-danger">*</span></label>
+            <input type="text" id="roleName" name="name" class="form-control" placeholder="e.g. Telecaller Manager" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Role Description</label>
+            <textarea id="roleDescription" name="description" class="form-control" rows="3" placeholder="Describe the responsibilities for this role..."></textarea>
           </div>
         </div>
-      `;
+        <div class="modal-footer bg-light p-3">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4" id="btnSaveRole">
+            <i class="fas fa-save me-1"></i> Save Role
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-      document.body.insertAdjacentHTML('beforeend', toastHtml);
-      const toastElement = document.getElementById(toastId);
-      const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
-      toast.show();
+<!-- Add Permission Modal -->
+<div class="modal fade" idaddPermissionModal" tabindex="-1" id="addPermissionModal" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-gradient-permissions text-white p-4">
+        <h5 class="modal-title text-white fw-bold"><i class="fas fa-key me-2"></i> Add Custom Permission</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="post" action="<?= base_url('admin/add-permission') ?>">
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Module Name <span class="text-danger">*</span></label>
+            <input type="text" name="module" class="form-control" placeholder="e.g. Booking, Call Analysis, Refund" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Permission Action / Key <span class="text-danger">*</span></label>
+            <input type="text" name="name" class="form-control" placeholder="e.g. view, add, edit, delete, audit, export" required>
+          </div>
+        </div>
+        <div class="modal-footer bg-light p-3">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm px-4">
+            <i class="fas fa-plus me-1"></i> Add Permission
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-      // Remove toast after it's hidden
-      toastElement.addEventListener('hidden.bs.toast', function() {
-        this.remove();
+<script>
+  let currentRoleAssignedIds = [];
+  let currentUserEffectiveData = null;
+
+  $(document.ready ? document : window).ready(function() {
+    loadRoleMatrixPermissions();
+
+    $('#matrixRoleSelect').on('change', function() {
+      loadRoleMatrixPermissions();
+    });
+
+    $('#userSelect').on('change', function() {
+      loadUserPermissions();
+    });
+
+    // Live search filter for Role Matrix
+    $('#matrixSearchInput').on('keyup', function() {
+      let query = $(this).val().toLowerCase().trim();
+      if (!query) {
+        $('.module-card-wrapper').show();
+        $('.perm-item').show();
+        return;
+      }
+      $('.module-card-wrapper').each(function() {
+        let modName = $(this).data('module') || '';
+        let hasMatchingPerm = false;
+        $(this).find('.perm-item').each(function() {
+          let permName = $(this).data('perm-name') || '';
+          let text = $(this).text().toLowerCase();
+          if (text.indexOf(query) > -1 || modName.indexOf(query) > -1) {
+            $(this).show();
+            hasMatchingPerm = true;
+          } else {
+            $(this).hide();
+          }
+        });
+        if (hasMatchingPerm || modName.indexOf(query) > -1) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
       });
-    }
+    });
 
-    // Initialize tooltips if using Bootstrap 5
-    if (typeof bootstrap !== 'undefined') {
-      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-      tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Role Matrix Form Submit
+    $('#roleMatrixForm').on('submit', function(e) {
+      e.preventDefault();
+      let btn = $('#btnSaveRoleMatrix');
+      btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Saving Role Matrix...');
+
+      $.ajax({
+        url: '<?= base_url('admin/permissions/save-role-permissions') ?>',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(resp) {
+          btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i> Save Role Permissions');
+          if (resp.status) {
+            showToast('Role permissions updated successfully!', 'success');
+            loadRoleMatrixPermissions();
+          } else {
+            showToast(resp.message || 'Failed to update role permissions.', 'danger');
+          }
+        },
+        error: function() {
+          btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i> Save Role Permissions');
+          showToast('Server error saving role permissions.', 'danger');
+        }
       });
-    }
+    });
+
+    // User Direct Override Form Submit
+    $('#userOverrideForm').on('submit', function(e) {
+      e.preventDefault();
+      let btn = $('#btnSaveUserOverride');
+      btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i> Saving Overrides...');
+
+      $.ajax({
+        url: '<?= base_url('admin/permissions/save-user-permissions') ?>',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(resp) {
+          btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i> Save User Direct Overrides');
+          if (resp.status) {
+            showToast('Direct user permission overrides updated successfully!', 'success');
+            loadUserPermissions();
+          } else {
+            showToast(resp.message || 'Failed to update user overrides.', 'danger');
+          }
+        },
+        error: function() {
+          btn.prop('disabled', false).html('<i class="fas fa-save me-2"></i> Save User Direct Overrides');
+          showToast('Server error saving user overrides.', 'danger');
+        }
+      });
+    });
+
+    // Save Role Form Submit
+    $('#roleForm').on('submit', function(e) {
+      e.preventDefault();
+      let btn = $('#btnSaveRole');
+      btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i> Saving...');
+
+      $.ajax({
+        url: '<?= base_url('admin/permissions/save-role') ?>',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function(resp) {
+          btn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Save Role');
+          if (resp.status) {
+            showToast(resp.message, 'success');
+            setTimeout(function() { location.reload(); }, 1200);
+          } else {
+            showToast(resp.message, 'danger');
+          }
+        }
+      });
+    });
   });
+
+  function loadRoleMatrixPermissions() {
+    let roleId = $('#matrixRoleSelect').val();
+    $('#matrixFormRoleId').val(roleId);
+
+    $('.matrix-checkbox').prop('checked', false);
+
+    $.ajax({
+      url: '<?= base_url('admin/permissions/get-role-permissions') ?>',
+      type: 'POST',
+      data: { role_id: roleId },
+      success: function(resp) {
+        if (!resp.status) return;
+        currentRoleAssignedIds = resp.permission_ids || [];
+        
+        $('#rolePermCountBadge').text(currentRoleAssignedIds.length + ' Permissions Active');
+
+        currentRoleAssignedIds.forEach(id => {
+          $('#matrix_p_' + id).prop('checked', true);
+        });
+      }
+    });
+  }
+
+  function loadUserPermissions() {
+    let userId = $('#userSelect').val();
+    if (!userId) {
+      $('#userOverridePrompt').show();
+      $('#userOverrideContent').hide();
+      return;
+    }
+
+    $('#overrideUserId').val(userId);
+    $('.user-override-checkbox').prop('checked', false);
+
+    $.ajax({
+      url: '<?= base_url('admin/permissions/get-user-permissions') ?>',
+      type: 'POST',
+      data: { user_id: userId },
+      success: function(resp) {
+        if (!resp.status) return;
+        let d = resp.data;
+        currentUserEffectiveData = d;
+
+        $('#userHeaderName').text(d.user.name + ' (' + d.user.email + ')');
+        $('#userHeaderRole').text('Assigned Role: ' + (d.user.role_name || 'Role #' + d.user.role_id));
+
+        let roleIds = d.role_permission_ids || [];
+        let directIds = d.direct_permission_ids || [];
+
+        $('.user-override-checkbox').each(function() {
+          let pId = parseInt($(this).val());
+          let badge = $('#user_badge_' + pId);
+
+          if (directIds.includes(pId)) {
+            $(this).prop('checked', true);
+            badge.removeClass().addClass('badge badge-direct ms-2').text('Direct User Override');
+          } else if (roleIds.includes(pId)) {
+            $(this).prop('checked', true);
+            badge.removeClass().addClass('badge badge-inherited ms-2').text('Role Inherited');
+          } else {
+            $(this).prop('checked', false);
+            badge.removeClass().addClass('badge bg-secondary ms-2').text('Not Granted');
+          }
+        });
+
+        $('#userOverridePrompt').hide();
+        $('#userOverrideContent').show();
+      }
+    });
+  }
+
+  function onMatrixToggle(permId, isChecked) {
+    let roleId = $('#matrixRoleSelect').val();
+    $.ajax({
+      url: '<?= base_url('admin/permissions/toggle-role-permission') ?>',
+      type: 'POST',
+      data: { role_id: roleId, permission_id: permId, enable: isChecked ? 1 : 0 },
+      success: function(resp) {
+        if (resp.status) {
+          showToast('Permission toggle updated.', 'info');
+        }
+      }
+    });
+  }
+
+  function onUserOverrideToggle(permId, isChecked) {
+    let userId = $('#userSelect').val();
+    $.ajax({
+      url: '<?= base_url('admin/permissions/toggle-user-permission') ?>',
+      type: 'POST',
+      data: { user_id: userId, permission_id: permId, enable: isChecked ? 1 : 0 },
+      success: function(resp) {
+        if (resp.status) {
+          showToast('User direct permission updated.', 'info');
+        }
+      }
+    });
+  }
+
+  function quickSelectAllMatrix(enable) {
+    $('.matrix-checkbox').prop('checked', enable);
+    $('#roleMatrixForm').submit();
+  }
+
+  function quickSelectTypeMatrix(type) {
+    $('.matrix-checkbox[data-type="' + type + '"]').prop('checked', true);
+    $('#roleMatrixForm').submit();
+  }
+
+  function toggleModuleGroup(moduleName, enable) {
+    $('.matrix-checkbox[data-module="' + moduleName + '"]').prop('checked', enable);
+    $('#roleMatrixForm').submit();
+  }
+
+  function editRole(id, name, desc) {
+    $('#roleEditId').val(id);
+    $('#roleName').val(name);
+    $('#roleDescription').val(desc);
+    $('#roleModalTitle').html('<i class="fas fa-edit me-2"></i> Edit Role #' + id);
+    new bootstrap.Modal(document.getElementById('addRoleModal')).show();
+  }
+
+  function deleteRole(id, name) {
+    if (!confirm('Are you sure you want to delete role "' + name + '"?')) return;
+    $.ajax({
+      url: '<?= base_url('admin/permissions/delete-role') ?>',
+      type: 'POST',
+      data: { role_id: id },
+      success: function(resp) {
+        if (resp.status) {
+          showToast(resp.message, 'success');
+          setTimeout(function() { location.reload(); }, 1200);
+        } else {
+          showToast(resp.message, 'danger');
+        }
+      }
+    });
+  }
+
+  function deletePermission(id) {
+    if (!confirm('Are you sure you want to delete permission #' + id + '?')) return;
+    $.ajax({
+      url: '<?= base_url('admin/permissions/delete-permission') ?>',
+      type: 'POST',
+      data: { permission_id: id },
+      success: function(resp) {
+        if (resp.status) {
+          showToast(resp.message, 'success');
+          setTimeout(function() { location.reload(); }, 1200);
+        } else {
+          showToast(resp.message, 'danger');
+        }
+      }
+    });
+  }
+
+  function changeUserRole(userId, roleId) {
+    $.ajax({
+      url: '<?= base_url('admin/permissions/assign-user-role') ?>',
+      type: 'POST',
+      data: { user_id: userId, role_id: roleId },
+      success: function(resp) {
+        if (resp.status) {
+          showToast('Staff member role updated successfully!', 'success');
+        } else {
+          showToast(resp.message || 'Failed to update user role.', 'danger');
+        }
+      }
+    });
+  }
+
+  function switchToUserTab(userId) {
+    $('#userSelect').val(userId).trigger('change');
+    let tab = new bootstrap.Tab(document.getElementById('user-override-tab'));
+    tab.show();
+  }
+
+  function showToast(message, type) {
+    let bg = type === 'success' ? 'bg-success' : (type === 'danger' ? 'bg-danger' : 'bg-info');
+    let toastId = 'toast-' + Date.now();
+    let toastHtml = `
+      <div id="${toastId}" class="toast align-items-center text-white ${bg} border-0 position-fixed bottom-0 end-0 m-3 shadow-lg" style="z-index: 9999;" role="alert">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2 fw-semibold">
+            <i class="fas fa-info-circle me-1"></i> ${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', toastHtml);
+    let toastEl = document.getElementById(toastId);
+    let toast = new bootstrap.Toast(toastEl, { delay: 2500 });
+    toast.show();
+    toastEl.addEventListener('hidden.bs.toast', function() { this.remove(); });
+  }
 </script>
 
 <?php echo $this->include('admin/footer') ?>

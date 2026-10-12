@@ -255,12 +255,23 @@ class ServiceModel extends Model
 
     public function getBanners()
     {
-        return $this->db->table('banners')->get()->getResult();
+        return $this->db->table('banners')->orderBy('id', 'DESC')->get()->getResult();
+    }
+
+    public function getBanner($id)
+    {
+        return $this->db->table('banners')->where('id', $id)->get()->getRow();
     }
 
     public function addBanner($data)
     {
-        return $this->db->table('banners')->insert($data);
+        $this->db->table('banners')->insert($data);
+        return $this->db->insertID();
+    }
+
+    public function updateBanner($id, $data)
+    {
+        return $this->db->table('banners')->where('id', $id)->update($data);
     }
 
     public function deleteBanner($id)
@@ -270,7 +281,12 @@ class ServiceModel extends Model
 
     public function updateBannerStatus($id, $status)
     {
-        return $this->db->table('banners')->where('id', $id)->update(['status' => $status]);
+        $isActive = ($status === 'active' || $status === '1' || $status === 1) ? 1 : 0;
+        $updateData = ['is_active' => $isActive];
+        if ($this->db->fieldExists('status', 'banners')) {
+            $updateData['status'] = $isActive ? 'active' : 'inactive';
+        }
+        return $this->db->table('banners')->where('id', $id)->update($updateData);
     }
        public function checkProviderJobStatus($provider_id){
         $data = $this->db->table('quotations')->where('provider_id', $provider_id)->where('status', 'Accepted')->get()->getRow();

@@ -22,13 +22,27 @@
             </div>
         </div>
 
+        <?php
+        $bookingsList = $bookings ?? [];
+        $allRequestsCount = count($bookingsList);
+        $extendRequestsCount = 0;
+        $normalRequestsCount = 0;
+        foreach ($bookingsList as $b) {
+            if (strtolower($b->type ?? '') === 'extend') {
+                $extendRequestsCount++;
+            } else {
+                $normalRequestsCount++;
+            }
+        }
+        ?>
+
         <!-- Tab Navigation -->
         <div class="card border-0 shadow-sm mb-4 rounded-3">
             <div class="card-body p-2">
                 <ul class="nav nav-pills nav-fill" id="requestTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <a class="nav-link active rounded-pill py-2 fw-bold" href="<?= base_url('bookingRequests') ?>">
-                            <i class="bi bi-list-task me-2"></i>Normal Requests
+                            <i class="bi bi-list-task me-2"></i>Booking Requests (<?= $allRequestsCount ?>)
                         </a>
                     </li>
                     <li class="nav-item" role="presentation">
@@ -44,7 +58,7 @@
         <div class="card border-0 shadow-sm mb-2 rounded-3">
             <div class="card-body p-3">
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-black border-end-0 text-white">
                                 <i class="bi bi-search"></i>
@@ -54,6 +68,16 @@
                         </div>
                     </div>
                     <div class="col-md-3">
+                        <div class="d-flex align-items-center mb-2 mb-md-0">
+                            <label class="text-muted small me-2 text-nowrap">Type</label>
+                            <select class="form-select form-select-sm" id="typeFilter">
+                                <option value="all">All Requests (<?= $allRequestsCount ?>)</option>
+                                <option value="normal">Normal Requests (<?= $normalRequestsCount ?>)</option>
+                                <option value="extend">Extend Requests (<?= $extendRequestsCount ?>)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
                         <div class="d-flex align-items-center mb-2 mb-md-0">
                             <label class="text-muted small me-2">Show</label>
                             <select class="form-select form-select-sm" style="width: auto;" id="entriesPerPage">
@@ -66,17 +90,31 @@
                             <label class="text-muted small ms-2">entries</label>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-black bg-black p-2 text-white w-100" onclick="applyFilters()">
+                    <div class="col-md-3 d-flex gap-2">
+                        <button class="btn btn-black bg-black p-2 text-white w-50" onclick="applyFilters()">
                             <i class="bi bi-funnel me-1"></i>Filter
                         </button>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-black bg-black p-2 text-white w-100" onclick="clearFilters()">
+                        <button class="btn btn-black bg-black p-2 text-white w-50" onclick="clearFilters()">
                             <i class="bi bi-x-circle me-1"></i>Clear
                         </button>
                     </div>
+                </div>
 
+                <!-- Quick Filter Pills -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3 pt-2 border-top">
+                    <span class="text-muted small me-1">Quick Filter:</span>
+                    <button type="button" class="btn btn-sm type-filter-btn btn-dark rounded-pill px-3 py-1 fw-semibold active"
+                        data-type="all" style="font-size: 0.8rem;">
+                        All Requests <span class="badge bg-secondary ms-1"><?= $allRequestsCount ?></span>
+                    </button>
+                    <button type="button" class="btn btn-sm type-filter-btn btn-outline-primary rounded-pill px-3 py-1 fw-semibold"
+                        data-type="normal" style="font-size: 0.8rem;">
+                        Normal Requests <span class="badge bg-primary ms-1"><?= $normalRequestsCount ?></span>
+                    </button>
+                    <button type="button" class="btn btn-sm type-filter-btn btn-outline-success rounded-pill px-3 py-1 fw-semibold"
+                        data-type="extend" style="font-size: 0.8rem;">
+                        <i class="bi bi-arrow-repeat me-1 text-success"></i>Extend Requests <span class="badge bg-success ms-1"><?= $extendRequestsCount ?></span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -235,7 +273,7 @@
 
 
                         $i = 1;
-                        foreach ($bookings as $booking):
+                        foreach ($bookingsList as $booking):
                             // Determine status badge color
                             $statusColors = [
                                 'pending' => ['class' => 'bg-warning bg-opacity-10 text-warning border-warning border-opacity-25', 'icon' => 'bi-clock'],
@@ -257,7 +295,7 @@
                             $daysLeft = $booking->total_days ?? 0;
                             $daysStyle = getDaysLeftStyle($daysLeft, $booking->service_name ?? '');
                             ?>
-                            <tr class="booking-row" data-status="<?= $status ?>">
+                            <tr class="booking-row" data-status="<?= $status ?>" data-type="<?= esc(strtolower($booking->type ?? 'normal')) ?>">
                                 <!-- Customer Column -->
                                 <td class="ps-4 py-2">
                                     <div class="d-flex align-items-center gap-3">
@@ -296,6 +334,18 @@
                                                         border: 1px solid rgba(59, 130, 246, 0.2) !important;">
                                                 <?= htmlspecialchars($booking->service_name ?? '--') ?>
                                             </span>
+                                            <?php if (!empty($booking->type)): 
+                                                $isExtend = strtolower($booking->type) === 'extend';
+                                            ?>
+                                                <span class="badge rounded-pill p-1 px-2 border-0 mt-1" 
+                                                    style="background-color: <?= $isExtend ? 'rgba(16, 185, 129, 0.12)' : 'rgba(107, 114, 128, 0.1)' ?> !important;
+                                                           color: <?= $isExtend ? '#059669' : '#6b7280' ?> !important;
+                                                           border: 1px solid <?= $isExtend ? 'rgba(16, 185, 129, 0.3)' : 'rgba(107, 114, 128, 0.2)' ?> !important;
+                                                           font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                                    <i class="bi <?= $isExtend ? 'bi-arrow-repeat' : 'bi-plus-circle' ?> me-1"></i>
+                                                    <?= $isExtend ? 'Extend' : htmlspecialchars($booking->type) ?>
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </td>
@@ -903,6 +953,12 @@
         const statusColor = getStatusColor(booking.status);
         const statusBadge = `<span class="badge bg-${statusColor} px-3 py-2">${booking.status ? booking.status.charAt(0).toUpperCase() + booking.status.slice(1) : 'Unknown'}</span>`;
 
+        // Format booking type badge
+        const isExtend = (booking.type || '').toLowerCase() === 'extend';
+        const typeBadge = booking.type ? `<span class="badge rounded-pill px-3 py-2" style="font-size: 0.8rem; background: ${isExtend ? 'rgba(16, 185, 129, 0.12)' : 'rgba(107, 114, 128, 0.1)'} !important; border: 1px solid ${isExtend ? 'rgba(16, 185, 129, 0.3)' : 'rgba(107, 114, 128, 0.2)'} !important; color: ${isExtend ? '#059669' : '#6b7280'} !important;">
+            <i class="bi ${isExtend ? 'bi-arrow-repeat' : 'bi-plus-circle'} me-1"></i>${isExtend ? 'Extend Request' : booking.type}
+        </span>` : '';
+
         // Format days left badge
         const daysLeft = booking.total_days || 0;
         const daysStyle = getDaysLeftStyle(daysLeft, booking.service_name || '');
@@ -919,6 +975,13 @@
                     <span class="text-secondary small">Status</span>
                     <div class="mt-1">${statusBadge}</div>
                 </div>
+                ${booking.type ? `
+                <div class="vr"></div>
+                <div>
+                    <span class="text-secondary small">Type</span>
+                    <div class="mt-1">${typeBadge}</div>
+                </div>
+                ` : ''}
                 <div class="vr"></div>
                 <div>
                     <span class="text-secondary small">Time Left</span>
@@ -1025,12 +1088,26 @@
                         </h6>
                     </div>
                     <div class="card-body p-3">
-                        <div class="mb-3">
+                        <div class="mb-3 d-flex align-items-center gap-2 flex-wrap">
                             <span class="badge fw-bold rounded-pill px-4 py-2" 
                                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                                 ${booking.service_name || '--'}
                             </span>
+                            ${isExtend ? `
+                            <span class="badge rounded-pill px-3 py-2" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 600;">
+                                <i class="bi bi-arrow-repeat me-1"></i>Extension
+                            </span>
+                            ` : ''}
                         </div>
+                        ${booking.original_booking_id ? `
+                        <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2" style="font-size: 0.85rem; border-radius: 8px;">
+                            <i class="bi bi-link-45deg fs-5"></i>
+                            <div>
+                                <span class="text-muted">Extension for Original Booking:</span>
+                                <strong>#${booking.original_booking_id}</strong>
+                            </div>
+                        </div>
+                        ` : ''}
                         <div class="row g-3">
                             <div class="col-6">
                                 <span class="text-secondary small">Start Date</span>
@@ -1504,10 +1581,13 @@
         constructor() {
             this.currentPage = 1;
             this.entriesPerPage = 10;
-            this.totalEntries = <?= count($bookings) ?>;
+            this.totalEntries = <?= !empty($bookings) ? count($bookings) : 0 ?>;
             this.tableBody = document.getElementById('tableBody');
             this.allRows = Array.from(document.querySelectorAll('.booking-row'));
             this.filteredRows = this.allRows; // For filtered results
+            this.searchTerm = '';
+            this.statusFilter = 'all_bookings';
+            this.typeFilter = 'all';
             this.init();
         }
 
@@ -1518,50 +1598,69 @@
 
         setupEventListeners() {
             // Entries per page change
-            document.getElementById('entriesPerPage').addEventListener('change', (e) => {
-                const value = e.target.value;
-                this.entriesPerPage = value === 'all' ? this.totalEntries : parseInt(value);
-                this.currentPage = 1;
-                this.updateDisplay();
-            });
-
-            // Previous page button
-            document.getElementById('prevPage').addEventListener('click', () => {
-                if (this.currentPage > 1) {
-                    this.currentPage--;
+            const entriesSelect = document.getElementById('entriesPerPage');
+            if (entriesSelect) {
+                entriesSelect.addEventListener('change', (e) => {
+                    const value = e.target.value;
+                    this.entriesPerPage = value === 'all' ? this.totalEntries : parseInt(value);
+                    this.currentPage = 1;
                     this.updateDisplay();
-                }
-            });
-
-            // Next page button
-            document.getElementById('nextPage').addEventListener('click', () => {
-                const totalPages = this.getTotalPages();
-                if (this.currentPage < totalPages) {
-                    this.currentPage++;
-                    this.updateDisplay();
-                }
-            });
-
-            // Search input - override existing search
-            const searchInput = document.getElementById('searchBookings');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    this.searchBookings(e.target.value);
                 });
             }
 
-            // Filter buttons - override existing filter
+            // Previous page button
+            const prevBtn = document.getElementById('prevPage');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', () => {
+                    if (this.currentPage > 1) {
+                        this.currentPage--;
+                        this.updateDisplay();
+                    }
+                });
+            }
+
+            // Next page button
+            const nextBtn = document.getElementById('nextPage');
+            if (nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    const totalPages = this.getTotalPages();
+                    if (this.currentPage < totalPages) {
+                        this.currentPage++;
+                        this.updateDisplay();
+                    }
+                });
+            }
+
+            // Search input
+            const searchInput = document.getElementById('searchBookings');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    this.searchTerm = e.target.value.toLowerCase();
+                    this.applyFilters();
+                });
+            }
+
+            // Type filter select dropdown
+            const typeFilterSelect = document.getElementById('typeFilter');
+            if (typeFilterSelect) {
+                typeFilterSelect.addEventListener('change', (e) => {
+                    this.setTypeFilter(e.target.value);
+                });
+            }
+
+            // Quick filter buttons (All, Normal, Extend)
+            document.querySelectorAll('.type-filter-btn').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    this.setTypeFilter(btn.dataset.type);
+                });
+            });
+
+            // Status filter buttons
             document.querySelectorAll('.status-filter-btn').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     this.filterByStatus(btn.dataset.status);
                 });
             });
-
-            // Clear filters button
-            const clearBtn = document.querySelector('button[onclick="clearFilters()"]');
-            if (clearBtn) {
-                clearBtn.onclick = () => this.clearFilters();
-            }
         }
 
         getTotalPages() {
@@ -1592,10 +1691,11 @@
             const pageNumbersContainer = document.getElementById('pageNumbers');
 
             // Update prev/next buttons
-            prevBtn.disabled = this.currentPage === 1;
-            nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
+            if (prevBtn) prevBtn.disabled = this.currentPage === 1;
+            if (nextBtn) nextBtn.disabled = this.currentPage === totalPages || totalPages === 0;
 
             // Generate page numbers
+            if (!pageNumbersContainer) return;
             let pageNumbersHtml = '';
             const maxVisiblePages = 5;
 
@@ -1645,42 +1745,79 @@
             return `<button class="btn btn-sm ${activeClass} page-btn" data-page="${pageNum}">${pageNum}</button>`;
         }
 
+        setTypeFilter(type) {
+            this.typeFilter = type || 'all';
+            const typeFilterSelect = document.getElementById('typeFilter');
+            if (typeFilterSelect && typeFilterSelect.value !== this.typeFilter) {
+                typeFilterSelect.value = this.typeFilter;
+            }
+            // Update quick filter buttons
+            document.querySelectorAll('.type-filter-btn').forEach(btn => {
+                const btnType = btn.dataset.type;
+                btn.classList.remove('active', 'btn-dark', 'btn-primary', 'btn-success', 'btn-outline-dark', 'btn-outline-primary', 'btn-outline-success');
+                if (btnType === this.typeFilter) {
+                    btn.classList.add('active');
+                    if (btnType === 'all') btn.classList.add('btn-dark');
+                    else if (btnType === 'normal') btn.classList.add('btn-primary');
+                    else if (btnType === 'extend') btn.classList.add('btn-success');
+                } else {
+                    if (btnType === 'all') btn.classList.add('btn-outline-dark');
+                    else if (btnType === 'normal') btn.classList.add('btn-outline-primary');
+                    else if (btnType === 'extend') btn.classList.add('btn-outline-success');
+                }
+            });
+            this.applyFilters();
+        }
 
         searchBookings(query) {
-            query = query.toLowerCase();
-            this.filteredRows = this.allRows.filter(row => {
-                return row.textContent.toLowerCase().includes(query);
-            });
-            this.currentPage = 1;
-            this.updateDisplay();
+            this.searchTerm = (query || '').toLowerCase();
+            this.applyFilters();
         }
 
         filterByStatus(status) {
-            if (status === 'all_bookings') {
-                this.filteredRows = this.allRows;
-            } else {
-                this.filteredRows = this.allRows.filter(row => row.dataset.status === status);
-            }
-
-            // Update active filter button
+            this.statusFilter = status;
             document.querySelectorAll('.status-filter-btn').forEach(btn => {
                 btn.classList.remove('active', 'shadow-sm');
                 if (btn.dataset.status === status) {
                     btn.classList.add('active', 'shadow-sm');
                 }
             });
+            this.applyFilters();
+        }
 
+        applyFilters() {
+            this.filteredRows = this.allRows.filter(row => {
+                // Text search
+                const matchesSearch = !this.searchTerm || row.textContent.toLowerCase().includes(this.searchTerm);
+
+                // Status match
+                const rowStatus = row.dataset.status;
+                const matchesStatus = this.statusFilter === 'all_bookings' || rowStatus === this.statusFilter;
+
+                // Type match
+                const rowType = (row.dataset.type || 'normal').toLowerCase();
+                let matchesType = true;
+                if (this.typeFilter === 'extend') {
+                    matchesType = rowType === 'extend';
+                } else if (this.typeFilter === 'normal') {
+                    matchesType = rowType !== 'extend';
+                }
+
+                return matchesSearch && matchesStatus && matchesType;
+            });
             this.currentPage = 1;
             this.updateDisplay();
         }
 
         clearFilters() {
-            document.getElementById('searchBookings').value = '';
-            document.getElementById('dateFilter').value = '';
-            this.filteredRows = this.allRows;
-            this.currentPage = 1;
+            const searchInput = document.getElementById('searchBookings');
+            if (searchInput) searchInput.value = '';
+            const dateFilter = document.getElementById('dateFilter');
+            if (dateFilter) dateFilter.value = '';
+            this.searchTerm = '';
+            this.statusFilter = 'all_bookings';
 
-            // Reset active filter button
+            // Reset status buttons
             document.querySelectorAll('.status-filter-btn').forEach(btn => {
                 btn.classList.remove('active', 'shadow-sm');
                 if (btn.dataset.status === 'all_bookings') {
@@ -1688,7 +1825,7 @@
                 }
             });
 
-            this.updateDisplay();
+            this.setTypeFilter('all');
         }
 
         // Call this method when new data is loaded (e.g., after AJAX)
@@ -1702,74 +1839,31 @@
     }
 
     function filterBookings(status) {
-        const rows = document.querySelectorAll('.booking-row');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            if (status === 'all_bookings' || row.dataset.status === status) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Update active filter button
-        document.querySelectorAll('.status-filter-btn').forEach(btn => {
-            if (btn.dataset.status === status) {
-                btn.style.backgroundColor = 'white';
-                btn.style.color = '#7c3aed';
-                btn.classList.add('shadow-sm');
-            } else {
-                btn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                btn.style.color = 'white';
-                btn.classList.remove('shadow-sm');
-            }
-        });
+        if (window.paginationManager) {
+            window.paginationManager.filterByStatus(status);
+        }
     }
 
     function searchBookings(query) {
-        const rows = document.querySelectorAll('.booking-row');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            const rowText = row.textContent.toLowerCase();
-            if (rowText.includes(query.toLowerCase())) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        if (window.paginationManager) {
+            window.paginationManager.searchBookings(query);
+        }
     }
 
     function applyFilters() {
-        const searchTerm = document.getElementById('searchBookings').value.toLowerCase();
-        const dateFilter = document.getElementById('dateFilter').value;
-
-        const rows = document.querySelectorAll('.booking-row');
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            const rowText = row.textContent.toLowerCase();
-            const rowDate = row.dataset.date;
-
-            const matchesSearch = !searchTerm || rowText.includes(searchTerm);
-            const matchesDate = !dateFilter || rowDate === dateFilter;
-
-            if (matchesSearch && matchesDate) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
+        if (window.paginationManager) {
+            const searchInput = document.getElementById('searchBookings');
+            const typeFilter = document.getElementById('typeFilter');
+            if (searchInput) window.paginationManager.searchTerm = searchInput.value.toLowerCase();
+            if (typeFilter) window.paginationManager.typeFilter = typeFilter.value;
+            window.paginationManager.applyFilters();
+        }
     }
 
     function clearFilters() {
-        document.getElementById('searchBookings').value = '';
-        document.getElementById('dateFilter').value = '';
-        filterBookings('all_bookings');
+        if (window.paginationManager) {
+            window.paginationManager.clearFilters();
+        }
     }
 
     function animateDaysBadges() {

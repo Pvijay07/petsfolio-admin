@@ -2,6 +2,26 @@
 <html>
 
 <head>
+  <!-- Theme Early Detection (Zero-Flicker) -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('petsfolio_theme');
+        if (!theme) {
+          theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'light');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Petsfolio | Admin</title>
@@ -24,6 +44,9 @@
 
   <!-- Dark Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/dark.min.css" />
+
+  <!-- Universal Dark Mode Overrides (Global Engine) -->
+  <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
 
   <!-- Customizer Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/customizer.min.css" />
@@ -1327,6 +1350,600 @@
         display: none;
       }
     }
+
+    /* ==========================================================================
+       GLOBAL DARK & LIGHT MODE STYLES
+       ========================================================================== */
+    :root {
+      --pf-transition-speed: 0.25s;
+    }
+
+    body, .sidebar-container, nav.navbar.iq-navbar, .card, .modal-content, .dropdown-menu, .form-control, .form-select, input, select, textarea {
+      transition: background-color var(--pf-transition-speed) ease, border-color var(--pf-transition-speed) ease, color var(--pf-transition-speed) ease, box-shadow var(--pf-transition-speed) ease !important;
+    }
+
+    /* Dark Theme Variables & Base */
+    html.dark, body.dark, .dark {
+      color-scheme: dark;
+      background-color: #0b111e !important;
+      color: #cbd5e1 !important;
+    }
+
+    html.dark body, body.dark {
+      background-color: #0b111e !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6,
+    html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
+    body.dark .h1, body.dark .h2, body.dark .h3, body.dark .h4, body.dark .h5, body.dark .h6 {
+      color: #f8fafc !important;
+    }
+
+    body.dark .text-dark, html.dark .text-dark,
+    body.dark .text-black, html.dark .text-black {
+      color: #f8fafc !important;
+    }
+
+    body.dark .text-muted, html.dark .text-muted {
+      color: #94a3b8 !important;
+    }
+
+    body.dark .text-secondary, html.dark .text-secondary {
+      color: #cbd5e1 !important;
+    }
+
+    /* Sidebar Dark Mode */
+    body.dark .sidebar-container {
+      background-color: #141c2e !important;
+      border-right-color: #26354d !important;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.35) !important;
+    }
+
+    body.dark .sidebar-header {
+      background-color: #141c2e !important;
+      border-bottom-color: #26354d !important;
+    }
+
+    body.dark .sidebar-footer {
+      background-color: #101726 !important;
+      border-top-color: #26354d !important;
+    }
+
+    body.dark .user-name {
+      color: #f8fafc !important;
+    }
+
+    body.dark .user-role {
+      color: #94a3b8 !important;
+    }
+
+    body.dark .nav-section-title {
+      color: #64748b !important;
+    }
+
+    body.dark .nav-button {
+      color: #cbd5e1 !important;
+      background-color: transparent !important;
+    }
+
+    body.dark .nav-button:hover {
+      background-color: #1f2b42 !important;
+      color: #60a5fa !important;
+    }
+
+    body.dark .nav-button.active {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+    }
+
+    body.dark .nav-button.active .nav-icon {
+      color: #ffffff !important;
+    }
+
+    body.dark .nav-icon {
+      color: #94a3b8 !important;
+    }
+
+    body.dark .sidebar-toggle {
+      background-color: #26354d !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark .sidebar-toggle svg {
+      stroke: #cbd5e1 !important;
+    }
+
+    body.dark .sidebar-toggle:hover {
+      background-color: #334155 !important;
+    }
+
+    body.dark .sidebar-container.collapsed .nav-button::after {
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+      border: 1px solid #334155 !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    body.dark .sidebar-container.collapsed .nav-button::before {
+      border-right-color: #1e293b !important;
+    }
+
+    /* Navbar Dark Mode */
+    body.dark .iq-navbar,
+    body.dark nav.navbar.iq-navbar {
+      background: rgba(20, 28, 46, 0.94) !important;
+      border-bottom: 1px solid #26354d !important;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    body.dark .navbar-inner h3,
+    body.dark .navbar-inner .text-dark,
+    body.dark .navbar-nav .text-dark,
+    body.dark .navbar-list .text-dark {
+      color: #f8fafc !important;
+    }
+
+    body.dark .navbar-toggler-bar {
+      background-color: #cbd5e1 !important;
+    }
+
+    body.dark .theme-toggle-btn {
+      background: #182234 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .theme-toggle-btn:hover {
+      background: #1f2b42 !important;
+      border-color: #3b82f6 !important;
+    }
+
+    /* Cards & Panels */
+    body.dark .card,
+    html.dark .card {
+      background-color: #141c2e !important;
+      border-color: #26354d !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+      color: #cbd5e1;
+    }
+
+    body.dark .card-header,
+    html.dark .card-header {
+      background-color: #141c2e !important;
+      border-bottom-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .card-footer,
+    html.dark .card-footer {
+      background-color: #101726 !important;
+      border-top-color: #26354d !important;
+    }
+
+    body.dark .bg-white,
+    html.dark .bg-white {
+      background-color: #141c2e !important;
+    }
+
+    body.dark .bg-light,
+    html.dark .bg-light {
+      background-color: #182234 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .border,
+    html.dark .border,
+    body.dark .border-bottom,
+    html.dark .border-bottom,
+    body.dark .border-top,
+    html.dark .border-top,
+    body.dark .border-start,
+    html.dark .border-start,
+    body.dark .border-end,
+    html.dark .border-end {
+      border-color: #26354d !important;
+    }
+
+    /* Tables */
+    body.dark .table,
+    html.dark .table {
+      color: #cbd5e1 !important;
+      border-color: #26354d !important;
+    }
+
+    body.dark .table > :not(caption) > * > *,
+    html.dark .table > :not(caption) > * > * {
+      background-color: transparent !important;
+      border-bottom-color: #26354d !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .table-hover > tbody > tr:hover > *,
+    html.dark .table-hover > tbody > tr:hover > * {
+      background-color: #182234 !important;
+      color: #ffffff !important;
+    }
+
+    body.dark .table thead,
+    body.dark .table thead th,
+    body.dark .table-light,
+    html.dark .table-light {
+      background-color: #101726 !important;
+      color: #94a3b8 !important;
+      border-bottom-color: #26354d !important;
+    }
+
+    body.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+      background-color: rgba(24, 34, 52, 0.4) !important;
+    }
+
+    /* Forms & Inputs */
+    body.dark .form-control,
+    body.dark .form-select,
+    body.dark input[type="text"],
+    body.dark input[type="password"],
+    body.dark input[type="email"],
+    body.dark input[type="number"],
+    body.dark input[type="tel"],
+    body.dark input[type="search"],
+    body.dark input[type="date"],
+    body.dark select,
+    body.dark textarea,
+    html.dark .form-control,
+    html.dark .form-select {
+      background-color: #162032 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .form-control:focus,
+    body.dark .form-select:focus,
+    body.dark input:focus,
+    body.dark select:focus,
+    body.dark textarea:focus {
+      background-color: #162032 !important;
+      border-color: #3b82f6 !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+    }
+
+    body.dark .form-control::placeholder,
+    body.dark input::placeholder,
+    body.dark textarea::placeholder {
+      color: #64748b !important;
+    }
+
+    body.dark .input-group-text {
+      background-color: #182234 !important;
+      border-color: #26354d !important;
+      color: #94a3b8 !important;
+    }
+
+    body.dark input[type="date"] {
+      background-color: #162032 !important;
+      color: #f8fafc !important;
+      border-color: #26354d !important;
+    }
+
+    body.dark .form-check-input {
+      background-color: #162032 !important;
+      border-color: #334155 !important;
+    }
+
+    body.dark .form-check-input:checked {
+      background-color: #3b82f6 !important;
+      border-color: #3b82f6 !important;
+    }
+
+    /* Dropdowns & Modals */
+    body.dark .dropdown-menu,
+    html.dark .dropdown-menu {
+      background-color: #141c2e !important;
+      border: 1px solid #26354d !important;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .dropdown-item,
+    html.dark .dropdown-item {
+      color: #cbd5e1 !important;
+      border-bottom-color: #1e2c40 !important;
+    }
+
+    body.dark .dropdown-item:hover,
+    body.dark .dropdown-item:focus,
+    html.dark .dropdown-item:hover {
+      background-color: #1f2b42 !important;
+      color: #ffffff !important;
+    }
+
+    body.dark .dropdown-divider,
+    html.dark .dropdown-divider {
+      border-top-color: #26354d !important;
+    }
+
+    body.dark .dropdown-header,
+    html.dark .dropdown-header {
+      background-color: #101726 !important;
+      color: #94a3b8 !important;
+      border-bottom-color: #26354d !important;
+    }
+
+    body.dark .notification-item:hover {
+      background-color: #1f2b42 !important;
+    }
+
+    body.dark .modal-content,
+    html.dark .modal-content {
+      background-color: #141c2e !important;
+      border: 1px solid #26354d !important;
+      color: #cbd5e1 !important;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+    }
+
+    body.dark .modal-header,
+    html.dark .modal-header {
+      border-bottom-color: #26354d !important;
+    }
+
+    body.dark .modal-footer,
+    html.dark .modal-footer {
+      border-top-color: #26354d !important;
+      background-color: #101726 !important;
+    }
+
+    body.dark .modal-body.bg-light {
+      background-color: #101726 !important;
+    }
+
+    body.dark .btn-close,
+    html.dark .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    /* Badges & Soft Colors */
+    body.dark .badge.bg-light,
+    html.dark .badge.bg-light {
+      background-color: #1f2b42 !important;
+      color: #cbd5e1 !important;
+      border-color: #26354d !important;
+    }
+
+    body.dark .bg-primary-subtle {
+      background-color: rgba(59, 130, 246, 0.18) !important;
+      color: #93c5fd !important;
+    }
+
+    body.dark .bg-danger-subtle {
+      background-color: rgba(239, 68, 68, 0.18) !important;
+      color: #fca5a5 !important;
+    }
+
+    body.dark .bg-warning-subtle {
+      background-color: rgba(245, 158, 11, 0.18) !important;
+      color: #fcd34d !important;
+    }
+
+    body.dark .bg-success-subtle {
+      background-color: rgba(16, 185, 129, 0.18) !important;
+      color: #6ee7b7 !important;
+    }
+
+    body.dark .bg-info-subtle {
+      background-color: rgba(6, 182, 212, 0.18) !important;
+      color: #67e8f9 !important;
+    }
+
+    body.dark .border-primary-subtle { border-color: rgba(59, 130, 246, 0.35) !important; }
+    body.dark .border-danger-subtle { border-color: rgba(239, 68, 68, 0.35) !important; }
+    body.dark .border-warning-subtle { border-color: rgba(245, 158, 11, 0.35) !important; }
+    body.dark .border-success-subtle { border-color: rgba(16, 185, 129, 0.35) !important; }
+    body.dark .border-info-subtle { border-color: rgba(6, 182, 212, 0.35) !important; }
+
+    /* Buttons */
+    body.dark .btn-light,
+    html.dark .btn-light {
+      background-color: #1f2b42 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .btn-light:hover,
+    html.dark .btn-light:hover {
+      background-color: #2a3b59 !important;
+      color: #ffffff !important;
+    }
+
+    body.dark .btn-outline-secondary,
+    html.dark .btn-outline-secondary {
+      border-color: #334155 !important;
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .btn-outline-secondary:hover,
+    html.dark .btn-outline-secondary:hover {
+      background-color: #1f2b42 !important;
+      color: #ffffff !important;
+    }
+
+    /* Nav Tabs & Accordions */
+    body.dark .nav-tabs {
+      border-bottom-color: #26354d !important;
+    }
+
+    body.dark .nav-tabs .nav-link {
+      color: #94a3b8 !important;
+    }
+
+    body.dark .nav-tabs .nav-link.active {
+      background-color: #141c2e !important;
+      color: #60a5fa !important;
+      border-color: #26354d #26354d #141c2e !important;
+    }
+
+    body.dark .nav-pills .nav-link {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .nav-pills .nav-link.active {
+      background-color: #2563eb !important;
+      color: #ffffff !important;
+    }
+
+    body.dark .accordion-item {
+      background-color: #141c2e !important;
+      border-color: #26354d !important;
+    }
+
+    body.dark .accordion-button {
+      background-color: #182234 !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .accordion-button:not(.collapsed) {
+      background-color: #1f2b42 !important;
+      color: #60a5fa !important;
+    }
+
+    body.dark .accordion-button::after {
+      filter: invert(1);
+    }
+
+    /* Popups & SweetAlert2 */
+    body.dark .popup-content,
+    body.dark .addpopup .popup-content {
+      background: #141c2e !important;
+      color: #f8fafc !important;
+      border: 1px solid #26354d !important;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+    }
+
+    body.dark .popup-content input,
+    body.dark .popup-content select {
+      background-color: #162032 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    body.dark .swal2-popup {
+      background: #141c2e !important;
+      color: #f8fafc !important;
+      border: 1px solid #26354d !important;
+    }
+
+    body.dark .swal2-title,
+    body.dark .swal2-html-container {
+      color: #f8fafc !important;
+    }
+
+    /* Code & Pre Blocks */
+    body.dark code {
+      background-color: #182234 !important;
+      color: #f43f5e !important;
+    }
+
+    body.dark pre {
+      background-color: #0f172a !important;
+      color: #38bdf8 !important;
+    }
+
+    /* Footer */
+    body.dark .footer,
+    html.dark .footer {
+      background-color: #101726 !important;
+      border-top-color: #26354d !important;
+      color: #94a3b8 !important;
+    }
+
+    body.dark .footer a {
+      color: #60a5fa !important;
+    }
+
+    /* DataTables pagination */
+    body.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+      color: #cbd5e1 !important;
+    }
+
+    body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      border-color: #2563eb !important;
+    }
+
+    body.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background: #1f2b42 !important;
+      color: #ffffff !important;
+      border-color: #26354d !important;
+    }
+
+    body.dark .dataTables_wrapper select,
+    body.dark .dataTables_wrapper input {
+      background-color: #162032 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+
+    /* Dashboard, Analytics & Specialized Components */
+    body.dark .dashboard-tab {
+      color: #cbd5e1 !important;
+    }
+    body.dark .dashboard-tab:hover {
+      color: #60a5fa !important;
+      background: rgba(59, 130, 246, 0.15) !important;
+    }
+    body.dark .dashboard-tab.active {
+      background-color: rgba(59, 130, 246, 0.25) !important;
+      color: #60a5fa !important;
+      border: 1px solid rgba(59, 130, 246, 0.5) !important;
+    }
+    body.dark .chart-container-premium,
+    body.dark .chart-container {
+      background-color: #141c2e !important;
+      border-color: #26354d !important;
+    }
+    body.dark .stat-card-hover {
+      border-color: #26354d !important;
+    }
+    body.dark .stat-card-hover:hover {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    }
+    body.dark .glass-card {
+      background: rgba(20, 28, 46, 0.8) !important;
+      border-color: #26354d !important;
+    }
+    body.dark .glass-pill {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      color: #f8fafc !important;
+    }
+    body.dark .glass-btn {
+      background: rgba(255, 255, 255, 0.9) !important;
+      color: #0b111e !important;
+    }
+    body.dark .glass-btn:hover {
+      background: #ffffff !important;
+      color: #0b111e !important;
+    }
+    body.dark .list-group-item {
+      background-color: #141c2e !important;
+      border-color: #26354d !important;
+      color: #cbd5e1 !important;
+    }
+    body.dark .list-group-item-action:hover {
+      background-color: #1f2b42 !important;
+      color: #ffffff !important;
+    }
+    body.dark .alert {
+      border-color: #26354d !important;
+    }
+    body.dark .progress {
+      background-color: #182234 !important;
+    }
   </style>
 </head>
 
@@ -1526,13 +2143,13 @@
 
       <hr class="nav-divider">
 
-      <!-- Users Section -->
-      <div class="nav-section-title">Users</div>
+      <!-- AI Call Intelligence & Conversation Analysis -->
+      <div class="nav-section-title">AI Call Intelligence</div>
 
-      <!-- AI Call Analysis -->
-      <!-- <div class="nav-item">
-        <button class="nav-button <?= service('uri')->getSegment(1) === 'ai-analysis' ? 'active' : '' ?>"
-          onclick="window.location.href='<?= base_url() ?>ai-analysis'" data-tooltip="AI Call Analysis">
+      <!-- SP Verification Call Analysis (Executive <-> SP) -->
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'call-analysis' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('call-analysis') ?>'" data-tooltip="SP Verification Calls">
           <div class="nav-button-content">
             <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1540,10 +2157,27 @@
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
               <line x1="12" x2="12" y1="19" y2="22"></line>
             </svg>
-            <span class="nav-text">AI Call Analysis</span>
+            <span class="nav-text">SP Verification Calls <span class="badge bg-soft-primary text-primary ms-1" style="font-size:10px;">Executive</span></span>
           </div>
         </button>
-      </div> -->
+      </div>
+
+      <!-- Client & SP Service Call Analysis (Client <-> SP) -->
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'client-call-analysis' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('client-call-analysis') ?>'" data-tooltip="Client & SP Calls">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <span class="nav-text">Client & SP Calls <span class="badge bg-soft-success text-success ms-1" style="font-size:10px;">Service AI</span></span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Users Section -->
+      <div class="nav-section-title">Users</div>
 
       <div class="nav-item">
         <button class="nav-button <?= service('uri')->getSegment(1) === 'chat-history' ? 'active' : '' ?>"
@@ -1554,6 +2188,22 @@
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             <span class="nav-text">Chat History</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Unauthorized Provider Visits -->
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'suspicious-visits' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('suspicious-visits') ?>'" data-tooltip="Unauthorized Visits">
+          <div class="nav-button-content">
+            <svg class="nav-icon text-danger" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span class="nav-text text-danger font-weight-bold">Unauthorized Visits</span>
           </div>
         </button>
       </div>
@@ -2054,8 +2704,62 @@
 
 
       <hr class="nav-divider">
+      <!-- Notification Hub Section -->
+      <div class="nav-section-title">Notification Hub</div>
+
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'notification-manager' && !service('uri')->getSegment(2) ? 'active' : '' ?>"
+          onclick="toggleDropdown('notifications-hub-dropdown')" data-tooltip="Notification Hub">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m3 11 18-5v12L3 13v-2z"></path>
+              <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>
+            </svg>
+            <span class="nav-text">Notifications</span>
+          </div>
+          <svg class="nav-chevron" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+        <div id="notifications-hub-dropdown" class="sub-nav <?= service('uri')->getSegment(1) === 'notification-manager' ? 'open' : '' ?>">
+          <button class="nav-button <?= service('uri')->getSegment(1) === 'notification-manager' && !service('uri')->getSegment(2) ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('notification-manager') ?>'" data-tooltip="Dashboard">
+            <span class="nav-text">Dashboard</span>
+          </button>
+          <button class="nav-button <?= service('uri')->getSegment(2) === 'templates' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('notification-manager/templates') ?>'" data-tooltip="Templates">
+            <span class="nav-text">Templates</span>
+          </button>
+          <button class="nav-button <?= service('uri')->getSegment(2) === 'campaigns' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('notification-manager/campaigns') ?>'" data-tooltip="Campaigns">
+            <span class="nav-text">Campaigns</span>
+          </button>
+          <button class="nav-button <?= service('uri')->getSegment(2) === 'logs' ? 'active' : '' ?>"
+            onclick="window.location.href='<?= base_url('notification-manager/logs') ?>'" data-tooltip="Logs">
+            <span class="nav-text">Logs</span>
+          </button>
+        </div>
+      </div>
+
+      <hr class="nav-divider">
       <!-- Statistics Section -->
       <div class="nav-section-title">Statistics</div>
+
+      <!-- Customer Journey Funnel Analytics -->
+      <div class="nav-item">
+        <button class="nav-button <?= in_array(service('uri')->getSegment(1), ['customer-journey', 'analytics']) ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url('customer-journey') ?>'" data-tooltip="Customer Journey">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            <span class="nav-text">Customer Journey</span>
+          </div>
+        </button>
+      </div>
 
       <!-- Client Statistics -->
       <div class="nav-item">
@@ -2803,6 +3507,41 @@
 
       <hr class="nav-divider">
 
+      <!-- Release Management Section -->
+      <?php if (hasPermission('release_management.view', session()->get('user_role'))): ?>
+      <div class="nav-section-title">Release Management</div>
+      <div class="nav-item">
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'releases' && service('uri')->getSegment(2) === '' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url() ?>releases'" data-tooltip="Releases">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+              <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+              <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+              <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+            </svg>
+            <span class="nav-text">Dashboard</span>
+          </div>
+        </button>
+
+        <button class="nav-button <?= service('uri')->getSegment(1) === 'releases' && service('uri')->getSegment(2) === 'create' ? 'active' : '' ?>"
+          onclick="window.location.href='<?= base_url() ?>releases/create'" data-tooltip="New Version">
+          <div class="nav-button-content">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <span class="nav-text">New Version</span>
+          </div>
+        </button>
+      </div>
+      <?php endif; ?>
+
+      <hr class="nav-divider">
+
       <!-- System Settings Section -->
       <div class="nav-section-title">System Settings</div>
       <div class="nav-item">
@@ -3060,8 +3799,61 @@
     src="https://omnidim.io/web_widget.js?secret_key=cc7096796292801e2941c5e38da370ca">
   </script> -->
 
-  <!-- JavaScript for Sidebar Functionality -->
+  <!-- JavaScript for Sidebar & Theme Functionality -->
   <script>
+    // Global Dark / Light Theme Engine
+    function applyTheme(theme) {
+      const isDark = theme === 'dark';
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.body && document.body.classList.add('dark');
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body && document.body.classList.remove('dark');
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+
+      // Update navbar toggle icons
+      document.querySelectorAll('.theme-icon-moon').forEach(el => {
+        el.style.display = isDark ? 'none' : 'inline-block';
+      });
+      document.querySelectorAll('.theme-icon-sun').forEach(el => {
+        el.style.display = isDark ? 'inline-block' : 'none';
+      });
+
+      // Update dropdown switch checkbox
+      const switchCb = document.getElementById('themeSwitchCheckbox');
+      if (switchCb) {
+        switchCb.checked = isDark;
+      }
+
+      try {
+        localStorage.setItem('petsfolio_theme', theme);
+      } catch (e) {}
+    }
+
+    function toggleTheme() {
+      const currentTheme = localStorage.getItem('petsfolio_theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    }
+
+    // Apply on DOM load
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('petsfolio_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      applyTheme(savedTheme);
+    });
+
+    // Sync across tabs
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'petsfolio_theme' && e.newValue) {
+        applyTheme(e.newValue);
+      }
+    });
+
     function toggleSidebar() {
       const sidebar = document.querySelector('.sidebar-container');
       sidebar.classList.toggle('collapsed');

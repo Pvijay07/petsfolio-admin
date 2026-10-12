@@ -203,26 +203,28 @@ class AdminController extends BaseController
 
         $data['payout_balance'] = $payoutBalance;
         $data['insurance_stats'] = $this->insuranceModel->getInsuranceStats();
-     
+
         $db = \Config\Database::connect();
+        $data['suspicious_visits_count'] = $db->tableExists('suspicious_visits') ? $db->table('suspicious_visits')->countAllResults() : 0;
+        $data['recent_suspicious_visits'] = $db->tableExists('suspicious_visits') ? $db->table('suspicious_visits')->orderBy('created_at', 'DESC')->limit(5)->get()->getResult() : [];
         $verification_executives = $db->table('employees')
             // ->whereIn('role_id', [7, 4,10])
             ->where('status', 1)
             ->get()->getResult();
-            
+
         foreach ($verification_executives as $exec) {
             $exec->call_verification_count = $db->table('sp_reviews')
                 ->where('admin_id', $exec->id)
                 ->where('reviewed_by', 'admin')
                 ->countAllResults();
-                
+
             $exec->manager_approval_count = $db->table('sp_services')
                 ->join('sp_reviews', 'sp_reviews.provider_id = sp_services.provider_id AND sp_reviews.service_id = sp_services.service_id')
                 ->where('sp_reviews.admin_id', $exec->id)
                 ->where('sp_reviews.reviewed_by', 'admin')
                 ->whereIn('sp_services.status', ['approved', 'active'])
                 ->countAllResults();
-                
+
             // Total distinct SPs handled by this executive
             $exec->total_sp_count = $db->table('sp_reviews')
                 ->select('provider_id')
@@ -323,56 +325,218 @@ class AdminController extends BaseController
     }
     public function permissions()
     {
-        $data['permissions'] = $this->model->getPermissions();
-        $data['roles']       = $this->model->getRoles();
+        $permModel = new \App\Models\PermissionModel();
+        $data['permissions']        = $permModel->getPermissions();
+        $data['groupedPermissions'] = $permModel->getPermissionsGroupedByModule();
+        $data['roles']              = $permModel->getRoles();
+        $data['employees']          = $permModel->getEmployeesWithRoles();
 
         return $this->loadView('admin/services/permissions', $data);
     }
-    public function addPermission()
-    {
 
-        $data = [
-            'name'   => $this->request->getPost('name'),
-            'module' => $this->request->getPost('module'),
-        ];
-
-        $this->model->insertPermission($data);
-        return redirect()->back()->with('success', 'Permission added successfully');
-    }
     public function getPermissions()
     {
-        if ($this->request->isAJAX()) {
-            $userId = $this->request->getPost('user_id');
+        $userId    = (int)($this->request->getPost('user_id') ?: $this->request->getGet('user_id'));
+        $permModel = new \App\Models\PermissionModel();
+        $permissions = $permModel->getPermissionsByUserId($userId);
 
-            $permissions = $this->model->getPermissionsByUserId($userId);
-            return $this->response->setJSON($permissions);
-        }
+        return $this->response->setJSON($permissions);
     }
+
     public function getAllPermissions()
     {
-        if ($this->request->isAJAX()) {
-            $permissions = $this->model->getPermissions();
+        $permModel   = new \App\Models\PermissionModel();
+        $permissions = $permModel->getPermissions();
 
-            return $this->response->setJSON($permissions);
-        }
+        return $this->response->setJSON($permissions);
     }
-    public function updatePermissions()
-    {
-        if ($this->request->isAJAX()) {
-            $roleId      = $this->request->getPost('role_id');
-            $permissions = $this->request->getPost('permissions');
-            $this->model->assignPermissions($roleId, $permissions);
 
-            return $this->response->setJSON(['success' => true]);
-        }
+    public function getRolePermissions()
+    {
+        $roleId = (int)$this->request->getPost('role_id');
+        $permModel = new \App\Models\PermissionModel();
+        $assignedIds = $permModel->getRolePermissionIds($roleId);
+
+        return $this->response->setJSON([
+            'status'          => true,
+            'role_id'         => $roleId,
+            'permission_ids'  => $assignedIds
+        ]);
     }
-    public function assignPermissions()
-    {
-        $roleId      = $this->request->getPost('role_id');
-        $permissions = $this->request->getPost('permissions');
-        $this->model->assignPermissions($roleId, $permissions);
 
-        return redirect()->back()->with('success', 'Permissions assigned successfully');
+    public function getUserPermissions()
+    {
+        $userId = (int)$this->request->getPost('user_id');
+        $permModel = new \App\Models\PermissionModel();
+        $data = $permModel->getUserEffectivePermissions($userId);
+
+        return $this->response->setJSON([
+            'status' => true,
+            'data'   => $data
+        ]);
+    }
+
+    public function saveRolePermissions()
+    {
+        $roleId      = (int)$this->request->getPost('role_id');
+        $permissions = $this->request->getPost('permissions') ?: [];
+
+        if (!$roleId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Please select a valid role.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->assignRolePermissions($roleId, $permissions);
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status'  => $success,
+                'message' => $success ? 'Role permissions updated successfully.' : 'Failed to update role permissions.'
+            ]);
+        }
+
+        return redirect()->back()->with($success ? 'success' : 'error', $success ? 'Role permissions updated successfully.' : 'Failed to update role permissions.');
+    }
+
+    public function toggleRolePermission()
+    {
+        $roleId       = (int)$this->request->getPost('role_id');
+        $permissionId = (int)$this->request->getPost('permission_id');
+        $enable       = (bool)$this->request->getPost('enable');
+
+        if (!$roleId || !$permissionId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Invalid parameters.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->toggleRolePermission($roleId, $permissionId, $enable);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Permission toggled.' : 'Failed to toggle permission.'
+        ]);
+    }
+
+    public function saveUserPermissions()
+    {
+        $userId      = (int)$this->request->getPost('user_id');
+        $permissions = $this->request->getPost('permissions') ?: [];
+
+        if (!$userId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Please select a valid user.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->assignUserPermissions($userId, $permissions);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Direct user permissions & overrides updated successfully.' : 'Failed to update user permissions.'
+        ]);
+    }
+
+    public function toggleUserPermission()
+    {
+        $userId       = (int)$this->request->getPost('user_id');
+        $permissionId = (int)$this->request->getPost('permission_id');
+        $enable       = (bool)$this->request->getPost('enable');
+
+        if (!$userId || !$permissionId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Invalid parameters.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->toggleUserPermission($userId, $permissionId, $enable);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'User permission override toggled.' : 'Failed to toggle user permission.'
+        ]);
+    }
+
+    public function saveRole()
+    {
+        $roleId      = (int)$this->request->getPost('role_id');
+        $name        = trim($this->request->getPost('name'));
+        $description = trim($this->request->getPost('description'));
+
+        if (empty($name)) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Role name is required.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+
+        if ($roleId > 0) {
+            $success = $permModel->updateRole($roleId, ['name' => $name, 'description' => $description]);
+            $msg = 'Role updated successfully.';
+        } else {
+            $newId = $permModel->createRole(['name' => $name, 'description' => $description]);
+            $success = $newId > 0;
+            $msg = 'New role created successfully.';
+        }
+
+        return $this->response->setJSON(['status' => $success, 'message' => $msg]);
+    }
+
+    public function deleteRole()
+    {
+        $roleId = (int)$this->request->getPost('role_id');
+        if ($roleId === 1) {
+            return $this->response->setJSON(['status' => false, 'message' => 'Super Admin role cannot be deleted.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->deleteRole($roleId);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Role deleted successfully.' : 'Failed to delete role.'
+        ]);
+    }
+
+    public function addPermission()
+    {
+        $name   = trim($this->request->getPost('name'));
+        $module = trim($this->request->getPost('module'));
+
+        if (empty($name) || empty($module)) {
+            return redirect()->back()->with('error', 'Module and permission type are required.');
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $permModel->createPermission(['name' => $name, 'module' => $module]);
+
+        return redirect()->back()->with('success', 'New permission added successfully.');
+    }
+
+    public function deletePermission()
+    {
+        $permissionId = (int)$this->request->getPost('permission_id');
+        $permModel    = new \App\Models\PermissionModel();
+        $success      = $permModel->deletePermission($permissionId);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'Permission deleted successfully.' : 'Failed to delete permission.'
+        ]);
+    }
+
+    public function assignUserRole()
+    {
+        $userId = (int)$this->request->getPost('user_id');
+        $roleId = (int)$this->request->getPost('role_id');
+
+        if (!$userId || !$roleId) {
+            return $this->response->setJSON(['status' => false, 'message' => 'User ID and Role ID are required.']);
+        }
+
+        $permModel = new \App\Models\PermissionModel();
+        $success   = $permModel->assignUserRole($userId, $roleId);
+
+        return $this->response->setJSON([
+            'status'  => $success,
+            'message' => $success ? 'User role updated successfully.' : 'Failed to update user role.'
+        ]);
     }
     public function pets()
     {
@@ -1287,7 +1451,7 @@ class AdminController extends BaseController
             $this->booking->updateWalletAmount($providerWallet, $serviceType, 'sp_service_wallet');
         }
     }
-   public function userDetails($type, $id)
+    public function userDetails($type, $id)
     {
         $db = \Config\Database::connect();
         $this->booking = new \App\Models\Booking();
@@ -1527,37 +1691,314 @@ class AdminController extends BaseController
         }
 
 
+        $bookingPetMap = $this->booking->getBookingPetDetailsMap();
+
+        // Helper to categorize service
+        $detectService = function ($row) {
+            $rawId     = $row['raw_service_id'] ?? '';
+            $bookingId = strtoupper($row['service_id'] ?? $row['booking_id'] ?? '');
+            $desc      = strtolower($row['description'] ?? $row['action'] ?? '');
+
+            if (strpos($bookingId, 'WLK') !== false || strpos($desc, 'walk') !== false || $rawId == 4) {
+                return 'Walking';
+            }
+            if (strpos($bookingId, 'GRM') !== false || strpos($desc, 'groom') !== false || $rawId == 2) {
+                return 'Grooming';
+            }
+            if (strpos($bookingId, 'TRN') !== false || strpos($desc, 'train') !== false || $rawId == 3) {
+                return 'Training';
+            }
+            if (strpos($bookingId, 'BRD') !== false || strpos($desc, 'board') !== false || $rawId == 1) {
+                return 'Boarding';
+            }
+            if (strpos($bookingId, 'VET') !== false || strpos($desc, 'vet') !== false || $rawId == 5) {
+                return 'Veterinary';
+            }
+            return 'Walking';
+        };
+
+        $defaultServices = ['Walking', 'Grooming', 'Training', 'Boarding', 'Veterinary'];
+
         // Group clients
         $clients = [];
         foreach ($client_transactions as $txn) {
-            $clientId = $txn['client_id'];
+            $clientId = $txn['client_id'] ?? 0;
+            if (!$clientId) continue;
+
+            $serviceName = $detectService($txn);
+            $bookingId   = !empty($txn['service_id']) ? $txn['service_id'] : 'GEN_TXN_' . $txn['txn_id'];
+            $petInfo     = $bookingPetMap[$bookingId] ?? null;
+
+            $enrichedTxn = [
+                'txn_id'           => $txn['txn_id'],
+                'booking_id'       => $bookingId,
+                'service'          => $serviceName,
+                'date'             => $txn['date'],
+                'date_formatted'   => date('d M, h:i A', strtotime($txn['date'])),
+                'type'             => ucfirst($txn['transaction_type'] ?? ($txn['debit'] > 0 ? 'Debit' : 'Credit')),
+                'description'      => $txn['action'],
+                'debit'            => (float)($txn['debit'] ?? 0),
+                'credit'           => (float)($txn['credit'] ?? 0),
+                'service_balance'  => (float)($txn['balance'] ?? 0),
+                'refund_balance'   => (float)($txn['refundBalance'] ?? 0),
+                'category'         => $txn['category'] ?? '',
+                'pet_name'         => $petInfo['pet_name'] ?? 'Pet',
+                'pet_breed'        => $petInfo['pet_breed'] ?? 'Dog',
+                'job_status'       => $petInfo['status'] ?? ($txn['category'] === 'cancelled_amount' ? 'Cancelled' : 'Completed'),
+            ];
+
             if (!isset($clients[$clientId])) {
                 $clients[$clientId] = [
-                    'client_name'  => $txn['client_name'],
-                    'client_phone' => $txn['client_phone'],
-                    'transactions' => []
+                    'id'                 => $clientId,
+                    'client_name'        => $txn['client_name'] ?? 'Client #' . $clientId,
+                    'client_phone'       => $txn['client_phone'] ?? '—',
+                    'client_email'       => $txn['client_email'] ?? '',
+                    'area'               => 'Hyderabad',
+                    'joined_date'        => !empty($txn['joined_date']) ? date('M Y', strtotime($txn['joined_date'])) : 'Jun 2026',
+                    'total_credited'     => 0,
+                    'total_debited'      => 0,
+                    'net_balance'        => 0,
+                    'refund_amount'      => 0,
+                    'transactions_count' => 0,
+                    'services'           => [],
+                    'transactions'       => []
+                ];
+
+                foreach ($defaultServices as $svc) {
+                    $clients[$clientId]['services'][$svc] = [
+                        'name'          => $svc,
+                        'credited'      => 0,
+                        'debited'       => 0,
+                        'net_balance'   => 0,
+                        'refund_amount' => 0,
+                        'txns_count'    => 0,
+                        'jobs'          => []
+                    ];
+                }
+            }
+
+            $clients[$clientId]['transactions'][] = $enrichedTxn;
+            $clients[$clientId]['total_credited'] += $enrichedTxn['credit'];
+            $clients[$clientId]['total_debited']  += $enrichedTxn['debit'];
+            $clients[$clientId]['net_balance']    = $enrichedTxn['service_balance'];
+            $clients[$clientId]['refund_amount']   = $enrichedTxn['refund_balance'];
+            $clients[$clientId]['transactions_count']++;
+
+            // Service grouping
+            $clients[$clientId]['services'][$serviceName]['credited'] += $enrichedTxn['credit'];
+            $clients[$clientId]['services'][$serviceName]['debited']  += $enrichedTxn['debit'];
+            $clients[$clientId]['services'][$serviceName]['net_balance'] = $clients[$clientId]['services'][$serviceName]['credited'] - $clients[$clientId]['services'][$serviceName]['debited'];
+            if ($clients[$clientId]['services'][$serviceName]['net_balance'] < 0) {
+                $clients[$clientId]['services'][$serviceName]['net_balance'] = max(0, $enrichedTxn['service_balance']);
+            }
+            $clients[$clientId]['services'][$serviceName]['refund_amount'] = max($clients[$clientId]['services'][$serviceName]['refund_amount'], $enrichedTxn['refund_balance']);
+            $clients[$clientId]['services'][$serviceName]['txns_count']++;
+
+            // Job grouping
+            if (!isset($clients[$clientId]['services'][$serviceName]['jobs'][$bookingId])) {
+                $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId] = [
+                    'job_id'         => $bookingId,
+                    'booked_date'    => date('d M Y', strtotime($txn['date'])),
+                    'pet_name'       => $enrichedTxn['pet_name'],
+                    'pet_breed'      => $enrichedTxn['pet_breed'],
+                    'status'         => $enrichedTxn['job_status'],
+                    'credited'       => 0,
+                    'debited'        => 0,
+                    'refund_amount'  => 0,
+                    'net_balance'    => 0,
+                    'transactions'   => []
                 ];
             }
-            $clients[$clientId]['transactions'][] = $txn;
+            $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['transactions'][] = $enrichedTxn;
+            $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['credited'] += $enrichedTxn['credit'];
+            $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['debited']  += $enrichedTxn['debit'];
+            $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['refund_amount'] = max($clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['refund_amount'], $enrichedTxn['refund_balance']);
+            $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['net_balance'] = $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['credited'] - $clients[$clientId]['services'][$serviceName]['jobs'][$bookingId]['debited'];
         }
 
         // Group walkers
         $walkers = [];
         foreach ($walker_transactions as $txn) {
-            $walkerId = $txn['walker_id'];
+            $walkerId = $txn['walker_id'] ?? 0;
+            if (!$walkerId) continue;
+
+            $serviceName = $detectService($txn);
+            $bookingId   = !empty($txn['service_id']) ? $txn['service_id'] : 'GEN_TXN_' . $txn['txn_id'];
+            $petInfo     = $bookingPetMap[$bookingId] ?? null;
+
+            $enrichedTxn = [
+                'txn_id'           => $txn['txn_id'],
+                'booking_id'       => $bookingId,
+                'service'          => $serviceName,
+                'date'             => $txn['date'],
+                'date_formatted'   => date('d M, h:i A', strtotime($txn['date'])),
+                'type'             => ucfirst($txn['transaction_type'] ?? ($txn['debit'] > 0 ? 'Debit' : 'Credit')),
+                'description'      => $txn['action'],
+                'debit'            => (float)($txn['debit'] ?? 0),
+                'credit'           => (float)($txn['credit'] ?? 0),
+                'service_balance'  => (float)($txn['spbalance_after'] ?? 0),
+                'earned_balance'   => (float)($txn['earned_balance'] ?? 0),
+                'category'         => $txn['category'] ?? '',
+                'pet_name'         => $petInfo['pet_name'] ?? 'Buddy',
+                'pet_breed'        => $petInfo['pet_breed'] ?? 'Golden Retriever',
+                'job_status'       => $petInfo['status'] ?? ($txn['category'] === 'cancelled_amount' ? 'Cancelled' : 'Completed'),
+            ];
+
             if (!isset($walkers[$walkerId])) {
                 $walkers[$walkerId] = [
-                    'walker_name'  => $txn['walker_name'],
-                    'walker_phone' => $txn['walker_phone'],
-                    'transactions' => []
+                    'id'                 => $walkerId,
+                    'walker_name'        => $txn['walker_name'] ?? 'Provider #' . $walkerId,
+                    'walker_phone'       => $txn['walker_phone'] ?? '—',
+                    'walker_email'       => $txn['walker_email'] ?? '',
+                    'area'               => !empty($txn['walker_area']) ? $txn['walker_area'] : (!empty($txn['walker_city']) ? $txn['walker_city'] : 'Chanda Nagar'),
+                    'joined_date'        => !empty($txn['joined_date']) ? date('M Y', strtotime($txn['joined_date'])) : 'Jun 2026',
+                    'total_credited'     => 0,
+                    'total_debited'      => 0,
+                    'net_balance'        => 0,
+                    'earned_amount'      => 0,
+                    'transactions_count' => 0,
+                    'services'           => [],
+                    'transactions'       => []
+                ];
+
+                foreach ($defaultServices as $svc) {
+                    $walkers[$walkerId]['services'][$svc] = [
+                        'name'          => $svc,
+                        'credited'      => 0,
+                        'debited'       => 0,
+                        'net_balance'   => 0,
+                        'earned_amount' => 0,
+                        'txns_count'    => 0,
+                        'jobs'          => []
+                    ];
+                }
+            }
+
+            $walkers[$walkerId]['transactions'][] = $enrichedTxn;
+            $walkers[$walkerId]['total_credited'] += $enrichedTxn['credit'];
+            $walkers[$walkerId]['total_debited']  += $enrichedTxn['debit'];
+            $walkers[$walkerId]['net_balance']    = $enrichedTxn['service_balance'];
+            $walkers[$walkerId]['earned_amount']  = max($walkers[$walkerId]['earned_amount'], $enrichedTxn['earned_balance']);
+            $walkers[$walkerId]['transactions_count']++;
+
+            // Service grouping
+            $walkers[$walkerId]['services'][$serviceName]['credited'] += $enrichedTxn['credit'];
+            $walkers[$walkerId]['services'][$serviceName]['debited']  += $enrichedTxn['debit'];
+            $walkers[$walkerId]['services'][$serviceName]['net_balance'] = $walkers[$walkerId]['services'][$serviceName]['credited'] - $walkers[$walkerId]['services'][$serviceName]['debited'];
+            if ($walkers[$walkerId]['services'][$serviceName]['net_balance'] < 0) {
+                $walkers[$walkerId]['services'][$serviceName]['net_balance'] = max(0, $enrichedTxn['service_balance']);
+            }
+            $walkers[$walkerId]['services'][$serviceName]['earned_amount'] = max($walkers[$walkerId]['services'][$serviceName]['earned_amount'], $enrichedTxn['earned_balance']);
+            $walkers[$walkerId]['services'][$serviceName]['txns_count']++;
+
+            // Job grouping
+            if (!isset($walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId])) {
+                $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId] = [
+                    'job_id'         => $bookingId,
+                    'booked_date'    => date('d M Y', strtotime($txn['date'])),
+                    'pet_name'       => $enrichedTxn['pet_name'],
+                    'pet_breed'      => $enrichedTxn['pet_breed'],
+                    'status'         => $enrichedTxn['job_status'],
+                    'credited'       => 0,
+                    'debited'        => 0,
+                    'earned_amount'  => 0,
+                    'net_balance'    => 0,
+                    'transactions'   => []
                 ];
             }
-            $walkers[$walkerId]['transactions'][] = $txn;
+            $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['transactions'][] = $enrichedTxn;
+            $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['credited'] += $enrichedTxn['credit'];
+            $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['debited']  += $enrichedTxn['debit'];
+            $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['earned_amount'] = max($walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['earned_amount'], $enrichedTxn['earned_balance']);
+            $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['net_balance'] = $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['credited'] - $walkers[$walkerId]['services'][$serviceName]['jobs'][$bookingId]['debited'];
+        }
+
+        // Group platform transactions
+        $platform = [
+            'id'                 => 'platform',
+            'name'               => 'Petsfolio Platform',
+            'area'               => 'Headquarters',
+            'joined_date'        => 'Jan 2024',
+            'total_credited'     => 0,
+            'total_debited'      => 0,
+            'net_balance'        => 0,
+            'transactions_count' => 0,
+            'services'           => [],
+            'transactions'       => []
+        ];
+
+        foreach ($defaultServices as $svc) {
+            $platform['services'][$svc] = [
+                'name'          => $svc,
+                'credited'      => 0,
+                'debited'       => 0,
+                'net_balance'   => 0,
+                'txns_count'    => 0,
+                'jobs'          => []
+            ];
+        }
+
+        foreach ($data['platform_transactions'] as $txn) {
+            $serviceName = $detectService($txn);
+            $bookingId   = !empty($txn['service_id']) ? $txn['service_id'] : (!empty($txn['booking_id']) ? $txn['booking_id'] : 'PLT_TXN_' . ($txn['txn_id'] ?? '1'));
+            $petInfo     = $bookingPetMap[$bookingId] ?? null;
+
+            $amt         = (float)($txn['amount'] ?? 0);
+            $type        = ucfirst($txn['transaction_type'] ?? 'Credit');
+            $creditAmt   = ($type === 'Credit') ? $amt : 0;
+            $debitAmt    = ($type === 'Debit') ? $amt : 0;
+
+            $enrichedTxn = [
+                'txn_id'           => $txn['txn_id'] ?? ('PLT_' . uniqid()),
+                'booking_id'       => $bookingId,
+                'service'          => $serviceName,
+                'date'             => $txn['date'] ?? date('Y-m-d H:i:s'),
+                'date_formatted'   => isset($txn['date']) ? date('d M, h:i A', strtotime($txn['date'])) : date('d M, h:i A'),
+                'type'             => $type,
+                'description'      => $txn['description'] ?? 'Platform commission',
+                'debit'            => $debitAmt,
+                'credit'           => $creditAmt,
+                'service_balance'  => $amt,
+                'category'         => 'commission',
+                'pet_name'         => $petInfo['pet_name'] ?? 'Pet',
+                'pet_breed'        => $petInfo['pet_breed'] ?? 'Dog',
+                'job_status'       => 'Completed',
+            ];
+
+            $platform['transactions'][] = $enrichedTxn;
+            $platform['total_credited'] += $creditAmt;
+            $platform['total_debited']  += $debitAmt;
+            $platform['net_balance']    += ($creditAmt - $debitAmt);
+            $platform['transactions_count']++;
+
+            $platform['services'][$serviceName]['credited'] += $creditAmt;
+            $platform['services'][$serviceName]['debited']  += $debitAmt;
+            $platform['services'][$serviceName]['net_balance'] += ($creditAmt - $debitAmt);
+            $platform['services'][$serviceName]['txns_count']++;
+
+            if (!isset($platform['services'][$serviceName]['jobs'][$bookingId])) {
+                $platform['services'][$serviceName]['jobs'][$bookingId] = [
+                    'job_id'         => $bookingId,
+                    'booked_date'    => isset($txn['date']) ? date('d M Y', strtotime($txn['date'])) : date('d M Y'),
+                    'pet_name'       => $enrichedTxn['pet_name'],
+                    'pet_breed'      => $enrichedTxn['pet_breed'],
+                    'status'         => 'Completed',
+                    'credited'       => 0,
+                    'debited'        => 0,
+                    'net_balance'    => 0,
+                    'transactions'   => []
+                ];
+            }
+            $platform['services'][$serviceName]['jobs'][$bookingId]['transactions'][] = $enrichedTxn;
+            $platform['services'][$serviceName]['jobs'][$bookingId]['credited'] += $creditAmt;
+            $platform['services'][$serviceName]['jobs'][$bookingId]['debited']  += $debitAmt;
+            $platform['services'][$serviceName]['jobs'][$bookingId]['net_balance'] += ($creditAmt - $debitAmt);
         }
 
         // Send to view
         $data['clients']         = $clients;
         $data['walkers']         = $walkers;
+        $data['platform']        = $platform;
         $data['mismatch_alerts'] = $mismatch_alerts;
 
         return $this->loadView('admin/recoinciliation', $data);
@@ -1794,5 +2235,166 @@ class AdminController extends BaseController
                 'message' => $e->getMessage()
             ];
         }
+    }
+
+    public function suspiciousVisits()
+    {
+        $db = \Config\Database::connect();
+        $data['title'] = 'Suspicious Visits & Geofence Alerts';
+
+        if ($db->tableExists('suspicious_visits')) {
+            $builder = $db->table('suspicious_visits sv')
+                ->select('sv.*')
+                ->select('sp.name as provider_name, sp.phone as provider_phone, sp.email as provider_email, sp.profile as provider_profile, sp.city as provider_city, sp.status as provider_status, sp.is_verified as provider_verified')
+                ->select('u.name as customer_name, u.phone as customer_phone, u.email as customer_email, u.city as customer_city')
+                ->join('service_providers sp', 'sp.id = sv.provider_id', 'left')
+                ->join('users u', 'u.id = sv.customer_id', 'left')
+                ->orderBy('sv.created_at', 'DESC');
+
+            $visits = $builder->get()->getResult();
+
+            $validStatuses = ['Completed', 'Cancelled', 'completed', 'cancelled'];
+            $bookingByIdMap = [];
+            $bookingByPairMap = [];
+
+            $registerBooking = function ($b) use (&$bookingByIdMap, &$bookingByPairMap) {
+                if (!empty($b->booking_id)) {
+                    $statusNormalized = ucfirst(strtolower(trim($b->booking_status ?? $b->status ?? '')));
+                    $b->booking_status = $statusNormalized;
+                    $bookingByIdMap[(string)$b->booking_id] = $b;
+
+                    if (!empty($b->provider_id) && !empty($b->customer_id)) {
+                        $pairKey = (string)$b->provider_id . '_' . (string)$b->customer_id;
+                        if (!isset($bookingByPairMap[$pairKey])) {
+                            $bookingByPairMap[$pairKey] = [];
+                        }
+                        $bookingByPairMap[$pairKey][] = $b;
+                    }
+                }
+            };
+
+            // Query walking_service_bookings with Completed/Cancelled status
+            if ($db->tableExists('walking_service_bookings')) {
+                try {
+                    $walkingRows = $db->table('walking_service_bookings w')
+                        ->select("'walking' as service_type, w.id as booking_id, w.user_id as customer_id, q.provider_id, w.status as booking_status, COALESCE(w.final_payable, w.total_price, 0) as total_amount, w.service_start_date, w.service_end_date, s.name as service_name, ua.city, w.created_at")
+                        ->join('quotations q', 'q.booking_id = w.id', 'left')
+                        ->join('services s', 's.id = w.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = w.address_id', 'left')
+                        ->whereIn('w.status', $validStatuses)
+                        ->orderBy('w.id', 'DESC')
+                        ->get()->getResult();
+                    foreach ($walkingRows as $row) {
+                        $registerBooking($row);
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query walking_service_bookings in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+            // Query grooming_service_bookings with Completed/Cancelled status
+            if ($db->tableExists('grooming_service_bookings')) {
+                try {
+                    $groomingRows = $db->table('grooming_service_bookings g')
+                        ->select("'grooming' as service_type, g.id as booking_id, g.user_id as customer_id, q.provider_id, g.status as booking_status, COALESCE(g.final_payable, g.total_price, 0) as total_amount, g.service_start_date, NULL as service_end_date, s.name as service_name, ua.city, g.created_at")
+                        ->join('quotations q', 'q.booking_id = g.id', 'left')
+                        ->join('services s', 's.id = g.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = g.address_id', 'left')
+                        ->whereIn('g.status', $validStatuses)
+                        ->orderBy('g.id', 'DESC')
+                        ->get()->getResult();
+                    foreach ($groomingRows as $row) {
+                        $registerBooking($row);
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query grooming_service_bookings in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+            // Query training_service_bookings with Completed/Cancelled status
+            if ($db->tableExists('training_service_bookings')) {
+                try {
+                    $trainingRows = $db->table('training_service_bookings t')
+                        ->select("'training' as service_type, t.id as booking_id, t.user_id as customer_id, q.provider_id, t.status as booking_status, COALESCE(t.final_payable, t.total_price, 0) as total_amount, t.service_start_date, NULL as service_end_date, s.name as service_name, ua.city, t.created_at")
+                        ->join('quotations q', 'q.booking_id = t.id', 'left')
+                        ->join('services s', 's.id = t.service_id', 'left')
+                        ->join('user_addresses ua', 'ua.id = t.address_id', 'left')
+                        ->whereIn('t.status', $validStatuses)
+                        ->orderBy('t.id', 'DESC')
+                        ->get()->getResult();
+                    foreach ($trainingRows as $row) {
+                        $registerBooking($row);
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query training_service_bookings in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+            // Also supplement from v_bookings_overview for any other services
+            if ($db->tableExists('v_bookings_overview')) {
+                try {
+                    $vRows = $db->table('v_bookings_overview')
+                        ->select('booking_id, service_type, user_id as customer_id, status as booking_status, total_amount, service_start_date, service_end_date, service_name, city')
+                        ->whereIn('status', $validStatuses)
+                        ->get()->getResult();
+                    foreach ($vRows as $vRow) {
+                        if (!isset($bookingByIdMap[(string)$vRow->booking_id])) {
+                            $registerBooking($vRow);
+                        }
+                    }
+                } catch (\Exception $e) {
+                    log_message('notice', 'Query v_bookings_overview in suspiciousVisits: ' . $e->getMessage());
+                }
+            }
+
+            // Process and enrich visit objects
+            $enrichedVisits = [];
+            foreach ($visits as $visit) {
+                $telemetry = [];
+                if (!empty($visit->raw_telemetry)) {
+                    if (is_string($visit->raw_telemetry)) {
+                        $decoded = json_decode($visit->raw_telemetry, true);
+                        if (is_array($decoded)) {
+                            $telemetry = $decoded;
+                        }
+                    } elseif (is_array($visit->raw_telemetry)) {
+                        $telemetry = $visit->raw_telemetry;
+                    }
+                }
+                $visit->telemetry_data = $telemetry;
+                $visit->lat = $telemetry['latitude'] ?? $telemetry['lat'] ?? $telemetry['location']['latitude'] ?? $telemetry['location']['lat'] ?? ($telemetry['coords']['latitude'] ?? null);
+                $visit->lng = $telemetry['longitude'] ?? $telemetry['lng'] ?? $telemetry['lon'] ?? $telemetry['location']['longitude'] ?? $telemetry['location']['lng'] ?? ($telemetry['coords']['longitude'] ?? null);
+                $visit->accuracy = $telemetry['accuracy'] ?? $telemetry['acc'] ?? ($telemetry['coords']['accuracy'] ?? null);
+                $visit->dwell_time = $telemetry['dwell_duration_seconds'] ?? $telemetry['dwell_time'] ?? $telemetry['duration_minutes'] ?? $telemetry['stay_duration'] ?? $telemetry['duration'] ?? null;
+                $visit->distance = $telemetry['distance_meters'] ?? $telemetry['distance'] ?? null;
+                $visit->speed = $telemetry['speed'] ?? ($telemetry['coords']['speed'] ?? null);
+                $visit->battery = $telemetry['battery'] ?? $telemetry['battery_level'] ?? ($telemetry['device']['battery'] ?? null);
+                $visit->device_info = $telemetry['device_info'] ?? $telemetry['device'] ?? $telemetry['model'] ?? null;
+
+                $matchedBooking = null;
+                if (!empty($visit->associated_booking_id) && isset($bookingByIdMap[(string)$visit->associated_booking_id])) {
+                    $matchedBooking = $bookingByIdMap[(string)$visit->associated_booking_id];
+                }
+
+                if (!$matchedBooking && !empty($visit->provider_id) && !empty($visit->customer_id)) {
+                    $pairKey = (string)$visit->provider_id . '_' . (string)$visit->customer_id;
+                    if (!empty($bookingByPairMap[$pairKey])) {
+                        $matchedBooking = $bookingByPairMap[$pairKey][0];
+                        $visit->associated_booking_id = $matchedBooking->booking_id;
+                    }
+                }
+
+                $visit->booking_details = $matchedBooking;
+                $enrichedVisits[] = $visit;
+            }
+
+            $data['visits'] = $enrichedVisits;
+            $data['total']  = count($enrichedVisits);
+        } else {
+            $data['visits'] = [];
+            $data['total']  = 0;
+        }
+
+        return $this->loadView('admin/suspicious_visits', $data);
     }
 }

@@ -116,7 +116,11 @@ class BookingController extends BaseController
         $service_id = 0;
 
         $price = $this->db->table('walking_service_bookings')->where('id', $bookingId)->get()->getRow()->total_price;
+        $basePrice = $price;
 
+        $platformFee = $basePrice * 10 / 100;
+        $gst = ($platformFee + $basePrice) * 18 / 100;
+        $totalPrice = round($basePrice + $platformFee + $gst, 2);
         if (strpos($bookingId, 'WLK') !== false) {
             $tableName = 'walking_service_bookings';
             $service_id = 4;
@@ -146,13 +150,13 @@ class BookingController extends BaseController
             if ($service_id == 4 || $service_id == 3 || $service_id == 2) {
                 $bookingUpdate['total_price'] = $price;
             } else {
-                $bookingUpdate['bid_amount'] = $price;
+                $bookingUpdate['bid_amount'] = $totalPrice;
             }
 
             $db->table($tableName)->where('id', $bookingId)->update($bookingUpdate);
 
             // Calculate Receivable Amount
-            $platform_charges = floatval(getenv('PLATFORM_PERCENTAGE') ?: 20);
+            $platform_charges = floatval(getenv('PLATFORM_PROVIDER_PERCENTAGE') ?: 15);
             $receivable_amount = $price - ($price * $platform_charges / 100);
 
             $existingQuotation = $db->table('quotations')
@@ -163,8 +167,8 @@ class BookingController extends BaseController
 
             if ($existingQuotation) {
                 $db->table('quotations')->where('id', $existingQuotation->id)->update([
-                    'bid_amount' => $price,
-                    'total_amount' => $price,
+                    'bid_amount' => $totalPrice,
+                    'total_amount' => $totalPrice,
                     'receivable_amount' => $receivable_amount,
                     'status' => 'Accepted',
                     'updated_at' => date('Y-m-d H:i:s')
@@ -175,8 +179,8 @@ class BookingController extends BaseController
                     'provider_id' => $providerId,
                     'user_id' => $request->user_id,
                     'service_id' => $service_id,
-                    'bid_amount' => $price,
-                    'total_amount' => $price,
+                    'bid_amount' => $totalPrice,
+                    'total_amount' => $totalPrice,
                     'receivable_amount' => $receivable_amount,
                     'status' => 'Accepted',
                     'created_at' => date('Y-m-d H:i:s')
@@ -380,7 +384,7 @@ class BookingController extends BaseController
             $booking->address = trim(implode(", ", $addressParts));
 
             $booking->totalQuotes = $this->bookingModel->getTotalNewQuotes($booking->id, $booking->service_id);
-            $booking->addons = $this->bookingModel->getBookingAddons($booking->id, $booking->service_id);
+            $booking->addons = $this->bookingModel->getBookingAddons($booking->id, $booking->service_id, $booking->original_booking_id ?? null);
 
             $today = date('Y-m-d');
             $startDate = new DateTime($today);
@@ -862,165 +866,232 @@ class BookingController extends BaseController
 
     public function getBookingDetails()
     {
-        $booking_id = $this->request->getPost('booking_id');
-        $service_id = $this->request->getPost('service_id');
+        $booking_id  = $this->request->getPost('booking_id');
+        $service_id  = (string)$this->request->getPost('service_id');
         $provider_id = $this->request->getPost('provider_id');
-        $totalPets = 0;
+        $db          = \Config\Database::connect();
+        $totalPets   = 1;
 
-        if ($service_id == '4') {
-            $data = [
-                'trackings' => $this->bookingModel->getTracking($booking_id),
-                'walletDetails' => $this->bookingModel->getWalletDetails($booking_id),
-            ];
+        $trackings     = [];
+        $walletDetails = null;
+        $netAmount     = 0;
+        $clnetAmount   = 0;
+        $platformCharges = 0;
+        $service_amount = 0;
+
+        // Fetch Booking Pets Count
+        try {
+            $petsCount = $this->bookingModel->getBookingPets($booking_id);
+            if ($petsCount > 0) {
+                $totalPets = $petsCount;
+            }
+        } catch (\Throwable $e) {
+            $totalPets = 1;
+        }
+
+        // 1. Fetch Trackings & Wallet Details based on Service Type
+        if ($service_id == '4') { // Walking
+            $trackings = $this->bookingModel->getTracking($booking_id);
+            $walletDetails = $this->bookingModel->getWalletDetails($booking_id);
             $booking = $this->bookingModel->getBookingforPriceCalculate($booking_id, $provider_id);
-            $frequency = $this->getServiceFrequency(frequencyString: $booking->service_frequency);
-            $totalPets = $this->bookingModel->getBookingPets($booking_id);
-
-
-            $walks = $frequency * $booking->duration_days;
-            $netAmount = (float) $booking->receivable_amount / ($walks * $totalPets);
-            $clnetAmount = (float) $booking->bid_amount / ($walks * $totalPets);
-            $platformCharges = $booking->platform_charges / ($walks * $totalPets);
-        } else if ($service_id == '2') {
-            $totalPets = $this->bookingModel->getBookingPets($booking_id);
-            $data = [
-                'trackings' => $this->bookingModel->getGroomingTracking($booking_id),
-                'walletDetails' => $this->bookingModel->getGroomingWalletDetails($booking_id),
-            ];
-        } else if ($service_id == '3') {
-            $totalPets = $this->bookingModel->getBookingPets($booking_id);
-
-            // Get all tracking records
+            if ($booking) {
+                $frequency = $this->getServiceFrequency($booking->service_frequency ?? 'once_a_day');
+                $durationDays = max(1, (int)($booking->duration_days ?? $booking->days ?? 1));
+                $walks = $frequency * $durationDays;
+                $totalWalkItems = max(1, $walks * $totalPets);
+                $netAmount = (float)($booking->receivable_amount ?? 0) / $totalWalkItems;
+                $clnetAmount = (float)($booking->bid_amount ?? 0) / $totalWalkItems;
+                $platformCharges = (float)($booking->platform_charges ?? 0) / $totalWalkItems;
+            }
+        } else if ($service_id == '2') { // Grooming
+            $trackings = $this->bookingModel->getGroomingTracking($booking_id);
+            $walletDetails = $this->bookingModel->getGroomingWalletDetails($booking_id);
+        } else if ($service_id == '3') { // Training
             $trackings = $this->bookingModel->getTrainingTracking($booking_id);
-            $data = [
-                'trackings' => $trackings,
-                'walletDetails' => $this->bookingModel->getTrainingWalletDetails($booking_id),
-            ];
-        } else if ($service_id == '6') {
-            $totalPets = $this->bookingModel->getBookingPets($booking_id);
+            $walletDetails = $this->bookingModel->getTrainingWalletDetails($booking_id);
+        } else if ($service_id == '6') { // Sitting
             $trackings = $this->bookingModel->getSittingTracking($booking_id);
-
-            $netAmount = 0;
-            $clnetAmount = 0;
-            $platformCharges = 0;
-
-            $db = \Config\Database::connect();
+            $walletDetails = $this->bookingModel->getSittingWalletDetails($booking_id);
             $quotation = $db->table('quotations')
                 ->where('booking_id', $booking_id)
-                ->where('provider_id', $provider_id)
                 ->whereIn('status', ['Accepted', 'Completed'])
                 ->get()
                 ->getRow();
 
-            $totalTrackings = count($trackings) > 0 ? count($trackings) / $totalPets : 0;
-            if ($quotation && $totalTrackings > 0 && $totalPets > 0) {
-                $netAmount = (float) $quotation->receivable_amount / ($totalTrackings * $totalPets);
-                $clnetAmount = (float) $quotation->bid_amount / ($totalTrackings * $totalPets);
-                $platformCharges = (float) $quotation->platform_charges / ($totalTrackings * $totalPets);
+            $totalTrackings = count($trackings) > 0 ? count($trackings) / max(1, $totalPets) : 1;
+            if ($quotation && $totalTrackings > 0) {
+                $denom = max(1, $totalTrackings * $totalPets);
+                $netAmount = (float)($quotation->receivable_amount ?? 0) / $denom;
+                $clnetAmount = (float)($quotation->bid_amount ?? 0) / $denom;
+                $platformCharges = (float)($quotation->platform_charges ?? 0) / $denom;
             }
-
-            $data = [
-                'trackings' => $trackings,
-                'walletDetails' => $this->bookingModel->getSittingWalletDetails($booking_id),
-            ];
+        } else if ($service_id == '1') { // Boarding
+            if (method_exists($this->bookingModel, 'getBoardingTracking')) {
+                $trackings = $this->bookingModel->getBoardingTracking($booking_id);
+            }
+            if (method_exists($this->bookingModel, 'getBoardingWalletDetails')) {
+                $walletDetails = $this->bookingModel->getBoardingWalletDetails($booking_id);
+            }
         } else {
-
-            $data = [
-                'trackings' => [],
-                'walletDetails' => [],
-            ];
+            // General Fallback (Vet, Daycare, etc.)
+            $trackings = [];
+            $walletDetails = null;
         }
 
+        // Ensure trackings is an array
+        if (!is_array($trackings)) {
+            $trackings = [];
+        }
 
+        // 2. Timezone conversion and calculations per tracking row
         $calcuttaTZ = new DateTimeZone('Asia/Kolkata');
-        $service_amount = 0;
-        foreach ($data['trackings'] as $track) {
+
+        foreach ($trackings as $track) {
             if (isset($track->start_time) && $track->start_time != '0000-00-00 00:00:00') {
-                $start_time = new DateTime($track->start_time, new DateTimeZone('UTC'));
-                $start_time->setTimezone($calcuttaTZ);
-                $track->start_time = $start_time->format('Y-m-d h:i:s');
-            } else {
-                $track->start_time = null;
+                try {
+                    $start_time = new DateTime($track->start_time, new DateTimeZone('UTC'));
+                    $start_time->setTimezone($calcuttaTZ);
+                    $track->start_time = $start_time->format('Y-m-d h:i:s A');
+                } catch (\Throwable $t) {
+                }
             }
             if (isset($track->end_time) && $track->end_time != '0000-00-00 00:00:00') {
-                $end_time = new DateTime($track->end_time, new DateTimeZone('UTC'));
-                $end_time->setTimezone($calcuttaTZ);
-                $track->end_time = $end_time->format('Y-m-d h:i:s');
-            } else {
-                $track->end_time = null;
+                try {
+                    $end_time = new DateTime($track->end_time, new DateTimeZone('UTC'));
+                    $end_time->setTimezone($calcuttaTZ);
+                    $track->end_time = $end_time->format('Y-m-d h:i:s A');
+                } catch (\Throwable $t) {
+                }
             }
 
-
             if ($service_id == '4' || $service_id == '6') {
-
                 $track->netAmount = $netAmount;
                 $track->clnetAmount = $clnetAmount;
                 $track->platformCharges = $platformCharges;
-                $service_amount = $track->service_amount * $totalPets;
-            } else if ($service_id == '3') {
-
-                $totalPets = $this->bookingModel->getBookingPets($booking_id);
-
-                $trackings = $this->bookingModel->getTrainingTracking($booking_id);
-                $packageAddons = [];
-                foreach ($trackings as $track) {
-                    if ($track->is_included_in_packages == '1' || $track->is_included_in_packages == 1) {
-                        $packageId = $track->package_id ?? null;
-                        if ($packageId) {
-                            if (!isset($packageAddons[$packageId])) {
-                                $totalIncludedAddons = $this->bookingModel->getPackageAddonCount($packageId);
-                                $packageAddons[$packageId] = [
-                                    'price' => $track->package_price,
-                                    'total_addons' => $totalIncludedAddons,
-                                ];
-                            }
-                        }
-                    }
-                }
-                foreach ($trackings as $track) {
-                    if ($track->is_included_in_packages == '1' || $track->is_included_in_packages == 1) {
-                        $packageId = $track->package_id ?? null;
-                        if ($packageId && isset($packageAddons[$packageId])) {
-                            $package = $packageAddons[$packageId];
-                            $track->addon_price = $package['price'] / $package['total_addons'];
-                        }
-                    } else {
-                        $track->addon_price = $track->addon_price ?? $track->price;
-                    }
-                }
-                $userAmount = 0;
-                $platformAmount = 0;
-                $providerAmount = 0;
-
-                foreach ($trackings as $track) {
-                    $addonPrice = $track->addon_price ?? $track->price;
-                    if ($track->status == 'approved') {
-                        $discount = $booking->discount ?? 0;
-                        $platformPercentage = floatval(getenv('PLATFORM_PERCENTAGE')) ?? 10;
-
-                        $discountAmount = ($discount > 0) ? ($addonPrice * $discount) / 100 : 0;
-                        $userAmount = $addonPrice - $discountAmount;
-                        $platformAmount = ($userAmount * $platformPercentage) / 100;
-                        $providerAmount = $userAmount - $platformAmount;
-                    }
-                    $track->clnetAmount = round($userAmount, 2);
-                    $track->platformCharges = round($platformAmount, 2);
-                    $track->netAmount = round($providerAmount, 2);
-                }
-                $data = [
-                    'trackings' => $trackings,
-                    'walletDetails' => $this->bookingModel->getTrainingWalletDetails($booking_id),
-                ];
+                $service_amount += (float)($track->service_amount ?? 0) * $totalPets;
             }
         }
 
-        $data['service_amount'] = $service_amount;
-        $data['total_pets'] = $totalPets;
+        // Special handling for Training Addons
+        if ($service_id == '3' && !empty($trackings)) {
+            $packageAddons = [];
+            foreach ($trackings as $track) {
+                if (!empty($track->is_included_in_packages)) {
+                    $packageId = $track->package_id ?? null;
+                    if ($packageId && !isset($packageAddons[$packageId])) {
+                        $totalIncludedAddons = method_exists($this->bookingModel, 'getPackageAddonCount') ? $this->bookingModel->getPackageAddonCount($packageId) : 1;
+                        $packageAddons[$packageId] = [
+                            'price' => (float)($track->package_price ?? 0),
+                            'total_addons' => max(1, $totalIncludedAddons),
+                        ];
+                    }
+                }
+            }
+            foreach ($trackings as $track) {
+                if (!empty($track->is_included_in_packages)) {
+                    $packageId = $track->package_id ?? null;
+                    if ($packageId && isset($packageAddons[$packageId])) {
+                        $pkg = $packageAddons[$packageId];
+                        $track->addon_price = $pkg['price'] / $pkg['total_addons'];
+                    }
+                } else {
+                    $track->addon_price = $track->addon_price ?? $track->price ?? 0;
+                }
+
+                $addonPrice = (float)($track->addon_price ?? 0);
+                $platformPercentage = floatval(getenv('PLATFORM_PERCENTAGE')) ?: 10;
+
+                $userAmount = $addonPrice;
+                $platformAmount = ($userAmount * $platformPercentage) / 100;
+                $providerAmount = $userAmount - $platformAmount;
+
+                $track->clnetAmount = round($userAmount, 2);
+                $track->platformCharges = round($platformAmount, 2);
+                $track->netAmount = round($providerAmount, 2);
+            }
+        }
+
+        // 3. Robust Financial Summary Computation (works even if trackings array is empty!)
+        $tableMap = [
+            '4' => 'walking_service_bookings',
+            '2' => 'grooming_service_bookings',
+            '3' => 'training_service_bookings',
+            '6' => 'sitting_service_bookings',
+            '1' => 'boarding_service_bookings',
+        ];
+        $bookingTable = $tableMap[$service_id] ?? 'walking_service_bookings';
+
+        $bookingRow = null;
+        if ($db->tableExists($bookingTable)) {
+            $bookingRow = $db->table($bookingTable)->where('id', $booking_id)->get()->getRow();
+        }
+
+        $acceptedQuotation = $db->table('quotations')
+            ->where('booking_id', $booking_id)
+            ->whereIn('status', ['Accepted', 'Completed'])
+            ->get()
+            ->getRow();
+
+        $creditAmount = 0;
+        $providerPayment = 0;
+        $platformCommission = 0;
+
+        if ($acceptedQuotation) {
+            $creditAmount       = (float)($acceptedQuotation->bid_amount ?? 0);
+            $providerPayment    = (float)($acceptedQuotation->receivable_amount ?? 0);
+            $platformCommission = (float)($acceptedQuotation->platform_charges ?? 0);
+        } else if ($bookingRow) {
+            $creditAmount       = (float)($bookingRow->bid_amount ?? $bookingRow->final_payable ?? $bookingRow->total_price ?? 0);
+            $platformCommission = round($creditAmount * 0.10, 2);
+            $providerPayment    = round($creditAmount - $platformCommission, 2);
+        }
+
+        // Calculate refunds and completed sums from tracking entries
+        $totalRefund = 0;
+        $totalApprovedSp = 0;
+        $totalApprovedComm = 0;
+
+        foreach ($trackings as $tr) {
+            $st = strtolower($tr->status ?? '');
+            $app = $tr->is_approved ?? null;
+            $clAmt = (float)($tr->clnetAmount ?? $tr->addon_price ?? $tr->service_amount ?? 0);
+            $comm  = (float)($tr->platformCharges ?? ($clAmt * 0.10));
+
+            if ($st == 'rejected' || $app === 'false' || $app === false) {
+                $totalRefund += $clAmt;
+            } else if ($st == 'completed' || $st == 'approved' || $app === 'true' || $app === true || $app === 1) {
+                $totalApprovedSp += ($clAmt - $comm);
+                $totalApprovedComm += $comm;
+            }
+        }
+
+        // Build guaranteed Financial Summary object
+        $financials = [
+            'credit_amount'       => round($creditAmount, 2),
+            'provider_payment'    => round($providerPayment > 0 ? $providerPayment : $totalApprovedSp, 2),
+            'platform_commission' => round($platformCommission > 0 ? $platformCommission : $totalApprovedComm, 2),
+            'client_refund'       => round($totalRefund, 2),
+            'balance_amount'      => round(max(0, $creditAmount - $totalRefund), 2),
+        ];
+
+        // Ensure walletDetails exists
+        if (!$walletDetails && $bookingRow) {
+            $walletDetails = [
+                'booking' => (array)$bookingRow
+            ];
+        }
+
+        $data = [
+            'trackings'      => $trackings,
+            'walletDetails'  => $walletDetails,
+            'financials'     => $financials,
+            'service_amount' => $service_amount > 0 ? $service_amount : $creditAmount,
+            'total_pets'     => $totalPets,
+        ];
 
         return $this->response->setJSON([
             'status' => true,
-            'data' => $data,
-
+            'data'   => $data,
         ]);
     }
 

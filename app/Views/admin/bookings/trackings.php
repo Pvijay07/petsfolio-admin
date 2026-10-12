@@ -499,449 +499,263 @@
         });
 
         function processBookingDetails(response, serviceId) {
-          // Clear previous data
+          // Clear previous data & state
           $('#trackingTable tbody').empty();
-
-          // Hide empty state initially
           $('#emptyState').addClass('d-none');
 
-          // Populate tracking details
-          if (response.data.trackings && response.data.trackings.length > 0) {
-            // Set headers based on service type
-            if (serviceId == '4') { // Walking service
-              $('#trackingDetailsHeader').html(`
-                        <tr>
-                            <th class="py-3 text-center">Pet Name</th>
-                            <th class="py-3 text-center">Breed</th>
-                            <th class="py-3 text-center">Date</th>
-                            <th class="py-3 text-center">Service Time</th>
-                            <th class="py-3 text-center">Start Time</th>
-                            <th class="py-3 text-center">End Time</th>
-                            <th class="py-3 text-center">Status</th>
-                            <th class="py-3 text-center">Approval</th>
-                            <th class="py-3 text-center">Payment Status</th>
-                            <th class="py-3 text-center">Debit</th>
-                            <th class="py-3 text-center">Commission</th>
-                            <th class="py-3 text-center">Wallet Balance</th>
-                        </tr>
-                    `);
-            } else if (serviceId == '3') { // Training service
-              $('#trackingDetailsHeader').html(`
-                        <tr>
-                            <th class="py-3 text-center">Pet Name</th>
-                            <th class="py-3 text-center">Breed</th>
-                            <th class="py-3 text-center">Addon</th>
-                            <th class="py-3 text-center">Date</th>
-                            <th class="py-3 text-center">Status</th>
-                            <th class="py-3 text-center">Approved At</th>
-                            <th class="py-3 text-center">Payment Status</th>
-                            <th class="py-3 text-center">Debit</th>
-                            <th class="py-3 text-center">Commission</th>
-                            <th class="py-3 text-center">Wallet Balance</th>
-                        </tr>
-                    `);
-            } else if (serviceId == '2') { // Grooming service
-              $('#trackingDetailsHeader').html(`
-                        <tr>
-                            <th class="py-3 text-center">Pet Name</th>
-                            <th class="py-3 text-center">Breed</th>
-                            <th class="py-3 text-center">Addon</th>
-                            <th class="py-3 text-center">Date</th>
-                            <th class="py-3 text-center">Status</th>
-                            <th class="py-3 text-center">Approved At</th>
-                            <th class="py-3 text-center">Payment Status</th>
-                            <th class="py-3 text-center">Debit</th>
-                            <th class="py-3 text-center">Commission</th>
-                            <th class="py-3 text-center">Wallet Balance</th>
-                        </tr>
-                    `);
-            } else if (serviceId == '1') { // Boarding service
-              $('#trackingDetailsHeader').html(`
-                        <tr>
-                            <th class="py-3 text-center">Pet Name</th>
-                            <th class="py-3 text-center">Breed</th>
-                            <th class="py-3 text-center">Service Time</th>
-                            <th class="py-3 text-center">Start Time</th>
-                            <th class="py-3 text-center">End Time</th>
-                            <th class="py-3 text-center">Status</th>
-                            <th class="py-3 text-center">Approval</th>
-                            <th class="py-3 text-center">Payment Status</th>
-                        </tr>
-                    `);
-            } else if (serviceId == '6') { // Sitting service
-              $('#trackingDetailsHeader').html(`
-                        <tr>
-                            <th class="py-3 text-center">Pet Name</th>
-                            <th class="py-3 text-center">Breed</th>
-                            <th class="py-3 text-center">Date</th>
-                            <th class="py-3 text-center">Service Time</th>
-                            <th class="py-3 text-center">Start Time</th>
-                            <th class="py-3 text-center">End Time</th>
-                            <th class="py-3 text-center">Status</th>
-                            <th class="py-3 text-center">Approval</th>
-                            <th class="py-3 text-center">Payment Status</th>
-                            <th class="py-3 text-center">Debit</th>
-                            <th class="py-3 text-center">Commission</th>
-                            <th class="py-3 text-center">Wallet Balance</th>
-                        </tr>
-                    `);
+          let data = response.data || {};
+          let trackings = Array.isArray(data.trackings) ? data.trackings : [];
+          let financials = data.financials || null;
+          let walletDetails = data.walletDetails || null;
+
+          // Provider Label Mapping
+          const providerLabels = {
+            '1': 'Boarding Host',
+            '2': 'Groomer',
+            '3': 'Trainer',
+            '4': 'Walker',
+            '5': 'Veterinarian',
+            '6': 'Sitter',
+            '7': 'Daycare Host'
+          };
+          let providerLabel = providerLabels[serviceId] || 'Provider';
+          $('.card.bg-payment h6').text(providerLabel + ' Payment');
+
+          // -------------------------------------------------------------
+          // 1. ALWAYS UPDATE FINANCIAL SUMMARY CARDS FIRST
+          // -------------------------------------------------------------
+          let creditAmt = 0;
+          let providerAmt = 0;
+          let commAmt = 0;
+          let refundAmt = 0;
+          let balanceAmt = 0;
+
+          if (financials) {
+            creditAmt    = parseFloat(financials.credit_amount) || 0;
+            providerAmt  = parseFloat(financials.provider_payment) || 0;
+            commAmt      = parseFloat(financials.platform_commission) || 0;
+            refundAmt    = parseFloat(financials.client_refund) || 0;
+            balanceAmt   = parseFloat(financials.balance_amount) || Math.max(0, creditAmt - refundAmt);
+          } else if (walletDetails && walletDetails.booking) {
+            let b = walletDetails.booking;
+            creditAmt   = parseFloat(b.bid_amount || b.total_price || b.final_payable || data.service_amount || 0);
+            commAmt     = parseFloat(b.platform_charges || (creditAmt * 0.10));
+            providerAmt = parseFloat(b.receivable_amount || (creditAmt - commAmt));
+            refundAmt   = 0;
+            balanceAmt  = creditAmt;
+          } else if (data.service_amount) {
+            creditAmt   = parseFloat(data.service_amount) || 0;
+            commAmt     = creditAmt * 0.10;
+            providerAmt = creditAmt - commAmt;
+            balanceAmt  = creditAmt;
+          }
+
+          $('#creditAmount').text('₹' + creditAmt.toFixed(2));
+          $('#providerPayment').text('₹' + providerAmt.toFixed(2));
+          $('#platformCommission').text('₹' + commAmt.toFixed(2));
+          $('#clientRefund').text('₹' + refundAmt.toFixed(2));
+          $('#balanceAmount').text('₹' + balanceAmt.toFixed(2));
+
+          // -------------------------------------------------------------
+          // 2. SET TABLE HEADERS DEPENDING ON SERVICE
+          // -------------------------------------------------------------
+          if (serviceId == '4' || serviceId == '6') { // Walking / Sitting
+            $('#trackingDetailsHeader').html(`
+              <tr>
+                <th class="py-3 text-center">Pet Name</th>
+                <th class="py-3 text-center">Breed</th>
+                <th class="py-3 text-center">Date</th>
+                <th class="py-3 text-center">Service Time</th>
+                <th class="py-3 text-center">Start Time</th>
+                <th class="py-3 text-center">End Time</th>
+                <th class="py-3 text-center">Status</th>
+                <th class="py-3 text-center">Approval</th>
+                <th class="py-3 text-center">Payment Status</th>
+                <th class="py-3 text-center">Debit</th>
+                <th class="py-3 text-center">Commission</th>
+                <th class="py-3 text-center">Running Balance</th>
+              </tr>
+            `);
+          } else if (serviceId == '2' || serviceId == '3') { // Grooming / Training
+            $('#trackingDetailsHeader').html(`
+              <tr>
+                <th class="py-3 text-center">Pet Name</th>
+                <th class="py-3 text-center">Breed</th>
+                <th class="py-3 text-center">Addon / Command</th>
+                <th class="py-3 text-center">Date</th>
+                <th class="py-3 text-center">Status</th>
+                <th class="py-3 text-center">Approved At</th>
+                <th class="py-3 text-center">Payment Status</th>
+                <th class="py-3 text-center">Debit</th>
+                <th class="py-3 text-center">Commission</th>
+                <th class="py-3 text-center">Running Balance</th>
+              </tr>
+            `);
+          } else { // Boarding / Vet / Daycare / Others
+            $('#trackingDetailsHeader').html(`
+              <tr>
+                <th class="py-3 text-center">Pet Name</th>
+                <th class="py-3 text-center">Breed</th>
+                <th class="py-3 text-center">Service Time</th>
+                <th class="py-3 text-center">Start Time</th>
+                <th class="py-3 text-center">End Time</th>
+                <th class="py-3 text-center">Status</th>
+                <th class="py-3 text-center">Approval</th>
+                <th class="py-3 text-center">Payment Status</th>
+              </tr>
+            `);
+          }
+
+          // -------------------------------------------------------------
+          // 3. RENDER TABLE ROWS OR SHOW EMPTY STATE
+          // -------------------------------------------------------------
+          if (trackings.length === 0) {
+            $('#emptyState').removeClass('d-none');
+            return;
+          }
+
+          let runningCredit = creditAmt;
+
+          $.each(trackings, function(index, tracking) {
+            let petName   = tracking.pet_name || 'N/A';
+            let petBreed  = tracking.pet_breed || 'N/A';
+            let dateStr   = tracking.tracking_date || 'N/A';
+            let sTime     = tracking.service_time || 'N/A';
+            let startTime = tracking.start_time ? tracking.start_time.split(' ')[1] + ' ' + (tracking.start_time.split(' ')[2] || '') : 'N/A';
+            let endTime   = tracking.end_time ? tracking.end_time.split(' ')[1] + ' ' + (tracking.end_time.split(' ')[2] || '') : 'N/A';
+
+            let rawStatus = tracking.status ? tracking.status.toString() : 'Pending';
+            let displayStatus = rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1);
+
+            // Determine Approval Status & Class
+            let approvalStatus = 'Pending';
+            let isApp = tracking.is_approved;
+
+            if (tracking.status === 'Untracked' && tracking.request_reason) {
+              if (tracking.request_status === 'approved') approvalStatus = 'Approved (Manual)';
+              else if (tracking.request_status === 'rejected') approvalStatus = 'Rejected (Manual)';
+              else approvalStatus = 'Pending Approval';
+            } else if (isApp === true || isApp === "true" || isApp === 1 || tracking.approved_at) {
+              approvalStatus = 'Approved';
+            } else if (isApp === false || isApp === "false" || isApp === 0 || rawStatus.toLowerCase() === 'rejected') {
+              approvalStatus = 'Rejected';
+            } else if (rawStatus.toLowerCase() === 'completed') {
+              approvalStatus = 'Approved';
             }
 
-              var creditAmount = parseFloat(response.data.service_amount) || 0;
-              var totalSpAmount = 0;
-              var totalCommission = 0;
-              var totalRefund = 0;
+            let statusClass = getStatusClass(approvalStatus);
 
-              $.each(response.data.trackings, function(index, tracking) {
-                if (serviceId == '4' || serviceId == '6') {
-                  var payment_status = '';
-                  var debitAmount = 0;
-                  var commissionAmount = 0;
-                  var walletAmount = tracking.service_amount;
+            // Determine Payment Status Label & Badge Class
+            let paymentStatusLabel = formatPaymentStatusText(tracking.payment_status || (approvalStatus === 'Approved' ? 'Paid' : 'Pending'));
+            let paymentStatusClass = getPaymentStatusClass(paymentStatusLabel);
 
-                  // Determine payment status and amounts
-                  if (tracking.status == 'Untracked') {
-                    if (tracking.request_reason) {
-                      if (tracking.request_status == 'approved') {
-                        payment_status = 'Paid';
-                        debitAmount = parseFloat(tracking.clnetAmount) || 0;
-                        commissionAmount = parseFloat(tracking.platformCharges) || 0;
-                        walletAmount = parseFloat(tracking.service_amount) || 0;
-                        totalSpAmount += debitAmount;
-                        totalCommission += commissionAmount;
-                        creditAmount += debitAmount;
-                      } else if (tracking.request_status == 'rejected') {
-                        payment_status = 'Refunded';
-                        debitAmount = parseFloat(tracking.clnetAmount) || 0;
-                        commissionAmount = 0;
-                        totalRefund += debitAmount;
-                        creditAmount += debitAmount;
-                      } else { // pending
-                        payment_status = 'Processing';
-                        debitAmount = 0;
-                        commissionAmount = 0;
-                      }
-                    } else {
-                      payment_status = 'Refunded';
-                      debitAmount = parseFloat(tracking.clnetAmount) || 0;
-                      commissionAmount = 0;
-                      totalRefund += debitAmount;
-                      creditAmount += debitAmount;
-                    }
-                  } else if (tracking.status == 'completed' && tracking.is_approved == null) {
-                    payment_status = 'Processing';
-                    debitAmount = 0;
-                    commissionAmount = 0;
-                  } else if (tracking.status == 'completed' && (tracking.is_approved == "false" || tracking.is_approved == null)) {
-                    payment_status = 'Rejected';
-                  } else if (tracking.status == 'in_progress' && tracking.is_approved == null) {
-                    payment_status = 'Pending';
-                  } else if (tracking.status == 'rejected') {
-                    payment_status = 'Refunded';
-                    debitAmount = parseFloat(tracking.clnetAmount) || 0;
-                    commissionAmount = 0;
-                    totalRefund += debitAmount;
-                    creditAmount += debitAmount;
-                  } else {
-                    payment_status = tracking.payment_status;
-                    debitAmount = parseFloat(tracking.clnetAmount) || 0;
-                    commissionAmount = parseFloat(tracking.platformCharges) || 0;
-                    walletAmount = parseFloat(tracking.service_amount) || 0;
-                    totalSpAmount += debitAmount;
-                    totalCommission += commissionAmount;
-                    creditAmount += debitAmount;
-                  }
+            let debit = parseFloat(tracking.clnetAmount || tracking.addon_price || tracking.service_amount || 0);
+            let comm  = parseFloat(tracking.platformCharges || (debit * 0.10));
 
-                  // Determine approval status
-                  var approvalStatus = '';
-                  if (tracking.status == 'Untracked' && tracking.request_reason) {
-                    if (tracking.request_status == 'approved') {
-                      approvalStatus = 'Approved (Manual)';
-                    } else if (tracking.request_status == 'rejected') {
-                      approvalStatus = 'Rejected (Manual)';
-                    } else {
-                      approvalStatus = 'Pending Approval';
-                    }
-                  } else if ((tracking.status == 'completed' || tracking.status == 'in_progress') && tracking.is_approved == null) {
-                    approvalStatus = 'Pending';
-                  } else if (tracking.is_approved == true || tracking.is_approved == "true") {
-                    approvalStatus = 'Approved';
-                  } else if (tracking.is_approved == false || tracking.is_approved == "false") {
-                    approvalStatus = 'Rejected';
-                  } else if (tracking.status == 'rejected') {
-                    approvalStatus = 'Rejected';
-                  } else {
-                    approvalStatus = 'NO WALK';
-                  }
+            // Subtract debit from Running Balance if session is approved or paid
+            if (paymentStatusLabel === 'Paid' || approvalStatus === 'Approved' || approvalStatus === 'Approved (Manual)') {
+              runningCredit = Math.max(0, runningCredit - debit);
+            }
 
-                  console.log("Refunded", payment_status)
+            if (serviceId == '4' || serviceId == '6') {
+              $('#trackingTable tbody').append(`
+                <tr>
+                  <td class="text-center text-dark">${petName}</td>
+                  <td class="text-center text-dark">${petBreed}</td>
+                  <td class="text-center text-dark">${dateStr}</td>
+                  <td class="text-center text-dark">${sTime}</td>
+                  <td class="text-center text-dark">${startTime}</td>
+                  <td class="text-center text-dark">${endTime}</td>
+                  <td class="text-center"><span class="status-badge ${statusClass}">${displayStatus}</span></td>
+                  <td class="text-center">
+                    <span class="status-badge ${statusClass}">${approvalStatus}</span>
+                    ${tracking.request_reason ? `<div class="small text-muted mt-1" style="font-size:0.75rem;">Reason: ${tracking.request_reason}</div>` : ''}
+                  </td>
+                  <td class="text-center"><span class="status-badge ${paymentStatusClass}">${paymentStatusLabel}</span></td>
+                  <td class="text-center fw-bold text-debit">${debit > 0 ? '-₹' + debit.toFixed(2) : '₹0.00'}</td>
+                  <td class="text-center fw-bold text-secondary">${comm > 0 ? '-₹' + comm.toFixed(2) : '₹0.00'}</td>
+                  <td class="text-center fw-bold text-primary">₹${runningCredit.toFixed(2)}</td>
+                </tr>
+              `);
+            } else if (serviceId == '2' || serviceId == '3') {
+              let addonName = tracking.addon || tracking.package_name || 'N/A';
+              let approvedAt = tracking.approved_at || (approvalStatus === 'Approved' ? dateStr : 'N/A');
 
-                  // Get status badge class
-                  var statusClass = getStatusClass(approvalStatus);
-                  var paymentStatusClass = getPaymentStatusClass(payment_status);
-
-                  $('#trackingTable tbody').append(`
-                            <tr>
-                                <td class="text-center text-dark">${tracking.pet_name || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.pet_breed || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.tracking_date || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.service_time || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.start_time ? tracking.start_time.split(' ')[1] : 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.end_time ? tracking.end_time.split(' ')[1] : 'N/A'}</td>
-                                <td class="text-center">
-                                    <span class="status-badge ${statusClass}">
-                                        ${tracking.status ? tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1) : 'N/A'}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="status-badge ${statusClass}">
-                                        ${approvalStatus}
-                                    </span>
-                                    ${tracking.request_reason ? `<div class="small text-muted mt-1" style="font-size: 0.75rem; line-height: 1.2;">Reason: ${tracking.request_reason}</div>` : ''}
-                                    ${tracking.proof_image ? `<a href="${'<?= base_url() ?>' + tracking.proof_image}" target="_blank" class="btn btn-link p-0 small mt-1" style="font-size: 0.7rem; display: block;">View Proof</a>` : ''}
-                                </td>
-                                <td class="text-center">
-                                    <span class="status-badge ${paymentStatusClass}">
-                                        ${payment_status}
-                                    </span>
-                                </td>
-                                <td class="text-center fw-bold text-debit">
-                                    ${debitAmount > 0 ? '-₹' + debitAmount.toFixed(2) : '₹0.00'}
-                                </td>
-                                <td class="text-center fw-bold text-secondary">
-                                    ${commissionAmount > 0 ? '-₹' + commissionAmount.toFixed(2) : '₹0.00'}
-                                </td>
-                                <td class="text-center fw-bold text-primary">
-                                    ₹${creditAmount.toFixed(2)}
-                                </td>
-                            </tr>
-                        `);
-
-                } else if (serviceId == '3' || serviceId == '2') {
-                  var approvalStatus = tracking.approved_at ? 'Approved' : 'Pending';
-                  var statusClass = approvalStatus === 'Approved' ? 'status-approved' : 'status-pending';
-
-                  var addon_price = 0;
-                  var commissionAmount = 0;
-
-                  if (approvalStatus === 'Approved') {
-                    addon_price = parseFloat(tracking.addon_price) || 0;
-                    commissionAmount = parseFloat(tracking.platformCharges) || (addon_price * 0.10);
-                    creditAmount += addon_price;
-                    totalSpAmount += addon_price;
-                    totalCommission += commissionAmount;
-                  }
-                  console.log("tracking.payment_status", typeof tracking.payment_status)
-
-                  var paymentStatusClass = tracking.payment_status === '1' ? 'status-approved' :
-                    tracking.payment_status === '0' ? 'status-pending' : 'status-processing';
-
-                  $('#trackingTable tbody').append(`
-                            <tr>
-                                <td class="text-center text-dark">${tracking.pet_name || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.pet_breed || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.addon || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.tracking_date || 'N/A'}</td>
-                                <td class="text-center">
-                                    <span class="status-badge ${statusClass}">
-                                        ${tracking.status ? tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1) : 'N/A'}
-                                    </span>
-                                </td>
-                                <td class="text-center text-dark">${tracking.approved_at || 'N/A'}</td>
-                                <td class="text-center">
-                                    <span class="status-badge ${paymentStatusClass}">
-                                        ${tracking.payment_status === '1' ? 'status-approved' :
-                tracking.payment_status === '0' ? 'status-pending' : 'status-processing' || 'N/A'}
-                                    </span>
-                                </td>
-                                <td class="text-center fw-bold text-debit">
-                                    ${addon_price > 0 ? '-₹' + addon_price.toFixed(2) : '₹0.00'}
-                                </td>
-                                <td class="text-center fw-bold text-secondary">
-                                    ${commissionAmount > 0 ? '-₹' + commissionAmount.toFixed(2) : '₹0.00'}
-                                </td>
-                                <td class="text-center fw-bold text-primary">
-                                    ₹${creditAmount.toFixed(2)}
-                                </td>
-                            </tr>
-                        `);
-
-                } else if (serviceId == '1') {
-                  // Boarding service logic
-                  var approvalStatus = '';
-                  if ((tracking.status == 'completed' || tracking.status == 'in_progress') && tracking.is_approved == null) {
-                    approvalStatus = 'Pending';
-                  } else if (tracking.is_approved == true || tracking.is_approved == "true") {
-                    approvalStatus = 'Approved';
-                  } else if (tracking.is_approved == false || tracking.is_approved == "false") {
-                    approvalStatus = 'Rejected';
-                  } else {
-                    approvalStatus = 'N/A';
-                  }
-
-                  var statusClass = getStatusClass(approvalStatus);
-                  var paymentStatusClass = getPaymentStatusClass(tracking.payment_status);
-
-                  $('#trackingTable tbody').append(`
-                            <tr>
-                                <td class="text-center text-dark">${tracking.pet_name || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.pet_breed || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.service_time || 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.start_time ? tracking.start_time.split(' ')[1] : 'N/A'}</td>
-                                <td class="text-center text-dark">${tracking.end_time ? tracking.end_time.split(' ')[1] : 'N/A'}</td>
-                                <td class="text-center">
-                                    <span class="status-badge ${statusClass}">
-                                        ${tracking.status ? tracking.status.charAt(0).toUpperCase() + tracking.status.slice(1) : 'N/A'}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="status-badge ${statusClass}">
-                                        ${approvalStatus}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <span class="status-badge ${paymentStatusClass}">
-                                        ${tracking.payment_status || 'N/A'}
-                                    </span>
-                                </td>
-                            </tr>
-                        `);
-                }
-              });
-
+              $('#trackingTable tbody').append(`
+                <tr>
+                  <td class="text-center text-dark">${petName}</td>
+                  <td class="text-center text-dark">${petBreed}</td>
+                  <td class="text-center text-dark fw-semibold">${addonName}</td>
+                  <td class="text-center text-dark">${dateStr}</td>
+                  <td class="text-center"><span class="status-badge ${statusClass}">${displayStatus}</span></td>
+                  <td class="text-center text-dark">${approvedAt}</td>
+                  <td class="text-center"><span class="status-badge ${paymentStatusClass}">${paymentStatusLabel}</span></td>
+                  <td class="text-center fw-bold text-debit">${debit > 0 ? '-₹' + debit.toFixed(2) : '₹0.00'}</td>
+                  <td class="text-center fw-bold text-secondary">${comm > 0 ? '-₹' + comm.toFixed(2) : '₹0.00'}</td>
+                  <td class="text-center fw-bold text-primary">₹${runningCredit.toFixed(2)}</td>
+                </tr>
+              `);
             } else {
-              // Show empty state
-              $('#emptyState').removeClass('d-none');
-              $('#trackingDetailsHeader').html(`
-                    <tr>
-                        <th colspan="10" class="py-4 text-center text-muted">No tracking details found</th>
-                    </tr>
-                `);
+              $('#trackingTable tbody').append(`
+                <tr>
+                  <td class="text-center text-dark">${petName}</td>
+                  <td class="text-center text-dark">${petBreed}</td>
+                  <td class="text-center text-dark">${sTime}</td>
+                  <td class="text-center text-dark">${startTime}</td>
+                  <td class="text-center text-dark">${endTime}</td>
+                  <td class="text-center"><span class="status-badge ${statusClass}">${displayStatus}</span></td>
+                  <td class="text-center"><span class="status-badge ${statusClass}">${approvalStatus}</span></td>
+                  <td class="text-center"><span class="status-badge ${paymentStatusClass}">${paymentStatusLabel}</span></td>
+                </tr>
+              `);
             }
+          });
+        }
 
-            // Update summary cards with wallet details
-            if (response.data.walletDetails) {
-              const walletDetails = response.data.walletDetails;
-              const booking = walletDetails.booking;
-              var service_amount = '';
-              var service_name = '';
-              var provider = '';
-              var netSpAmount = 0;
+        // Helper function to get status badge class
+        function getStatusClass(status) {
+          if (!status) return 'status-pending';
+          let s = status.toString().toLowerCase();
+          if (s.includes('approved') || s.includes('completed') || s.includes('paid')) return 'status-approved';
+          if (s.includes('pending') || s.includes('processing') || s.includes('untracked')) return 'status-pending';
+          if (s.includes('rejected') || s.includes('cancelled') || s.includes('refunded')) return 'status-rejected';
+          return 'status-pending';
+        }
 
-              if (serviceId == '4' || serviceId == '6') {
-                if (serviceId == '6') {
-                  service_amount = parseFloat(booking.sitting_amount || 0).toFixed(2);
-                  service_name = booking.service_name || 'Sitting service';
-                  provider = 'Sitter';
-                } else {
-                  service_amount = parseFloat(booking.walking_amount || 0).toFixed(2);
-                  service_name = booking.service_name || 'Walking service';
-                  provider = 'Walker';
-                }
-                netSpAmount = totalSpAmount - totalCommission;
+        // Helper function to get payment status badge class
+        function getPaymentStatusClass(status) {
+          if (!status) return 'status-pending';
+          let s = status.toString().toLowerCase();
+          if (s === 'paid' || s === 'completed' || s === 'approved' || s === '1') return 'status-approved';
+          if (s === 'processing' || s === 'pending' || s === '0' || s === 'in_progress') return 'status-processing';
+          if (s === 'refunded' || s === 'rejected' || s === 'cancelled') return 'status-rejected';
+          return 'status-pending';
+        }
 
-                // Update summary cards
-                $('#creditAmount').text('₹' + creditAmount.toFixed(2));
-                $('#providerPayment').text('₹' + netSpAmount.toFixed(2));
-                $('#platformCommission').text('₹' + totalCommission.toFixed(2));
-                $('#clientRefund').text('₹' + totalRefund.toFixed(2));
+        // Helper function to format human-readable payment status text
+        function formatPaymentStatusText(status) {
+          if (!status && status !== 0) return 'Pending';
+          let s = status.toString().toLowerCase();
+          if (s === '1' || s === 'paid' || s === 'completed' || s === 'approved') return 'Paid';
+          if (s === '0' || s === 'pending') return 'Pending';
+          if (s === 'processing' || s === 'in_progress') return 'Processing';
+          if (s === 'refunded') return 'Refunded';
+          if (s === 'rejected' || s === 'cancelled') return 'Rejected';
+          return status.charAt(0).toUpperCase() + status.slice(1);
+        }
 
-                // Calculate balance
-                var balanceAmount = response.data.service_amount || service_amount;
-                $('#balanceAmount').text('₹' + parseFloat(balanceAmount).toFixed(2));
-
-              } else if (serviceId == '3') {
-                service_amount = parseFloat(booking.training_amount || 0).toFixed(2);
-                service_name = booking.service_name || 'Training service';
-                provider = 'Trainer';
-                netSpAmount = totalSpAmount - totalCommission;
-
-                $('#creditAmount').text('₹' + (booking.bid_amount || '0'));
-                $('#providerPayment').text('₹' + netSpAmount.toFixed(2));
-                $('#platformCommission').text('₹' + totalCommission.toFixed(2));
-                $('#clientRefund').text('₹' + totalRefund.toFixed(2));
-
-                var balanceAmount = service_amount;
-                $('#balanceAmount').text('₹' + parseFloat(balanceAmount).toFixed(2));
-
-              } else if (serviceId == '2') {
-                service_amount = parseFloat(booking.grooming_amount || 0).toFixed(2);
-                service_name = booking.service_name || 'Grooming service';
-                provider = 'Groomer';
-                netSpAmount = totalSpAmount - totalCommission;
-
-                $('#creditAmount').text('₹' + creditAmount.toFixed(2));
-                $('#providerPayment').text('₹' + netSpAmount.toFixed(2));
-                $('#platformCommission').text('₹' + totalCommission.toFixed(2));
-                $('#clientRefund').text('₹' + totalRefund.toFixed(2));
-
-                var balanceAmount = response.data.service_amount || service_amount;
-                $('#balanceAmount').text('₹' + parseFloat(balanceAmount).toFixed(2));
-
-              } else if (serviceId == '1') {
-                service_amount = parseFloat(booking.boarding_amount || 0).toFixed(2);
-                service_name = booking.service_name || 'Boarding service';
-                provider = 'Boarding';
-
-                // Update summary cards for boarding
-                $('#creditAmount').text('₹' + service_amount);
-                $('#providerPayment').text('₹0');
-                $('#platformCommission').text('₹0');
-                $('#clientRefund').text('₹0');
-                $('#balanceAmount').text('₹' + service_amount);
-              }
-
-              // Update payment card title
-              $('.card.bg-payment h6').text(provider + ' Payment');
-
-            } else {
-              showError('No wallet details found');
-            }
-          }
-
-          // Helper function to get status badge class
-          function getStatusClass(status) {
-            var s = status.toLowerCase();
-            if (s.includes('approved')) return 'status-approved';
-            if (s.includes('pending')) return 'status-pending';
-            if (s.includes('rejected')) return 'status-rejected';
-            if (s.includes('processing')) return 'status-processing';
-            if (s.includes('refunded')) return 'status-refunded';
-            return 'status-pending';
-          }
-
-          // Helper function to get payment status class
-          function getPaymentStatusClass(status) {
-            switch (status.toLowerCase()) {
-              case 'paid':
-              case 'completed':
-                return 'status-approved';
-              case 'pending':
-              case 'processing':
-                return 'status-processing';
-              case 'rejected':
-              case 'refunded':
-                return 'status-rejected';
-              default:
-                return 'status-pending';
-            }
-          }
-
-          // Show error message
-          function showError(message) {
-            // Create error alert
-            const errorAlert = `
-                <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-
-            // Add error alert before the tracking table
-            $('#trackingTable').before(errorAlert);
-          }
-        });
+        // Show error message
+        function showError(message) {
+          const errorAlert = `
+            <div class="alert alert-danger alert-dismissible fade show mx-3 mt-3" role="alert">
+              <i class="bi bi-exclamation-triangle me-2"></i>
+              ${message}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          `;
+          $('#trackingTable').before(errorAlert);
+        }
+  });
 </script>
 
 <?php echo $this->endSection() ?>

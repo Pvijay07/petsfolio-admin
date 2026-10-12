@@ -128,3 +128,7 @@ nb-configuration.xml
 public/service_account/
 .env
 app/ThirdParty/*
+
+# Python virtual environments
+app/Python/venv/
+app/Python/.venv/

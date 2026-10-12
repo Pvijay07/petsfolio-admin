@@ -541,7 +541,7 @@ class InsuranceManagement extends BaseController
 
     // Fetch unique session IDs and their last message time
     $sessions = $db->table('chatbot_logs')
-      ->select('chatbot_logs.session_id as id, MAX(chatbot_logs.created_at) as last_message_at, users.name as user_name, users.phone')
+      ->select('chatbot_logs.session_id as id, MAX(chatbot_logs.created_at) as last_message_at, MAX(users.name) as user_name, MAX(users.phone) as phone')
       ->join('users', 'users.id = chatbot_logs.user_id', 'left')
       ->groupBy('chatbot_logs.session_id')
       ->orderBy('last_message_at', 'DESC')

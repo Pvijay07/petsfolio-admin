@@ -9,8 +9,27 @@ class AIService
 
     public function __construct(?string $pythonPath = null, ?string $scriptPath = null)
     {
-        $this->pythonPath = $pythonPath ?? (getenv('PYTHON_BIN') ?: 'python3');
         $this->scriptPath = $scriptPath ?? (APPPATH . 'Python/analyze.py');
+
+        if ($pythonPath !== null) {
+            $this->pythonPath = $pythonPath;
+        } else {
+            $envBin = (function_exists('env') ? env('PYTHON_BIN') : null) ?: getenv('PYTHON_BIN');
+            if ($envBin && (file_exists($envBin) || $envBin === 'python3' || $envBin === 'python')) {
+                $this->pythonPath = $envBin;
+            } else {
+                // Auto-detect project virtual environment first
+                $venvBin = APPPATH . 'Python/venv/bin/python3';
+                $venvBinAlt = APPPATH . 'Python/venv/bin/python';
+                if (file_exists($venvBin) && is_executable($venvBin)) {
+                    $this->pythonPath = $venvBin;
+                } elseif (file_exists($venvBinAlt) && is_executable($venvBinAlt)) {
+                    $this->pythonPath = $venvBinAlt;
+                } else {
+                    $this->pythonPath = 'python3';
+                }
+            }
+        }
     }
 
     /**
@@ -21,25 +40,47 @@ class AIService
      */
     public function analyzeRecording(string $audioFilePath): array
     {
-        if (!file_exists($audioFilePath)) {
-            throw new \InvalidArgumentException("Audio file does not exist: {$audioFilePath}");
+        return $this->executePythonScript($this->scriptPath, [$audioFilePath]);
+    }
+
+    /**
+     * Run specialized analyze_client_call.py on Client <-> SP audio recording.
+     *
+     * @param string $audioFilePath Absolute path to the audio file
+     * @param string $bookedService Booked service (walking, grooming, training, sitting)
+     * @return array Decoded JSON analysis result
+     */
+    public function analyzeClientRecording(string $audioFilePath, string $bookedService = 'walking'): array
+    {
+        $clientScript = APPPATH . 'Python/analyze_client_call.py';
+        if (!file_exists($clientScript)) {
+            $clientScript = $this->scriptPath;
         }
 
-        if (!file_exists($this->scriptPath)) {
-            throw new \RuntimeException("Python analysis script not found at: {$this->scriptPath}");
+        return $this->executePythonScript($clientScript, [$audioFilePath, $bookedService]);
+    }
+
+    /**
+     * Executes given Python script with arguments and safely parses JSON output.
+     */
+    protected function executePythonScript(string $scriptPath, array $arguments): array
+    {
+        if (!file_exists($scriptPath)) {
+            throw new \RuntimeException("Python analysis script not found at: {$scriptPath}");
         }
 
+        $argStrings = array_map('escapeshellarg', $arguments);
         $command = sprintf(
             '%s %s %s 2>&1',
             escapeshellcmd($this->pythonPath),
-            escapeshellarg($this->scriptPath),
-            escapeshellarg($audioFilePath)
+            escapeshellarg($scriptPath),
+            implode(' ', $argStrings)
         );
 
         $descriptorSpec = [
-            0 => ['pipe', 'r'], // stdin
-            1 => ['pipe', 'w'], // stdout
-            2 => ['pipe', 'w'], // stderr
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
         ];
 
         $process = proc_open($command, $descriptorSpec, $pipes);
@@ -62,10 +103,8 @@ class AIService
             throw new \RuntimeException("Python script exited with error code ({$exitCode}): {$stderr}");
         }
 
-        // Parse JSON output from stdout
         $trimmedStdout = trim($stdout);
-        
-        // Isolate JSON block if log lines are present
+
         if (strspn($trimmedStdout, '{') !== 0 || strrpos($trimmedStdout, '}') !== strlen($trimmedStdout) - 1) {
             $firstBrace = strpos($trimmedStdout, '{');
             $lastBrace  = strrpos($trimmedStdout, '}');

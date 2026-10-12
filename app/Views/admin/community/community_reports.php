@@ -163,6 +163,13 @@
                                 <span class="text-[10px] font-700 text-slate-500 uppercase tracking-wider">Reported
                                     By:</span>
                                 <span class="text-[12px] font-800 text-slate-900"><?= esc ( $report['name'] ) ?></span>
+                                <?php if (($report['user_type'] ?? '') == 'admin'): ?>
+                                    <span class="px-1.5 py-0.5 bg-rose-100 text-rose-700 rounded text-[9px] font-800">ADMIN</span>
+                                <?php elseif (($report['user_type'] ?? '') == 'provider'): ?>
+                                    <span class="px-1.5 py-0.5 bg-sky-100 text-sky-700 rounded text-[9px] font-800">PROVIDER</span>
+                                <?php else: ?>
+                                    <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-[9px] font-800">CLIENT</span>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Channel -->

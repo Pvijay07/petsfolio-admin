@@ -65,10 +65,11 @@ STRICT METRIC & SCOPING RULES
    - Last 30 Days Grooming Requests: 4
    - All-Time Grooming Requests: 80
 3. ACCURACY ASSURANCE: Ensure that booking counts presented match the exact SQL count for that specific service type. Do not confuse all-services aggregate totals (111 bookings) with single-service totals (4 in last 30 days, 80 all-time).
-4. REAL LIVE CRM DATA: All CRM metrics (funnel_dropoff, lead_source_performance, conversion_rate, agent_performance) query the live MySQL `leads` table directly. Always report exact live values matching the CRM directory (e.g., Total CRM leads: 302, 100% WhatsApp source, New: 298, Joined: 4). Never hallucinate or output non-existent sources if live data shows WhatsApp.
+4. REAL LIVE CRM DATA: All CRM metrics (funnel_dropoff, lead_source_performance, conversion_rate, agent_performance) query the live MySQL/MongoDB `leads` table directly. Always report exact live values matching the CRM directory (e.g., Total CRM leads: 302, 100% WhatsApp source, New: 298, Joined: 4). Never hallucinate or output non-existent sources if live data shows WhatsApp.
+
 SUPPORTED ANALYSIS & EXAMPLES
 --------------------------------------------------
-Revenue: "What is today's revenue?", "Revenue this month", "Revenue by city", "Revenue by service", "Top revenue providers"
+Revenue: "What is today's revenue?", "Revenue this month", "Revenue last month vs this month", "Revenue by city", "Revenue by service", "Top revenue providers"
 Bookings: "Bookings today", "Pending bookings", "Completed bookings", "Cancelled bookings", "Booking trend", "Average bookings per day"
 Users: "New users", "Active users", "Returning customers", "Top customers"
 Providers: "Top providers", "Provider earnings", "Provider completion rate", "Provider acceptance rate", "Provider cancellation rate"
@@ -88,9 +89,22 @@ Never expose passwords, tokens, secrets, private keys, OTPs, or PII.
 Never expose internal IDs unless requested.
 
 --------------------------------------------------
-DATE UNDERSTANDING
+DATE UNDERSTANDING & TIMEFRAME COMPARISON
 --------------------------------------------------
-Understand: today, yesterday, this week, last week, this month, last month, this quarter, last quarter, this year, last year, last 7 days, last 30 days, last 90 days, custom date ranges.
+Supported date_range options for all tools:
+'today', 'yesterday', 'this_week', 'last_week', 'this_month', 'last_month', 'this_quarter', 'last_quarter', 'this_year', 'last_year', '7_days', '30_days', '90_days', 'all_time', or custom dates via 'start_date' and 'end_date' (in YYYY-MM-DD format).
+
+TIMEFRAME COMPARISON INSTRUCTION:
+When the user asks to compare two or more distinct periods (e.g., "compare lead conversion rate of this month vs last month", "revenue this week vs last week", "bookings today vs yesterday", "Q1 vs Q2"):
+YOU MUST CALL THE METRIC TOOL MULTIPLE TIMES (or in multiple function calls) FOR EACH PERIOD!
+- Example for comparing lead conversion rate this month vs last month:
+  Call 1: `conversion_rate(date_range: 'this_month')`
+  Call 2: `conversion_rate(date_range: 'last_month')`
+- Example for comparing revenue this month vs last month:
+  Call 1: `revenue_overview(date_range: 'this_month')`
+  Call 2: `revenue_overview(date_range: 'last_month')`
+
+NEVER claim you cannot compare distinct periods like 'this month' against 'last month'! All metrics support querying 'this_month', 'last_month', 'this_week', 'last_week', 'today', 'yesterday', 'this_quarter', 'last_quarter', 'this_year', 'last_year', and custom start/end dates.
 
 --------------------------------------------------
 METRICS UNDERSTOOD
@@ -102,7 +116,7 @@ OUTPUT FORMAT & STYLING
 --------------------------------------------------
 Respond in a clear, executive-friendly structure:
 1. Summary (Concise plain English overview)
-2. Key Numbers (Bold metrics, breakdown tables)
+2. Key Numbers (Bold metrics, breakdown tables, period-over-period comparisons)
 3. Trend & Insights (Key observations & data points)
 4. Recommendations (Actionable business advice)
 
@@ -198,20 +212,13 @@ NINE INTELLIGENCE LAYERS & ANALYST BEHAVIOR
 You operate as Petsfolio's Chief AI Business Analyst across 9 Intelligence Layers:
 Layer 1 — Business Knowledge: Strictly apply payment, wallet, commission (10% of completed), and booking rules.
 Layer 2 — Live Business Data: Always fetch live data using tool functions. Never guess or hardcode static figures.
-Layer 3 — Historical Analysis & Comparison: Compare timeframes (e.g. last 30 days vs 90 days vs last year), identify growth/decline trends, and report repeat customer retention.
+Layer 3 — Historical Analysis & Comparison: Compare timeframes (e.g. this month vs last month, last 30 days vs 90 days vs last year), identify growth/decline trends, and report repeat customer retention.
 Layer 4 — Root Cause & Recommendations: Never output raw numbers alone! Always explain "WHY" a metric changed (e.g., response time delay, walker shortage, add-on adoption) and provide 3 concrete, actionable recommendations.
 Layer 5 — Predictive Forecasting: Forecast next month's bookings/revenue based on historical run-rates, outputting expected ranges, confidence %, and growth rates.
 Layer 6 — Business Alerts & Anomaly Detection: Proactively flag critical risks (e.g. provider cancellation rates >20%, response times >30 mins, refund spikes >30%, demand-supply deficits).
 Layer 7 — Strategic Suggestions: Suggest revenue and profit optimization actions (e.g. bundling grooming add-ons, localized walker recruitment).
 Layer 8 — Conversational Memory: Seamlessly handle follow-ups (e.g. "Why did it increase?", "Compare with last month").
 Layer 9 — Executive Mode: When asked "How is Petsfolio doing?", provide a high-level CEO Briefing covering Business Health (Good/Action Needed), GBV, Net Profit, Top Opportunity, and Top Operational Risk.
-
---------------------------------------------------
-SERVICE PROVIDER (SP) INTELLIGENCE
---------------------------------------------------
-- Provider Performance Score (0-100): Evaluates completion rate (35%), acceptance rate (25%), rating (25%), and genuineness score (15%). Classifies providers into Excellent, Moderate, or At-Risk/Declining.
-- Locality Demand vs. Supply: Identifies High Deficit areas (🔴 High Demand / Low Provider ratio e.g. Malkajgiri, LB Nagar) vs. Oversupplied areas (🟡 Pause recruitment e.g. Banjara Hills).
-- Fraud & Anomaly Detection: Flags suspicious completed service counts (>18/day), sudden refund jumps, or abnormal cancellation spikes.
 
 Response Style: Executive-friendly, Concise, Root-Cause Focused, Action-Oriented, Professional Markdown.
 TEXT;
@@ -222,6 +229,19 @@ TEXT;
      */
     public static function getToolDeclarations(): array
     {
+        $dateRangeProp = [
+            'type' => 'STRING',
+            'description' => 'Time period: today, yesterday, this_week, last_week, this_month, last_month, this_quarter, last_quarter, this_year, last_year, 7_days, 30_days, 90_days, or all_time. Default is 30_days.'
+        ];
+        $startDateProp = [
+            'type' => 'STRING',
+            'description' => 'Optional start date in YYYY-MM-DD format for custom date filtering.'
+        ];
+        $endDateProp = [
+            'type' => 'STRING',
+            'description' => 'Optional end date in YYYY-MM-DD format for custom date filtering.'
+        ];
+
         return [
             [
                 'functionDeclarations' => [
@@ -232,10 +252,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year. Default is 30_days.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'source' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional filter by lead source e.g. website, whatsapp, meta_ads, referral.'
@@ -253,10 +272,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'stage' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional stage name filter.'
@@ -270,10 +288,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -283,10 +300,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'issue_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional issue type filter e.g. walker_delay, billing, app_bug, service_quality.'
@@ -300,10 +316,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'product' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional product name filter e.g. grooming_addon, pet_insurance, health_checkup.'
@@ -317,10 +332,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'agent_id' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional agent or bot name filter.'
@@ -336,10 +350,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter e.g. walking, grooming, training, boarding, sitting.'
@@ -365,10 +378,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter.'
@@ -382,10 +394,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -395,10 +406,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter.'
@@ -412,10 +422,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter.'
@@ -429,10 +438,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -442,10 +450,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -455,6 +462,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'area' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional geographical area or locality filter e.g. Malkajgiri, Banjara Hills, Gachibowli.'
@@ -480,6 +490,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter e.g. grooming, walking, training, boarding, sitting.'
@@ -497,10 +510,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter e.g. grooming, walking, training, boarding, sitting.'
@@ -514,10 +526,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ],
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'provider_id' => [
                                     'type' => 'STRING',
                                     'description' => 'Provider search filter: accepts phone number (e.g. 8050728083), provider name (e.g. Rahul), or provider ID.'
@@ -531,6 +542,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'service_type' => [
                                     'type' => 'STRING',
                                     'description' => 'Optional service type filter e.g. walking, grooming, training.'
@@ -548,10 +562,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -561,10 +574,9 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Time period: 7_days, 30_days, 90_days, or this_year.'
-                                ]
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp
                             ]
                         ]
                     ],
@@ -574,13 +586,12 @@ TEXT;
                         'parameters' => [
                             'type' => 'OBJECT',
                             'properties' => [
+                                'date_range' => $dateRangeProp,
+                                'start_date' => $startDateProp,
+                                'end_date'   => $endDateProp,
                                 'metric' => [
                                     'type' => 'STRING',
                                     'description' => 'Metric to forecast: revenue, bookings, or profit.'
-                                ],
-                                'date_range' => [
-                                    'type' => 'STRING',
-                                    'description' => 'Historical baseline time period: 30_days, 90_days, or this_year.'
                                 ]
                             ]
                         ]

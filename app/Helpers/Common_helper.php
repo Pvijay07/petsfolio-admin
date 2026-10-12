@@ -1,69 +1,61 @@
 <?php
+
+/**
+ * Common Helper Functions for Petsfolio Admin
+ */
+
 if (!function_exists('ageCalculator')) {
+  /**
+   * Calculates age string from Date of Birth (DOB).
+   *
+   * @param string|null $dob Date of birth (Y-m-d)
+   * @return string e.g. "25 yrs" or "2 mos" or "N/A"
+   */
   function ageCalculator($dob)
   {
-    $dob      = new \DateTime($dob);
-    $today    = new \DateTime();
-    $interval = $today->diff($dob);
-
-    if ($interval->y >= 1) {
-      // If age is more than or equal to 1 year
-      $age = $interval->y . ' Year' . ($interval->y > 1 ? 's' : '');
-    } elseif ($interval->m >= 1) {
-      // If age is less than 1 year but more than or equal to 1 month
-      $age = ($interval->y * 12 + $interval->m) . ' Month' . ($interval->m > 1 ? 's' : '');
-    } else {
-      // If age is less than a month
-      $age = $interval->days . ' Day' . ($interval->days > 1 ? 's' : '');
+    if (empty($dob) || $dob == '0000-00-00' || $dob == '1970-01-01') {
+      return 'N/A';
     }
 
-    return $age;
+    try {
+      $birthDate = new DateTime($dob);
+      $today     = new DateTime('today');
+      $diff      = $birthDate->diff($today);
+
+      if ($diff->y > 0) {
+        return $diff->y . ' yrs';
+      } elseif ($diff->m > 0) {
+        return $diff->m . ' mos';
+      } else {
+        return $diff->d . ' days';
+      }
+    } catch (\Throwable $e) {
+      return 'N/A';
+    }
   }
 }
-if (!function_exists('distanceCalculator')) {
+
+if (!function_exists('haversineGreatCircleDistance')) {
   /**
-   * Calculate distance between two points in kilometers using the Haversine formula.
-   *
-   * @param float $lat1 Latitude of point 1
-   * @param float $lon1 Longitude of point 1
-   * @param float $lat2 Latitude of point 2
-   * @param float $lon2 Longitude of point 2
-   * @return float Distance in kilometers, rounded to 4 decimal places
+   * Calculates the great-circle distance between two points.
    */
-  function distanceCalculator($lat1, $lon1, $lat2, $lon2)
+  function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371)
   {
+    $latFrom = deg2rad($latitudeFrom);
+    $lonFrom = deg2rad($longitudeFrom);
+    $latTo   = deg2rad($latitudeTo);
+    $lonTo   = deg2rad($longitudeTo);
 
+    $latDelta = $latTo - $latFrom;
+    $lonDelta = $lonTo - $lonFrom;
 
-    $earthRadius = 6371; // Earth's radius in kilometers
-
-    // Convert degrees to radians
-    $lat1 = deg2rad($lat1);
-    $lon1 = deg2rad($lon1);
-    $lat2 = deg2rad($lat2);
-    $lon2 = deg2rad($lon2);
-
-    // Differences in coordinates
-    $dLat = $lat2 - $lat1;
-    $dLon = $lon2 - $lon1;
-
-    // Haversine formula
-    $a        = sin($dLat / 2) * sin($dLat / 2) +
-      cos($lat1) * cos($lat2) *
-      sin($dLon / 2) * sin($dLon / 2);
-    $c        = 2 * atan2(sqrt($a), sqrt(1 - $a));
-    $distance = $earthRadius * $c;
-
-    return round($distance, 4);
+    $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+      cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+    return $angle * $earthRadius;
   }
 }
 
 if (!function_exists('deg2rad')) {
-  /**
-   * Convert degrees to radians.
-   *
-   * @param float $deg Degrees
-   * @return float Radians
-   */
   function deg2rad($deg)
   {
     return $deg * (pi() / 180);
@@ -71,15 +63,59 @@ if (!function_exists('deg2rad')) {
 }
 
 if (!function_exists('hasPermission')) {
+  /**
+   * Check if current user has permission (supports Super Admin bypass, Direct User Overrides, & Role Permissions).
+   *
+   * @param string|int $permissionName Permission ID or Name
+   * @return bool
+   */
   function hasPermission($permissionName)
   {
+    $session = \Config\Services::session();
+    $user    = $session->get('user');
+
+    if (!$user) {
+      return false;
+    }
+
+    // Super Admin (Role 1) always has full access
+    if (isset($user->role_id) && (int)$user->role_id === 1) {
+      return true;
+    }
+
     $db       = \Config\Database::connect();
-    $userRole = session()->get('user')->role_id;
-    return $db->table('role_permissions')
-      ->join('permissions', 'permissions.id = role_permissions.permission_id')
-      ->where('role_permissions.role_id', $userRole)
-      ->where('permissions.id', $permissionName)
-      ->countAllResults() > 0;
+    $userId   = (int)($user->id ?? 0);
+    $userRole = (int)($user->role_id ?? 0);
+
+    // 1. Direct User-level Permission Overrides
+    if ($userId > 0 && $db->tableExists('user_permissions')) {
+      $userPerm = $db->table('user_permissions')
+        ->join('permissions', 'permissions.id = user_permissions.permission_id')
+        ->where('user_permissions.user_id', $userId)
+        ->groupStart()
+          ->where('permissions.id', $permissionName)
+          ->orWhere('permissions.name', $permissionName)
+        ->groupEnd()
+        ->countAllResults();
+
+      if ($userPerm > 0) {
+        return true;
+      }
+    }
+
+    // 2. Role-wise Permissions
+    if ($userRole > 0) {
+      return $db->table('role_permissions')
+        ->join('permissions', 'permissions.id = role_permissions.permission_id')
+        ->where('role_permissions.role_id', $userRole)
+        ->groupStart()
+          ->where('permissions.id', $permissionName)
+          ->orWhere('permissions.name', $permissionName)
+        ->groupEnd()
+        ->countAllResults() > 0;
+    }
+
+    return false;
   }
 }
 
@@ -88,101 +124,20 @@ if (!function_exists('calculateEndDate')) {
   {
     $startDate = new DateTime($startDateStr);
     $endDate   = clone $startDate;
-    $daysAdded = 1; // Start with 1 because the start date is included.
+    $daysAdded = 1;
 
     while ($daysAdded < $totalDays) {
       $endDate->modify('+1 day');
 
       if ($serviceDays === 'weekdays') {
-        // Skip Sunday (N=7)
         if ($endDate->format('N') < 7) {
           $daysAdded++;
         }
       } else {
-        // Include all days
         $daysAdded++;
       }
     }
 
     return $endDate->format('Y-m-d');
-  }
-}
-
-if (!function_exists('phonepeResponseDescription')) {
-  function phonepeResponseDescription($code)
-  {
-    $map = [
-      'TXN_AUTO_FAILED'             => 'Payment couldn’t be completed due to issues related to customer or their bank.',
-      'TXN_FAILED'                  => 'Payment failed due to temporary technical issue.',
-      'PENDING'                     => 'Payment is being processed.',
-      'REQUEST_CANCEL_BY_REQUESTER' => 'You cancelled the payment request.',
-      'CANCELLED_BY_USER'           => 'Customer didn’t complete the authentication process in time.',
-      'ISSUER_BANK_UNAVAILABLE'     => 'Technical issue at the customer’s bank.',
-      'REQUEST_TIME_OUT'            => 'Payment request timed-out.',
-      'INSUFFICIENT_FUNDS'          => 'Payment failed due to insufficient balance in customer’s account.',
-      'Z9'                          => 'Payment failed due to insufficient balance in customer’s account.',
-      'S96'                         => 'echnical issue at the customer’s bank.',
-      '500'                         => 'Internal Server Error'
-    ];
-
-    return $map[$code] ?? 'Unknown payment status';
-  }
-}
-if (!function_exists('getGoogleDistance')) {
-
-  function getGoogleDistance($lat1, $lon1, $lat2, $lon2, $mode = "driving")
-  {
-       $apiKey = getenv('gMapKey');
-
-
-    $url = "https://maps.googleapis.com/maps/api/distancematrix/json?" .
-      "origins={$lat1},{$lon1}&destinations={$lat2},{$lon2}" .
-      "&mode={$mode}&units=metric&key={$apiKey}";
-
-    $response = file_get_contents($url);
-    $data = json_decode($response, true);
-    if (!empty($data['rows'][0]['elements'][0]['distance']['value'])) {
-      // distance in meters
-      $meters = $data['rows'][0]['elements'][0]['distance']['value'];
-      return round($meters / 1000, 1) . " Km";
-    }
-
-    return null;
-  }
-}
-
-if (!function_exists('getGoogleDirections')) {
-
-  function getGoogleDirections($lat1, $lon1, $lat2, $lon2, $mode = "driving")
-  {
-        $apiKey = getenv('gMapKey');
-
-
-    $url = "https://maps.googleapis.com/maps/api/directions/json?" .
-      "origin={$lat1},{$lon1}&destination={$lat2},{$lon2}" .
-      "&mode={$mode}&key={$apiKey}";
-
-    $response = file_get_contents($url);
-    $data = json_decode($response, true);
-    if (!empty($data['routes'][0]['legs'][0]['distance'])) {
-      $distance = $data['routes'][0]['legs'][0]['distance'];
-      $meters   = (int) $distance['value']; // raw meters
-      $text     = $distance['text'];        // "1 m", "850 m", "1.2 km"
-
-      // ✅ If Google says 0 meters, but text exists → fallback to text
-      if ($meters === 0) {
-        return $text;
-      }
-
-      // if less than 1000m → return meters
-      if ($meters < 1000) {
-        return $meters . " m";
-      }
-
-      // else return in km
-      return round($meters / 1000, 1) . " Km";
-    }
-
-    return null;
   }
 }

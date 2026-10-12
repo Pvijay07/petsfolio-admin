@@ -55,3 +55,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="<?= base_url('public/assets/js/backend.js?v=' . time()) ?>"></script>
 
+<!-- Universal Dark Mode Overrides (Applied last to guarantee precedence over all modals, SweetAlert, jQuery UI & dynamic popups) -->
+<link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>">
+

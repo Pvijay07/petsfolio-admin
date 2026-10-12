@@ -618,6 +618,7 @@
                                             <th class="text-center fs-6" style="background: #c6d2ff !important;">Rating</th>
                                             <th class="text-center fs-6" style="background: #c6d2ff !important;">Joined At</th>
                                             <th class="text-center fs-6" style="background: #c6d2ff !important;">Verified At</th>
+                                            <th class="text-center fs-6" style="background: #c6d2ff !important;">Device & App</th>
                                             <th class="text-center fs-6" style="background: #c6d2ff !important;">Status</th>
                                             <th class="text-center fs-6" style="background: #c6d2ff !important;">Action</th>
                                         </tr>
@@ -686,6 +687,27 @@
 
                                                     <td class="text-center text-muted small"><?= date('d M Y', strtotime($provider->created_at)) ?></td>
                                                     <td class="text-center text-muted small"><?= !empty($provider->verifiedAt) ? date('d M Y', strtotime($provider->verifiedAt)) : '--' ?></td>
+                                                    <td class="text-center">
+                                                         <?php if (!empty($provider->latest_device)): ?>
+                                                             <?php $dev = $provider->latest_device; ?>
+                                                             <div class="d-flex flex-column align-items-center text-center">
+                                                                 <span class="badge bg-primary-subtle text-primary border border-primary px-2 py-1 mb-1" style="font-weight: 600;">
+                                                                     v<?= htmlspecialchars($dev->app_version ?? 'N/A') ?> <?= !empty($dev->build_number) ? '('.$dev->build_number.')' : '' ?>
+                                                                 </span>
+                                                                 <span class="text-dark small fw-bold">
+                                                                     <?= ucfirst(htmlspecialchars($dev->os ?? '')) ?> <?= htmlspecialchars($dev->os_version ?? '') ?>
+                                                                 </span>
+                                                                 <span class="text-muted small" style="font-size: 0.75rem;">
+                                                                     <?= htmlspecialchars(trim(($dev->manufacturer ?? '').' '.($dev->model ?? $dev->device_name ?? ''))) ?>
+                                                                 </span>
+                                                                 <span class="badge <?= $dev->is_active ? 'bg-success' : 'bg-secondary' ?> mt-1" style="font-size: 0.65rem;">
+                                                                     <?= $dev->is_active ? 'Active' : 'Inactive' ?>
+                                                                 </span>
+                                                             </div>
+                                                         <?php else: ?>
+                                                             <span class="text-muted small">No Device</span>
+                                                         <?php endif; ?>
+                                                     </td>
 
                                                     <td class="text-center">
                                                         <div class="form-check form-switch d-flex justify-content-center">
@@ -2606,6 +2628,40 @@
                 return new Date(dateString).toLocaleString("en-GB", options);
             }
 
+            let providerDeviceDetailsHtml = '';
+            if (data.devices && data.devices.length > 0) {
+                data.devices.forEach((dev) => {
+                    providerDeviceDetailsHtml += `
+                    <div class="detail-card mb-2 p-2 border rounded">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge ${dev.is_active == 1 ? 'bg-success' : 'bg-secondary'}">${dev.is_active == 1 ? 'Active' : 'Inactive'}</span>
+                            <span class="badge bg-primary">App v${dev.app_version || 'N/A'} ${dev.build_number ? '('+dev.build_number+')' : ''}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-1">
+                                <div class="text-black small mb-1 fw-bold">OS / Version</div>
+                                <div class="fw-medium text-dark">${(dev.os || '').toUpperCase()} ${dev.os_version || ''}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="text-black small mb-1 fw-bold">Device Model</div>
+                                <div class="fw-medium text-dark">${dev.manufacturer || ''} ${dev.model || dev.device_name || '--'}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="text-black small mb-1 fw-bold">Last Login</div>
+                                <div class="fw-medium text-dark small">${dev.last_login_at ? formatDate(dev.last_login_at) : '--'}</div>
+                            </div>
+                            <div class="col-md-6 mb-1">
+                                <div class="text-black small mb-1 fw-bold">Last Active</div>
+                                <div class="fw-medium text-dark small">${dev.last_active_at ? formatDate(dev.last_active_at) : '--'}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                });
+            } else {
+                providerDeviceDetailsHtml = '<div class="text-center text-muted py-2">No registered devices</div>';
+            }
+
             let serviceDetailsHtml = '';
             if (data.serviceDetails && Object.keys(data.serviceDetails).length > 0) {
                 Object.entries(data.serviceDetails).forEach(([serviceName, details]) => {
@@ -2739,6 +2795,13 @@
                                 <div class="fw-medium text-success">₹${data.wallet_amount || 0}</div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="detail-section mb-4">
+                        <h6 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-mobile-alt me-2"></i> Registered Devices (${data.devices ? data.devices.length : 0})
+                        </h6>
+                        ${providerDeviceDetailsHtml}
                     </div>
 
                     <div class="detail-section mb-4">

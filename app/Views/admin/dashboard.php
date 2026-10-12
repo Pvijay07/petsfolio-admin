@@ -552,32 +552,32 @@
                             </div>
 
                             <!-- Verification Executives Performance -->
-                            <?php if(isset($verification_executives) && !empty($verification_executives)): ?>
-                            <div class="mt-3 pt-3 border-top">
-                                <h6 class="fw-bold mb-2 small text-muted text-uppercase">Verification Executives</h6>
-                                <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
-                                    <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
-                                        <thead>
-                                            <tr>
-                                                <th class="fw-normal border-0 pb-1">Name</th>
-                                                <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Call Verifications">Calls</th>
-                                                <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Manager Approvals">Apprvls</th>
-                                                <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Total SPs Processed">Total SP</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach($verification_executives as $exec): ?>
-                                            <tr>
-                                                <td class="fw-semibold text-dark border-0 py-1"><?= htmlspecialchars($exec->name ?? '') ?></td>
-                                                <td class="text-center text-primary border-0 py-1"><?= $exec->call_verification_count ?></td>
-                                                <td class="text-center text-success border-0 py-1"><?= $exec->manager_approval_count ?></td>
-                                                <td class="text-center fw-bold text-dark border-0 py-1"><?= $exec->total_sp_count ?></td>
-                                            </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
+                            <?php if (isset($verification_executives) && !empty($verification_executives)): ?>
+                                <div class="mt-3 pt-3 border-top">
+                                    <h6 class="fw-bold mb-2 small text-muted text-uppercase">Verification Executives</h6>
+                                    <div class="table-responsive" style="max-height: 150px; overflow-y: auto;">
+                                        <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                                            <thead>
+                                                <tr>
+                                                    <th class="fw-normal border-0 pb-1">Name</th>
+                                                    <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Call Verifications">Calls</th>
+                                                    <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Manager Approvals">Apprvls</th>
+                                                    <th class=" fw-normal border-0 pb-1 text-center text-dark" title="Total SPs Processed">Total SP</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($verification_executives as $exec): ?>
+                                                    <tr>
+                                                        <td class="fw-semibold text-dark border-0 py-1"><?= htmlspecialchars($exec->name ?? '') ?></td>
+                                                        <td class="text-center text-primary border-0 py-1"><?= $exec->call_verification_count ?></td>
+                                                        <td class="text-center text-success border-0 py-1"><?= $exec->manager_approval_count ?></td>
+                                                        <td class="text-center fw-bold text-dark border-0 py-1"><?= $exec->total_sp_count ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
                             <?php endif; ?>
                         </div>
                         <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 px-3">
@@ -645,216 +645,242 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="reports-tab" class="tab-content" style="display: none;">
-            <div class="row g-4">
-                <div class="col-xl-8">
-                    <div class="card glass-card border-0 shadow-sm rounded-3 mb-0" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
-                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                        <div
-                            class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
-                            <div>
-                                <h5 class="mb-1 fw-bold text-white">Business Performance Analytics</h5>
-                                <small class="text-white">Comprehensive business insights</small>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn text-white dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                    style="border: 1px solid rgba(255, 255, 255, 0.7) !important; background-color: rgba(139, 183, 255, 0.1) !important;">
-                                    Last 30 Days
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
-                                    <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
-                                    <li><a class="dropdown-item" href="#">Last 90 Days</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="chart-container-premium">
-                                <canvas id="analyticsChart" style="height: 320px; width: 100%;"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Most Requested Cities -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
-                        <div class="card-header bg-transparent py-4 border-bottom"
-                            style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
-                            <h5 class="mb-1 fw-bold text-white">Most Requested Cities</h5>
-                            <small class="text-white">Service demand by location</small>
-                        </div>
-                        <div class="card-body p-0 bg-white">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th style="background: #10b981 !important;" class="border-0 text-white">City
-                                            </th>
-                                            <th style="background: #10b981 !important;"
-                                                class="border-0 text-center text-white">Bookings</th>
-                                            <th style="background: #10b981 !important;"
-                                                class="border-0 text-center text-white">Clients</th>
-                                            <th style="background: #10b981 !important;"
-                                                class="border-0 text-center text-white">Providers</th>
-                                            <th style="background: #10b981 !important;"
-                                                class="border-0 text-center text-white">Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($most_requests as $request) { ?>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="bi bi-geo-alt me-2" style="color: #4f46e5;"></i>
-                                                        <?= $request['city'] ?? 'N/A' ?>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">
-                                                    <span
-                                                        class="badge-premium bg-purple-10 text-purple"><?= $request['total_bookings'] ?? 0 ?></span>
-                                                </td>
-                                                <td class="text-center">
-                                                    <span class="badge-premium bg-opacity-10 text-white"
-                                                        style="background-color: #10b981;"><?= $request['total_clients'] ?? 0 ?></span>
-                                                </td>
-                                                <td class="text-center">
-                                                    <span
-                                                        class="badge-premium bg-success bg-opacity-10 text-white"><?= $request['total_providers'] ?? 0 ?></span>
-                                                </td>
-                                                <td class="text-center fw-semibold" style="color: #10b981;">
-                                                    ₹<?= number_format($request['revenue'] ?? 0) ?>
-                                                </td>
-                                            </tr>
-                                        <?php } ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-4">
-                    <!-- Customer Reviews -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3">
-                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom"
-                            style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
-                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                            <div>
-                                <h5 class="mb-1 fw-bold text-white">Recent Reviews</h5>
-                                <small class="text-white">Customer feedback</small>
-                            </div>
-                            <a href="#" class="btn btn-link btn-sm text-decoration-none" style="color: #fff;">View
-                                All</a>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="list-group list-group-flush custom-scrollbar"
-                                style="max-height: 400px; overflow-y: auto; scrollbar-width: none;">
-                                <?php foreach ($reviews as $review) { ?>
-                                    <div class="list-group-item border-0 py-2">
-                                        <div class="d-flex align-items-start">
-                                            <div class="avatar-premium me-3"
-                                                style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
-                                                <?= strtoupper(substr($review->name, 0, 1)) ?>
+                            <div class="col-md-12 mt-2">
+                                <div class="card border-0 shadow-sm rounded-3 h-100 mb-0 border-start border-3 border-danger">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stat-icon-wrapper me-3 bg-danger" style="width: 48px; height: 48px; border-radius: 8px;">
+                                                <i class="bi bi-shield-exclamation text-white fs-4"></i>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                                    <h6 class="mb-0 fw-semibold"><?= $review->name ?></h6>
-                                                    <span class="badge-premium bg-warning bg-opacity-10 text-warning">
-                                                        <?= str_repeat('★', $review->rating) ?>
-                                                    </span>
+                                            <div>
+                                                <span class="text-danger fw-bold small d-block">Unauthorized Provider Visits</span>
+                                                <div class="d-flex align-items-baseline">
+                                                    <span class="fw-bold fs-3 text-danger"><?= $suspicious_visits_count ?? 0 ?></span>
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger ms-2">Flagged</span>
                                                 </div>
-                                                <p class="mb-2 text-sm">"<?= $review->comment ?>"</p>
-                                                <small class="text-muted">
-                                                    <i class="bi bi-clock me-1"></i>
-                                                    <?= date('M d, Y', strtotime($review->created_at ?? 'now')) ?>
-                                                </small>
                                             </div>
                                         </div>
+                                        <div class="mt-3">
+                                            <div class="d-flex justify-content-between small mb-1">
+                                                <span>Stayed 5+ min without booking</span>
+                                                <span><?= $suspicious_visits_count ?? 0 ?> visits</span>
+                                            </div>
+                                            <a href="<?= base_url('/suspicious-visits') ?>"
+                                                class="btn btn-sm btn-outline-danger w-100 mt-2">
+                                                <i class="bi bi-shield-slash me-1"></i>View Flagged Visits
+                                            </a>
+                                        </div>
                                     </div>
-                                <?php } ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- FINANCIALS SECTION -->
-        <div id="financials-tab" class="tab-content" style="display: none;">
-            <div class="row g-4">
-                <div class="col-xl-8">
-                    <!-- Financial Overview -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                <div id="reports-tab" class="tab-content" style="display: none;">
+                    <div class="row g-4">
+                        <div class="col-xl-8">
+                            <div class="card glass-card border-0 shadow-sm rounded-3 mb-0" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
                             border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                        <div
-                            class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
-                            <div>
-                                <h5 class="mb-1 fw-bold text-white">Financial Overview</h5>
-                                <small class="text-white">Revenue, profit, and expenses</small>
+                                <div
+                                    class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-white">Business Performance Analytics</h5>
+                                        <small class="text-white">Comprehensive business insights</small>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn text-white dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                            style="border: 1px solid rgba(255, 255, 255, 0.7) !important; background-color: rgba(139, 183, 255, 0.1) !important;">
+                                            Last 30 Days
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#">Last 7 Days</a></li>
+                                            <li><a class="dropdown-item" href="#">Last 30 Days</a></li>
+                                            <li><a class="dropdown-item" href="#">Last 90 Days</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="chart-container-premium">
+                                        <canvas id="analyticsChart" style="height: 320px; width: 100%;"></canvas>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" style="background-color: rgba(139, 183, 255, 0.1) !important;
-                                        color: #ffffff !important;
-                                        border: 1px solid rgba(255, 255, 255, 0.7) !important;"
-                                    data-bs-toggle="dropdown">
-                                    This Year
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">This Quarter</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                    <li><a class="dropdown-item" href="#">All Time</a></li>
-                                </ul>
+
+                            <!-- Most Requested Cities -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
+                                <div class="card-header bg-transparent py-4 border-bottom"
+                                    style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
+                                    <h5 class="mb-1 fw-bold text-white">Most Requested Cities</h5>
+                                    <small class="text-white">Service demand by location</small>
+                                </div>
+                                <div class="card-body p-0 bg-white">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background: #10b981 !important;" class="border-0 text-white">City
+                                                    </th>
+                                                    <th style="background: #10b981 !important;"
+                                                        class="border-0 text-center text-white">Bookings</th>
+                                                    <th style="background: #10b981 !important;"
+                                                        class="border-0 text-center text-white">Clients</th>
+                                                    <th style="background: #10b981 !important;"
+                                                        class="border-0 text-center text-white">Providers</th>
+                                                    <th style="background: #10b981 !important;"
+                                                        class="border-0 text-center text-white">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($most_requests as $request) { ?>
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="bi bi-geo-alt me-2" style="color: #4f46e5;"></i>
+                                                                <?= $request['city'] ?? 'N/A' ?>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span
+                                                                class="badge-premium bg-purple-10 text-purple"><?= $request['total_bookings'] ?? 0 ?></span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span class="badge-premium bg-opacity-10 text-white"
+                                                                style="background-color: #10b981;"><?= $request['total_clients'] ?? 0 ?></span>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span
+                                                                class="badge-premium bg-success bg-opacity-10 text-white"><?= $request['total_providers'] ?? 0 ?></span>
+                                                        </td>
+                                                        <td class="text-center fw-semibold" style="color: #10b981;">
+                                                            ₹<?= number_format($request['revenue'] ?? 0) ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-body p-4">
-                            <div class="chart-container-premium">
-                                <canvas id="financialChart" style="height: 320px; width: 100%;"></canvas>
+
+                        <div class="col-xl-4">
+                            <!-- Customer Reviews -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3">
+                                <div class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom"
+                                    style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-white">Recent Reviews</h5>
+                                        <small class="text-white">Customer feedback</small>
+                                    </div>
+                                    <a href="#" class="btn btn-link btn-sm text-decoration-none" style="color: #fff;">View
+                                        All</a>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush custom-scrollbar"
+                                        style="max-height: 400px; overflow-y: auto; scrollbar-width: none;">
+                                        <?php foreach ($reviews as $review) { ?>
+                                            <div class="list-group-item border-0 py-2">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="avatar-premium me-3"
+                                                        style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+                                                        <?= strtoupper(substr($review->name, 0, 1)) ?>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                                            <h6 class="mb-0 fw-semibold"><?= $review->name ?></h6>
+                                                            <span class="badge-premium bg-warning bg-opacity-10 text-warning">
+                                                                <?= str_repeat('★', $review->rating) ?>
+                                                            </span>
+                                                        </div>
+                                                        <p class="mb-2 text-sm">"<?= $review->comment ?>"</p>
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-clock me-1"></i>
+                                                            <?= date('M d, Y', strtotime($review->created_at ?? 'now')) ?>
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Revenue Distribution -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
-                        <div class="card-header bg-transparent py-4 border-bottom"
-                            style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
-                            <h5 class="mb-1 fw-bold text-white">Revenue Distribution</h5>
-                            <small class="text-white">Income by service category</small>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="row">
-                                <div class="col-md-7">
-                                    <canvas id="revenueStreamsChart" style="height: 280px; width: 100%;"></canvas>
+                <!-- FINANCIALS SECTION -->
+                <div id="financials-tab" class="tab-content" style="display: none;">
+                    <div class="row g-4">
+                        <div class="col-xl-8">
+                            <!-- Financial Overview -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
+                                <div
+                                    class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-white">Financial Overview</h5>
+                                        <small class="text-white">Revenue, profit, and expenses</small>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" style="background-color: rgba(139, 183, 255, 0.1) !important;
+                                        color: #ffffff !important;
+                                        border: 1px solid rgba(255, 255, 255, 0.7) !important;"
+                                            data-bs-toggle="dropdown">
+                                            This Year
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#">This Quarter</a></li>
+                                            <li><a class="dropdown-item" href="#">This Year</a></li>
+                                            <li><a class="dropdown-item" href="#">All Time</a></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div class="col-md-5">
-                                    <div class="mt-4">
-                                        <?php
-                                        $icons = [
-                                            'Grooming' => 'bi-scissors',
-                                            'Training' => 'bi-award',
-                                            'Boarding' => 'bi-house-door',
-                                            'Walking' => 'bi-pin-map',
-                                            'Insurance' => 'bi-shield-check'
-                                        ];
-                                        $colors = [
-                                            'Grooming' => '#8b5cf6',
-                                            'Training' => '#3b82f6',
-                                            'Boarding' => '#10b981',
-                                            'Walking' => '#f59e0b',
-                                            'Insurance' => '#ec4899'
-                                        ];
+                                <div class="card-body p-4">
+                                    <div class="chart-container-premium">
+                                        <canvas id="financialChart" style="height: 320px; width: 100%;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
 
-                                        $total_rev = max($revenue, 1);
-                                        foreach ($revenue_by_service as $stream) {
-                                            $name = $stream['service'];
-                                            $amount = $stream['amount'];
-                                            $percent = round(($amount / $total_rev) * 100);
-                                            $icon = $icons[$name] ?? 'bi-cash';
-                                            $color = $colors[$name] ?? '#4f46e5';
-                                            echo '
+                            <!-- Revenue Distribution -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
+                                <div class="card-header bg-transparent py-4 border-bottom"
+                                    style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
+                                    <h5 class="mb-1 fw-bold text-white">Revenue Distribution</h5>
+                                    <small class="text-white">Income by service category</small>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <canvas id="revenueStreamsChart" style="height: 280px; width: 100%;"></canvas>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="mt-4">
+                                                <?php
+                                                $icons = [
+                                                    'Grooming' => 'bi-scissors',
+                                                    'Training' => 'bi-award',
+                                                    'Boarding' => 'bi-house-door',
+                                                    'Walking' => 'bi-pin-map',
+                                                    'Insurance' => 'bi-shield-check'
+                                                ];
+                                                $colors = [
+                                                    'Grooming' => '#8b5cf6',
+                                                    'Training' => '#3b82f6',
+                                                    'Boarding' => '#10b981',
+                                                    'Walking' => '#f59e0b',
+                                                    'Insurance' => '#ec4899'
+                                                ];
+
+                                                $total_rev = max($revenue, 1);
+                                                foreach ($revenue_by_service as $stream) {
+                                                    $name = $stream['service'];
+                                                    $amount = $stream['amount'];
+                                                    $percent = round(($amount / $total_rev) * 100);
+                                                    $icon = $icons[$name] ?? 'bi-cash';
+                                                    $color = $colors[$name] ?? '#4f46e5';
+                                                    echo '
                                             <div class="mb-4">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <div class="d-flex align-items-center">
@@ -870,161 +896,161 @@
                                                 </div>
                                                 <small class="text-muted">' . $percent . '% of total revenue</small>
                                             </div>';
-                                        }
-                                        ?>
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="col-xl-4">
-                    <!-- Financial KPIs -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3">
-                        <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                        <div class="col-xl-4">
+                            <!-- Financial KPIs -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3">
+                                <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
                             border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                            <h5 class="mb-1 fw-bold text-white">Financial KPIs</h5>
-                            <small class="text-white">Key financial indicators</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper bg-primary text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-currency-rupee text-white"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold">₹<?= number_format($revenue ?? 0) ?></h4>
-                                    <small class="text-muted">Revenue</small>
+                                    <h5 class="mb-1 fw-bold text-white">Financial KPIs</h5>
+                                    <small class="text-white">Key financial indicators</small>
                                 </div>
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper dashboard-gradient-green text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-graph-up text-white"></i>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper bg-primary text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-currency-rupee text-white"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">₹<?= number_format($revenue ?? 0) ?></h4>
+                                            <small class="text-muted">Revenue</small>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper dashboard-gradient-green text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-graph-up text-white"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">₹<?= number_format($profit ?? 0) ?></h4>
+                                            <small class="text-muted">Profit</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-icon-wrapper dashboard-gradient-blue text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-cash-stack"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">₹<?= number_format($request_amount ?? 0) ?></h4>
+                                            <small class="text-muted">Payouts</small>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper dashboard-gradient-orange text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-percent"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold"><?= $margin ?>%</h4>
+                                            <small class="text-muted">Margin</small>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper dashboard-gradient-purple text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-bank"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">₹<?= number_format($payout_balance['available'] ?? 0, 2) ?>
+                                            </h4>
+                                            <small class="text-muted">Available Balance</small>
+                                        </div>
                                     </div>
-                                    <h4 class="mb-1 fw-bold">₹<?= number_format($profit ?? 0) ?></h4>
-                                    <small class="text-muted">Profit</small>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-icon-wrapper dashboard-gradient-blue text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-cash-stack"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold">₹<?= number_format($request_amount ?? 0) ?></h4>
-                                    <small class="text-muted">Payouts</small>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper dashboard-gradient-orange text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-percent"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold"><?= $margin ?>%</h4>
-                                    <small class="text-muted">Margin</small>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper dashboard-gradient-purple text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-bank"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold">₹<?= number_format($payout_balance['available'] ?? 0, 2) ?>
-                                    </h4>
-                                    <small class="text-muted">Available Balance</small>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Quick Actions -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
-                        <div class="card-header bg-transparent py-4 border-bottom"
-                            style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
-                            <h5 class="mb-1 fw-bold text-white">Quick Actions</h5>
-                            <small class="text-white">Common administrative tasks</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-3">
-                                <button class="btn btn-gradient-primary py-3 fw-semibold"
-                                    onclick="exportDashboardData()">
-                                    <i class="bi bi-download me-2"></i>Export Financial Report
-                                </button>
-                                <a href="<?= base_url() ?>providers-payments"
-                                    class="btn btn-outline-gradient py-3 fw-semibold text-white"
-                                    style="color: #fff !important;">
-                                    <i class="bi bi-cash-coin me-2"></i>View Provider Payouts
-                                </a>
-                                <a href="https://login.bulksmsgateway.in" target="_blank"
-                                    class="btn btn-outline-gradient py-3 fw-semibold text-white"
-                                    style="color: #fff !important;">
-                                    <i class="bi bi-chat-text me-2"></i>Recharge SMS Credits
-                                </a>
-                                <button class="btn btn-outline-gradient py-3 fw-semibold text-white"
-                                    onclick="generateInvoice()" style="color: #fff !important;">
-                                    <i class="bi bi-receipt me-2"></i>Generate Invoice
-                                </button>
+                            <!-- Quick Actions -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
+                                <div class="card-header bg-transparent py-4 border-bottom"
+                                    style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%)!important;">
+                                    <h5 class="mb-1 fw-bold text-white">Quick Actions</h5>
+                                    <small class="text-white">Common administrative tasks</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-3">
+                                        <button class="btn btn-gradient-primary py-3 fw-semibold"
+                                            onclick="exportDashboardData()">
+                                            <i class="bi bi-download me-2"></i>Export Financial Report
+                                        </button>
+                                        <a href="<?= base_url() ?>providers-payments"
+                                            class="btn btn-outline-gradient py-3 fw-semibold text-white"
+                                            style="color: #fff !important;">
+                                            <i class="bi bi-cash-coin me-2"></i>View Provider Payouts
+                                        </a>
+                                        <a href="https://login.bulksmsgateway.in" target="_blank"
+                                            class="btn btn-outline-gradient py-3 fw-semibold text-white"
+                                            style="color: #fff !important;">
+                                            <i class="bi bi-chat-text me-2"></i>Recharge SMS Credits
+                                        </a>
+                                        <button class="btn btn-outline-gradient py-3 fw-semibold text-white"
+                                            onclick="generateInvoice()" style="color: #fff !important;">
+                                            <i class="bi bi-receipt me-2"></i>Generate Invoice
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- PROVIDERS SECTION -->
-        <div id="providers-tab" class="tab-content" style="display: none;">
-            <div class="row g-4">
-                <div class="col-xl-8">
-                    <!-- Provider Performance -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3">
-                        <div style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                <!-- PROVIDERS SECTION -->
+                <div id="providers-tab" class="tab-content" style="display: none;">
+                    <div class="row g-4">
+                        <div class="col-xl-8">
+                            <!-- Provider Performance -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3">
+                                <div style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
                             border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)"
-                            class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
-                            <div>
-                                <h5 class="mb-1 fw-bold text-white">Provider Performance</h5>
-                                <small class="text-white">Top performing service providers</small>
-                            </div>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle" style="background-color: rgba(139, 183, 255, 0.1) !important;
+                                    class="card-header bg-transparent d-flex justify-content-between align-items-center py-4 border-bottom">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-white">Provider Performance</h5>
+                                        <small class="text-white">Top performing service providers</small>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn dropdown-toggle" style="background-color: rgba(139, 183, 255, 0.1) !important;
                                         color: #ffffff !important;
                                         border: 1px solid rgba(255, 255, 255, 0.7) !important;"
-                                    data-bs-toggle="dropdown">
-                                    All Services
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="#">Grooming</a></li>
-                                    <li><a class="dropdown-item" href="#">Training</a></li>
-                                    <li><a class="dropdown-item" href="#">Walking</a></li>
-                                    <li><a class="dropdown-item" href="#">Boarding</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
-                                                class="border-0 text-white">Provider</th>
-                                            <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
-                                                class="border-0 text-center text-white">Service</th>
-                                            <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
-                                                class="border-0 text-center text-white">Completed</th>
-                                            <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
-                                                class="border-0 text-center text-white">Earnings</th>
-                                            <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
-                                                class="border-0 text-center text-white">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $top_providers = [
-                                            ['name' => 'John Smith', 'service' => 'Grooming', 'rating' => 4.9, 'completed' => 42, 'earnings' => '₹1,25,400', 'status' => 'active'],
-                                            ['name' => 'Emma Wilson', 'service' => 'Training', 'rating' => 4.8, 'completed' => 38, 'earnings' => '₹98,500', 'status' => 'active'],
-                                            ['name' => 'Mike Johnson', 'service' => 'Walking', 'rating' => 4.7, 'completed' => 56, 'earnings' => '₹87,200', 'status' => 'active'],
-                                            ['name' => 'Sarah Davis', 'service' => 'Boarding', 'rating' => 4.9, 'completed' => 31, 'earnings' => '₹1,05,800', 'status' => 'active'],
-                                            ['name' => 'Robert Brown', 'service' => 'Grooming', 'rating' => 4.6, 'completed' => 27, 'earnings' => '₹76,300', 'status' => 'inactive']
-                                        ];
+                                            data-bs-toggle="dropdown">
+                                            All Services
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="#">Grooming</a></li>
+                                            <li><a class="dropdown-item" href="#">Training</a></li>
+                                            <li><a class="dropdown-item" href="#">Walking</a></li>
+                                            <li><a class="dropdown-item" href="#">Boarding</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                        class="border-0 text-white">Provider</th>
+                                                    <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                        class="border-0 text-center text-white">Service</th>
+                                                    <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                        class="border-0 text-center text-white">Completed</th>
+                                                    <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                        class="border-0 text-center text-white">Earnings</th>
+                                                    <th style="background:linear-gradient(135deg, #4895ef 0%, #4361ee 100%)!important;"
+                                                        class="border-0 text-center text-white">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $top_providers = [
+                                                    ['name' => 'John Smith', 'service' => 'Grooming', 'rating' => 4.9, 'completed' => 42, 'earnings' => '₹1,25,400', 'status' => 'active'],
+                                                    ['name' => 'Emma Wilson', 'service' => 'Training', 'rating' => 4.8, 'completed' => 38, 'earnings' => '₹98,500', 'status' => 'active'],
+                                                    ['name' => 'Mike Johnson', 'service' => 'Walking', 'rating' => 4.7, 'completed' => 56, 'earnings' => '₹87,200', 'status' => 'active'],
+                                                    ['name' => 'Sarah Davis', 'service' => 'Boarding', 'rating' => 4.9, 'completed' => 31, 'earnings' => '₹1,05,800', 'status' => 'active'],
+                                                    ['name' => 'Robert Brown', 'service' => 'Grooming', 'rating' => 4.6, 'completed' => 27, 'earnings' => '₹76,300', 'status' => 'inactive']
+                                                ];
 
-                                        foreach ($top_providers as $provider) {
-                                            echo '
+                                                foreach ($top_providers as $provider) {
+                                                    echo '
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
@@ -1052,78 +1078,78 @@
                                                     </span>
                                                 </td>
                                             </tr>';
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-4">
-                    <!-- Provider Statistics -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3">
-                        <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
-                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                            <h5 class="mb-1 fw-bold text-white">Provider Statistics</h5>
-                            <small class="text-white">Provider network overview</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper bg-primary text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-people"></i>
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <h4 class="mb-1 fw-bold"><?= $active_providers ?? 0 ?></h4>
-                                    <small class="text-muted">Active Providers</small>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="stat-icon-wrapper dashboard-gradient-green text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-check-circle"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold">94%</h4>
-                                    <small class="text-muted">Satisfaction</small>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-icon-wrapper dashboard-gradient-blue text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-clock"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold"><?= $providers->pending_tracking_approvals ?? 0 ?></h4>
-                                    <small class="text-muted">Pending Approval</small>
-                                </div>
-                                <div class="col-6">
-                                    <div class="stat-icon-wrapper dashboard-gradient-orange text-white mx-auto mb-2"
-                                        style="width: 48px; height: 48px;">
-                                        <i class="bi bi-star"></i>
-                                    </div>
-                                    <h4 class="mb-1 fw-bold">4.7</h4>
-                                    <small class="text-muted">Avg. Rating</small>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Provider Services -->
-                    <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
-                        <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                        <div class="col-xl-4">
+                            <!-- Provider Statistics -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3">
+                                <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
                             border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
-                            <h5 class="mb-1 fw-bold text-white">Provider by Service</h5>
-                            <small class="text-white">Provider distribution</small>
-                        </div>
-                        <div class="card-body">
-                            <canvas id="providerServicesChart" style="height: 200px; width: 100%;"></canvas>
+                                    <h5 class="mb-1 fw-bold text-white">Provider Statistics</h5>
+                                    <small class="text-white">Provider network overview</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper bg-primary text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-people"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold"><?= $active_providers ?? 0 ?></h4>
+                                            <small class="text-muted">Active Providers</small>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <div class="stat-icon-wrapper dashboard-gradient-green text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-check-circle"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">94%</h4>
+                                            <small class="text-muted">Satisfaction</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-icon-wrapper dashboard-gradient-blue text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-clock"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold"><?= $providers->pending_tracking_approvals ?? 0 ?></h4>
+                                            <small class="text-muted">Pending Approval</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="stat-icon-wrapper dashboard-gradient-orange text-white mx-auto mb-2"
+                                                style="width: 48px; height: 48px;">
+                                                <i class="bi bi-star"></i>
+                                            </div>
+                                            <h4 class="mb-1 fw-bold">4.7</h4>
+                                            <small class="text-muted">Avg. Rating</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Provider Services -->
+                            <div class="card glass-card border-0 shadow-sm rounded-3 mt-4">
+                                <div class="card-header bg-transparent py-4 border-bottom" style="background:linear-gradient(135deg, #4361ee 0%, #4895ef 100%)!important;  
+                            border: 1px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(30px) saturate(180%)">
+                                    <h5 class="mb-1 fw-bold text-white">Provider by Service</h5>
+                                    <small class="text-white">Provider distribution</small>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="providerServicesChart" style="height: 200px; width: 100%;"></canvas>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <?php echo $this->include('admin/footer') ?>
+            <?php echo $this->include('admin/footer') ?>
 </main>
 
 <style>

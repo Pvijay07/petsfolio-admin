@@ -456,88 +456,253 @@ class ServiceController extends BaseController
     $data['title'] = 'Banners';
     $data['banners'] = $this->serviceModel->getBanners();
     $data['services'] = $this->serviceModel->getServices();
+    $data['available_screens'] = [
+        'all'         => ['label' => 'All Screens', 'icon' => '📱', 'color' => 'primary'],
+        'home'        => ['label' => 'Home Screen', 'icon' => '🏠', 'color' => 'info'],
+        'boarding'    => ['label' => 'Boarding',    'icon' => '🏨', 'color' => 'secondary'],
+        'grooming'    => ['label' => 'Grooming',    'icon' => '✂️', 'color' => 'success'],
+        'training'    => ['label' => 'Training',    'icon' => '🎓', 'color' => 'warning'],
+        'walking'     => ['label' => 'Walking',     'icon' => '🦮', 'color' => 'danger'],
+        'vet_at_home' => ['label' => 'Vet @ Home',  'icon' => '🩺', 'color' => 'teal'],
+        'sitting'     => ['label' => 'Sitting',     'icon' => '🛋️', 'color' => 'dark'],
+        'community'   => ['label' => 'Community',   'icon' => '👥', 'color' => 'purple'],
+        'bookings'    => ['label' => 'Bookings',    'icon' => '📅', 'color' => 'orange'],
+        'profile'     => ['label' => 'Profile',     'icon' => '👤', 'color' => 'indigo'],
+    ];
 
     return $this->loadView('admin/banners', $data);
   }
 
+  public function getBannerDetails($id = null)
+  {
+      if (!$id) {
+          $id = $this->request->getVar('id');
+      }
+      $banner = $this->serviceModel->getBanner($id);
+      if ($banner) {
+          return $this->response->setJSON([
+              'status'     => true,
+              'data'       => $banner,
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash()
+          ]);
+      }
+      return $this->response->setJSON([
+          'status'     => false,
+          'message'    => 'Banner not found',
+          'csrf_token' => csrf_token(),
+          'csrf_hash'  => csrf_hash()
+      ]);
+  }
+
   public function addBanner()
   {
-    $file = $this->request->getFile('feature_image');
-    $newName = '';
-    if ($file && $file->isValid() && !$file->hasMoved()) {
-         $newName = $file->getRandomName();
-         $file->move(FCPATH . 'public/uploads/banners', $newName);
-    }
+      $id = $this->request->getPost('id');
+      $isEdit = !empty($id) && is_numeric($id);
+      $existing = $isEdit ? $this->serviceModel->getBanner($id) : null;
 
-    $data = [
-        'name' => $this->request->getPost('name'),
-        'url' => $this->request->getPost('url'),
-        'type' => $this->request->getPost('type'),
-        'link_id' => $this->request->getPost('link_id'),
-        'image' => $newName,
-        'status' => 'active'
-    ];
-    
-    $result = $this->serviceModel->addBanner($data);
-    if ($result) {
-        return $this->response->setJSON(['status' => true, 'message' => 'Banner added successfully']);
-    } else {
-        return $this->response->setJSON(['status' => false, 'message' => 'Failed to add banner']);
-    }
+      if ($isEdit && !$existing) {
+          return $this->response->setJSON([
+              'status'     => false,
+              'message'    => 'Banner record to update was not found',
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash()
+          ]);
+      }
+
+      $uploadDir = FCPATH . 'public/uploads/banners/';
+      if (!is_dir($uploadDir)) {
+          mkdir($uploadDir, 0777, true);
+      }
+
+      // 1. Process Media Type
+      $mediaType = $this->request->getPost('media_type');
+      if (!in_array($mediaType, ['image', 'video'])) {
+          $mediaType = 'image';
+      }
+
+      // 2. Process Screen Selection
+      $screensInput = $this->request->getPost('screens');
+      if (empty($screensInput)) {
+          $screensInput = $this->request->getPost('screen');
+      }
+      $screenList = [];
+      if (is_array($screensInput)) {
+          $screenList = array_values(array_unique(array_filter(array_map('trim', $screensInput))));
+      } elseif (is_string($screensInput) && trim($screensInput) !== '') {
+          $screenList = array_values(array_unique(array_filter(array_map('trim', explode(',', $screensInput)))));
+      }
+      if (empty($screenList) || in_array('all', $screenList)) {
+          $screenStr = 'all';
+      } else {
+          $screenStr = implode(',', $screenList);
+      }
+
+      // 3. Process Image Upload (Feature Image / Poster)
+      $imageFile = $this->request->getFile('feature_image');
+      if (!$imageFile || !$imageFile->isValid()) {
+          $imageFile = $this->request->getFile('banner_image');
+      }
+
+      $imageName = $existing ? ($existing->banner_image ?? $existing->image ?? null) : null;
+      if ($imageFile && $imageFile->isValid() && !$imageFile->hasMoved()) {
+          $newImgName = $imageFile->getRandomName();
+          $imageFile->move($uploadDir, $newImgName);
+          // Delete old image file if updating
+          if ($existing) {
+              $oldFiles = array_filter([$existing->image ?? null, $existing->banner_image ?? null]);
+              foreach (array_unique($oldFiles) as $oldF) {
+                  if ($oldF && file_exists($uploadDir . $oldF) && !is_dir($uploadDir . $oldF)) {
+                      @unlink($uploadDir . $oldF);
+                  }
+              }
+          }
+          $imageName = $newImgName;
+      }
+
+      // 4. Process Video Upload
+      $videoFile = $this->request->getFile('banner_video');
+      $videoName = $existing ? ($existing->banner_video ?? null) : null;
+      if ($videoFile && $videoFile->isValid() && !$videoFile->hasMoved()) {
+          $newVideoName = $videoFile->getRandomName();
+          $videoFile->move($uploadDir, $newVideoName);
+          // Delete old video file if updating
+          if ($existing && !empty($existing->banner_video)) {
+              if (file_exists($uploadDir . $existing->banner_video) && !is_dir($uploadDir . $existing->banner_video)) {
+                  @unlink($uploadDir . $existing->banner_video);
+              }
+          }
+          $videoName = $newVideoName;
+      }
+
+      // 5. Process Popup Image Upload
+      $popupFile = $this->request->getFile('popup_image');
+      $popupImgName = $existing ? ($existing->popup_image ?? null) : null;
+      if ($popupFile && $popupFile->isValid() && !$popupFile->hasMoved()) {
+          $newPopupName = $popupFile->getRandomName();
+          $popupFile->move($uploadDir, $newPopupName);
+          if ($existing && !empty($existing->popup_image)) {
+              if (file_exists($uploadDir . $existing->popup_image) && !is_dir($uploadDir . $existing->popup_image)) {
+                  @unlink($uploadDir . $existing->popup_image);
+              }
+          }
+          $popupImgName = $newPopupName;
+      }
+
+      // 6. Assemble Data
+      $showPopup = $this->request->getPost('show_popup');
+      $showPopupVal = ($showPopup === '1' || $showPopup === 1 || $showPopup === 'on' || $showPopup === 'true') ? 1 : 0;
+
+      $data = [
+          'name'         => $this->request->getPost('name') ?? '',
+          'url'          => $this->request->getPost('url') ?? '',
+          'type'         => $this->request->getPost('type') ?? '',
+          'link_id'      => $this->request->getPost('link_id') ?? '',
+          'media_type'   => $mediaType,
+          'video_url'    => $this->request->getPost('video_url') ?? null,
+          'screen'       => $screenStr,
+          'banner_video' => $videoName,
+          'image'        => $imageName,
+          'banner_image' => $imageName,
+          'show_popup'   => $showPopupVal,
+          'popup_image'  => $popupImgName,
+          'popup_link'   => $this->request->getPost('popup_link') ?? null,
+          'banner_type'  => $this->request->getPost('banner_type') ?? ($existing->banner_type ?? 'promo'),
+      ];
+
+      if ($isEdit) {
+          $result = $this->serviceModel->updateBanner($id, $data);
+          $message = 'Banner updated successfully';
+      } else {
+          $data['is_active'] = 1;
+          $result = $this->serviceModel->addBanner($data);
+          $message = 'Banner added successfully';
+      }
+
+      if ($result) {
+          return $this->response->setJSON([
+              'status'     => true,
+              'message'    => $message,
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash(),
+          ]);
+      } else {
+          return $this->response->setJSON([
+              'status'     => false,
+              'message'    => $isEdit ? 'Failed to update banner' : 'Failed to add banner',
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash(),
+          ]);
+      }
   }
 
   public function deleteBanner()
   {
-      $id = $this->request->getPost('id');
-      // If the request comes from the view's delete link which might be a GET or DELETE type, 
-      // but usually these admin panels use a JS handler that sends a DELETE or POST request. 
-      // The route I'm adding is POST.
-      // Wait, the view says data-method="DELETE". 
-      // I should check if the router handles DELETE or if it's spoofed. 
-      // Often in CI4 $routes->delete() is used.
-      // But I will stick to POST for simplicity unless instructed otherwise, 
-      // or I can handle both if I use $routes->match(['post', 'delete'], ...).
-      // However, the existing deleteAddon uses POST (Line 167: $this->request->getPost('id')).
-      // The view link has data-type="ajax" data-method="DELETE".
-      // This implies the JS converts it to an AJAX request with method DELETE.
-      // To be safe and consistent with existing code (deleteAddon), I'll use getPost('id') 
-      // but also check getVar('id') to cover both.
-      
-      $id = $this->request->getVar('id'); 
-      // For RESTful delete, the ID might be in the URL segment, but here it seems to be in the body or query?
-      // The view URL is .../app-banners/2. 
-      // If it's a resource controller, it would be delete($id).
-      // But I am just adding a method.
-      // The view's data-method="DELETE" suggests the JS might send a DELETE request.
-      // If the route is defined as $routes->post('deleteBanner'...), a DELETE request might fail if not matched.
-      // I'll stick to defining the route as post and assume the JS library might support method overriding or I'll just change the view to use POST if needed.
-      // Actually, looking at `deleteAddon` (line 165), it takes `id` from POST.
-      // `banners.php` line 68: `data-method="DELETE"`.
-      // If the JS respects that, it sends a DELETE request.
-      // I should probably support it.
-      
-      $result = $this->serviceModel->deleteBanner($id);
-      if ($result) {
-          return $this->response->setJSON(['status' => true, 'message' => 'Banner deleted successfully']);
-      } else {
-          return $this->response->setJSON(['status' => false, 'message' => 'Failed to delete banner']);
+      $id = $this->request->getVar('id');
+      if (!$id) {
+          return $this->response->setJSON([
+              'status'     => false,
+              'message'    => 'Banner ID is required',
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash()
+          ]);
       }
+
+      $banner = $this->serviceModel->getBanner($id);
+      if ($banner) {
+          $uploadDir = FCPATH . 'public/uploads/banners/';
+          $filesToDelete = array_filter([
+              $banner->image ?? null,
+              $banner->banner_image ?? null,
+              $banner->banner_video ?? null,
+              $banner->popup_image ?? null,
+          ]);
+
+          foreach (array_unique($filesToDelete) as $f) {
+              if ($f && file_exists($uploadDir . $f) && !is_dir($uploadDir . $f)) {
+                  @unlink($uploadDir . $f);
+              }
+          }
+
+          $result = $this->serviceModel->deleteBanner($id);
+          if ($result) {
+              return $this->response->setJSON([
+                  'status'     => true,
+                  'message'    => 'Banner deleted successfully',
+                  'csrf_token' => csrf_token(),
+                  'csrf_hash'  => csrf_hash()
+              ]);
+          }
+      }
+
+      return $this->response->setJSON([
+          'status'     => false,
+          'message'    => 'Failed to delete banner or record not found',
+          'csrf_token' => csrf_token(),
+          'csrf_hash'  => csrf_hash()
+      ]);
   }
 
   public function updateBannerStatus()
   {
       $id = $this->request->getPost('id');
       $status = $this->request->getPost('status');
-      // The view sends status as '1' or '2' maybe? 
-      // Line 61: value="2" checked="checked".
-      // Usually status is active/inactive or 1/0.
-      // I'll save whatever is passed.
-      
+
       $result = $this->serviceModel->updateBannerStatus($id, $status);
       if ($result) {
-          return $this->response->setJSON(['status' => true, 'message' => 'Status updated successfully']);
+          return $this->response->setJSON([
+              'status'     => true,
+              'message'    => 'Status updated successfully',
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash()
+          ]);
       } else {
-          return $this->response->setJSON(['status' => false, 'message' => 'Failed to update status']);
+          return $this->response->setJSON([
+              'status'     => false,
+              'message'    => 'Failed to update status',
+              'csrf_token' => csrf_token(),
+              'csrf_hash'  => csrf_hash()
+          ]);
       }
   }
   public function events()

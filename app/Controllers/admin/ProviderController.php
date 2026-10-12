@@ -16,7 +16,7 @@ class ProviderController extends BaseController
     $this->model         = new Provider();
     $this->questionModel = new VerificationQuestionModel();
     $this->db            = \Config\Database::connect();
-    helper('Common_helper');
+    helper('common');
   }
   public function index()
   {

@@ -20,6 +20,14 @@
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
+                    <!-- Dark / Light Mode Toggle Button -->
+                    <li class="nav-item me-2 me-md-3">
+                        <button type="button" class="btn btn-sm rounded-pill theme-toggle-btn shadow-sm" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Mode" aria-label="Toggle Dark / Light Mode" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.85); transition: all 0.25s ease;">
+                            <i class="bi bi-moon-stars-fill theme-icon-moon fs-5 text-dark"></i>
+                            <i class="bi bi-sun-fill theme-icon-sun fs-5 text-warning" style="display: none;"></i>
+                        </button>
+                    </li>
+
                     <li class="nav-item dropdown me-3">
                         <a class="nav-link position-relative p-2" href="#" id="notificationDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -99,6 +107,16 @@
                                     <i class="bi bi-person me-2 text-primary"></i>
                                     <span>My Profile</span>
                                 </a>
+
+                                <div class="dropdown-item p-3 d-flex align-items-center justify-content-between" onclick="toggleTheme()" style="cursor: pointer;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-moon-stars me-2 text-primary"></i>
+                                        <span>Dark Mode</span>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="themeSwitchCheckbox" style="cursor: pointer;" onclick="event.stopPropagation(); toggleTheme();">
+                                    </div>
+                                </div>
 
                                 <div class="dropdown-divider my-2"></div>
                                 <a href="<?= base_url ( 'logout' ) ?>" class="dropdown-item p-3 text-danger">

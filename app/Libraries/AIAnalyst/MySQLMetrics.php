@@ -61,16 +61,29 @@ class MySQLMetrics
     }
 
     /**
+     * Helper to apply flexible date filters to Query Builder instance.
+     */
+    private function applyDateFilter(object $builder, string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null, string $field = 'created_at'): void
+    {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        if ($startStr !== null) {
+            $builder->where("{$field} >=", $startStr);
+        }
+        if ($endStr !== null) {
+            $builder->where("{$field} <=", $endStr);
+        }
+    }
+
+    /**
      * Bookings summary breakdown by service type and status.
      */
-    public function bookings_summary(string $date_range = '30_days', ?string $service_type = null, ?string $status = null, ?string $area = null, ?string $city = null): array
+    public function bookings_summary(string $date_range = '30_days', ?string $service_type = null, ?string $status = null, ?string $area = null, ?string $city = null, ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
-        $days     = $this->parseDays($date_range);
         $normType = $this->normalizeServiceType($service_type);
 
         $allBuilder = $this->db->table('v_bookings_overview');
-        $allBuilder->where('created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
+        $this->applyDateFilter($allBuilder, $date_range, $start_date, $end_date, 'created_at');
 
         if ($normType) {
             $allBuilder->where('service_type', $normType);
@@ -136,13 +149,13 @@ class MySQLMetrics
     /**
      * Daily booking trend over a time window.
      */
-    public function daily_booking_trend(string $date_range = '30_days', ?string $service_type = null): array
+    public function daily_booking_trend(string $date_range = '30_days', ?string $service_type = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $days    = $this->parseDays($date_range);
+        $this->ensureConnection();
         $builder = $this->db->table('v_bookings_overview');
 
         $builder->select('DATE(created_at) as booking_date, COUNT(*) as bookings, SUM(total_amount) as daily_revenue');
-        $builder->where('created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
+        $this->applyDateFilter($builder, $date_range, $start_date, $end_date, 'created_at');
 
         $normType = $this->normalizeServiceType($service_type);
         if ($normType) {
@@ -164,12 +177,12 @@ class MySQLMetrics
     /**
      * Calculate cancellation rate.
      */
-    public function cancellation_rate(string $date_range = '30_days', ?string $service_type = null): array
+    public function cancellation_rate(string $date_range = '30_days', ?string $service_type = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $days    = $this->parseDays($date_range);
+        $this->ensureConnection();
         $builder = $this->db->table('v_bookings_overview');
 
-        $builder->where('created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
+        $this->applyDateFilter($builder, $date_range, $start_date, $end_date, 'created_at');
 
         $normType = $this->normalizeServiceType($service_type);
         if ($normType) {
@@ -199,20 +212,16 @@ class MySQLMetrics
 
     /**
      * Revenue overview & platform earnings.
-     * 
-     * Platform Profit = SUM(platform_wallet_histories.commission_amount) — ACTUAL recorded commissions.
-     * Provider Payouts = SUM(sp_wallet_histories.amount WHERE transaction_type='credit') — actual provider credits.
-     * Gross Revenue = Platform Commission + Provider Payouts.
      */
-    public function revenue_overview(string $date_range = '30_days', ?string $service_type = null): array
+    public function revenue_overview(string $date_range = '30_days', ?string $service_type = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $days = $this->parseDays($date_range);
-        $dateFrom = date('Y-m-d 00:00:00', strtotime("-{$days} days"));
+        $this->ensureConnection();
 
         // 1. Platform commission from platform_wallet_histories (SOURCE OF TRUTH)
         $commBuilder = $this->db->table('platform_wallet_histories')
-            ->select('COALESCE(SUM(commission_amount), 0) AS total_commission, COUNT(*) AS txn_count')
-            ->where('created_at >=', $dateFrom);
+            ->select('COALESCE(SUM(commission_amount), 0) AS total_commission, COUNT(*) AS txn_count');
+        
+        $this->applyDateFilter($commBuilder, $date_range, $start_date, $end_date, 'created_at');
 
         $normType = $this->normalizeServiceType($service_type);
         if ($normType) {
@@ -226,9 +235,10 @@ class MySQLMetrics
         // 2. Provider payouts from sp_wallet_histories (credits to providers for completed services)
         $payoutBuilder = $this->db->table('sp_wallet_histories')
             ->select('COALESCE(SUM(amount), 0) AS total_payouts')
-            ->where('created_at >=', $dateFrom)
             ->where('transaction_type', 'credit')
             ->whereIn('category', ['approved_amount', 'earning_amount', 'service_amount']);
+
+        $this->applyDateFilter($payoutBuilder, $date_range, $start_date, $end_date, 'created_at');
 
         $payoutRow = $payoutBuilder->get()->getRowArray();
         $payout = round((float) ($payoutRow['total_payouts'] ?? 0), 2);
@@ -249,15 +259,12 @@ class MySQLMetrics
     /**
      * Active customers count & list breakdown.
      */
-    public function active_customers(string $date_range = '30_days'): array
+    public function active_customers(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
-        $days = $this->parseDays($date_range);
 
         $builder = $this->db->table('v_bookings_overview');
-        if ($days < 99999) {
-            $builder->where('created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
-        }
+        $this->applyDateFilter($builder, $date_range, $start_date, $end_date, 'created_at');
 
         $builder->select('
             user_id,
@@ -298,17 +305,14 @@ class MySQLMetrics
     }
 
     /**
-     * Repeat business analysis (Repeat Customers count, repeat customer rate %, and top repeat client list).
+     * Repeat business analysis.
      */
-    public function repeat_customers(string $date_range = '30_days'): array
+    public function repeat_customers(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
-        $days = $this->parseDays($date_range);
 
         $builder = $this->db->table('v_bookings_overview');
-        if ($days < 99999) {
-            $builder->where('created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
-        }
+        $this->applyDateFilter($builder, $date_range, $start_date, $end_date, 'created_at');
 
         $builder->select('
             user_id,
@@ -355,9 +359,9 @@ class MySQLMetrics
     }
 
     /**
-     * Service Providers overview (tier distribution, area/city breakdown, and ratings).
+     * Service Providers overview.
      */
-    public function provider_stats(?string $area = null, ?string $city = null, ?string $status = null, ?string $provider_search = null): array
+    public function provider_stats(?string $area = null, ?string $city = null, ?string $status = null, ?string $provider_search = null, string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
         $builder = $this->db->table('v_providers_overview');
@@ -472,7 +476,7 @@ class MySQLMetrics
     /**
      * Identify geographical areas/cities across India with low service provider or groomer density.
      */
-    public function low_provider_density_areas(?string $service_type = null, int $max_threshold = 10): array
+    public function low_provider_density_areas(?string $service_type = null, int $max_threshold = 10, string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
         $normType = $this->normalizeServiceType($service_type);
@@ -534,10 +538,9 @@ class MySQLMetrics
     /**
      * Analyzes average bids submitted per booking request and conversion rate per bid count.
      */
-    public function bids_conversion_analytics(string $date_range = '30_days', ?string $service_type = null): array
+    public function bids_conversion_analytics(string $date_range = '30_days', ?string $service_type = null, ?string $start_date = null, ?string $end_date = null): array
     {
         $this->ensureConnection();
-        $days     = $this->parseDays($date_range);
         $normType = $this->normalizeServiceType($service_type);
 
         // Fetch exact grooming counts reference to eliminate any scope confusion
@@ -547,9 +550,7 @@ class MySQLMetrics
         $groomingAllTime = (int) $this->db->table('grooming_service_bookings')->countAllResults();
 
         $builder = $this->db->table('v_bookings_overview b');
-        if ($days < 99999) {
-            $builder->where('b.created_at >=', date('Y-m-d 00:00:00', strtotime("-{$days} days")));
-        }
+        $this->applyDateFilter($builder, $date_range, $start_date, $end_date, 'b.created_at');
 
         if ($normType) {
             $builder->where('b.service_type', $normType);
@@ -662,10 +663,10 @@ class MySQLMetrics
 
     /**
      * Provider Performance Score & SP Intelligence Analysis.
-     * Evaluates provider completion rates, acceptance rates, ratings, and genuineness scores.
      */
-    public function provider_performance_score(?string $provider_id = null, string $date_range = '30_days'): array
+    public function provider_performance_score(?string $provider_id = null, string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
+        $this->ensureConnection();
         $builder = $this->db->table('v_providers_overview');
         if (!empty($provider_id)) {
             $clean = trim($provider_id);
@@ -748,14 +749,16 @@ class MySQLMetrics
 
     /**
      * Locality Demand vs Supply Analysis.
-     * Identifies high deficit demand areas vs oversupplied localities across India.
      */
-    public function locality_demand_supply(?string $service_type = null, ?string $city = null): array
+    public function locality_demand_supply(?string $service_type = null, ?string $city = null, string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
+        $this->ensureConnection();
         // 1. Demand by city
         $bBuilder = $this->db->table('v_bookings_overview')
             ->select('city, COUNT(*) as request_count')
             ->groupBy('city');
+
+        $this->applyDateFilter($bBuilder, $date_range, $start_date, $end_date, 'created_at');
 
         $normType = $this->normalizeServiceType($service_type);
         if ($normType) {
@@ -825,18 +828,19 @@ class MySQLMetrics
     /**
      * Fraud & Operational Anomaly Detection.
      */
-    public function fraud_anomaly_detection(string $date_range = '30_days'): array
+    public function fraud_anomaly_detection(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $days = $this->parseDays($date_range);
-        $dateFrom = date('Y-m-d 00:00:00', strtotime("-{$days} days"));
-
+        $this->ensureConnection();
         $anomalies = [];
 
         // Check providers with unusually high completed bookings in a single day (>18 completions)
-        $volumeSpikes = $this->db->table('v_bookings_overview')
+        $volumeBuilder = $this->db->table('v_bookings_overview')
             ->select('service_type, user_name, city, DATE(created_at) as service_day, COUNT(*) as daily_completions')
-            ->where('created_at >=', $dateFrom)
-            ->where('status', 'Completed')
+            ->where('status', 'Completed');
+
+        $this->applyDateFilter($volumeBuilder, $date_range, $start_date, $end_date, 'created_at');
+
+        $volumeSpikes = $volumeBuilder
             ->groupBy('service_type, user_name, city, DATE(created_at)')
             ->having('COUNT(*) >', 18)
             ->get()->getResultArray();
@@ -852,9 +856,12 @@ class MySQLMetrics
         }
 
         // Check high cancellation rates (>30%)
-        $cancSpikes = $this->db->table('v_bookings_overview')
-            ->select('city, COUNT(*) as total, SUM(CASE WHEN status="Cancelled" THEN 1 ELSE 0 END) as cancelled')
-            ->where('created_at >=', $dateFrom)
+        $cancBuilder = $this->db->table('v_bookings_overview')
+            ->select('city, COUNT(*) as total, SUM(CASE WHEN status="Cancelled" THEN 1 ELSE 0 END) as cancelled');
+
+        $this->applyDateFilter($cancBuilder, $date_range, $start_date, $end_date, 'created_at');
+
+        $cancSpikes = $cancBuilder
             ->groupBy('city')
             ->having('total >', 5)
             ->get()->getResultArray();
@@ -885,12 +892,12 @@ class MySQLMetrics
     /**
      * Executive CEO Summary & Business Health Report.
      */
-    public function executive_summary(string $date_range = '30_days'): array
+    public function executive_summary(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $rev = $this->revenue_overview($date_range);
-        $book = $this->bookings_summary($date_range);
-        $canc = $this->cancellation_rate($date_range);
-        $demand = $this->locality_demand_supply();
+        $rev = $this->revenue_overview($date_range, null, $start_date, $end_date);
+        $book = $this->bookings_summary($date_range, null, null, null, null, $start_date, $end_date);
+        $canc = $this->cancellation_rate($date_range, null, $start_date, $end_date);
+        $demand = $this->locality_demand_supply(null, null, $date_range, $start_date, $end_date);
 
         $gbv      = $rev['gross_revenue_inr'] ?? 0;
         $profit   = $rev['platform_commission'] ?? 0;
@@ -922,12 +929,17 @@ class MySQLMetrics
     /**
      * Predictive Business Forecast (Bookings, Revenue, Profit).
      */
-    public function business_forecast(string $metric = 'revenue', string $date_range = '30_days'): array
+    public function business_forecast(string $metric = 'revenue', string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $rev = $this->revenue_overview($date_range);
-        $book = $this->bookings_summary($date_range);
+        $rev = $this->revenue_overview($date_range, null, $start_date, $end_date);
+        $book = $this->bookings_summary($date_range, null, null, null, null, $start_date, $end_date);
 
-        $days = $this->parseDays($date_range);
+        [$s, $e] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+        $days = 30;
+        if ($s && $e) {
+            $days = max(1, (int) round((strtotime($e) - strtotime($s)) / 86400));
+        }
+
         $multiplier = 30 / max(1, min(90, $days)); // Run-rate multiplier for 30-day projection
 
         $currentRevenue = $rev['gross_revenue_inr'] ?? 0;
@@ -949,26 +961,4 @@ class MySQLMetrics
             'expected_growth_rate' => '+12% to +15%'
         ];
     }
-
-    /**
-     * Helper to parse date range string into number of days.
-     */
-    private function parseDays(string $date_range): int
-    {
-        $clean = strtolower(trim($date_range));
-        if ($clean === 'all' || $clean === 'all_time' || $clean === 'lifetime' || $clean === 'overall') {
-            return 999999;
-        }
-        if (preg_match('/(\d+)/', $clean, $matches)) {
-            return (int) $matches[1];
-        }
-        return match ($clean) {
-            '7_days', 'week', '7' => 7,
-            '30_days', 'month', '30' => 30,
-            '90_days', 'quarter', '90' => 90,
-            'this_year', 'year', '365' => 365,
-            default => 30
-        };
-    }
 }
-

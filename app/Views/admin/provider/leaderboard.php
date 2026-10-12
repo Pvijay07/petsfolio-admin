@@ -2602,7 +2602,7 @@
         $('#prediction-drawer').addClass('open');
 
         $.ajax({
-            url: `<?= base_url() ?>admin/walkerstats/predictions/${providerId}`,
+            url: `<?= base_url() ?>walkerstats/predictions/${providerId}`,
             type: 'GET',
             success: function(res) {
                 if (res.status === 'success') {

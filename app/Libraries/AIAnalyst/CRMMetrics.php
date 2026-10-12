@@ -20,27 +20,29 @@ class CRMMetrics
     /**
      * Calculate live lead conversion rate from MongoDB `leads` collection.
      */
-    public function conversion_rate(string $date_range = '30_days', ?string $source = null, ?string $channel = null): array
+    public function conversion_rate(string $date_range = '30_days', ?string $source = null, ?string $channel = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $match = $this->buildDateMatch($date_range);
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         if (!empty($source) && strtolower($source) !== 'all') {
             $match['source'] = new \MongoDB\BSON\Regex(trim($source), 'i');
         }
 
-        $pipeline = [
-            ['$match' => (object) $match],
-            [
-                '$group' => [
-                    '_id'         => null,
-                    'total_leads' => ['$sum' => 1],
-                    'converted'   => [
-                        '$sum' => [
-                            '$cond' => [
-                                ['$in' => ['$status', ['Joined', 'joined', 'converted', 'won', 'closed_won', 'Active', 'Job Assigned', 'Job Posted']]],
-                                1,
-                                0
-                            ]
+        $pipeline = [];
+        if (!empty($match)) {
+            $pipeline[] = ['$match' => (object) $match];
+        }
+
+        $pipeline[] = [
+            '$group' => [
+                '_id'         => null,
+                'total_leads' => ['$sum' => 1],
+                'converted'   => [
+                    '$sum' => [
+                        '$cond' => [
+                            ['$in' => ['$status', ['Joined', 'joined', 'converted', 'won', 'closed_won', 'Active', 'Job Assigned', 'Job Posted']]],
+                            1,
+                            0
                         ]
                     ]
                 ]
@@ -68,9 +70,9 @@ class CRMMetrics
     /**
      * Analyze live CRM sales funnel drop-off by stage from MongoDB `leads` collection.
      */
-    public function funnel_dropoff(string $date_range = '30_days', ?string $stage = null): array
+    public function funnel_dropoff(string $date_range = '30_days', ?string $stage = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $match = $this->buildDateMatch($date_range);
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         $pipeline = [];
         if (!empty($match)) {
@@ -123,9 +125,9 @@ class CRMMetrics
     /**
      * Compare live lead source performance from MongoDB `leads` collection.
      */
-    public function lead_source_performance(string $date_range = '30_days'): array
+    public function lead_source_performance(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $match = $this->buildDateMatch($date_range);
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         $pipeline = [];
         if (!empty($match)) {
@@ -180,9 +182,9 @@ class CRMMetrics
     /**
      * Evaluate live sales agent performance from MongoDB `leads` collection.
      */
-    public function agent_performance(string $date_range = '30_days', ?string $agent_id = null): array
+    public function agent_performance(string $date_range = '30_days', ?string $agent_id = null, ?string $start_date = null, ?string $end_date = null): array
     {
-        $match = $this->buildDateMatch($date_range);
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
 
         if (!empty($agent_id) && strtolower($agent_id) !== 'all') {
             $match['assignedTo'] = new \MongoDB\BSON\Regex(trim($agent_id), 'i');
@@ -236,7 +238,7 @@ class CRMMetrics
     /**
      * Average support ticket resolution time.
      */
-    public function avg_resolution_time(string $date_range = '30_days', ?string $issue_type = null): array
+    public function avg_resolution_time(string $date_range = '30_days', ?string $issue_type = null, ?string $start_date = null, ?string $end_date = null): array
     {
         return [
             'metric'                 => 'avg_resolution_time',
@@ -250,7 +252,7 @@ class CRMMetrics
     /**
      * Cross-sell acceptance rate.
      */
-    public function cross_sell_acceptance_rate(string $date_range = '30_days', ?string $product = null): array
+    public function cross_sell_acceptance_rate(string $date_range = '30_days', ?string $product = null, ?string $start_date = null, ?string $end_date = null): array
     {
         return [
             'metric'                => 'cross_sell_acceptance_rate',
@@ -264,9 +266,9 @@ class CRMMetrics
     /**
      * Categorize and analyze live incoming WhatsApp client message topics from MongoDB `messages` collection.
      */
-    public function whatsapp_inquiry_topics(string $date_range = '30_days'): array
+    public function whatsapp_inquiry_topics(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $match = $this->buildDateMatch($date_range);
+        $match = $this->buildDateMatch($date_range, $start_date, $end_date);
         $match['direction'] = 'incoming';
 
         $messages = $this->mongo->find('messages', $match, ['text' => 1, 'createdAt' => 1], 1000);
@@ -330,26 +332,35 @@ class CRMMetrics
     /**
      * Helper to build date range match filter for MongoDB pipeline.
      */
-    private function buildDateMatch(string $date_range): array
+    private function buildDateMatch(string $date_range = '30_days', ?string $start_date = null, ?string $end_date = null): array
     {
-        $clean = strtolower(trim($date_range));
-        if ($clean === 'all' || $clean === 'all_time' || $clean === 'lifetime' || $clean === 'overall') {
+        [$startStr, $endStr] = DateRangeHelper::resolve($date_range, $start_date, $end_date);
+
+        if ($startStr === null && $endStr === null) {
             return [];
         }
 
-        $days = match ($clean) {
-            '7_days', '7'            => 7,
-            '30_days', '30'          => 30,
-            '90_days', '90'          => 90,
-            'this_year', '365', 'year' => 365,
-            default                  => 30
-        };
+        $startMs = $startStr ? strtotime($startStr) * 1000 : 0;
+        $endMs   = $endStr ? strtotime($endStr) * 1000 : strtotime('2099-12-31') * 1000;
 
-        $milliseconds = strtotime("-{$days} days") * 1000;
-        $utcDateTime  = new \MongoDB\BSON\UTCDateTime($milliseconds);
+        $startUtc = new \MongoDB\BSON\UTCDateTime($startMs);
+        $endUtc   = new \MongoDB\BSON\UTCDateTime($endMs);
+
+        $startIso = date('c', strtotime($startStr));
+        $endIso   = date('c', strtotime($endStr));
+
+        $startDateOnly = date('Y-m-d', strtotime($startStr));
+        $endDateOnly   = date('Y-m-d', strtotime($endStr));
 
         return [
-            'createdAt' => ['$gte' => $utcDateTime]
+            '$or' => [
+                ['createdAt' => ['$gte' => $startUtc, '$lte' => $endUtc]],
+                ['created_at' => ['$gte' => $startUtc, '$lte' => $endUtc]],
+                ['createdAt' => ['$gte' => $startIso, '$lte' => $endIso]],
+                ['created_at' => ['$gte' => $startIso, '$lte' => $endIso]],
+                ['created_at' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]],
+                ['createdAt' => ['$gte' => $startDateOnly, '$lte' => $endDateOnly]]
+            ]
         ];
     }
 }

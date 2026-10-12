@@ -5,30 +5,35 @@ namespace App\Filters;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
-use CodeIgniter\Session\Session;
 use Config\Services;
 
 class PermissionFilter implements FilterInterface
 {
   public function before(RequestInterface $request, $arguments = null)
   {
-    $session  = Services::session();
-    $userRole = $session->get('user')->role_id;
+    $session = Services::session();
+    $user    = $session->get('user');
+
+    if (!$user) {
+      return redirect()->to('/login')->with('error', 'Please log in to continue.');
+    }
 
     $requiredPermission = $arguments[0] ?? null;
 
     if ($requiredPermission) {
-      $db               = \Config\Database::connect();
-      $permissionExists = $db->table('role_permissions')
-        ->join('permissions', 'permissions.id = role_permissions.permission_id')
-        ->where('role_permissions.role_id', $userRole)
-        ->where('permissions.id', $requiredPermission)
-        ->countAllResults();
+      // Super Admin (Role 1) has full unrestricted access
+      if (isset($user->role_id) && $user->role_id == 1) {
+        return null;
+      }
 
-      if ($permissionExists == 0) {
-        return redirect()->to('/unauthorized')->with('error', 'You do not have permission to access this page.');
+      // Check using central hasPermission helper (supports user-wise & role-wise permissions)
+      helper('common');
+      if (!hasPermission($requiredPermission)) {
+        return redirect()->to('/unauthorized')->with('error', 'You do not have permission to access this resource.');
       }
     }
+
+    return null;
   }
 
   public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

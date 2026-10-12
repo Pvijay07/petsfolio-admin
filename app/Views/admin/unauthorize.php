@@ -2,6 +2,26 @@
 <html>
 
 <head>
+    <!-- Theme Early Detection (Zero-Flicker) -->
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('petsfolio_theme');
+                if (!theme) {
+                    theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+                }
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <title>403 Unauthorize</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link
@@ -9,6 +29,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url() ?>public/assets/_ui/css/styles.css">
     <link rel="stylesheet" href="<?= base_url() ?>public/assets/_ui/css/responsive.css">
+    <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>">
     <style type="text/css">
         .er_pg {
             display: flex;

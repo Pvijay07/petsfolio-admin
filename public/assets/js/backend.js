@@ -633,3 +633,58 @@ window.onclick = function (event) {
 
 // Enhanced reminder system with local storage
 
+// ==========================================
+// Global Universal Dark / Light Mode Engine
+// ==========================================
+window.applyTheme = function(theme) {
+  const isDark = theme === 'dark';
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+    if (document.body) document.body.classList.add('dark');
+    document.documentElement.setAttribute('data-bs-theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    if (document.body) document.body.classList.remove('dark');
+    document.documentElement.setAttribute('data-bs-theme', 'light');
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+
+  // Update navbar toggle icons
+  document.querySelectorAll('.theme-icon-moon').forEach(el => {
+    el.style.display = isDark ? 'none' : 'inline-block';
+  });
+  document.querySelectorAll('.theme-icon-sun').forEach(el => {
+    el.style.display = isDark ? 'inline-block' : 'none';
+  });
+
+  // Update dropdown switches
+  document.querySelectorAll('#themeSwitchCheckbox, .theme-switch-checkbox').forEach(cb => {
+    cb.checked = isDark;
+  });
+
+  try {
+    localStorage.setItem('petsfolio_theme', theme);
+  } catch (e) {}
+};
+
+window.toggleTheme = function() {
+  const currentTheme = localStorage.getItem('petsfolio_theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  window.applyTheme(newTheme);
+};
+
+// Initialize theme on DOM ready
+if (typeof $ !== 'undefined') {
+  $(document).ready(function() {
+    const savedTheme = localStorage.getItem('petsfolio_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    window.applyTheme(savedTheme);
+  });
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('petsfolio_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    window.applyTheme(savedTheme);
+  });
+}
+
+

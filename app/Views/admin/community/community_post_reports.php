@@ -47,7 +47,16 @@
             <?php endif; ?>
             <div class="flex-grow-1">
                 <h1 class="post-title"><?= esc($post['subject'] ?? 'Post Investigation') ?></h1>
-                <span class="post-handle">@<?= esc($post['name']) ?></span>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="post-handle mb-0">@<?= esc($post['name']) ?></span>
+                    <?php if (($post['user_type'] ?? '') == 'admin'): ?>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-0.5" style="font-size: 0.7rem; font-weight: 800;">ADMIN</span>
+                    <?php elseif (($post['user_type'] ?? '') == 'provider'): ?>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-0.5" style="font-size: 0.7rem; font-weight: 800;">PROVIDER</span>
+                    <?php else: ?>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-0.5" style="font-size: 0.7rem; font-weight: 800;">CLIENT</span>
+                    <?php endif; ?>
+                </div>
 
                 <p class="post-summary">
                     "<?= esc($post['post_text']) ?>"
@@ -80,10 +89,19 @@
                     <div class="report-meta">
                         <div class="reporter-info">
                             <div class="reporter-avatar">
-                                <?= strtoupper(substr($report['name'], 0, 2)) ?>
+                                <?= strtoupper(substr($report['name'] ?? 'U', 0, 2)) ?>
                             </div>
                             <div>
-                                <span class="fw-800 text-dark d-block">Reported by @<?= esc($report['name']) ?></span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-800 text-dark d-block">Reported by @<?= esc($report['name']) ?></span>
+                                    <?php if (($report['user_type'] ?? '') == 'admin'): ?>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">ADMIN</span>
+                                    <?php elseif (($report['user_type'] ?? '') == 'provider'): ?>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">PROVIDER</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">CLIENT</span>
+                                    <?php endif; ?>
+                                </div>
                                 <small class="text-muted fw-bold"><?php
                                                                     $diff = time() - strtotime($report['created_at']);
                                                                     if ($diff < 60) echo "Just now";

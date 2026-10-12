@@ -151,6 +151,13 @@ class Provider extends Model
         ];
       }
       $provider->serviceDetails = $serviceDetails;
+
+      $provider->devices = $this->db->table('user_devices')
+        ->where('user_id', $provider->id)
+        ->where('user_type', 'provider')
+        ->orderBy('last_active_at', 'DESC')
+        ->get()->getResult();
+      $provider->latest_device = !empty($provider->devices) ? $provider->devices[0] : null;
     }
 
     return $providers;
@@ -393,6 +400,13 @@ class Provider extends Model
         ];
       }
       $provider->serviceDetails = $serviceDetails;
+
+      $provider->devices = $this->db->table('user_devices')
+        ->where('user_id', $provider->id)
+        ->where('user_type', 'provider')
+        ->orderBy('last_active_at', 'DESC')
+        ->get()->getResult();
+      $provider->latest_device = !empty($provider->devices) ? $provider->devices[0] : null;
     }
 
     return $providers;

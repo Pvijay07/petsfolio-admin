@@ -39,7 +39,7 @@ abstract class BaseController extends Controller
      *
      * @var list<string>
      */
-    protected $helpers = [];
+    protected $helpers = ['common', 'form', 'url', 'html'];
 
     /**
      * Be sure to declare properties for any property fetch you initialized.
@@ -126,8 +126,9 @@ abstract class BaseController extends Controller
         $groomingBookings = $bookingModel->getGroomingBookings('New');
         $walkingBookings  = $bookingModel->getWalkingBookings('New');
         $trainingBookings = $bookingModel->getTrainingBookings('New');
+        $sittingBookings  = $bookingModel->getSittingBookings('New');
 
-        $bookings = array_merge($groomingBookings, $walkingBookings, $trainingBookings);
+        $bookings = array_merge($groomingBookings ?? [], $walkingBookings ?? [], $trainingBookings ?? [], $sittingBookings ?? []);
         foreach ($bookings as $booking) {
 
 

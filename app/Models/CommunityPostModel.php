@@ -22,6 +22,7 @@ class CommunityPostModel extends Model
         'comments_count',
         'shares_count',
         'saves_count',
+        'category',
         'visibility',
         'status',
         'is_pinned',

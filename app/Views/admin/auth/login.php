@@ -2,6 +2,26 @@
 <html lang="en" dir="ltr">
 
 <head>
+  <!-- Theme Early Detection (Zero-Flicker) -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('petsfolio_theme');
+        if (!theme) {
+          theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'light');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Petsfolio | Login</title>
@@ -21,6 +41,9 @@
   <!-- Dark Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/dark.min.css" />
 
+  <!-- Universal Dark Mode Overrides (Global Engine) -->
+  <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
+
   <!-- Customizer Css -->
   <link rel="stylesheet" href="<?= base_url() ?>public/assets/css/customizer.min.css" />
 
@@ -39,6 +62,36 @@
   <script src="<?= base_url() ?>public/assets/js/jquery.min.js"></script>
 
   <style>
+    /* Dark Mode Overrides for Login */
+    html.dark body, body.dark {
+      background-color: #0b111e !important;
+      color: #cbd5e1 !important;
+    }
+    body.dark .bg-white {
+      background-color: #0b111e !important;
+    }
+    body.dark .card {
+      background-color: #141c2e !important;
+      color: #cbd5e1 !important;
+    }
+    body.dark .form-control {
+      background-color: #162032 !important;
+      border-color: #26354d !important;
+      color: #f8fafc !important;
+    }
+    body.dark .form-control:focus {
+      border-color: #3b82f6 !important;
+      color: #ffffff !important;
+    }
+    body.dark .form-label, body.dark h2, body.dark h5, body.dark .text-dark {
+      color: #f8fafc !important;
+    }
+    body.dark .text-muted {
+      color: #94a3b8 !important;
+    }
+    body.dark .loader-overlay {
+      background: rgba(11, 17, 30, 0.85);
+    }
     .error-message {
       color: red;
       position: absolute;

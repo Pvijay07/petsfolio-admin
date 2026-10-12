@@ -1,7 +1,27 @@
 <!doctype html>
-<html lang="en" class="light-theme">
+<html lang="en">
 
 <head>
+  <!-- Theme Early Detection (Zero-Flicker) -->
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('petsfolio_theme');
+        if (!theme) {
+          theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-bs-theme', 'light');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,6 +52,7 @@
   <link href="assets/css/light-theme.css" rel="stylesheet" />
   <link href="assets/css/semi-dark.css" rel="stylesheet" />
   <link href="assets/css/header-colors.css" rel="stylesheet" />
+  <link rel="stylesheet" href="<?= base_url('public/assets/css/theme-dark-overrides.css?v=' . time()) ?>" />
 
   <title>Reports</title>
 </head>

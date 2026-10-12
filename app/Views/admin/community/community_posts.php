@@ -28,23 +28,28 @@
                         </div>
                     </div>
 
-                    <div class="pill-nav-container d-inline-flex bg-white p-1 rounded-pill shadow-sm mt-4">
-                        <a href="<?= base_url('community/posts?status=admin') ?>" class="pill-item px-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'admin' ? 'active' : '' ?>">
+                    <div class="pill-nav-container d-inline-flex bg-white p-1 rounded-pill shadow-sm mt-4 flex-wrap gap-1">
+                        <a href="<?= base_url('community/posts?status=admin') ?>" class="pill-item px-3 px-md-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'admin' ? 'active' : '' ?>">
                             <span class="material-symbols-outlined fs-5">admin_panel_settings</span>
                             <span>Admin Posts</span>
                             <span class="pill-badge"><?= $admin_posts_count ?></span>
                         </a>
-                        <a href="<?= base_url('community/posts?status=user') ?>" class="pill-item px-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'user' ? 'active' : '' ?>">
+                        <a href="<?= base_url('community/posts?status=user') ?>" class="pill-item px-3 px-md-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= ($status == 'user' || $status == 'client') ? 'active' : '' ?>">
                             <span class="material-symbols-outlined fs-5">person</span>
-                            <span>User Posts</span>
+                            <span>Client Posts</span>
                             <span class="pill-badge"><?= $user_posts_count ?></span>
                         </a>
-                        <a href="<?= base_url('community/posts?status=scheduled') ?>" class="pill-item px-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'scheduled' ? 'active' : '' ?>">
+                        <a href="<?= base_url('community/posts?status=provider') ?>" class="pill-item px-3 px-md-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'provider' ? 'active' : '' ?>">
+                            <span class="material-symbols-outlined fs-5">badge</span>
+                            <span>Provider Posts</span>
+                            <span class="pill-badge"><?= $provider_posts_count ?></span>
+                        </a>
+                        <a href="<?= base_url('community/posts?status=scheduled') ?>" class="pill-item px-3 px-md-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'scheduled' ? 'active' : '' ?>">
                             <span class="material-symbols-outlined fs-5">schedule</span>
                             <span>Scheduled</span>
                             <span class="pill-badge"><?= $scheduled_posts_count ?></span>
                         </a>
-                        <a href="<?= base_url('community/posts?status=questions') ?>" class="pill-item px-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'questions' ? 'active' : '' ?>">
+                        <a href="<?= base_url('community/posts?status=questions') ?>" class="pill-item px-3 px-md-4 py-2 text-decoration-none d-flex align-items-center gap-2 <?= $status == 'questions' ? 'active' : '' ?>">
                             <span class="material-symbols-outlined fs-5">question_mark</span>
                             <span>Questions</span>
                             <span class="pill-badge"><?= $questions_count ?></span>
@@ -54,9 +59,6 @@
 
                 <div class="col-lg-5 mt-4 mt-lg-0">
                     <div class="d-flex flex-column flex-sm-row justify-content-lg-end gap-3">
-                        <!-- <button class="btn glass-pill border-0 text-white px-4 rounded-pill py-3 fw-bold d-flex align-items-center justify-content-center gap-2" onclick="window.location.href='<?= base_url('community/reports') ?>'">
-                            <span class="material-symbols-outlined">report</span> Moderation Queue
-                        </button> -->
                         <button class="btn btn-white text-primary bg-white rounded-pill px-4 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 border-0" onclick="window.location.href='<?= base_url('community/addPost') ?>'">
                             <span class="material-symbols-outlined">add</span> Create New Post
                         </button>
@@ -74,7 +76,7 @@
                             <div class="icon-glass">
                                 <span class="material-symbols-outlined fs-2">dynamic_feed</span>
                             </div>
-                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1  fw-bold">+12%</span>
+                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1 fw-bold">Live</span>
                         </div>
                         <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Total Posts</h5>
                         <h2 class="display-6 text-white fw-bold mb-0"><?= number_format($stats['total_posts'] ?? 0) ?></h2>
@@ -88,25 +90,41 @@
                     <div class="card-body p-4 text-white position-relative">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div class="icon-glass">
-                                <span class="material-symbols-outlined fs-2">groups</span>
+                                <span class="material-symbols-outlined fs-2">pets</span>
                             </div>
-                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1  fw-bold">Active</span>
+                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1 fw-bold">Clients</span>
                         </div>
-                        <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Active Users</h5>
+                        <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Active Clients</h5>
                         <h2 class="display-6 text-white fw-bold mb-0"><?= number_format($stats['active_users'] ?? 0) ?></h2>
                     </div>
                 </div>
             </div>
 
             <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 p-0 rounded-4xl stat-card shadow-lg h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <div class="card border-0 p-0 rounded-4xl stat-card shadow-lg h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
                     <div class="position-absolute" style="width:120px; height: 120px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); top: -40px; right: -20px;"></div>
+                    <div class="card-body p-4 text-white position-relative">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="icon-glass">
+                                <span class="material-symbols-outlined fs-2">badge</span>
+                            </div>
+                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1 fw-bold">Providers</span>
+                        </div>
+                        <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Active Providers</h5>
+                        <h2 class="display-6 text-white fw-bold mb-0"><?= number_format($stats['active_providers'] ?? 0) ?></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-3">
+                <div class="card border-0 p-0 rounded-4xl stat-card shadow-lg h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                    <div class="position-absolute shadow-lg" style="width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 20px; bottom: 10px; right: -20px; transform: rotate(30deg);"></div>
                     <div class="card-body p-4 text-white position-relative">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <div class="icon-glass">
                                 <span class="material-symbols-outlined fs-2">favorite</span>
                             </div>
-                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1  fw-bold">Hot</span>
+                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1 fw-bold">Hot</span>
                         </div>
                         <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Total Interactions</h5>
                         <h2 class="display-6 text-white fw-bold mb-0">
@@ -118,22 +136,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="col-sm-6 col-lg-3">
-                <div class="card border-0 p-0 rounded-4xl stat-card shadow-lg h-100 position-relative overflow-hidden" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
-                    <div class="position-absolute shadow-lg" style="width: 80px; height: 80px; background: rgba(255,255,255,0.05); border-radius: 20px; bottom: 10px; right: -20px; transform: rotate(30deg);"></div>
-                    <div class="card-body p-4 text-white position-relative">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="icon-glass">
-                                <span class="material-symbols-outlined fs-2">query_stats</span>
-                            </div>
-                            <span class="badge bg-white/20 text-white rounded-pill px-3 py-1  fw-bold">Live</span>
-                        </div>
-                        <h5 class="text-white small fw-bold text-uppercase tracking-wider mb-2">Engagement Rate</h5>
-                        <h2 class="display-6 text-white fw-bold mb-0"><?= $stats['reporting_rate'] ?? '0.0%' ?></h2>
-                    </div>
-                </div>
-            </div>
         </div>
         <form action="<?= base_url('community/posts') ?>" method="GET" class="mb-4 px-1">
             <input type="hidden" name="status" value="<?= $status ?>">
@@ -141,7 +143,7 @@
                 <!-- Search Input Group -->
                 <div class="flex-grow-1 position-relative d-none d-md-block">
                     <span class="material-symbols-outlined position-absolute top-50 translate-middle-y ms-4 text-muted" style="z-index: 5;">search</span>
-                    <input type="text" name="search" class="form-control border-0 bg-light rounded-pill ps-5 py-3 fw-medium" placeholder="Search posts, topics..." value="<?= esc($request->getVar('search')) ?>" style="padding-left: 3.5rem !important;">
+                    <input type="text" name="search" class="form-control border-0 bg-light rounded-pill ps-5 py-3 fw-medium" placeholder="Search posts, authors, topics..." value="<?= esc($request->getVar('search')) ?>" style="padding-left: 3.5rem !important;">
                 </div>
 
                 <!-- Channel Select -->
@@ -173,30 +175,51 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="bg-primary rounded-pill shadow-sm" style="width: 5px; height: 32px; opacity: 0.8;"></div>
                 <h4 class="fw-bold text-dark mb-0">
-                    <?= ($status == 'admin') ? 'Official Admin Contributions' : (($status == 'questions') ? 'Community Questions' : 'Community User Activity') ?>
+                    <?php
+                    if ($status == 'admin') echo 'Official Admin Contributions';
+                    elseif ($status == 'provider') echo 'Service Provider Community Feed';
+                    elseif ($status == 'user' || $status == 'client') echo 'Pet Parent / Client Community Feed';
+                    elseif ($status == 'questions') echo 'Community Questions & Advice';
+                    elseif ($status == 'scheduled') echo 'Scheduled Posts Queue';
+                    else echo 'Community Activity Feed';
+                    ?>
                 </h4>
                 <div class="ms-2 badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-black shadow-sm" style="font-size: 0.75rem;">
                     <?= number_format(count($posts)) ?> Posts Total
                 </div>
             </div>
             <div class="d-none d-md-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm">
-                <span class="material-symbols-outlined text-primary fs-5">verified_user</span>
+                <span class="material-symbols-outlined text-primary fs-5">
+                    <?= ($status == 'admin') ? 'shield_person' : (($status == 'provider') ? 'badge' : 'pets') ?>
+                </span>
                 <small class="text-muted fw-bold text-uppercase tracking-wider" style="font-size: 0.65rem; letter-spacing: 0.1em;">
-                    <?= $status == 'admin' ? 'Verified Staff Feed' : 'General Community Feed' ?>
+                    <?= ($status == 'admin') ? 'Verified Staff Feed' : (($status == 'provider') ? 'Verified Provider Feed' : 'Client Community Feed') ?>
                 </small>
             </div>
         </div>
 
         <div class="row g-3">
             <?php foreach ($posts as $post): ?>
+                <?php
+                $avatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($post['name'] ?? 'User') . '&background=random';
+                if (!empty($post['profile'])) {
+                    if (($post['user_type'] ?? '') == 'provider') {
+                        $avatarUrl = 'https://beta.petsfolio.in/public/uploads/providers/' . $post['profile'];
+                    } elseif (($post['user_type'] ?? '') == 'admin') {
+                        $avatarUrl = base_url('public/uploads/employees/' . $post['profile']);
+                    } else {
+                        $avatarUrl = 'https://beta.petsfolio.in/public/uploads/users/' . $post['profile'];
+                    }
+                }
+                ?>
                 <div class="col-12">
-                    <div class="card border-0 rounded-4xl shadow-sm  overflow-hidden bg-white mb-0">
+                    <div class="card border-0 rounded-4xl shadow-sm overflow-hidden bg-white mb-0">
                         <div class="card-body p-3">
                             <div class="d-flex gap-4">
                                 <!-- User Avatar Column -->
                                 <div class="d-none d-sm-block">
                                     <div class="position-relative">
-                                        <img src="https://i.pravatar.cc/100?u=<?= $post['user_id'] ?>" class="rounded-circle shadow-sm border border-4 border-light" width="80" height="80" style="object-fit: cover;">
+                                        <img src="<?= $avatarUrl ?>" class="rounded-circle shadow-sm border border-4 border-light" width="80" height="80" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($post['name'] ?? 'User') ?>&background=random'">
                                         <div class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 18px; height: 18px;"></div>
                                     </div>
                                 </div>
@@ -206,20 +229,33 @@
                                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-2">
                                         <div class="d-flex align-items-center gap-3">
                                             <!-- Mobile Avatar -->
-                                            <img src="https://i.pravatar.cc/100?u=<?= $post['user_id'] ?>" class="d-sm-none rounded-circle border border-2 border-light" width="48" height="48">
+                                            <img src="<?= $avatarUrl ?>" class="d-sm-none rounded-circle border border-2 border-light" width="48" height="48" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($post['name'] ?? 'User') ?>&background=random'">
                                             <div>
                                                 <div class="d-flex align-items-center gap-2 flex-wrap">
                                                     <h5 class="fw-bold text-dark mb-0"><?= esc($post['name']) ?></h5>
-                                                    <div class="status-pill px-3 py-1 rounded-pill d-flex align-items-center gap-1.5" style="background: <?= ($post['user_type'] ?? '') == 'admin' ? 'rgba(255, 59, 48, 0.08)' : (($post['user_type'] ?? '') == 'provider' ? 'rgba(0, 122, 255, 0.08)' : 'rgba(52, 199, 89, 0.08)') ?>; border: 1px solid <?= ($post['user_type'] ?? '') == 'admin' ? 'rgba(255, 59, 48, 0.15)' : (($post['user_type'] ?? '') == 'provider' ? 'rgba(0, 122, 255, 0.15)' : 'rgba(52, 199, 89, 0.15)') ?>;">
-                                                        <div class="w-1.5 h-1.5 rounded-full <?= ($post['user_type'] ?? '') == 'admin' ? 'bg-[#ff3b30]' : (($post['user_type'] ?? '') == 'provider' ? 'bg-[#007aff]' : 'bg-[#34c759]') ?>"></div>
-                                                        <span class="text-[10px] uppercase font-black tracking-wider" style="color: <?= ($post['user_type'] ?? '') == 'admin' ? '#ff3b30' : (($post['user_type'] ?? '') == 'provider' ? '#007aff' : '#34c759') ?>;">
-                                                            <?= ($post['user_type'] ?? '') == 'admin' ? 'Admin' : (($post['user_type'] ?? '') == 'provider' ? 'Provider' : 'Client') ?>
+                                                    <?php if (($post['user_type'] ?? '') == 'admin'): ?>
+                                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.65rem; font-weight: 800;">
+                                                            <span class="material-symbols-outlined fs-6" style="font-size: 13px;">shield_person</span> ADMIN
                                                         </span>
-                                                    </div>
+                                                    <?php elseif (($post['user_type'] ?? '') == 'provider'): ?>
+                                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.65rem; font-weight: 800;">
+                                                            <span class="material-symbols-outlined fs-6" style="font-size: 13px;">badge</span> PROVIDER
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.65rem; font-weight: 800;">
+                                                            <span class="material-symbols-outlined fs-6" style="font-size: 13px;">pets</span> CLIENT
+                                                        </span>
+                                                    <?php endif; ?>
+
+                                                    <?php if (!empty($post['channel_name'])): ?>
+                                                        <span class="badge bg-light text-muted border rounded-pill px-2 py-0.5" style="font-size: 0.65rem; font-weight: 600;">
+                                                            #<?= esc($post['channel_name']) ?>
+                                                        </span>
+                                                    <?php endif; ?>
                                                 </div>
-                                                <small class="text-black  d-flex align-items-center gap-1 mt-2 fw-medium">
+                                                <small class="text-muted d-flex align-items-center gap-1 mt-1 fw-medium">
                                                     <span class="material-symbols-outlined fs-6">schedule</span>
-                                                    Post at: <?= date('M d, Y', strtotime($post['created_at'])) ?>
+                                                    Posted: <?= date('M d, Y • h:i A', strtotime($post['created_at'])) ?>
                                                 </small>
                                             </div>
                                         </div>
@@ -239,7 +275,7 @@
                                     <div class="d-flex flex-column flex-md-row gap-4">
                                         <div class="flex-grow-1">
                                             <p class="text-dark fs-6 lh-base mb-0" style="opacity: 0.85; font-weight: 500;">
-                                                <?= (strlen($post['post_text']) > 450) ? substr($post['post_text'], 0, 450) . '...' : $post['post_text'] ?>
+                                                <?= (strlen($post['post_text'] ?? '') > 450) ? substr($post['post_text'], 0, 450) . '...' : ($post['post_text'] ?? '') ?>
                                             </p>
                                             <div class="d-flex align-items-center justify-content-between pt-2 border-light">
                                                 <div class="d-flex align-items-center gap-4">
@@ -300,8 +336,6 @@
                                             </div>
                                         <?php endif; ?>
                                     </div>
-
-
                                 </div>
                             </div>
                         </div>
@@ -311,20 +345,41 @@
         </div>
 
         <div class="mt-5">
-            <h4 class="fw-bold mb-3">Last Hour User Posts</h4>
+            <h4 class="fw-bold mb-3">Last Hour Activity</h4>
             <div class="row g-3">
                 <?php if (!empty($lastHourPosts)): ?>
                     <?php foreach ($lastHourPosts as $post): ?>
+                        <?php
+                        $hourAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($post['name'] ?? 'User') . '&background=random';
+                        if (!empty($post['profile'])) {
+                            if (($post['user_type'] ?? '') == 'provider') {
+                                $hourAvatar = 'https://beta.petsfolio.in/public/uploads/providers/' . $post['profile'];
+                            } elseif (($post['user_type'] ?? '') == 'admin') {
+                                $hourAvatar = base_url('public/uploads/employees/' . $post['profile']);
+                            } else {
+                                $hourAvatar = 'https://beta.petsfolio.in/public/uploads/users/' . $post['profile'];
+                            }
+                        }
+                        ?>
                         <div class="col-12">
                             <div class="bg-white rounded-3xl p-3 shadow-sm border">
-                                <div class="d-flex gap-3">
-                                    <img src="https://i.pravatar.cc/40?u=<?= $post['user_id'] ?>" class="rounded-circle" width="40" height="40">
+                                <div class="d-flex gap-3 align-items-center">
+                                    <img src="<?= $hourAvatar ?>" class="rounded-circle" width="40" height="40" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($post['name'] ?? 'User') ?>&background=random'">
                                     <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between">
-                                            <strong><?= esc($post['name']) ?></strong>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <strong><?= esc($post['name']) ?></strong>
+                                                <?php if (($post['user_type'] ?? '') == 'admin'): ?>
+                                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">ADMIN</span>
+                                                <?php elseif (($post['user_type'] ?? '') == 'provider'): ?>
+                                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">PROVIDER</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5" style="font-size: 0.6rem; font-weight: 800;">CLIENT</span>
+                                                <?php endif; ?>
+                                            </div>
                                             <small class="text-muted"><?= date('h:i A', strtotime($post['created_at'])) ?></small>
                                         </div>
-                                        <p class="text-muted small mb-0"><?= esc(substr($post['post_text'], 0, 100)) ?>...</p>
+                                        <p class="text-muted small mb-0"><?= esc(substr($post['post_text'] ?? '', 0, 100)) ?>...</p>
                                     </div>
                                 </div>
                             </div>

@@ -1,0 +1,782 @@
+/* ==========================================================================
+   PETSFOLIO UNIVERSAL DARK MODE ENGINE & OVERRIDES
+   Ensures seamless Dark & Light theme application across ALL screens, 
+   popups, modals, tables, inputs, widgets, dialogs, and dynamic DOM elements.
+   ========================================================================== */
+
+:root {
+  --pf-transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Base Transition */
+body, .sidebar-container, nav.navbar.iq-navbar, .card, .modal-content, .popup-content, .dropdown-menu, .form-control, .form-select, input, select, textarea {
+  transition: var(--pf-transition);
+}
+
+/* ==========================================================================
+   1. MAIN ROOT, LAYOUT & CONTAINER THEME
+   ========================================================================== */
+html.dark,
+html.dark body,
+body.dark,
+[data-bs-theme="dark"],
+.dark {
+  color-scheme: dark;
+  background-color: #0b111e !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark main,
+html.dark .main-content,
+html.dark #page_layout,
+html.dark .content-inner,
+html.dark .wrapper,
+html.dark .page-content,
+html.dark section {
+  background-color: #0b111e !important;
+  color: #cbd5e1 !important;
+}
+
+/* ==========================================================================
+   2. TYPOGRAPHY & TEXT OVERRIDES
+   ========================================================================== */
+html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6,
+html.dark .h1, html.dark .h2, html.dark .h3, html.dark .h4, html.dark .h5, html.dark .h6,
+body.dark h1, body.dark h2, body.dark h3, body.dark h4, body.dark h5, body.dark h6 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-dark,
+html.dark .text-black,
+html.dark .text-body,
+body.dark .text-dark,
+body.dark .text-black {
+  color: #f8fafc !important;
+}
+
+html.dark .text-muted,
+body.dark .text-muted {
+  color: #94a3b8 !important;
+}
+
+html.dark .text-secondary,
+body.dark .text-secondary {
+  color: #cbd5e1 !important;
+}
+
+html.dark label,
+html.dark .form-label,
+body.dark label,
+body.dark .form-label {
+  color: #cbd5e1 !important;
+}
+
+/* Override hardcoded inline light backgrounds & dark text across any view */
+html.dark [style*="background: white"],
+html.dark [style*="background:white"],
+html.dark [style*="background: #fff"],
+html.dark [style*="background:#fff"],
+html.dark [style*="background: #ffffff"],
+html.dark [style*="background:#ffffff"],
+html.dark [style*="background-color: white"],
+html.dark [style*="background-color:white"],
+html.dark [style*="background-color: #fff"],
+html.dark [style*="background-color:#fff"],
+html.dark [style*="background-color: #ffffff"],
+html.dark [style*="background-color:#ffffff"],
+html.dark [style*="background: rgb(255, 255, 255)"],
+html.dark [style*="background-color: rgb(255, 255, 255)"] {
+  background: #141c2e !important;
+  background-color: #141c2e !important;
+}
+
+html.dark [style*="background: #f8f9fa"],
+html.dark [style*="background-color: #f8f9fa"],
+html.dark [style*="background: #f9fafb"],
+html.dark [style*="background-color: #f9fafb"],
+html.dark [style*="background: #f1f5f9"],
+html.dark [style*="background-color: #f1f5f9"],
+html.dark [style*="background: #f3f4f6"],
+html.dark [style*="background-color: #f3f4f6"] {
+  background: #182234 !important;
+  background-color: #182234 !important;
+}
+
+html.dark [style*="color: black"],
+html.dark [style*="color:black"],
+html.dark [style*="color: #000"],
+html.dark [style*="color:#000"],
+html.dark [style*="color: #000000"],
+html.dark [style*="color:#000000"],
+html.dark [style*="color: #111827"],
+html.dark [style*="color: #1e293b"],
+html.dark [style*="color: #374151"],
+html.dark [style*="color: #333333"],
+html.dark [style*="color: #333"] {
+  color: #f8fafc !important;
+}
+
+/* ==========================================================================
+   3. CARDS, PANELS & CONTAINERS
+   ========================================================================== */
+html.dark .card,
+html.dark .card-body,
+html.dark .card-header,
+html.dark .card-footer,
+html.dark .glass-card,
+html.dark .stat-card-hover,
+html.dark .auth-card,
+html.dark .iq-single-card {
+  background-color: #141c2e !important;
+  border-color: #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .card-header {
+  border-bottom: 1px solid #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .card-footer {
+  background-color: #101726 !important;
+  border-top: 1px solid #26354d !important;
+}
+
+html.dark .bg-white {
+  background-color: #141c2e !important;
+}
+
+html.dark .bg-light {
+  background-color: #182234 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .border,
+html.dark .border-bottom,
+html.dark .border-top,
+html.dark .border-start,
+html.dark .border-end {
+  border-color: #26354d !important;
+}
+
+/* ==========================================================================
+   4. ALL MODALS, POPUPS & OVERLAYS (UNIVERSAL)
+   ========================================================================== */
+
+/* Bootstrap Modals & Custom View Modals */
+html.dark .modal,
+html.dark .modal-dialog,
+html.dark .modal-content,
+html.dark div[id*="Modal"] .modal-content,
+html.dark div[id*="modal"] .modal-content,
+html.dark div[class*="modal"] .modal-content,
+html.dark #channelModal .modal-content,
+html.dark #uploadRecordingModal .modal-content,
+html.dark #addTutorialModal .modal-content,
+html.dark #nearbyProvidersModal .modal-content,
+html.dark #bookingDetailsModal .modal-content,
+html.dark #providersModal .modal-content,
+html.dark #reasonModal .modal-content,
+html.dark #editUserModal .modal-content,
+html.dark #assignProviderModal .modal-content,
+html.dark #trackingDetailsModal .modal-content,
+html.dark .srv_dtls .modal-content,
+html.dark .in_prgs .modal-content {
+  background-color: #141c2e !important;
+  background: #141c2e !important;
+  border: 1px solid #26354d !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75) !important;
+}
+
+html.dark .modal-header,
+html.dark div[id*="Modal"] .modal-header,
+html.dark div[class*="modal"] .modal-header,
+html.dark .srv_dtls .modal-header {
+  background-color: #141c2e !important;
+  border-bottom: 1px solid #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .modal-body,
+html.dark div[id*="Modal"] .modal-body,
+html.dark div[class*="modal"] .modal-body,
+html.dark .srv_dtls .modal-body {
+  background-color: #141c2e !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .modal-body.bg-light,
+html.dark .modal-body .bg-light,
+html.dark .modal-body .card {
+  background-color: #182234 !important;
+  border-color: #26354d !important;
+}
+
+html.dark .modal-footer,
+html.dark div[id*="Modal"] .modal-footer,
+html.dark div[class*="modal"] .modal-footer,
+html.dark .srv_dtls .modal-footer {
+  background-color: #101726 !important;
+  border-top: 1px solid #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .modal-title,
+html.dark .modal-header h1,
+html.dark .modal-header h2,
+html.dark .modal-header h3,
+html.dark .modal-header h4,
+html.dark .modal-header h5,
+html.dark .modal-header h6 {
+  color: #f8fafc !important;
+}
+
+/* Custom Petsfolio Popups (.popup, .addpopup, #popup, #addpopup) */
+html.dark .popup,
+html.dark .addpopup,
+html.dark div[id*="popup"],
+html.dark div[class*="popup"] {
+  background: rgba(0, 0, 0, 0.75) !important;
+}
+
+html.dark .popup-content,
+html.dark .addpopup .popup-content,
+html.dark div[id*="popup"] .popup-content,
+html.dark div[class*="popup"] .popup-content {
+  background-color: #141c2e !important;
+  background: #141c2e !important;
+  border: 1px solid #26354d !important;
+  color: #cbd5e1 !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8) !important;
+}
+
+html.dark .popup-header {
+  background-color: #141c2e !important;
+  border-bottom: 1px solid #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .popup-body {
+  background-color: #141c2e !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .popup-footer {
+  background-color: #101726 !important;
+  border-top: 1px solid #26354d !important;
+}
+
+html.dark .popup-content h1,
+html.dark .popup-content h2,
+html.dark .popup-content h3,
+html.dark .popup-content h4,
+html.dark .popup-content h5 {
+  color: #f8fafc !important;
+}
+
+html.dark .popup-content input,
+html.dark .popup-content select,
+html.dark .popup-content textarea {
+  background-color: #162032 !important;
+  border: 1px solid #26354d !important;
+  color: #f8fafc !important;
+}
+
+/* SweetAlert2 Dialogs & Popups */
+html.dark .swal2-container.swal2-backdrop-show,
+html.dark .swal2-container.swal2-noanimation {
+  background: rgba(0, 0, 0, 0.75) !important;
+}
+
+html.dark .swal2-popup,
+html.dark .swal2-modal {
+  background: #141c2e !important;
+  background-color: #141c2e !important;
+  color: #f8fafc !important;
+  border: 1px solid #26354d !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+}
+
+html.dark .swal2-title {
+  color: #f8fafc !important;
+}
+
+html.dark .swal2-html-container,
+html.dark .swal2-content {
+  color: #cbd5e1 !important;
+}
+
+html.dark .swal2-input,
+html.dark .swal2-file,
+html.dark .swal2-textarea,
+html.dark .swal2-select,
+html.dark .swal2-radio,
+html.dark .swal2-checkbox {
+  background-color: #162032 !important;
+  border: 1px solid #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .swal2-validation-message {
+  background: #1f2b42 !important;
+  color: #f87171 !important;
+}
+
+html.dark .swal2-actions {
+  background-color: transparent !important;
+}
+
+/* Close buttons (Invert to white) */
+html.dark .btn-close,
+html.dark .close,
+html.dark .close-button,
+html.dark .close-icon {
+  filter: invert(1) grayscale(100%) brightness(200%) !important;
+  opacity: 0.85;
+}
+html.dark .btn-close:hover,
+html.dark .close:hover,
+html.dark .close-button:hover,
+html.dark .close-icon:hover {
+  opacity: 1;
+}
+
+/* jQuery UI Dialogs & Datepickers */
+html.dark .ui-dialog,
+html.dark .ui-widget-content {
+  background: #141c2e !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #26354d !important;
+}
+
+html.dark .ui-dialog-titlebar,
+html.dark .ui-widget-header {
+  background: #182234 !important;
+  color: #f8fafc !important;
+  border-bottom: 1px solid #26354d !important;
+}
+
+html.dark .ui-datepicker,
+html.dark .ui-datepicker-header,
+html.dark .datepicker-picker {
+  background: #141c2e !important;
+  color: #f8fafc !important;
+  border: 1px solid #26354d !important;
+}
+
+html.dark .ui-datepicker-calendar th,
+html.dark .ui-datepicker-calendar td,
+html.dark .ui-datepicker-calendar a,
+html.dark .ui-state-default {
+  background: #182234 !important;
+  color: #cbd5e1 !important;
+  border-color: #26354d !important;
+}
+
+html.dark .ui-state-active,
+html.dark .ui-state-highlight {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Offcanvas */
+html.dark .offcanvas {
+  background-color: #141c2e !important;
+  border-color: #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .offcanvas-header {
+  border-bottom: 1px solid #26354d !important;
+}
+
+/* Leaflet Map Popups */
+html.dark .leaflet-popup-content-wrapper,
+html.dark .custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background: #141c2e !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #26354d !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.dark .leaflet-popup-tip,
+html.dark .custom-leaflet-popup .leaflet-popup-tip {
+  background: #141c2e !important;
+  border: 1px solid #26354d !important;
+}
+
+/* ==========================================================================
+   5. TABLES & DATATABLES
+   ========================================================================== */
+html.dark table,
+html.dark .table {
+  color: #cbd5e1 !important;
+  border-color: #26354d !important;
+}
+
+html.dark .table > :not(caption) > * > * {
+  background-color: transparent !important;
+  border-bottom-color: #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .table-hover > tbody > tr:hover > * {
+  background-color: #182234 !important;
+  color: #ffffff !important;
+}
+
+html.dark .table thead,
+html.dark .table thead th,
+html.dark .table-light {
+  background-color: #101726 !important;
+  color: #94a3b8 !important;
+  border-bottom-color: #26354d !important;
+}
+
+html.dark .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(24, 34, 52, 0.45) !important;
+}
+
+html.dark .dataTables_wrapper select,
+html.dark .dataTables_wrapper input {
+  background-color: #162032 !important;
+  border-color: #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #cbd5e1 !important;
+}
+
+html.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+html.dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #1f2b42 !important;
+  color: #ffffff !important;
+  border-color: #26354d !important;
+}
+
+/* ==========================================================================
+   6. FORMS, INPUTS & SELECTS
+   ========================================================================== */
+html.dark .form-control,
+html.dark .form-select,
+html.dark input[type="text"],
+html.dark input[type="password"],
+html.dark input[type="email"],
+html.dark input[type="number"],
+html.dark input[type="tel"],
+html.dark input[type="search"],
+html.dark input[type="date"],
+html.dark select,
+html.dark textarea {
+  background-color: #162032 !important;
+  border-color: #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .form-control:focus,
+html.dark .form-select:focus,
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  background-color: #162032 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+}
+
+html.dark .form-control::placeholder,
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark .input-group-text {
+  background-color: #182234 !important;
+  border-color: #26354d !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .form-check-input {
+  background-color: #162032 !important;
+  border-color: #334155 !important;
+}
+
+html.dark .form-check-input:checked {
+  background-color: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* Select2 & Dropdowns */
+html.dark .dropdown-menu {
+  background-color: #141c2e !important;
+  border: 1px solid #26354d !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .dropdown-item {
+  color: #cbd5e1 !important;
+  border-bottom-color: #1e2c40 !important;
+}
+
+html.dark .dropdown-item:hover,
+html.dark .dropdown-item:focus {
+  background-color: #1f2b42 !important;
+  color: #ffffff !important;
+}
+
+html.dark .dropdown-divider {
+  border-top-color: #26354d !important;
+}
+
+html.dark .dropdown-header {
+  background-color: #101726 !important;
+  color: #94a3b8 !important;
+  border-bottom-color: #26354d !important;
+}
+
+html.dark .select2-dropdown {
+  background-color: #141c2e !important;
+  border: 1px solid #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .select2-container--default .select2-selection--single,
+html.dark .select2-container--default .select2-selection--multiple {
+  background-color: #162032 !important;
+  border-color: #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: #f8fafc !important;
+}
+
+html.dark .select2-container--default .select2-results__option {
+  color: #cbd5e1 !important;
+}
+
+html.dark .select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: #1f2b42 !important;
+  color: #60a5fa !important;
+}
+
+/* ==========================================================================
+   7. SIDEBAR & TOP NAVBAR
+   ========================================================================== */
+html.dark .sidebar-container {
+  background-color: #141c2e !important;
+  border-right: 1px solid #26354d !important;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.35) !important;
+}
+
+html.dark .sidebar-header {
+  background-color: #141c2e !important;
+  border-bottom: 1px solid #26354d !important;
+}
+
+html.dark .sidebar-footer {
+  background-color: #101726 !important;
+  border-top: 1px solid #26354d !important;
+}
+
+html.dark .user-name {
+  color: #f8fafc !important;
+}
+
+html.dark .user-role {
+  color: #94a3b8 !important;
+}
+
+html.dark .nav-section-title {
+  color: #64748b !important;
+}
+
+html.dark .nav-button {
+  color: #cbd5e1 !important;
+  background-color: transparent !important;
+}
+
+html.dark .nav-button:hover {
+  background-color: #1f2b42 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .nav-button.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+}
+
+html.dark .nav-icon {
+  color: #94a3b8 !important;
+}
+
+html.dark .sidebar-toggle {
+  background-color: #26354d !important;
+  border-color: #334155 !important;
+}
+
+html.dark .sidebar-toggle svg {
+  stroke: #cbd5e1 !important;
+}
+
+html.dark .iq-navbar,
+html.dark nav.navbar.iq-navbar {
+  background: rgba(20, 28, 46, 0.94) !important;
+  border-bottom: 1px solid #26354d !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+}
+
+html.dark .navbar-inner h3,
+html.dark .navbar-inner .text-dark,
+html.dark .navbar-nav .text-dark,
+html.dark .navbar-list .text-dark {
+  color: #f8fafc !important;
+}
+
+html.dark .theme-toggle-btn {
+  background: #182234 !important;
+  border-color: #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .theme-toggle-btn:hover {
+  background: #1f2b42 !important;
+  border-color: #3b82f6 !important;
+}
+
+/* ==========================================================================
+   8. BADGES, TABS, LISTS & SPECIALIZED COMPONENTS
+   ========================================================================== */
+html.dark .badge.bg-light {
+  background-color: #1f2b42 !important;
+  color: #cbd5e1 !important;
+  border-color: #26354d !important;
+}
+
+html.dark .bg-primary-subtle { background-color: rgba(59, 130, 246, 0.18) !important; color: #93c5fd !important; }
+html.dark .bg-danger-subtle { background-color: rgba(239, 68, 68, 0.18) !important; color: #fca5a5 !important; }
+html.dark .bg-warning-subtle { background-color: rgba(245, 158, 11, 0.18) !important; color: #fcd34d !important; }
+html.dark .bg-success-subtle { background-color: rgba(16, 185, 129, 0.18) !important; color: #6ee7b7 !important; }
+html.dark .bg-info-subtle { background-color: rgba(6, 182, 212, 0.18) !important; color: #67e8f9 !important; }
+
+html.dark .border-primary-subtle { border-color: rgba(59, 130, 246, 0.35) !important; }
+html.dark .border-danger-subtle { border-color: rgba(239, 68, 68, 0.35) !important; }
+html.dark .border-warning-subtle { border-color: rgba(245, 158, 11, 0.35) !important; }
+html.dark .border-success-subtle { border-color: rgba(16, 185, 129, 0.35) !important; }
+html.dark .border-info-subtle { border-color: rgba(6, 182, 212, 0.35) !important; }
+
+html.dark .btn-light {
+  background-color: #1f2b42 !important;
+  border-color: #26354d !important;
+  color: #f8fafc !important;
+}
+
+html.dark .btn-light:hover {
+  background-color: #2a3b59 !important;
+  color: #ffffff !important;
+}
+
+html.dark .btn-outline-secondary {
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .btn-outline-secondary:hover {
+  background-color: #1f2b42 !important;
+  color: #ffffff !important;
+}
+
+html.dark .nav-tabs {
+  border-bottom-color: #26354d !important;
+}
+
+html.dark .nav-tabs .nav-link {
+  color: #94a3b8 !important;
+}
+
+html.dark .nav-tabs .nav-link.active {
+  background-color: #141c2e !important;
+  color: #60a5fa !important;
+  border-color: #26354d #26354d #141c2e !important;
+}
+
+html.dark .nav-pills .nav-link {
+  color: #cbd5e1 !important;
+}
+
+html.dark .nav-pills .nav-link.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+html.dark .dashboard-tab {
+  color: #cbd5e1 !important;
+}
+
+html.dark .dashboard-tab:hover {
+  color: #60a5fa !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+}
+
+html.dark .dashboard-tab.active {
+  background-color: rgba(59, 130, 246, 0.25) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+}
+
+html.dark .chart-container-premium,
+html.dark .chart-container {
+  background-color: #141c2e !important;
+  border-color: #26354d !important;
+}
+
+html.dark .accordion-item {
+  background-color: #141c2e !important;
+  border-color: #26354d !important;
+}
+
+html.dark .accordion-button {
+  background-color: #182234 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .accordion-button:not(.collapsed) {
+  background-color: #1f2b42 !important;
+  color: #60a5fa !important;
+}
+
+html.dark .accordion-button::after {
+  filter: invert(1);
+}
+
+html.dark .list-group-item {
+  background-color: #141c2e !important;
+  border-color: #26354d !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark .list-group-item-action:hover {
+  background-color: #1f2b42 !important;
+  color: #ffffff !important;
+}
+
+html.dark .footer {
+  background-color: #101726 !important;
+  border-top: 1px solid #26354d !important;
+  color: #94a3b8 !important;
+}
+
+html.dark .footer a {
+  color: #60a5fa !important;
+}

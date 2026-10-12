@@ -53,21 +53,33 @@
       <div class="col-lg-8">
         <div class="glass-card mb-4 p-4 p-md-5">
           <div class="d-flex align-items-center justify-content-between mb-4">
+            <?php
+            $postAuthorAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($post['name'] ?? 'User') . '&background=random';
+            if (!empty($post['profile'])) {
+                if (($post['user_type'] ?? '') == 'provider') {
+                    $postAuthorAvatar = 'https://beta.petsfolio.in/public/uploads/providers/' . $post['profile'];
+                } elseif (($post['user_type'] ?? '') == 'admin') {
+                    $postAuthorAvatar = base_url('public/uploads/employees/' . $post['profile']);
+                } else {
+                    $postAuthorAvatar = 'https://beta.petsfolio.in/public/uploads/users/' . $post['profile'];
+                }
+            }
+            ?>
             <div class="author-badge">
-              <img src="<?= $post['profile'] ? ('https://beta.petsfolio.in/public/uploads/users/' . $post['profile']) : 'https://ui-avatars.com/api/?name=' . urlencode($post['name']) . '&background=random' ?>"
-                class="author-avatar" alt="<?= esc($post['name']) ?>">
+              <img src="<?= $postAuthorAvatar ?>"
+                class="author-avatar" alt="<?= esc($post['name']) ?>" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($post['name'] ?? 'User') ?>&background=random'">
               <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
                   <span class="fw-800 text-dark d-block leading-none"><?= esc($post['name']) ?></span>
-                  <?php if (($post['user_type'] ?? '') == 'admin' || ($post['user_type'] ?? '') == 3): ?>
-                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0 small" style="font-size: 0.65rem; font-weight: 800;">ADMIN</span>
-                  <?php elseif (($post['user_type'] ?? '') == 'provider' || ($post['user_type'] ?? '') == 2): ?>
-                    <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-0 small" style="font-size: 0.65rem; font-weight: 800;">PROVIDER</span>
+                  <?php if (($post['user_type'] ?? '') == 'admin' || ($post['user_type'] ?? '') == '3'): ?>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800;">ADMIN</span>
+                  <?php elseif (($post['user_type'] ?? '') == 'provider' || ($post['user_type'] ?? '') == '2'): ?>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800;">PROVIDER</span>
                   <?php else: ?>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0 small" style="font-size: 0.65rem; font-weight: 800;">CLIENT</span>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800;">CLIENT</span>
                   <?php endif; ?>
                 </div>
-                <small class="text-muted fw-bold">ID: #U-<?= $post['user_id'] ?></small>
+                <small class="text-muted fw-bold">ID: #<?= strtoupper(substr($post['user_type'] ?? 'U', 0, 1)) ?>-<?= $post['user_id'] ?></small>
               </div>
             </div>
             <div class="d-flex align-items-center gap-2">
@@ -143,10 +155,22 @@
           <div class="comments-container">
             <?php if (!empty($comments)): ?>
               <?php foreach ($comments as $comment): ?>
+                <?php
+                $commentAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($comment['name'] ?? 'User') . '&background=random';
+                if (!empty($comment['profile'])) {
+                    if (($comment['user_type'] ?? '') == 'provider') {
+                        $commentAvatar = 'https://beta.petsfolio.in/public/uploads/providers/' . $comment['profile'];
+                    } elseif (($comment['user_type'] ?? '') == 'admin') {
+                        $commentAvatar = base_url('public/uploads/employees/' . $comment['profile']);
+                    } else {
+                        $commentAvatar = 'https://beta.petsfolio.in/public/uploads/users/' . $comment['profile'];
+                    }
+                }
+                ?>
                 <div class="comment-card shadow-sm mb-3">
                   <div class="d-flex gap-3">
-                    <img src="<?= $comment['profile'] ? ('https://beta.petsfolio.in/public/uploads/users/' . $comment['profile']) : 'https://ui-avatars.com/api/?name=' . urlencode($comment['name']) . '&background=random' ?>"
-                      class="rounded-circle" width="42" height="42" style="object-fit: cover;">
+                    <img src="<?= $commentAvatar ?>"
+                      class="rounded-circle" width="42" height="42" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($comment['name'] ?? 'User') ?>&background=random'">
                     <div class="flex-grow-1">
                       <div class="d-flex align-items-center justify-content-between mb-1">
                         <span class="fw-800 text-dark"><?= esc($comment['name']) ?></span>
@@ -156,12 +180,12 @@
                         <?= esc($comment['comment']) ?>
                       </p>
                       <div class="d-flex gap-2 mt-1">
-                        <?php if (($comment['user_type'] ?? '') == 3): ?>
-                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Admin</span>
-                        <?php elseif (($comment['user_type'] ?? '') == 2): ?>
-                          <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-2 py-1 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Provider</span>
+                        <?php if (($comment['user_type'] ?? '') == 'admin' || ($comment['user_type'] ?? '') == '3'): ?>
+                          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Admin</span>
+                        <?php elseif (($comment['user_type'] ?? '') == 'provider' || ($comment['user_type'] ?? '') == '2'): ?>
+                          <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Provider</span>
                         <?php else: ?>
-                          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Client</span>
+                          <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0.5 small" style="font-size: 0.65rem; font-weight: 800; text-transform: uppercase;">Client</span>
                         <?php endif; ?>
                       </div>
                       <div class="d-flex align-items-center gap-4 mt-3">
@@ -196,13 +220,34 @@
                       <?php if (!empty($comment['replies'])): ?>
                         <div class="ms-5 mt-4 border-start ps-4">
                           <?php foreach ($comment['replies'] as $reply): ?>
+                            <?php
+                            $replyAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($reply['name'] ?? 'User') . '&background=random';
+                            if (!empty($reply['profile'])) {
+                                if (($reply['user_type'] ?? '') == 'provider') {
+                                    $replyAvatar = 'https://beta.petsfolio.in/public/uploads/providers/' . $reply['profile'];
+                                } elseif (($reply['user_type'] ?? '') == 'admin') {
+                                    $replyAvatar = base_url('public/uploads/employees/' . $reply['profile']);
+                                } else {
+                                    $replyAvatar = 'https://beta.petsfolio.in/public/uploads/users/' . $reply['profile'];
+                                }
+                            }
+                            ?>
                             <div class="mb-4">
                               <div class="d-flex gap-3">
-                                <img src="<?= $reply['profile'] ? ('https://beta.petsfolio.in/public/uploads/users/' . $reply['profile']) : 'https://ui-avatars.com/api/?name=' . urlencode($reply['name']) . '&background=random' ?>"
-                                  class="rounded-circle" width="32" height="32" style="object-fit: cover;">
+                                <img src="<?= $replyAvatar ?>"
+                                  class="rounded-circle" width="32" height="32" style="object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<?= urlencode($reply['name'] ?? 'User') ?>&background=random'">
                                 <div class="flex-grow-1">
                                   <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="fw-800 text-dark small"><?= esc($reply['name']) ?></span>
+                                    <div class="d-flex align-items-center gap-2">
+                                      <span class="fw-800 text-dark small"><?= esc($reply['name']) ?></span>
+                                      <?php if (($reply['user_type'] ?? '') == 'admin' || ($reply['user_type'] ?? '') == '3'): ?>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">ADMIN</span>
+                                      <?php elseif (($reply['user_type'] ?? '') == 'provider' || ($reply['user_type'] ?? '') == '2'): ?>
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">PROVIDER</span>
+                                      <?php else: ?>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-1.5 py-0" style="font-size: 0.6rem; font-weight: 800;">CLIENT</span>
+                                      <?php endif; ?>
+                                    </div>
                                     <small class="text-muted fw-bold" style="font-size: 0.7rem;"><?= date('M d, Y', strtotime($reply['created_at'])) ?></small>
                                   </div>
                                   <p class="text-secondary fw-semibold mb-1" style="font-size: 0.9rem;">
